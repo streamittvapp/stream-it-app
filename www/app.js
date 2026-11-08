@@ -3106,7 +3106,9 @@
         continueSec.classList.remove('hidden');
         var cwTitle = continueSec.querySelector('.row-title');
         if (cwTitle) cwTitle.textContent = 'המשך צפייה עבור ' + (activeProfile ? activeProfile.name : 'פרופיל ראשי');
-        continueRow.innerHTML = cwItems.map(renderPosterCardHtml).join('');
+        continueRow.innerHTML = cwItems.map(function (cwItem) {
+          return renderPosterCardHtml(cwItem, { isContinueWatching: true });
+        }).join('');
         bindPosterCardEvents(continueRow);
       } else {
         continueSec.classList.add('hidden');
@@ -3621,7 +3623,46 @@
     }
   }
 
-  function renderPosterCardHtml(item) {
+  function isInContinueWatching(itemId) {
+    if (!itemId) return false;
+    var profBucket = ensureActiveProfileBucket();
+    return Boolean(profBucket && profBucket.progress && profBucket.progress[itemId]);
+  }
+
+  function removeFromContinueWatching(itemId) {
+    if (!itemId) return;
+    var profBucket = ensureActiveProfileBucket();
+    if (profBucket && profBucket.progress && profBucket.progress[itemId]) {
+      delete profBucket.progress[itemId];
+    }
+    var prefix = String(itemId) + '_s';
+    var pKeys = Object.keys((profBucket && profBucket.progress) || {});
+    for (var k = 0; k < pKeys.length; k++) {
+      if (pKeys[k].indexOf(prefix) === 0) {
+        delete profBucket.progress[pKeys[k]];
+      }
+    }
+    saveSubUsersState();
+    renderCatalogShelves();
+    var remBtn = document.getElementById('detailsRemoveCwBtn');
+    if (remBtn && state.detailsItem && String(state.detailsItem.id) === String(itemId)) {
+      remBtn.classList.add('hidden');
+    }
+  }
+
+  function clearAllContinueWatching() {
+    var profBucket = ensureActiveProfileBucket();
+    if (profBucket) {
+      profBucket.progress = {};
+      saveSubUsersState();
+      renderCatalogShelves();
+    }
+    var remBtn = document.getElementById('detailsRemoveCwBtn');
+    if (remBtn) remBtn.classList.add('hidden');
+  }
+
+  function renderPosterCardHtml(item, opts) {
+    var isCwCard = Boolean(opts && opts.isContinueWatching);
     if (item && item.type === 'channel') {
       var chNum = item.channelNumber || (String(item.id || '').match(/\d+/) ? String(item.id || '').match(/\d+/)[0] : 'LIVE');
       var logoTxt = item.logoText || String(item.title || 'LIVE').split('—')[0].trim().slice(0, 14);
@@ -3668,11 +3709,23 @@
         '</div>';
     }
 
+    var cwControlsHtml = '';
+    if (isCwCard) {
+      cwControlsHtml =
+        '<button type="button" class="cw-card-remove-btn tv-focusable" data-remove-cw-id="' + escapeHtml(item.id) + '" title="הסר מהמשך צפייה" aria-label="הסר מהמשך צפייה">' +
+          '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>' +
+        '</button>' +
+        '<button type="button" class="cw-card-info-btn tv-focusable" data-info-cw-id="' + escapeHtml(item.id) + '" title="פרטים ופרקים" aria-label="פרטים ופרקים">' +
+          '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>' +
+        '</button>';
+    }
+
     return (
-      '<article class="poster-card tv-focusable" tabindex="0" role="button" ' +
+      '<article class="poster-card' + (isCwCard ? ' cw-poster-card' : '') + ' tv-focusable" tabindex="0" role="button" ' +
         'data-item-id="' + escapeHtml(item.id) + '" ' +
         'aria-label="' + escapeHtml(item.title) + '">' +
         '<img class="poster-img" src="' + escapeHtml(item.poster) + '" alt="' + escapeHtml(item.title) + '" decoding="async" onerror="this.onerror=null;this.src=\'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&auto=format&fit=crop&q=80\';" />' +
+        cwControlsHtml +
         '<div class="poster-hover-overlay">' +
           '<span class="poster-hover-title">' + escapeHtml(item.title) + '</span>' +
         '</div>' +
@@ -3682,6 +3735,26 @@
   }
 
   function bindPosterCardEvents(root) {
+    var remBtns = root.querySelectorAll('[data-remove-cw-id]');
+    for (var r = 0; r < remBtns.length; r++) {
+      remBtns[r].addEventListener('click', function (ev) {
+        ev.stopPropagation();
+        ev.preventDefault();
+        var remId = this.getAttribute('data-remove-cw-id');
+        if (remId) removeFromContinueWatching(remId);
+      });
+    }
+    var infoBtns = root.querySelectorAll('[data-info-cw-id]');
+    for (var inf = 0; inf < infoBtns.length; inf++) {
+      infoBtns[inf].addEventListener('click', function (ev) {
+        ev.stopPropagation();
+        ev.preventDefault();
+        var infId = this.getAttribute('data-info-cw-id');
+        var foundIt = findItemById(infId);
+        if (foundIt) openDetailsModal(foundIt);
+      });
+    }
+
     var cards = root.querySelectorAll('.poster-card');
     var isContinueRow = Boolean(root && (root.id === 'continueWatchingRow' || (root.closest && root.closest('#continueWatchingSection'))));
     for (var i = 0; i < cards.length; i++) {
@@ -3756,6 +3829,11 @@
     if (wlBtn) {
       var inWl = isInWatchlist(item.id);
       wlBtn.innerHTML = (inWl ? getSvgIcon('check') : getSvgIcon('plus')) + '<span>' + (inWl ? 'ברשימה שלי' : 'הרשימה שלי') + '</span>';
+    }
+
+    var remCwBtn = document.getElementById('detailsRemoveCwBtn');
+    if (remCwBtn) {
+      remCwBtn.classList.toggle('hidden', !isInContinueWatching(item.id));
     }
 
     closeDetailsSourcesDropdown();
@@ -5611,6 +5689,75 @@
     }
   }
 
+  function closeUserSettingsDropdown() {
+    var panel = document.getElementById('userSettingsDropdownPanel');
+    var btn = document.getElementById('userSettingsMenuBtn');
+    if (panel) panel.classList.add('hidden');
+    if (btn) {
+      btn.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  function renderUserSettingsQuickProfiles() {
+    var quickRow = document.getElementById('userMenuProfilesQuickRow');
+    var avatarCircle = document.getElementById('userMenuAvatarCircle');
+    var activeNameEl = document.getElementById('userMenuActiveProfileName');
+    var emailEl = document.getElementById('userMenuAccountEmail');
+    var headerBadge = document.getElementById('headerUserAvatarBadge');
+
+    var activeProf = getActiveSubUser();
+    var profName = activeProf ? activeProf.name : (state.user && state.user.name ? state.user.name : 'פרופיל ראשי');
+    var profColor = (activeProf && activeProf.color) ? activeProf.color : '#E50914';
+    var profInitial = (profName || 'S').trim().charAt(0);
+
+    if (avatarCircle) {
+      avatarCircle.textContent = profInitial;
+      avatarCircle.style.background = profColor;
+    }
+    if (headerBadge) {
+      headerBadge.style.background = profColor;
+      headerBadge.innerHTML = '<span>' + escapeHtml(profInitial) + '</span>';
+    }
+    if (activeNameEl) {
+      activeNameEl.textContent = 'פרופיל פעיל: ' + profName;
+    }
+    if (emailEl) {
+      emailEl.textContent = (state.user && (state.user.email || state.user.name))
+        ? (state.user.email || state.user.name)
+        : 'STREAM IT VIP';
+    }
+
+    if (!quickRow) return;
+    var chipsHtml = '';
+    for (var i = 0; i < state.subUsers.length; i++) {
+      var su = state.subUsers[i];
+      var isAct = su.id === state.activeSubUserId;
+      chipsHtml +=
+        '<button type="button" class="user-menu-prof-chip tv-focusable' + (isAct ? ' active' : '') + '" data-quick-subuser="' + escapeHtml(su.id) + '" aria-label="החלף לפרופיל ' + escapeHtml(su.name) + '">' +
+          '<span class="user-menu-prof-dot" style="background:' + escapeHtml(su.color || '#E50914') + '"></span>' +
+          '<span>' + escapeHtml(su.name) + '</span>' +
+        '</button>';
+    }
+    quickRow.innerHTML = chipsHtml;
+
+    var chipBtns = quickRow.querySelectorAll('[data-quick-subuser]');
+    for (var c = 0; c < chipBtns.length; c++) {
+      chipBtns[c].addEventListener('click', function (ev) {
+        ev.stopPropagation();
+        var pid = this.getAttribute('data-quick-subuser');
+        if (!pid) return;
+        state.activeSubUserId = pid;
+        ensureActiveProfileBucket();
+        saveSubUsersState();
+        updateAuthUi();
+        renderGenreFilterStrip();
+        renderInitialStage();
+        closeUserSettingsDropdown();
+      });
+    }
+  }
+
   function updateAuthUi() {
     var label = document.getElementById('authBtnLabel');
     var form = document.getElementById('authForm');
@@ -5621,6 +5768,7 @@
 
     var activeProf = getActiveSubUser();
     renderSubUsersGrid();
+    renderUserSettingsQuickProfiles();
 
     if (state.user && state.user.name) {
       document.body.classList.remove('auth-gate-locked');
@@ -5779,7 +5927,87 @@
       if (!e.target.closest('.explorer-dropdown-wrap')) {
         closeAllExplorerDropdowns();
       }
+      if (!e.target.closest('#userSettingsDropdownWrap')) {
+        closeUserSettingsDropdown();
+      }
     });
+
+    // User Settings Dropdown Menu on Left of Top Header (`#userSettingsMenuBtn`)
+    var userSettingsBtn = document.getElementById('userSettingsMenuBtn');
+    var userSettingsPanel = document.getElementById('userSettingsDropdownPanel');
+    if (userSettingsBtn && userSettingsPanel) {
+      userSettingsBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        closeAllExplorerDropdowns();
+        var isHidden = userSettingsPanel.classList.toggle('hidden');
+        userSettingsBtn.classList.toggle('open', !isHidden);
+        userSettingsBtn.setAttribute('aria-expanded', isHidden ? 'false' : 'true');
+        if (!isHidden) {
+          renderUserSettingsQuickProfiles();
+          var firstMenuItem = userSettingsPanel.querySelector('.user-menu-item');
+          if (firstMenuItem && typeof window.streamItFocusElement === 'function') {
+            window.streamItFocusElement(firstMenuItem, { scroll: false });
+          }
+        }
+      });
+    }
+
+    var userMenuWatchlistBtn = document.getElementById('userMenuWatchlistBtn');
+    if (userMenuWatchlistBtn) {
+      userMenuWatchlistBtn.addEventListener('click', function () {
+        closeUserSettingsDropdown();
+        state.activeCategory = 'mylist';
+        var allNavBtns = document.querySelectorAll('[data-category]');
+        for (var j = 0; j < allNavBtns.length; j++) {
+          allNavBtns[j].classList.toggle('active', allNavBtns[j].getAttribute('data-category') === 'mylist');
+        }
+        renderCatalogShelves();
+        var catMain = document.getElementById('catalogMain');
+        if (catMain && typeof catMain.scrollIntoView === 'function') {
+          catMain.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    }
+
+    var userMenuSubsBtn = document.getElementById('userMenuSubsSettingsBtn');
+    if (userMenuSubsBtn) {
+      userMenuSubsBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var order = ['xlarge', 'large', 'normal'];
+        var labels = { xlarge: 'ענק', large: 'גדול', normal: 'רגיל' };
+        var cur = state.subtitleSize || 'xlarge';
+        var nextIdx = (order.indexOf(cur) + 1) % order.length;
+        state.subtitleSize = order[nextIdx];
+        var subOverlay = document.getElementById('customSubtitleOverlay');
+        if (subOverlay) {
+          subOverlay.classList.remove('sub-size-normal', 'sub-size-large', 'sub-size-xlarge');
+          subOverlay.classList.add('sub-size-' + state.subtitleSize);
+        }
+        var subTitleEl = document.getElementById('userMenuSubsTitle');
+        if (subTitleEl) {
+          subTitleEl.textContent = 'העדפות כתוביות: עברית (' + (labels[state.subtitleSize] || 'ענק') + ')';
+        }
+      });
+    }
+
+    var userMenuRefreshBtn = document.getElementById('userMenuRefreshBtn');
+    if (userMenuRefreshBtn) {
+      userMenuRefreshBtn.addEventListener('click', function () {
+        closeUserSettingsDropdown();
+        initLiveNewsTicker();
+        syncTelegramPublicChannels(true);
+        renderCatalogShelves();
+      });
+    }
+
+    var userMenuLogoutBtn = document.getElementById('userMenuLogoutBtn');
+    if (userMenuLogoutBtn) {
+      userMenuLogoutBtn.addEventListener('click', function () {
+        closeUserSettingsDropdown();
+        var lg = document.getElementById('logoutBtn');
+        if (lg) lg.click();
+      });
+    }
 
     // Actor Live Search Input (`#actorSearchInput`) + Submit Button (`#actorSearchSubmitBtn`)
     var actorSearchInput = document.getElementById('actorSearchInput');
@@ -5827,11 +6055,43 @@
       });
     }
 
-    // Search Controls
+    // Search Controls + Expanded Top Header Search Input (`#headerQuickSearchInput`)
+    var headerQuickSearchInput = document.getElementById('headerQuickSearchInput');
+    var triggerSearchWithQuery = function (qText) {
+      closeUserSettingsDropdown();
+      openSearchModal();
+      var modalSearchIn = document.getElementById('searchInput');
+      if (modalSearchIn && typeof qText === 'string' && qText.trim()) {
+        modalSearchIn.value = qText.trim();
+        renderSearchResults(qText.trim());
+      }
+    };
+    if (headerQuickSearchInput) {
+      headerQuickSearchInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          triggerSearchWithQuery(this.value || '');
+        }
+      });
+      headerQuickSearchInput.addEventListener('input', function () {
+        var val = (this.value || '').trim();
+        if (val.length >= 2) {
+          if (state.headerQuickSearchTimer) clearTimeout(state.headerQuickSearchTimer);
+          state.headerQuickSearchTimer = setTimeout(function () {
+            triggerSearchWithQuery(val);
+          }, 360);
+        }
+      });
+    }
     var searchTriggers = ['openSearchBtn', 'tvSearchRailBtn', 'mobileSearchBtn'];
     for (var s = 0; s < searchTriggers.length; s++) {
       var sb = document.getElementById(searchTriggers[s]);
-      if (sb) sb.addEventListener('click', openSearchModal);
+      if (sb) {
+        sb.addEventListener('click', function () {
+          var qVal = headerQuickSearchInput ? headerQuickSearchInput.value : '';
+          triggerSearchWithQuery(qVal);
+        });
+      }
     }
     var closeSearch = document.getElementById('closeSearchBtn');
     if (closeSearch) {
@@ -5924,6 +6184,19 @@
         toggleWatchlist(state.detailsItem);
         var inWl = isInWatchlist(state.detailsItem.id);
         this.innerHTML = (inWl ? getSvgIcon('check') : getSvgIcon('plus')) + '<span>' + (inWl ? 'ברשימה שלי' : 'הרשימה שלי') + '</span>';
+      });
+    }
+    var detailsRemCw = document.getElementById('detailsRemoveCwBtn');
+    if (detailsRemCw) {
+      detailsRemCw.addEventListener('click', function () {
+        if (!state.detailsItem) return;
+        removeFromContinueWatching(state.detailsItem.id);
+      });
+    }
+    var clearAllCwBtn = document.getElementById('clearContinueWatchingBtn');
+    if (clearAllCwBtn) {
+      clearAllCwBtn.addEventListener('click', function () {
+        clearAllContinueWatching();
       });
     }
 
@@ -6403,14 +6676,24 @@
     var authBtns = ['openAuthModalBtn', 'tvAccountRailBtn'];
     for (var a = 0; a < authBtns.length; a++) {
       var ab = document.getElementById(authBtns[a]);
-      if (ab) ab.addEventListener('click', openAuthModal);
+      if (ab) {
+        ab.addEventListener('click', function () {
+          closeUserSettingsDropdown();
+          openAuthModal();
+        });
+      }
     }
 
     // Zero-Account Public Telegram VOD Hub Controls
     var tgOpenBtns = ['openTelegramHubBtn', 'tvTelegramRailBtn', 'openTelegramFromAuthBtn'];
     for (var tgIdx = 0; tgIdx < tgOpenBtns.length; tgIdx++) {
       var tgb = document.getElementById(tgOpenBtns[tgIdx]);
-      if (tgb) tgb.addEventListener('click', openTelegramModal);
+      if (tgb) {
+        tgb.addEventListener('click', function () {
+          closeUserSettingsDropdown();
+          openTelegramModal();
+        });
+      }
     }
     var closeTgBtn = document.getElementById('closeTelegramModalBtn');
     if (closeTgBtn) {
@@ -6876,6 +7159,94 @@
         '</div>' +
         '<div id="episodesGrid" class="episodes-grid"></div>';
     }
+
+    // Upgrade .header-left with Expanded Search Field + User Settings Menu on Left containing Telegram Button
+    var hdrLeft = document.querySelector('#topHeader .header-left');
+    if (hdrLeft && !document.getElementById('userSettingsDropdownWrap')) {
+      hdrLeft.innerHTML =
+        '<div id="headerSearchBox" class="header-search-box" role="search" aria-label="חיפוש רחב בקטלוג">' +
+          '<svg viewBox="0 0 24 24" class="icon-svg header-search-icon" aria-hidden="true">' +
+            '<circle cx="11" cy="11" r="7" /><path d="M20 20l-4.2-4.2" />' +
+          '</svg>' +
+          '<input type="text" id="headerQuickSearchInput" class="header-quick-search-input tv-focusable" placeholder="חפש סרט, סדרה, שחקן או ערוץ..." aria-label="חפש סרט, סדרה, שחקן או ערוץ" autocomplete="off" />' +
+          '<button type="button" id="openSearchBtn" class="header-search-submit-btn tv-focusable" aria-label="חיפוש קטלוג"><span class="header-btn-text">חיפוש</span></button>' +
+        '</div>' +
+        '<div id="userSettingsDropdownWrap" class="user-settings-dropdown-wrap">' +
+          '<button type="button" id="userSettingsMenuBtn" class="header-auth-btn header-user-settings-btn tv-focusable" aria-haspopup="menu" aria-expanded="false" aria-label="תפריט הגדרות משתמש ופרופילים">' +
+            '<span id="headerUserAvatarBadge" class="header-user-avatar-badge" aria-hidden="true">' +
+              '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>' +
+            '</span>' +
+            '<span id="authBtnLabel">התחברות</span>' +
+            '<svg viewBox="0 0 24 24" class="icon-svg user-settings-gear-icon" aria-hidden="true"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.77 1.02 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>' +
+            '<svg viewBox="0 0 24 24" class="icon-svg dropdown-chevron" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>' +
+          '</button>' +
+          '<div id="userSettingsDropdownPanel" class="user-settings-dropdown-panel hidden" role="menu" aria-label="תפריט הגדרות משתמש">' +
+            '<div class="user-menu-header-card">' +
+              '<div class="user-menu-profile-info">' +
+                '<div id="userMenuAvatarCircle" class="user-menu-avatar-circle">S</div>' +
+                '<div class="user-menu-profile-meta">' +
+                  '<strong id="userMenuActiveProfileName" class="user-menu-profile-name">פרופיל ראשי</strong>' +
+                  '<span id="userMenuAccountEmail" class="user-menu-account-email" dir="ltr">STREAM IT VIP</span>' +
+                '</div>' +
+              '</div>' +
+              '<div id="userMenuProfilesQuickRow" class="user-menu-profiles-quick-row"></div>' +
+            '</div>' +
+            '<div class="user-menu-divider"></div>' +
+            '<button type="button" id="openTelegramHubBtn" class="user-menu-item user-menu-tg-btn header-tg-btn tv-focusable" role="menuitem">' +
+              '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M22 2L11 13" /><path d="M22 2L15 22l-4-9-9-4 20-7z" /></svg>' +
+              '<div class="user-menu-item-text"><span class="user-menu-item-title">+ ערוצי טלגרם</span><span class="user-menu-item-sub">חיבור וניהול ערוצי טלגרם VOD</span></div>' +
+            '</button>' +
+            '<button type="button" id="openAuthModalBtn" class="user-menu-item tv-focusable" role="menuitem">' +
+              '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>' +
+              '<div class="user-menu-item-text"><span class="user-menu-item-title">מי צופה עכשיו? (ניהול פרופילים)</span><span class="user-menu-item-sub">החלפת צופה, מצב ילדים ופרטי מנוי</span></div>' +
+            '</button>' +
+            '<button type="button" id="userMenuWatchlistBtn" class="user-menu-item tv-focusable" role="menuitem">' +
+              '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" /></svg>' +
+              '<div class="user-menu-item-text"><span class="user-menu-item-title">הרשימה שלי והמשך צפייה</span><span class="user-menu-item-sub">כל הסרטים והסדרות ששמרת</span></div>' +
+            '</button>' +
+            '<button type="button" id="userMenuSubsSettingsBtn" class="user-menu-item tv-focusable" role="menuitem">' +
+              '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="M6 12h4M12 12h6M6 16h8M16 16h2" /></svg>' +
+              '<div class="user-menu-item-text"><span id="userMenuSubsTitle" class="user-menu-item-title">העדפות כתוביות: עברית (ענק)</span><span class="user-menu-item-sub">לחץ לשינוי גודל גופן ברירת מחדל</span></div>' +
+            '</button>' +
+            '<button type="button" id="userMenuRefreshBtn" class="user-menu-item tv-focusable" role="menuitem">' +
+              '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M23 4v6h-6M1 20v-6h6" /><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" /></svg>' +
+              '<div class="user-menu-item-text"><span class="user-menu-item-title">סנכרון ורענון קטלוג וערוצים</span><span class="user-menu-item-sub">עדכון מיידי של תכנים, ערוצים ומבזקים</span></div>' +
+            '</button>' +
+            '<div class="user-menu-divider"></div>' +
+            '<button type="button" id="userMenuLogoutBtn" class="user-menu-item user-menu-logout-item tv-focusable" role="menuitem">' +
+              '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>' +
+              '<div class="user-menu-item-text"><span class="user-menu-item-title">התנתק מהחשבון</span></div>' +
+            '</button>' +
+          '</div>' +
+        '</div>';
+    }
+
+    var detailsActions = document.querySelector('#detailsModal .details-actions');
+    if (detailsActions && !document.getElementById('detailsRemoveCwBtn')) {
+      var remBtnEl = document.createElement('button');
+      remBtnEl.type = 'button';
+      remBtnEl.id = 'detailsRemoveCwBtn';
+      remBtnEl.className = 'btn-secondary details-remove-cw-btn tv-focusable hidden';
+      remBtnEl.setAttribute('aria-label', 'הסר מרשימת המשך הצפייה');
+      remBtnEl.innerHTML =
+        '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12" /></svg>' +
+        '<span>הסר מהמשך צפייה</span>';
+      detailsActions.appendChild(remBtnEl);
+    }
+
+    var cwHeader = document.querySelector('#continueWatchingSection .row-header');
+    if (cwHeader && !document.getElementById('clearContinueWatchingBtn')) {
+      cwHeader.classList.add('cw-row-header');
+      var clrBtn = document.createElement('button');
+      clrBtn.type = 'button';
+      clrBtn.id = 'clearContinueWatchingBtn';
+      clrBtn.className = 'cw-clear-all-btn tv-focusable';
+      clrBtn.setAttribute('aria-label', 'נקה את כל רשימת המשך הצפייה');
+      clrBtn.innerHTML =
+        '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m5 0V4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2" /></svg>' +
+        '<span>נקה רשימת המשך צפייה</span>';
+      cwHeader.appendChild(clrBtn);
+    }
   }
 
   function initLiveNewsTicker() {
@@ -6883,37 +7254,141 @@
     if (!track) return;
 
     var renderTickerHeadlines = function (headlines) {
-      var list = headlines.concat(headlines); // duplicate for seamless infinite loop
-      track.innerHTML = list.map(function (h) {
-        return '<span class="news-ticker-item">' + escapeHtml(h) + ' <span class="news-ticker-sep">•</span></span>';
+      if (!Array.isArray(headlines) || !headlines.length) return;
+      var normalized = headlines.map(function (h) {
+        if (typeof h === 'string') {
+          return { source: 'LIVE', title: h };
+        }
+        return {
+          source: String(h.source || 'LIVE').trim(),
+          title: String(h.title || '').trim()
+        };
+      }).filter(function (item) { return Boolean(item.title); });
+
+      if (!normalized.length) return;
+
+      // Ultra-calm broadcast crawl speed: ~28 seconds per headline (minimum 460s for full loop)
+      var durSec = Math.max(460, normalized.length * 28);
+      track.style.animationDuration = durSec + 's';
+
+      var list = normalized.concat(normalized); // duplicate for seamless infinite loop
+      track.innerHTML = list.map(function (item) {
+        return (
+          '<span class="news-ticker-item">' +
+            '<span class="news-source-badge">' + escapeHtml(item.source) + '</span>' +
+            '<span>' + escapeHtml(item.title) + '</span>' +
+            '<span class="news-ticker-sep">•</span>' +
+          '</span>'
+        );
       }).join('');
     };
 
     var fallbackHeadlines = [
-      'מבזק: שידורי קשת 12, כאן 11, רשת 13, עכשיו 14 וכאן חינוכית 23 זמינים ב-1080p50 HD תחת קטגוריית "ערוצים"',
-      'קולנוע וסטרימינג: נוספו שוברי קופות חדשים ב-4K UHD עם כתוביות מסונכרנות בעברית',
-      'טלגרם קולנוע VOD: סנכרון אוטומטי מערוצי הטלגרם המובילים בישראל פועל בזמן אמת',
-      'עדכון נגן חכם: מעבר אוטומטי לנקודת העצירה האחרונה ותצוגת תמונות מקדימה (Seek Preview) בסרגל הזמן',
-      'שידורי ספורט וחדשות מהעולם 24/7: SPORT 55 HD, סקיי ניוז, CBS News ו-ABC News בשידור ישיר'
+      { source: 'כאן 11 / N12', title: 'שידורי קשת 12, כאן 11, רשת 13, עכשיו 14 וכאן חינוכית 23 זמינים ב-1080p50 HD תחת קטגוריית "ערוצים"' },
+      { source: 'קולנוע 4K', title: 'נוספו שוברי קופות וסדרות חדשות ב-4K UHD עם כתוביות מסונכרנות בעברית' },
+      { source: 'טלגרם VOD', title: 'סנכרון אוטומטי מערוצי הטלגרם המובילים בישראל פועל בזמן אמת מתוך תפריט הגדרות המשתמש' },
+      { source: 'Ynet חדשות', title: 'מבזקי חדשות, ביטחון, כלכלה, ספורט ותרבות מתעדכנים בשידור חי ממגוון מקורות מובילים' },
+      { source: 'וואלה! תרבות', title: 'הפקות מקור ישראליות, סדרות דרמה ודוקו מובילות זמינות לצפייה ישירה' },
+      { source: 'ספורט HD', title: 'שידורי ספורט וחדשות מהעולם 24/7: SPORT 55 HD, סקיי ניוז, CBS News ו-ABC News בשידור ישיר' }
     ];
     renderTickerHeadlines(fallbackHeadlines);
 
-    // Fetch live Hebrew RSS headlines from Ynet / Mako / Walla via CORS-friendly JSON endpoint
-    (async function () {
+    var rssSources = [
+      { name: 'Ynet מבזקים', url: 'https://www.ynet.co.il/Integration/StoryRss1854.xml', max: 6 },
+      { name: 'Ynet חדשות', url: 'https://www.ynet.co.il/Integration/StoryRss2.xml', max: 6 },
+      { name: 'N12 / מאקו', url: 'https://rcs.mako.co.il/rss/31750a2610f26110VgnVCM1000005201000aRCRD.xml', max: 6 },
+      { name: 'וואלה! חדשות', url: 'https://rss.walla.co.il/feed/22', max: 6 },
+      { name: 'מעריב', url: 'https://www.maariv.co.il/Rss/RssFeedsMivzakiChadashot', max: 6 },
+      { name: 'חדשות ישראל', url: 'https://news.google.com/rss?hl=iw&gl=IL&ceid=IL:he', max: 8, parseGoogleSource: true },
+      { name: 'וואלה! קולנוע', url: 'https://rss.walla.co.il/feed/272', max: 4 },
+      { name: 'Ynet תרבות', url: 'https://www.ynet.co.il/Integration/StoryRss538.xml', max: 4 },
+      { name: 'ספורט', url: 'https://www.ynet.co.il/Integration/StoryRss3.xml', max: 4 },
+      { name: 'וואלה! ספורט', url: 'https://rss.walla.co.il/feed/3', max: 4 },
+      { name: 'כלכלה וטכנולוגיה', url: 'https://www.ynet.co.il/Integration/StoryRss6.xml', max: 4 }
+    ];
+
+    var parseHeadlineEntry = function (rawTitle, defaultSource, parseGoogle) {
+      var clean = String(rawTitle || '')
+        .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
+        .replace(/<[^>]+>/g, '')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&amp;/g, '&')
+        .trim();
+      if (!clean) return null;
+      var srcLabel = defaultSource;
+      if (parseGoogle) {
+        var dashIdx = clean.lastIndexOf(' - ');
+        if (dashIdx > 8 && dashIdx < clean.length - 2) {
+          srcLabel = clean.slice(dashIdx + 3).trim();
+          clean = clean.slice(0, dashIdx).trim();
+        }
+      }
+      return { source: srcLabel, title: clean };
+    };
+
+    var fetchSingleSource = async function (src) {
+      // 1. Primary JSON RSS proxy
       try {
-        var rssUrl = encodeURIComponent('https://www.ynet.co.il/Integration/StoryRss2.xml');
-        var res = await fetch('https://api.rss2json.com/v1/api.json?rss_url=' + rssUrl);
+        var jsonUrl = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(src.url);
+        var res = await fetch(jsonUrl);
         if (res.ok) {
           var data = await res.json();
           if (data && Array.isArray(data.items) && data.items.length) {
-            var liveItems = data.items.slice(0, 10).map(function (it) {
-              var cleanTitle = String(it.title || '').replace(/<[^>]+>/g, '').trim();
-              return cleanTitle;
+            var parsed = data.items.slice(0, src.max || 5).map(function (it) {
+              return parseHeadlineEntry(it.title, src.name, src.parseGoogleSource);
             }).filter(Boolean);
-            if (liveItems.length >= 3) {
-              renderTickerHeadlines(liveItems);
+            if (parsed.length) return parsed;
+          }
+        }
+      } catch (e) {}
+
+      // 2. Fallback XML CORS proxy + DOMParser
+      try {
+        var xmlProxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(src.url);
+        var xmlRes = await fetch(xmlProxyUrl);
+        if (xmlRes.ok) {
+          var xmlText = await xmlRes.text();
+          if (xmlText && typeof window.DOMParser === 'function') {
+            var doc = new window.DOMParser().parseFromString(xmlText, 'text/xml');
+            var nodes = doc.querySelectorAll('item > title, entry > title');
+            var xmlItems = [];
+            for (var n = 0; n < nodes.length && xmlItems.length < (src.max || 5); n++) {
+              var entry = parseHeadlineEntry(nodes[n].textContent, src.name, src.parseGoogleSource);
+              if (entry) xmlItems.push(entry);
+            }
+            if (xmlItems.length) return xmlItems;
+          }
+        }
+      } catch (e2) {}
+
+      return [];
+    };
+
+    // Fetch all live Hebrew news, cinema, sport & economy sources in parallel and interleave them
+    (async function () {
+      try {
+        var results = await Promise.all(rssSources.map(fetchSingleSource));
+        var maxLen = 0;
+        for (var r = 0; r < results.length; r++) {
+          if (results[r].length > maxLen) maxLen = results[r].length;
+        }
+        var interleaved = [];
+        var seenTitles = {};
+        for (var idx = 0; idx < maxLen; idx++) {
+          for (var s = 0; s < results.length; s++) {
+            var item = results[s][idx];
+            if (item && item.title) {
+              var normKey = item.title.slice(0, 42);
+              if (!seenTitles[normKey]) {
+                seenTitles[normKey] = true;
+                interleaved.push(item);
+              }
             }
           }
+        }
+        if (interleaved.length >= 4) {
+          renderTickerHeadlines(interleaved);
         }
       } catch (e) {}
     })();

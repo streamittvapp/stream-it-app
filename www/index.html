@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&family=Rubik:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
-  <link rel="stylesheet" href="styles.css?v=9.5.0" />
+  <link rel="stylesheet" href="styles.css?v=9.5.4" />
   <script>
     (function () {
       try {
@@ -31,13 +31,13 @@
           });
         }
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (!otaVer || otaVer <= '9.5.0') {
+        if (!otaVer || otaVer <= '9.5.4') {
           localStorage.removeItem('streamit_ota_css_v9');
           localStorage.removeItem('streamit_ota_app_js_v9');
           localStorage.removeItem('streamit_ota_tv_nav_v9');
         }
         var otaCss = localStorage.getItem('streamit_ota_css_v9') || '';
-        if (otaVer && otaVer > '9.5.0' && otaCss.length > 500) {
+        if (otaVer && otaVer > '9.5.4' && otaCss.length > 500) {
           var st = document.createElement('style');
           st.id = 'streamit-ota-live-style-v9';
           st.textContent = otaCss;
@@ -71,29 +71,127 @@
       </div>
 
       <div class="header-left">
-        <button type="button" id="openTelegramHubBtn" class="header-icon-btn header-tg-btn tv-focusable" aria-label="חיבור וניהול ערוצי טלגרם VOD">
-          <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
-            <path d="M22 2L11 13" />
-            <path d="M22 2L15 22l-4-9-9-4 20-7z" />
-          </svg>
-          <span class="header-btn-text">+ ערוצי טלגרם</span>
-        </button>
-
-        <button type="button" id="openSearchBtn" class="header-icon-btn tv-focusable" aria-label="חיפוש קטלוג">
-          <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+        <!-- Expanded Top Search Field (#headerSearchBox) -->
+        <div id="headerSearchBox" class="header-search-box" role="search" aria-label="חיפוש רחב בקטלוג">
+          <svg viewBox="0 0 24 24" class="icon-svg header-search-icon" aria-hidden="true">
             <circle cx="11" cy="11" r="7" />
             <path d="M20 20l-4.2-4.2" />
           </svg>
-          <span class="header-btn-text">חיפוש</span>
-        </button>
+          <input
+            type="text"
+            id="headerQuickSearchInput"
+            class="header-quick-search-input tv-focusable"
+            placeholder="חפש סרט, סדרה, שחקן או ערוץ..."
+            aria-label="חפש סרט, סדרה, שחקן או ערוץ"
+            autocomplete="off"
+          />
+          <button type="button" id="openSearchBtn" class="header-search-submit-btn tv-focusable" aria-label="חיפוש קטלוג">
+            <span class="header-btn-text">חיפוש</span>
+          </button>
+        </div>
 
-        <button type="button" id="openAuthModalBtn" class="header-auth-btn tv-focusable" aria-label="מי צופה עכשיו וחשבון">
-          <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-            <circle cx="12" cy="7" r="4" />
-          </svg>
-          <span id="authBtnLabel">התחברות</span>
-        </button>
+        <!-- User Settings Menu Dropdown on the Left of Top Menu (#userSettingsDropdownWrap) -->
+        <div id="userSettingsDropdownWrap" class="user-settings-dropdown-wrap">
+          <button type="button" id="userSettingsMenuBtn" class="header-auth-btn header-user-settings-btn tv-focusable" aria-haspopup="menu" aria-expanded="false" aria-label="תפריט הגדרות משתמש ופרופילים">
+            <span id="headerUserAvatarBadge" class="header-user-avatar-badge" aria-hidden="true">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </span>
+            <span id="authBtnLabel">התחברות</span>
+            <svg viewBox="0 0 24 24" class="icon-svg user-settings-gear-icon" aria-hidden="true">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.77 1.02 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+            <svg viewBox="0 0 24 24" class="icon-svg dropdown-chevron" aria-hidden="true">
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </button>
+
+          <div id="userSettingsDropdownPanel" class="user-settings-dropdown-panel hidden" role="menu" aria-label="תפריט הגדרות משתמש">
+            <div class="user-menu-header-card">
+              <div class="user-menu-profile-info">
+                <div id="userMenuAvatarCircle" class="user-menu-avatar-circle">S</div>
+                <div class="user-menu-profile-meta">
+                  <strong id="userMenuActiveProfileName" class="user-menu-profile-name">פרופיל ראשי</strong>
+                  <span id="userMenuAccountEmail" class="user-menu-account-email" dir="ltr">STREAM IT VIP</span>
+                </div>
+              </div>
+              <div id="userMenuProfilesQuickRow" class="user-menu-profiles-quick-row" aria-label="החלפה מהירה בין פרופילים"></div>
+            </div>
+
+            <div class="user-menu-divider"></div>
+
+            <!-- Telegram Channels Button Inside User Settings Menu (#openTelegramHubBtn) -->
+            <button type="button" id="openTelegramHubBtn" class="user-menu-item user-menu-tg-btn header-tg-btn tv-focusable" role="menuitem" aria-label="חיבור וניהול ערוצי טלגרם VOD">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M22 2L11 13" />
+                <path d="M22 2L15 22l-4-9-9-4 20-7z" />
+              </svg>
+              <div class="user-menu-item-text">
+                <span class="user-menu-item-title">+ ערוצי טלגרם</span>
+                <span class="user-menu-item-sub">חיבור וניהול ערוצי טלגרם VOD</span>
+              </div>
+            </button>
+
+            <button type="button" id="openAuthModalBtn" class="user-menu-item tv-focusable" role="menuitem" aria-label="מי צופה עכשיו וניהול פרופילים">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              <div class="user-menu-item-text">
+                <span class="user-menu-item-title">מי צופה עכשיו? (ניהול פרופילים)</span>
+                <span class="user-menu-item-sub">החלפת צופה, מצב ילדים ופרטי מנוי</span>
+              </div>
+            </button>
+
+            <button type="button" id="userMenuWatchlistBtn" class="user-menu-item tv-focusable" role="menuitem" aria-label="הרשימה שלי">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+              </svg>
+              <div class="user-menu-item-text">
+                <span class="user-menu-item-title">הרשימה שלי והמשך צפייה</span>
+                <span class="user-menu-item-sub">כל הסרטים והסדרות ששמרת</span>
+              </div>
+            </button>
+
+            <button type="button" id="userMenuSubsSettingsBtn" class="user-menu-item tv-focusable" role="menuitem" aria-label="העדפות כתוביות ונגן">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <path d="M6 12h4M12 12h6M6 16h8M16 16h2" />
+              </svg>
+              <div class="user-menu-item-text">
+                <span id="userMenuSubsTitle" class="user-menu-item-title">העדפות כתוביות: עברית (ענק)</span>
+                <span class="user-menu-item-sub">לחץ לשינוי גודל גופן ברירת מחדל</span>
+              </div>
+            </button>
+
+            <button type="button" id="userMenuRefreshBtn" class="user-menu-item tv-focusable" role="menuitem" aria-label="סנכרון ורענון קטלוג">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M23 4v6h-6M1 20v-6h6" />
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+              </svg>
+              <div class="user-menu-item-text">
+                <span class="user-menu-item-title">סנכרון ורענון קטלוג וערוצים</span>
+                <span class="user-menu-item-sub">עדכון מיידי של תכנים, ערוצים ומבזקים</span>
+              </div>
+            </button>
+
+            <div class="user-menu-divider"></div>
+
+            <button type="button" id="userMenuLogoutBtn" class="user-menu-item user-menu-logout-item tv-focusable" role="menuitem" aria-label="התנתק מהחשבון">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+              <div class="user-menu-item-text">
+                <span class="user-menu-item-title">התנתק מהחשבון</span>
+              </div>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </header>
@@ -337,8 +435,15 @@
 
       <!-- Continue Watching Row -->
       <div id="continueWatchingSection" class="netflix-row hidden">
-        <div class="row-header">
+        <div class="row-header cw-row-header">
           <h2 class="row-title">המשך צפייה</h2>
+          <button type="button" id="clearContinueWatchingBtn" class="cw-clear-all-btn tv-focusable" aria-label="נקה את כל רשימת המשך הצפייה">
+            <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m5 0V4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2" />
+            </svg>
+            <span>נקה רשימת המשך צפייה</span>
+          </button>
         </div>
         <div id="continueWatchingRow" class="row-track"></div>
       </div>
@@ -493,6 +598,13 @@
                 <path d="M12 5v14M5 12h14" />
               </svg>
               <span>הרשימה שלי</span>
+            </button>
+
+            <button type="button" id="detailsRemoveCwBtn" class="btn-secondary details-remove-cw-btn tv-focusable hidden" aria-label="הסר מרשימת המשך הצפייה">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+              <span>הסר מהמשך צפייה</span>
             </button>
           </div>
         </div>
@@ -995,13 +1107,13 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Core Application & Smart TV Navigation Scripts -->
-  <script src="tv-navigation.js?v=9.5.1"></script>
-  <script src="app.js?v=9.5.1"></script>
+  <script src="tv-navigation.js?v=9.5.4"></script>
+  <script src="app.js?v=9.5.4"></script>
   <script>
     (function () {
       try {
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (otaVer && otaVer > '9.5.1') {
+        if (otaVer && otaVer > '9.5.4') {
           var navCode = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
           if (navCode.length > 500) {
             var s1 = document.createElement('script');

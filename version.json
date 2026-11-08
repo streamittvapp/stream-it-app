@@ -1,9 +1,9 @@
-﻿{
-    "version":  "9.5.1",
-    "native_apk_version":  "9.5.0",
-    "apk_download_url":  "https://is.gd/streamittv_apk",
-    "web_url":  "https://streamittvapp.github.io/stream-it-app/",
-    "short_url":  "https://is.gd/streamittv",
-    "updated_at":  "2026-11-08T20:05:00Z",
-    "notes":  "v9.5.0 â€” Restored full movie player control bar \u0026 timeline scrub slider (removed height: calc(100% + 66px) cut-off), added targeted Hebrew CC overlay over the embed foreign CC icon only, fixed Hebrew subtitle sync on movies like Verity (×ª×¢×ª×•×¢) and self-healed subtitle overlay after live channel playback, and strictly blocked non-Israeli/Far-East titles from the Israeli catalog."
+{
+  "version": "9.5.4",
+  "native_apk_version": "9.5.0",
+  "apk_download_url": "https://is.gd/streamittv_apk",
+  "web_url": "https://streamittvapp.github.io/stream-it-app/",
+  "short_url": "https://is.gd/streamittv",
+  "updated_at": "2026-11-08T21:25:00Z",
+  "notes": "v9.5.4 — Slowed down live news ticker speed with 11+ Israeli news/cinema/sport/tech RSS sources, added User Settings dropdown menu on the left of the top header containing the Telegram channels button, and widened the search fields."
 }
