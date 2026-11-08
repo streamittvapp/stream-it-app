@@ -5,16 +5,12 @@
     "status": "approved",
     "role": "admin",
     "max_profiles": 5,
-    "passHash": "f9d26c67c77cf8b3bd03f985cc6785c493c34505dfda9edf9259d04ffb88f5b1",
+    "passHash": "0d24c3b776130811276c208a3457be7c316328088de816ac3ebc192bb977094d",
     "altHashes": [
-      "f9d26c67c77cf8b3bd03f985cc6785c493c34505dfda9edf9259d04ffb88f5b1",
-      "01884b718ab9bed7c127b90f1880cc671e1d836488a9cc912c875547f4196a0f",
-      "b935bf959e686e20500064a8328e798338a2ee91215b4311b5eec4cee08dd447",
-      "ba113970b3c49b0fad970547ddf74cd4c29cef8eed9eb6fbf69f4e66077a68b3",
-      "cc43dbd645eaf3e9d95c618efdcdce07265ec7a56ad9dad5e25b8b1e9795881b",
-      "79fae471cb66b40e90730f0a80a74037c957514b76df6d6569c8d0511aa0cc8c"
+      "0d24c3b776130811276c208a3457be7c316328088de816ac3ebc192bb977094d"
     ],
-    "updatedAt": "2026-11-08T21:05:00Z"
+    "updatedAt": "2026-11-08 19:38",
+    "autoBindPassword": false
   },
   "bensahaltv@gmail.com": {
     "email": "bensahaltv@gmail.com",
