@@ -1715,10 +1715,11 @@
       "next_playing_he": "המרדף / דוקו כאן 11",
       "progress_pct": 64,
       "overview_he": "שידור חי ישיר של ערוץ כאן 11 מתאגיד השידור הישראלי — חדשות, תחקירים, סדרות דרמה ישראליות, דוקו ושידורי ספורט ב-Full HD.",
-      "poster": "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=600&auto=format&fit=crop&q=80",
-      "backdrop": "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=1600&auto=format&fit=crop&q=80",
-      "hls_url": "https://kancdn.medonecdn.net/livehls/oil/kancdn-live/live/kan11/live.livx/playlist.m3u8",
-      "backup_hls_url": "https://r.il.cdn-redge.media/livehls/oil/kancdn-live/live/kan11/live.livx/playlist.m3u8"
+      "poster": "",
+      "backdrop": "",
+      "hls_url": "https://r.il.cdn-redge.media/livehls/oil/kancdn-live/live/kan11/live.livx/playlist.m3u8",
+      "backup_hls_url": "https://kancdn.medonecdn.net/livehls/oil/kancdn-live/live/kan11/live.livx/playlist.m3u8",
+      "stream_url": "https://r.il.cdn-redge.media/livehls/oil/kancdn-live/live/kan11/live.livx/playlist.m3u8"
     },
     {
       "id": "il_keshet12",
@@ -1734,10 +1735,11 @@
       "next_playing_he": "ארץ נהדרת / עובדה / הכוכב הבא",
       "progress_pct": 48,
       "overview_he": "שידור חי ישיר של ערוץ קשת 12 — חדשות 12, ארץ נהדרת, הכוכב הבא, עובדה, מאסטר שף ודרמות מקור.",
-      "poster": "https://images.unsplash.com/photo-1593784991095-a205069470b6?w=600&auto=format&fit=crop&q=80",
-      "backdrop": "https://images.unsplash.com/photo-1593784991095-a205069470b6?w=1600&auto=format&fit=crop&q=80",
-      "hls_url": "https://d2dffl3588mvfk.cloudfront.net/out/v1/d8e15050ca4148aab0ee387a5e2eb46b/index_1.m3u8",
-      "backup_hls_url": "https://kancdn.medonecdn.net/livehls/oil/kancdn-live/live/kan11/live.livx/playlist.m3u8"
+      "poster": "",
+      "backdrop": "",
+      "hls_url": "https://contact.gostreaming.tv/Con-12/index.m3u8",
+      "backup_hls_url": "https://d2dffl3588mvfk.cloudfront.net/out/v1/d8e15050ca4148aab0ee387a5e2eb46b/index.m3u8",
+      "stream_url": "https://contact.gostreaming.tv/Con-12/index.m3u8"
     },
     {
       "id": "il_reshet13",
@@ -1753,10 +1755,11 @@
       "next_playing_he": "משחקי השף / האח הגדול / הישרדות",
       "progress_pct": 72,
       "overview_he": "שידור חי ישיר של ערוץ רשת 13 — חדשות 13, הצינור, האח הגדול, הישרדות, משחקי השף ותוכניות תחקיר.",
-      "poster": "https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=600&auto=format&fit=crop&q=80",
-      "backdrop": "https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=1600&auto=format&fit=crop&q=80",
+      "poster": "",
+      "backdrop": "",
       "hls_url": "https://d2xg1g9o5vns8m.cloudfront.net/out/v1/0855d703f7d5436fae6a9c7ce8ca5075/index.m3u8",
-      "backup_hls_url": "https://d2dffl3588mvfk.cloudfront.net/out/v1/d8e15050ca4148aab0ee387a5e2eb46b/index_1.m3u8"
+      "backup_hls_url": "https://contact.gostreaming.tv/Con-12/index.m3u8",
+      "stream_url": "https://d2xg1g9o5vns8m.cloudfront.net/out/v1/0855d703f7d5436fae6a9c7ce8ca5075/index.m3u8"
     },
     {
       "id": "il_now14",
@@ -1772,10 +1775,11 @@
       "next_playing_he": "אולפן פתוח וחדשות הלילה",
       "progress_pct": 55,
       "overview_he": "שידור חי ישיר מערוץ עכשיו 14 — חדשות, הפטריוטים, אקטואליה, ראיונות ופרשנויות מסביב לשעון.",
-      "poster": "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&auto=format&fit=crop&q=80",
-      "backdrop": "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1600&auto=format&fit=crop&q=80",
+      "poster": "",
+      "backdrop": "",
       "hls_url": "https://r.il.cdn-redge.media/livehls/oil/ch14/live/ch14/live.livx/playlist.m3u8",
-      "backup_hls_url": "https://i24newshebrew-cdn.encoders.immergo.tv/2/streamPlaylist.m3u8"
+      "backup_hls_url": "https://i24newshebrew-cdn.encoders.immergo.tv/2/streamPlaylist.m3u8",
+      "stream_url": "https://r.il.cdn-redge.media/livehls/oil/ch14/live/ch14/live.livx/playlist.m3u8"
     },
     {
       "id": "il_i24news",
@@ -1791,10 +1795,11 @@
       "next_playing_he": "המזרח התיכון הערב",
       "progress_pct": 38,
       "overview_he": "ערוץ החדשות הבינלאומי i24NEWS בעברית בשידור חי ישיר מאולפני נמל יפו — דיווחים מיוחדים מהארץ ומהעולם.",
-      "poster": "https://images.unsplash.com/photo-1495020689067-958852a7765e?w=600&auto=format&fit=crop&q=80",
-      "backdrop": "https://images.unsplash.com/photo-1495020689067-958852a7765e?w=1600&auto=format&fit=crop&q=80",
+      "poster": "",
+      "backdrop": "",
       "hls_url": "https://i24newshebrew-cdn.encoders.immergo.tv/2/streamPlaylist.m3u8",
-      "backup_hls_url": "https://i24newsenglish-cdn.encoders.immergo.tv/2/streamPlaylist.m3u8"
+      "backup_hls_url": "https://i24newsenglish-cdn.encoders.immergo.tv/2/streamPlaylist.m3u8",
+      "stream_url": "https://i24newshebrew-cdn.encoders.immergo.tv/2/streamPlaylist.m3u8"
     },
     {
       "id": "il_hot_drama",
@@ -1810,8 +1815,8 @@
       "next_playing_he": "הקרנת בכורה קולנועית",
       "progress_pct": 51,
       "overview_he": "שידור חי רציף של סרטי דרמה, קולנוע בינלאומי וסדרות מובחרות ב-HD.",
-      "poster": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&auto=format&fit=crop&q=80",
-      "backdrop": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1600&auto=format&fit=crop&q=80",
+      "poster": "",
+      "backdrop": "",
       "hls_url": "https://30a-tv.com/feeds/pzaz/30atvmovies.m3u8",
       "backup_hls_url": "https://d15ds134q59udk.cloudfront.net/out/v1/fbba879221d045598540ee783b140fe2/index.m3u8"
     },
@@ -1829,8 +1834,8 @@
       "next_playing_he": "מרתון סטנדאפ ישראלי",
       "progress_pct": 59,
       "overview_he": "שידור חי ישיר של ערוץ הקומדיה — מיטב הקומדיות, מופעי הסטנדאפ ותוכניות הבידור של ישראל ב-1080p.",
-      "poster": "https://images.unsplash.com/photo-1514306191717-452ec28c7814?w=600&auto=format&fit=crop&q=80",
-      "backdrop": "https://images.unsplash.com/photo-1514306191717-452ec28c7814?w=1600&auto=format&fit=crop&q=80",
+      "poster": "",
+      "backdrop": "",
       "hls_url": "https://d15ds134q59udk.cloudfront.net/out/v1/fbba879221d045598540ee783b140fe2/index.m3u8",
       "backup_hls_url": "https://d2dffl3588mvfk.cloudfront.net/out/v1/d8e15050ca4148aab0ee387a5e2eb46b/index_1.m3u8"
     },
@@ -1848,10 +1853,11 @@
       "next_playing_he": "ילדי בית העץ / גלילאו",
       "progress_pct": 42,
       "overview_he": "שידור חי ישיר של כאן חינוכית (ערוץ 23) — סדרות מקור זוכות פרסים לילדים ולנוער, תוכניות מדע והיסטוריה.",
-      "poster": "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=600&auto=format&fit=crop&q=80",
-      "backdrop": "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=1600&auto=format&fit=crop&q=80",
-      "hls_url": "https://origin.dpsgo.com/ssai/event/LhHrVtyeQkKZ-Ye_xEU75g/master.m3u8",
-      "backup_hls_url": "https://kancdn.medonecdn.net/livehls/oil/kancdn-live/live/kan11/live.livx/playlist.m3u8"
+      "poster": "",
+      "backdrop": "",
+      "hls_url": "https://r.il.cdn-redge.media/livehls/oil/kancdn-live/live/kan_edu/live.livx/playlist.m3u8",
+      "backup_hls_url": "https://kancdn.medonecdn.net/livehls/oil/kancdn-live/live/kan_edu/live.livx/playlist.m3u8",
+      "stream_url": "https://r.il.cdn-redge.media/livehls/oil/kancdn-live/live/kan_edu/live.livx/playlist.m3u8"
     },
     {
       "id": "il_ch24",
@@ -1867,8 +1873,8 @@
       "next_playing_he": "אולפן מוזיקה חי",
       "progress_pct": 67,
       "overview_he": "שידור חי ישיר של מוזיקה ישראלית ובידור ב-1080p — קליפים, הופעות חיות ותוכניות בידור.",
-      "poster": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80",
-      "backdrop": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1600&auto=format&fit=crop&q=80",
+      "poster": "",
+      "backdrop": "",
       "hls_url": "https://1247634592.rsc.cdn77.org/1247634592/playlist.m3u8",
       "backup_hls_url": "https://d1yd8hohnldm33.cloudfront.net/out/v1/19dee23c2cc24f689bd4e1288661ee0c/index_2.m3u8"
     },
@@ -1886,8 +1892,8 @@
       "next_playing_he": "פרק בכורה יומי",
       "progress_pct": 53,
       "overview_he": "שידור חי ישיר של ערוץ הריאליטי וערוץ החופש הישראלי באיכות 1080p Full HD.",
-      "poster": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80",
-      "backdrop": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&auto=format&fit=crop&q=80",
+      "poster": "",
+      "backdrop": "",
       "hls_url": "https://d1yd8hohnldm33.cloudfront.net/out/v1/19dee23c2cc24f689bd4e1288661ee0c/index_2.m3u8",
       "backup_hls_url": "https://d2dffl3588mvfk.cloudfront.net/out/v1/d8e15050ca4148aab0ee387a5e2eb46b/index_1.m3u8"
     },
@@ -1905,8 +1911,8 @@
       "next_playing_he": "עולם הטבע וחיות בר",
       "progress_pct": 49,
       "overview_he": "שידור חי רציף של סרטי טבע, מדע, מסעות ודוקו באיכות 1080p HD.",
-      "poster": "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&auto=format&fit=crop&q=80",
-      "backdrop": "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1600&auto=format&fit=crop&q=80",
+      "poster": "",
+      "backdrop": "",
       "hls_url": "https://a57e9c69976649b582a8d7604c00e69a.mediatailor.us-east-1.amazonaws.com/v1/master/44f73ba4d03e9607dcd9bebdcb8494d86964f1d8/RlaxxTV-eu_AdventureEarth/playlist.m3u8",
       "backup_hls_url": "https://media-tyo.hls.nhkworld.jp/hls/w/live/master.m3u8"
     },
@@ -1924,8 +1930,8 @@
       "next_playing_he": "שידור ישיר — משחק מרכזי",
       "progress_pct": 81,
       "overview_he": "שידורי ספורט חיים באיכות 1080p Full HD — ליגות הכדורגל הבכירות באירופה, כדורסל, UFC וטניס.",
-      "poster": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600&auto=format&fit=crop&q=80",
-      "backdrop": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1600&auto=format&fit=crop&q=80",
+      "poster": "",
+      "backdrop": "",
       "hls_url": "https://bein-esp-xumo.amagi.tv/playlist.m3u8",
       "backup_hls_url": "https://dai.google.com/linear/hls/event/Sid4xiTQTkCT1SLu6rjUSQ/master.m3u8"
     },
@@ -1943,8 +1949,8 @@
       "next_playing_he": "יומן האירועים המרכזי",
       "progress_pct": 60,
       "overview_he": "שידור חי ישיר של ערוץ 9 הישראלי ב-Full HD 1080p.",
-      "poster": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=600&auto=format&fit=crop&q=80",
-      "backdrop": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=1600&auto=format&fit=crop&q=80",
+      "poster": "",
+      "backdrop": "",
       "hls_url": "https://contact.gostreaming.tv/Con-11/index.m3u8",
       "backup_hls_url": "https://i24newshebrew-cdn.encoders.immergo.tv/2/streamPlaylist.m3u8"
     },
@@ -1962,8 +1968,8 @@
       "next_playing_he": "שידור חי מהאולפן",
       "progress_pct": 50,
       "overview_he": "שידור חי 24/7 של ערוץ 16 וערוץ הידברות בישראל באיכות 1080p HD.",
-      "poster": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80",
-      "backdrop": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1600&auto=format&fit=crop&q=80",
+      "poster": "",
+      "backdrop": "",
       "hls_url": "https://ch16israel-cdn.encoders.immergo.tv/2/streamPlaylist.m3u8",
       "backup_hls_url": "https://cdn.cybercdn.live/HidabrootIL/Live97/playlist.m3u8"
     }
