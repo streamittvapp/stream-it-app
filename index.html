@@ -920,13 +920,13 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Core Application & Smart TV Navigation Scripts -->
-  <script src="tv-navigation.js?v=9.4.7"></script>
-  <script src="app.js?v=9.4.7"></script>
+  <script src="tv-navigation.js?v=9.4.8"></script>
+  <script src="app.js?v=9.4.8"></script>
   <script>
     (function () {
       try {
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (otaVer && otaVer > '9.4.7') {
+        if (otaVer && otaVer > '9.4.8') {
           var navCode = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
           if (navCode.length > 500) {
             var s1 = document.createElement('script');

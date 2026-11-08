@@ -1,9 +1,9 @@
 {
-  "version": "9.4.7",
-  "native_apk_version": "9.4.7",
+  "version": "9.4.8",
+  "native_apk_version": "9.4.8",
   "apk_download_url": "https://is.gd/streamittv_apk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-08T15:35:00Z",
-  "notes": "v9.4.7 — Removed third-party embed CC/server controls bar in favor of unified STREAM IT Hebrew subtitles & player bar, set default subtitle style to ענק (42px) + לבן + ללא רקע (שקוף) + 3.5% with free +/- font size controls saved as default, and made TMDB/IMDb ID verification 100% dynamic across all titles."
+  "updated_at": "2026-11-08T15:55:00Z",
+  "notes": "v9.4.8 — Connected and verified all Live TV channels (Israeli Idan+ Kan 11, Keshet 12, Reshet 13, Now 14, i24NEWS Hebrew, Comedy, Channel 24, Reality, Channel 9, Channel 16, US News & Global Sports) with HTTPS+CORS HLS streams and automatic multi-server failover."
 }

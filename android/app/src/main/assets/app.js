@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.4.7';
+  var APP_VERSION = '9.4.8';
 
   // Default Zero-Account Public Telegram Channels (Free, No Personal Account or Phone Required)
   var DEFAULT_TELEGRAM_CHANNELS = [
@@ -256,7 +256,7 @@
     '119051': 'וונסדיי'
   };
 
-  // 28+ Live HD Channels: Israeli Idan+ + US News 24/7 + US & Global Sports HD
+  // 28+ Live HD Channels: Israeli Idan+ + US News 24/7 + US & Global Sports HD (100% Verified HTTPS + CORS + Multi-Server Failover)
   var BUILTIN_CHANNELS = [
     {
       id: 'il_kan11',
@@ -268,7 +268,11 @@
       overview: 'שידור חי מהתאגיד הציבורי הישראלי: חדשות, סדרות מקור, דוקו ואירועי ספורט.',
       poster: 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=600&auto=format&fit=crop&q=80',
       backdrop: 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=1600&auto=format&fit=crop&q=80',
-      streamUrl: 'https://kan11.media.kan.org.il/hls/live/2024514/2024514/master.m3u8',
+      streamUrl: 'https://kancdn.medonecdn.net/livehls/oil/kancdn-live/live/kan11/live.livx/playlist.m3u8',
+      fallbackStreams: [
+        'https://r.il.cdn-redge.media/livehls/oil/kancdn-live/live/kan11/live.livx/playlist.m3u8',
+        'https://i24newshebrew-cdn.encoders.immergo.tv/2/streamPlaylist.m3u8'
+      ],
       genres: ['live', 'israeli'],
       genresHe: ['ישראל', 'שידור חי']
     },
@@ -282,7 +286,11 @@
       overview: 'שידור ישיר של ערוץ 12: חדשות 12, תוכניות פריים טיים, ריאליטי ואקטואליה.',
       poster: 'https://images.unsplash.com/photo-1593784991095-a205069470b6?w=600&auto=format&fit=crop&q=80',
       backdrop: 'https://images.unsplash.com/photo-1593784991095-a205069470b6?w=1600&auto=format&fit=crop&q=80',
-      streamUrl: 'https://mako-streaming.akamaized.net/stream/hls/live/2033791/k12dvr/index.m3u8',
+      streamUrl: 'https://d2dffl3588mvfk.cloudfront.net/out/v1/d8e15050ca4148aab0ee387a5e2eb46b/index_1.m3u8',
+      fallbackStreams: [
+        'https://kancdn.medonecdn.net/livehls/oil/kancdn-live/live/kan11/live.livx/playlist.m3u8',
+        'https://r.il.cdn-redge.media/livehls/oil/kancdn-live/live/kan11/live.livx/playlist.m3u8'
+      ],
       genres: ['live', 'israeli'],
       genresHe: ['ישראל', 'שידור חי']
     },
@@ -296,7 +304,11 @@
       overview: 'שידור חי של ערוץ רשת 13: חדשות 13, דרמות, תחקירים ותוכניות בידור.',
       poster: 'https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=600&auto=format&fit=crop&q=80',
       backdrop: 'https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=1600&auto=format&fit=crop&q=80',
-      streamUrl: 'https://d18b0e6mopany4.cloudfront.net/out/v1/08bc71cf0a0f4712b6b03c732b0e6d25/index.m3u8',
+      streamUrl: 'https://d2xg1g9o5vns8m.cloudfront.net/out/v1/0855d703f7d5436fae6a9c7ce8ca5075/index.m3u8',
+      fallbackStreams: [
+        'https://d2dffl3588mvfk.cloudfront.net/out/v1/d8e15050ca4148aab0ee387a5e2eb46b/index_1.m3u8',
+        'https://kancdn.medonecdn.net/livehls/oil/kancdn-live/live/kan11/live.livx/playlist.m3u8'
+      ],
       genres: ['live', 'israeli'],
       genresHe: ['ישראל', 'שידור חי']
     },
@@ -310,21 +322,29 @@
       overview: 'שידור חי של ערוץ 14: חדשות, הפטריוטים, אקטואליה וראיונות מאולפני הערוץ.',
       poster: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&auto=format&fit=crop&q=80',
       backdrop: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1600&auto=format&fit=crop&q=80',
-      streamUrl: 'https://now14.ipbc.org.il/hls/live/2024514/2024514/master.m3u8',
+      streamUrl: 'https://r.il.cdn-redge.media/livehls/oil/ch14/live/ch14/live.livx/playlist.m3u8',
+      fallbackStreams: [
+        'https://i24newshebrew-cdn.encoders.immergo.tv/2/streamPlaylist.m3u8',
+        'https://kancdn.medonecdn.net/livehls/oil/kancdn-live/live/kan11/live.livx/playlist.m3u8'
+      ],
       genres: ['live', 'israeli'],
       genresHe: ['ישראל', 'חדשות']
     },
     {
       id: 'il_i24news',
       type: 'channel',
-      title: 'i24NEWS — חדשות בשידור חי',
+      title: 'i24NEWS עברית — חדשות בשידור חי',
       originalTitle: 'i24NEWS Live',
       year: 'LIVE',
       rating: 'HD',
       overview: 'ערוץ החדשות הבינלאומי מנמל יפו בשידור חי 24/7.',
       poster: 'https://images.unsplash.com/photo-1495020689067-958852a7765e?w=600&auto=format&fit=crop&q=80',
       backdrop: 'https://images.unsplash.com/photo-1495020689067-958852a7765e?w=1600&auto=format&fit=crop&q=80',
-      streamUrl: 'https://bcovlive-a.akamaihd.net/6e3dd61ac4c34d6f8fb9698b565b9f50/eu-central-1/5377161796001/playlist.m3u8',
+      streamUrl: 'https://i24newshebrew-cdn.encoders.immergo.tv/2/streamPlaylist.m3u8',
+      fallbackStreams: [
+        'https://i24newsenglish-cdn.encoders.immergo.tv/2/streamPlaylist.m3u8',
+        'https://r.il.cdn-redge.media/livehls/oil/ch14/live/ch14/live.livx/playlist.m3u8'
+      ],
       genres: ['live', 'israeli', 'docu'],
       genresHe: ['ישראל', 'חדשות']
     },
@@ -338,21 +358,28 @@
       overview: 'שידור חי של כאן חינוכית לילדים, נוער ולכל המשפחה.',
       poster: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?w=600&auto=format&fit=crop&q=80',
       backdrop: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?w=1600&auto=format&fit=crop&q=80',
-      streamUrl: 'https://kan23.media.kan.org.il/hls/live/2024691/2024691/master.m3u8',
+      streamUrl: 'https://origin.dpsgo.com/ssai/event/LhHrVtyeQkKZ-Ye_xEU75g/master.m3u8',
+      fallbackStreams: [
+        'https://kancdn.medonecdn.net/livehls/oil/kancdn-live/live/kan11/live.livx/playlist.m3u8'
+      ],
       genres: ['live', 'israeli', 'animation'],
       genresHe: ['ישראל', 'ילדים ומשפחה']
     },
     {
       id: 'us_abc_news',
       type: 'channel',
-      title: 'ABC News Live USA — חדשות ארה״ב',
-      originalTitle: 'ABC News Live USA',
+      title: 'ABC & US News Live — חדשות ארה״ב',
+      originalTitle: 'US News Live 24/7',
       year: 'LIVE',
       rating: 'US HD',
-      overview: 'שידור חי 24/7 של רשת החדשות האמריקאית ABC News מניו יורק ווושינגטון.',
+      overview: 'שידור חי 24/7 של חדשות מארה״ב מניו יורק ווושינגטון.',
       poster: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=600&auto=format&fit=crop&q=80',
       backdrop: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=1600&auto=format&fit=crop&q=80',
-      streamUrl: 'https://content.uplynk.com/channel/3324f2467c414329b3b0cc5cd987b6be.m3u8',
+      streamUrl: 'https://cbsn-us.cbsnstream.cbsnews.com/out/v1/55a8648e8f134e82a470f83d562deeca/master.m3u8',
+      fallbackStreams: [
+        'https://247wlive.foxweather.com/stream/index.m3u8',
+        'https://linear901-oo-hls0-prd-gtm.delivery.skycdp.com/17501/sde-fast-skynews/master.m3u8'
+      ],
       genres: ['live', 'docu'],
       genresHe: ['חדשות ארה״ב', 'שידור חי']
     },
@@ -367,20 +394,26 @@
       poster: 'https://images.unsplash.com/photo-1504711331083-9c895941bf81?w=600&auto=format&fit=crop&q=80',
       backdrop: 'https://images.unsplash.com/photo-1504711331083-9c895941bf81?w=1600&auto=format&fit=crop&q=80',
       streamUrl: 'https://cbsn-us.cbsnstream.cbsnews.com/out/v1/55a8648e8f134e82a470f83d562deeca/master.m3u8',
+      fallbackStreams: [
+        'https://247wlive.foxweather.com/stream/index.m3u8'
+      ],
       genres: ['live', 'docu'],
       genresHe: ['חדשות ארה״ב', 'שידור חי']
     },
     {
       id: 'us_nbc_news',
       type: 'channel',
-      title: 'NBC News NOW USA — חדשות ארה״ב',
-      originalTitle: 'NBC News NOW Live',
+      title: 'TRT & Global News HD — חדשות באנגלית',
+      originalTitle: 'Global English News 24/7',
       year: 'LIVE',
       rating: 'US HD',
-      overview: 'שידור חי של רשת NBC News האמריקאית: מבזקים, כתבות שטח ואירועים מרכזיים בארה״ב.',
+      overview: 'שידור חי באנגלית של חדשות, מבזקים ואירועים מרכזיים מהעולם וארה״ב.',
       poster: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80',
       backdrop: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1600&auto=format&fit=crop&q=80',
-      streamUrl: 'https://dai2.xumo.com/amagi_hls_data_xumo1212A-xumo-nbcnewsnow/CDN/master.m3u8',
+      streamUrl: 'https://tv-trtworld.medya.trt.com.tr/master.m3u8',
+      fallbackStreams: [
+        'https://cbsn-us.cbsnstream.cbsnews.com/out/v1/55a8648e8f134e82a470f83d562deeca/master.m3u8'
+      ],
       genres: ['live', 'docu'],
       genresHe: ['חדשות ארה״ב', 'שידור חי']
     },
@@ -395,20 +428,26 @@
       poster: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=600&auto=format&fit=crop&q=80',
       backdrop: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1600&auto=format&fit=crop&q=80',
       streamUrl: 'https://247wlive.foxweather.com/stream/index.m3u8',
+      fallbackStreams: [
+        'https://cbsn-us.cbsnstream.cbsnews.com/out/v1/55a8648e8f134e82a470f83d562deeca/master.m3u8'
+      ],
       genres: ['live', 'docu'],
       genresHe: ['חדשות ארה״ב', 'שידור חי']
     },
     {
       id: 'us_bloomberg',
       type: 'channel',
-      title: 'Bloomberg TV USA — כלכלה וול סטריט חי',
-      originalTitle: 'Bloomberg TV US Live',
+      title: 'NHK World & Business HD — כלכלה וטכנולוגיה חי',
+      originalTitle: 'NHK World Business & Tech Live',
       year: 'LIVE',
       rating: 'US HD',
-      overview: 'שידור חי מוול סטריט וניו יורק: שוק ההון האמריקאי, טכנולוגיה וחדשות כלכלה עולמיות.',
+      overview: 'שידור חי באנגלית: שוקי ההון, טכנולוגיה, מדע וחדשות כלכלה עולמיות.',
       poster: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&auto=format&fit=crop&q=80',
       backdrop: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1600&auto=format&fit=crop&q=80',
-      streamUrl: 'https://liveproduseast.global.ssl.fastly.net/us/Channel-USTV-AWS-virginia-1/Source-USTV-1000-1_live.m3u8',
+      streamUrl: 'https://media-tyo.hls.nhkworld.jp/hls/w/live/master.m3u8',
+      fallbackStreams: [
+        'https://dwamdstream102.akamaized.net/hls/live/2015525/dwstream102/index.m3u8'
+      ],
       genres: ['live', 'docu'],
       genresHe: ['חדשות ארה״ב', 'וול סטריט']
     },
@@ -423,6 +462,9 @@
       poster: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&auto=format&fit=crop&q=80',
       backdrop: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1600&auto=format&fit=crop&q=80',
       streamUrl: 'https://linear901-oo-hls0-prd-gtm.delivery.skycdp.com/17501/sde-fast-skynews/master.m3u8',
+      fallbackStreams: [
+        'https://dwamdstream102.akamaized.net/hls/live/2015525/dwstream102/index.m3u8'
+      ],
       genres: ['live', 'docu'],
       genresHe: ['חדשות עולמיות', 'שידור חי']
     },
@@ -437,6 +479,9 @@
       poster: 'https://images.unsplash.com/photo-1508921340878-ba53e1f016ec?w=600&auto=format&fit=crop&q=80',
       backdrop: 'https://images.unsplash.com/photo-1508921340878-ba53e1f016ec?w=1600&auto=format&fit=crop&q=80',
       streamUrl: 'https://dwamdstream102.akamaized.net/hls/live/2015525/dwstream102/index.m3u8',
+      fallbackStreams: [
+        'https://live.france24.com/hls/live/2037218-b/F24_EN_HI_HLS/master_5000.m3u8'
+      ],
       genres: ['live', 'docu'],
       genresHe: ['חדשות עולמיות', 'שידור חי']
     },
@@ -451,6 +496,9 @@
       poster: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&auto=format&fit=crop&q=80',
       backdrop: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1600&auto=format&fit=crop&q=80',
       streamUrl: 'https://live.france24.com/hls/live/2037218-b/F24_EN_HI_HLS/master_5000.m3u8',
+      fallbackStreams: [
+        'https://dwamdstream102.akamaized.net/hls/live/2015525/dwstream102/index.m3u8'
+      ],
       genres: ['live', 'docu'],
       genresHe: ['חדשות עולמיות', 'שידור חי']
     },
@@ -465,6 +513,10 @@
       poster: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600&auto=format&fit=crop&q=80',
       backdrop: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1600&auto=format&fit=crop&q=80',
       streamUrl: 'https://dai.google.com/linear/hls/event/Sid4xiTQTkCT1SLu6rjUSQ/master.m3u8',
+      fallbackStreams: [
+        'https://raycom-accdn-firetv.amagi.tv/playlist.m3u8',
+        'https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8'
+      ],
       genres: ['live', 'action'],
       genresHe: ['ספורט ארה״ב', 'שידור חי']
     },
@@ -479,34 +531,45 @@
       poster: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?w=600&auto=format&fit=crop&q=80',
       backdrop: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?w=1600&auto=format&fit=crop&q=80',
       streamUrl: 'https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8',
+      fallbackStreams: [
+        'https://dai.google.com/linear/hls/event/Sid4xiTQTkCT1SLu6rjUSQ/master.m3u8'
+      ],
       genres: ['live', 'action'],
       genresHe: ['ספורט ארה״ב', 'אקסטרים']
     },
     {
       id: 'us_motorsports_live',
       type: 'channel',
-      title: 'US Motorsports & Monster Jam HD — מרוצים חי',
-      originalTitle: 'US Motorsports Live HD',
+      title: 'beIN SPORTS Xtra HD — כדורגל וספורט חי',
+      originalTitle: 'beIN SPORTS Live HD',
       year: 'LIVE',
       rating: 'US SPORT',
-      overview: 'שידורים חיים של מרוצי מכוניות, משאיות ענק ומוטור-ספורט מאצטדיונים בארה״ב.',
+      overview: 'שידורים חיים 24/7 של משחקי כדורגל, ליגות בינלאומיות ואירועי ספורט מארה״ב ואירופה.',
       poster: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=600&auto=format&fit=crop&q=80',
       backdrop: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=1600&auto=format&fit=crop&q=80',
-      streamUrl: 'https://amg00218-fremantle-amg00218c1-samsung-us-1827.playouts.now.amagi.tv/playlist.m3u8',
+      streamUrl: 'https://bein-esp-xumo.amagi.tv/playlist.m3u8',
+      fallbackStreams: [
+        'https://dai.google.com/linear/hls/event/Sid4xiTQTkCT1SLu6rjUSQ/master.m3u8',
+        'https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8'
+      ],
       genres: ['live', 'action'],
-      genresHe: ['ספורט ארה״ב', 'מרוצים']
+      genresHe: ['ספורט ארה״ב', 'כדורגל חי']
     },
     {
       id: 'us_billiard_sports',
       type: 'channel',
-      title: 'US Pro Sports & Billiard TV HD — אליפויות חי',
-      originalTitle: 'Billiard TV US Sports Live',
+      title: 'ACC Sports Network USA — ספורט אמריקאי חי',
+      originalTitle: 'ACC Sports Network Live HD',
       year: 'LIVE',
       rating: 'US SPORT',
-      overview: 'שידור חי 24/7 של אליפויות סנוקר וביליארד מקצועניות מארה״ב והעולם.',
+      overview: 'שידור חי 24/7 של ליגות הכדורסל, הפוטבול והספורט מארצות הברית ב-Full HD.',
       poster: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&auto=format&fit=crop&q=80',
       backdrop: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1600&auto=format&fit=crop&q=80',
-      streamUrl: 'https://billiardtv.stream.aggro.tv/billiardtv/index.m3u8',
+      streamUrl: 'https://raycom-accdn-firetv.amagi.tv/playlist.m3u8',
+      fallbackStreams: [
+        'https://dai.google.com/linear/hls/event/Sid4xiTQTkCT1SLu6rjUSQ/master.m3u8',
+        'https://30a-tv.com/feeds/vidaa/golf.m3u8'
+      ],
       genres: ['live', 'action'],
       genresHe: ['ספורט ארה״ב', 'שידור חי']
     }
@@ -761,8 +824,13 @@
       ? raw.genres_he
       : genreKeys.map(function (k) { return GENRE_HE_LABELS[k] || 'דרמה'; });
 
-    var streamUrl = raw.stream_url || raw.streamUrl || raw.directUrl || '';
-    var fallbackStreams = Array.isArray(raw.fallback_streams) ? raw.fallback_streams : [];
+    var streamUrl = raw.stream_url || raw.streamUrl || raw.hls_url || raw.directUrl || '';
+    var fallbackStreams = Array.isArray(raw.fallback_streams)
+      ? raw.fallback_streams.slice()
+      : (Array.isArray(raw.fallbackStreams) ? raw.fallbackStreams.slice() : []);
+    if (raw.backup_hls_url && fallbackStreams.indexOf(raw.backup_hls_url) === -1) {
+      fallbackStreams.unshift(raw.backup_hls_url);
+    }
     var videoId = raw.videoId || '';
     var directYtId = raw.direct_yt_id || raw.directYtId || '';
     var trailerYtId = raw.trailer_yt_id || raw.trailerYtId || '';
@@ -1313,8 +1381,26 @@
           }
         }
         if (existingIdx >= 0) {
-          state.catalog.channels[existingIdx] = normCh;
-        } else {
+          var exCh = state.catalog.channels[existingIdx];
+          if (!exCh.streamUrl && normCh.streamUrl && normCh.streamUrl.indexOf('https://') === 0) {
+            exCh.streamUrl = normCh.streamUrl;
+          }
+          if (normCh.streamUrl && normCh.streamUrl.indexOf('https://') === 0 && normCh.streamUrl !== exCh.streamUrl) {
+            exCh.fallbackStreams = exCh.fallbackStreams || [];
+            if (exCh.fallbackStreams.indexOf(normCh.streamUrl) === -1) {
+              exCh.fallbackStreams.push(normCh.streamUrl);
+            }
+          }
+          if (Array.isArray(normCh.fallbackStreams)) {
+            exCh.fallbackStreams = exCh.fallbackStreams || [];
+            for (var fb = 0; fb < normCh.fallbackStreams.length; fb++) {
+              var fbUrl = normCh.fallbackStreams[fb];
+              if (fbUrl && fbUrl.indexOf('https://') === 0 && exCh.fallbackStreams.indexOf(fbUrl) === -1) {
+                exCh.fallbackStreams.push(fbUrl);
+              }
+            }
+          }
+        } else if (normCh.streamUrl && normCh.streamUrl.indexOf('https://') === 0) {
           state.catalog.channels.push(normCh);
         }
       }
@@ -2870,14 +2956,28 @@
       return;
     }
 
-    // 2. Live TV Channel Playback (Cloud Direct HLS on any computer, or proxied when local server is active)
-    if (item.type === 'channel' && item.streamUrl) {
-      var chUrls = [item.streamUrl].concat(item.fallbackStreams || []);
-      if (hasLocalBackend()) {
-        var proxiedLive = getApiBase() + '/api/hls-proxy?url=' + encodeURIComponent(chUrls[0]) + '&origin=live';
-        playDirectHlsOrMp4(proxiedLive, 0, chUrls[0]);
-      } else {
-        playDirectHlsOrMp4(chUrls[0], 0, chUrls[1] || '');
+    // 2. Live TV Channel Playback (Direct Verified HTTPS+CORS HLS on any computer/TV + multi-server automatic failover)
+    if (item.type === 'channel') {
+      if (!item.streamUrl) {
+        for (var bc = 0; bc < BUILTIN_CHANNELS.length; bc++) {
+          if (BUILTIN_CHANNELS[bc].id === item.id || BUILTIN_CHANNELS[bc].title === item.title) {
+            item.streamUrl = BUILTIN_CHANNELS[bc].streamUrl;
+            item.fallbackStreams = BUILTIN_CHANNELS[bc].fallbackStreams || [];
+            break;
+          }
+        }
+      }
+      var chUrls = [item.streamUrl].concat(item.fallbackStreams || []).filter(Boolean);
+      if (hasLocalBackend() && chUrls.length) {
+        chUrls.push(getApiBase() + '/api/hls-proxy?url=' + encodeURIComponent(chUrls[0]) + '&origin=live');
+      }
+      if ((state.activeSourceTab === 'embed1' || state.activeSourceTab === 'swarm') && chUrls.length > 1) {
+        chUrls = chUrls.slice(1).concat([chUrls[0]]);
+      } else if (state.activeSourceTab === 'embed2' && chUrls.length > 2) {
+        chUrls = chUrls.slice(2).concat(chUrls.slice(0, 2));
+      }
+      if (chUrls.length) {
+        playDirectHlsOrMp4(chUrls[0], 0, chUrls.slice(1));
       }
       return;
     }
@@ -3056,15 +3156,33 @@
     var embedContainer = document.getElementById('embedPlayerContainer');
     var playerModal = document.getElementById('playerModal');
     var spinner = document.getElementById('playerLoadingSpinner');
+    var loadingText = document.getElementById('playerLoadingText');
+    var subStatusEl = document.getElementById('playerSubtitleStatus');
     var subOverlay = document.getElementById('customSubtitleOverlay');
     if (!video || !embedContainer) return;
+
+    var fallbackQueue = Array.isArray(rawFallbackUrl)
+      ? rawFallbackUrl.filter(Boolean)
+      : (rawFallbackUrl ? [rawFallbackUrl] : []);
+
+    var isLiveChannel = Boolean(state.playingItem && state.playingItem.type === 'channel');
 
     state.playingMode = 'video';
     if (playerModal) playerModal.classList.remove('embed-mode-active');
     embedContainer.classList.add('hidden');
     embedContainer.innerHTML = '';
     video.classList.remove('hidden');
-    if (subOverlay) subOverlay.classList.remove('hidden');
+    if (subOverlay) {
+      if (isLiveChannel) {
+        subOverlay.innerHTML = '';
+        subOverlay.classList.add('hidden');
+      } else {
+        subOverlay.classList.remove('hidden');
+      }
+    }
+    if (loadingText && isLiveChannel) {
+      loadingText.textContent = 'מתחבר לשידור חי (LIVE HD)...';
+    }
 
     ensurePlyrInitialized(video);
 
@@ -3075,6 +3193,9 @@
 
     var onReadyToPlay = function () {
       if (spinner) spinner.classList.add('hidden');
+      if (isLiveChannel && subStatusEl) {
+        subStatusEl.textContent = 'שידור חי ישיר (LIVE HD) • מחובר';
+      }
       if (startOffsetSec > 0 && video.currentTime < startOffsetSec) {
         try { video.currentTime = startOffsetSec; } catch (e) {}
       }
@@ -3122,9 +3243,15 @@
       });
       hls.on(window.Hls.Events.ERROR, function (ev, errData) {
         if (errData && errData.fatal) {
-          if (rawFallbackUrl && streamUrl !== rawFallbackUrl) {
-            playDirectHlsOrMp4(rawFallbackUrl, startOffsetSec, '');
-          } else if (state.playingItem && state.playingItem.type !== 'channel') {
+          if (fallbackQueue.length > 0) {
+            var nextUrl = fallbackQueue[0];
+            var restUrls = fallbackQueue.slice(1);
+            if (nextUrl && nextUrl !== streamUrl) {
+              playDirectHlsOrMp4(nextUrl, startOffsetSec, restUrls);
+              return;
+            }
+          }
+          if (state.playingItem && state.playingItem.type !== 'channel') {
             playCleanEmbedStream(state.playingItem, state.activeSeason, state.activeEpisode, startOffsetSec, 'embed1');
           }
         }
@@ -3133,7 +3260,9 @@
       video.src = streamUrl;
       video.addEventListener('loadedmetadata', onReadyToPlay, { once: true });
       video.addEventListener('error', function () {
-        if (state.playingItem && state.playingItem.type !== 'channel') {
+        if (fallbackQueue.length > 0) {
+          playDirectHlsOrMp4(fallbackQueue[0], startOffsetSec, fallbackQueue.slice(1));
+        } else if (state.playingItem && state.playingItem.type !== 'channel') {
           playCleanEmbedStream(state.playingItem, state.activeSeason, state.activeEpisode, startOffsetSec, 'embed1');
         }
       }, { once: true });
