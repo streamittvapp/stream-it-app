@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&family=Rubik:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
-  <link rel="stylesheet" href="styles.css?v=9.6.0" />
+  <link rel="stylesheet" href="styles.css?v=9.6.2" />
   <script>
     (function () {
       try {
@@ -31,13 +31,13 @@
           });
         }
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (!otaVer || otaVer <= '9.6.0') {
+        if (!otaVer || otaVer <= '9.6.2') {
           localStorage.removeItem('streamit_ota_css_v9');
           localStorage.removeItem('streamit_ota_app_js_v9');
           localStorage.removeItem('streamit_ota_tv_nav_v9');
         }
         var otaCss = localStorage.getItem('streamit_ota_css_v9') || '';
-        if (otaVer && otaVer > '9.6.0' && otaCss.length > 500) {
+        if (otaVer && otaVer > '9.6.1' && otaCss.length > 500) {
           var st = document.createElement('style');
           st.id = 'streamit-ota-live-style-v9';
           st.textContent = otaCss;
@@ -199,9 +199,7 @@
   <!-- ===================================================================== -->
   <!-- SMART TV ULTRA-SLIM RIGHT SIDE RAIL (#tvSideRail)                     -->
   <!-- ===================================================================== -->
-  <aside id="tvSideRail" class="tv-side-rail" role="navigation" aria-label="סרגל ניווט לטלוויזיה">
-    <div class="tv-rail-logo" aria-hidden="true">S</div>
-
+  <aside id="tvSideRail" class="tv-side-rail" role="navigation" aria-label="סרגל צד ימני לסטרימר">
     <div class="tv-rail-group">
       <button type="button" id="tvSearchRailBtn" class="tv-rail-btn tv-focusable" aria-label="חיפוש">
         <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
@@ -211,68 +209,39 @@
         <span class="tv-rail-label">חיפוש</span>
       </button>
 
-      <button type="button" class="tv-rail-btn active tv-focusable" data-category="all" aria-label="ראשי">
+      <button type="button" id="tvGenresRailBtn" class="tv-rail-btn tv-focusable" aria-label="סוגות">
         <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
-          <path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5.5v-6h-5v6H4a1 1 0 0 1-1-1v-9.5z" />
+          <rect x="3" y="3" width="7" height="7" rx="1.5" />
+          <rect x="14" y="3" width="7" height="7" rx="1.5" />
+          <rect x="3" y="14" width="7" height="7" rx="1.5" />
+          <rect x="14" y="14" width="7" height="7" rx="1.5" />
         </svg>
-        <span class="tv-rail-label">ראשי</span>
+        <span class="tv-rail-label">סוגות</span>
       </button>
 
-      <button type="button" class="tv-rail-btn tv-focusable" data-category="movies" aria-label="סרטים">
+      <button type="button" id="tvPlatformsRailBtn" class="tv-rail-btn tv-focusable" aria-label="פלטפורמות">
         <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
-          <rect x="2" y="3" width="20" height="18" rx="1" />
-          <path d="M7 3v18M17 3v18M2 8h5M2 12h20M2 16h5M17 8h5M17 16h5" />
+          <rect x="2" y="4" width="20" height="14" rx="2" />
+          <path d="M8 21h8M12 18v3" />
         </svg>
-        <span class="tv-rail-label">סרטים</span>
+        <span class="tv-rail-label">פלטפורמות</span>
       </button>
 
-      <button type="button" class="tv-rail-btn tv-focusable" data-category="series" aria-label="סדרות">
+      <button type="button" id="tvYearsRailBtn" class="tv-rail-btn tv-focusable" aria-label="לפי שנה">
         <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
-          <rect x="2" y="6" width="20" height="14" rx="1" />
-          <path d="M7 3h10M9 11l6 3-6 3v-6z" />
+          <rect x="3" y="4" width="18" height="18" rx="2" />
+          <path d="M16 2v4M8 2v4M3 10h18" />
         </svg>
-        <span class="tv-rail-label">סדרות</span>
+        <span class="tv-rail-label">לפי שנה</span>
       </button>
 
-      <button type="button" class="tv-rail-btn tv-focusable" data-category="channels" aria-label="ערוצים">
+      <button type="button" id="tvMoreRailBtn" class="tv-rail-btn tv-focusable" aria-label="עוד">
         <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
-          <circle cx="12" cy="12" r="2.5" />
-          <path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14" />
+          <circle cx="5" cy="12" r="2" />
+          <circle cx="12" cy="12" r="2" />
+          <circle cx="19" cy="12" r="2" />
         </svg>
-        <span class="tv-rail-label">ערוצים</span>
-      </button>
-
-      <button type="button" class="tv-rail-btn tv-focusable" data-category="youtube" aria-label="יוטיוב">
-        <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
-          <rect x="2" y="5" width="20" height="14" rx="2" />
-          <path d="M10 9l5 3-5 3V9z" />
-        </svg>
-        <span class="tv-rail-label">יוטיוב</span>
-      </button>
-
-      <button type="button" class="tv-rail-btn tv-focusable" data-category="mylist" aria-label="הרשימה שלי">
-        <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
-          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-        </svg>
-        <span class="tv-rail-label">הרשימה</span>
-      </button>
-    </div>
-
-    <div class="tv-rail-footer">
-      <button type="button" id="tvTelegramRailBtn" class="tv-rail-btn tv-focusable" aria-label="ערוצי טלגרם VOD">
-        <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
-          <path d="M22 2L11 13" />
-          <path d="M22 2L15 22l-4-9-9-4 20-7z" />
-        </svg>
-        <span class="tv-rail-label">טלגרם</span>
-      </button>
-
-      <button type="button" id="tvAccountRailBtn" class="tv-rail-btn tv-focusable" aria-label="מי צופה עכשיו וחשבון">
-        <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-          <circle cx="12" cy="7" r="4" />
-        </svg>
-        <span class="tv-rail-label">פרופילים</span>
+        <span class="tv-rail-label">עוד</span>
       </button>
     </div>
   </aside>
@@ -1082,6 +1051,71 @@
   </div>
 
   <!-- ===================================================================== -->
+  <!-- STREAMER "MORE" HUB MODAL (#tvMoreModal) — ACTORS, TELEGRAM & SETTINGS-->
+  <!-- ===================================================================== -->
+  <div id="tvMoreModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="tvMoreModalHeading">
+    <div class="auth-modal-card tv-more-modal-card">
+      <div class="auth-card-header">
+        <div>
+          <h2 id="tvMoreModalHeading" class="auth-heading">עוד ב-STREAM IT — שחקנים, טלגרם והגדרות</h2>
+          <p class="tg-modal-sub">חיפוש וסינון לפי שחקנים, ערוצי טלגרם VOD, יוטיוב וניהול פרופילים</p>
+        </div>
+        <button type="button" id="closeTvMoreModalBtn" class="modal-close-btn tv-focusable" aria-label="סגור תפריט עוד">
+          <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="tv-more-actions-grid">
+        <button type="button" id="tvMoreProfilesBtn" class="tv-more-action-tile tv-focusable">
+          <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+          <span>מי צופה עכשיו? (פרופילים)</span>
+        </button>
+        <button type="button" id="tvMoreTelegramCatBtn" class="tv-more-action-tile tv-focusable">
+          <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M22 2L11 13" /><path d="M22 2L15 22l-4-9-9-4 20-7z" /></svg>
+          <span>קטלוג טלגרם VOD</span>
+        </button>
+        <button type="button" id="tvMoreTelegramHubBtn" class="tv-more-action-tile tv-focusable">
+          <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+          <span>+ ניהול ערוצי טלגרם</span>
+        </button>
+        <button type="button" id="tvMoreYoutubeBtn" class="tv-more-action-tile tv-focusable">
+          <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2" /><path d="M10 9l5 3-5 3V9z" /></svg>
+          <span>יוטיוב וטריילרים</span>
+        </button>
+        <button type="button" id="tvMoreSubsBtn" class="tv-more-action-tile tv-focusable">
+          <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="M6 12h4M12 12h6M6 16h8M16 16h2" /></svg>
+          <span id="tvMoreSubsLabel">כתוביות: עברית (ענק)</span>
+        </button>
+        <button type="button" id="tvMoreRefreshBtn" class="tv-more-action-tile tv-focusable">
+          <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M23 4v6h-6M1 20v-6h6" /><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" /></svg>
+          <span>סנכרון ורענון קטלוג</span>
+        </button>
+      </div>
+
+      <div class="tv-more-actors-section">
+        <div class="tv-more-actors-header">
+          <h3 class="sub-users-heading">שחקנים ופילמוגרפיה (בחר שחקן או חפש לפי שם)</h3>
+          <div class="tv-more-actor-search-bar">
+            <input
+              type="text"
+              id="tvMoreActorSearchInput"
+              class="form-input tv-more-actor-input tv-focusable"
+              dir="rtl"
+              placeholder="חפש שחקן (למשל: ברוס ויליס, גל גדות)..."
+              aria-label="חיפוש לפי שם שחקן"
+              autocomplete="off"
+            />
+            <button type="button" id="tvMoreActorSearchBtn" class="btn-primary tv-more-actor-btn tv-focusable">חפש שחקן</button>
+          </div>
+        </div>
+        <div id="tvMoreActorsGrid" class="actor-photo-grid tv-more-actors-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
   <!-- UNIVERSAL TV ON-SCREEN KEYBOARD (#tvVirtualKeyboard) — STRICT LTR     -->
   <!-- ===================================================================== -->
   <div id="tvVirtualKeyboard" class="tv-virtual-keyboard hidden" dir="ltr" role="dialog" aria-label="מקלדת על המסך">
@@ -1107,13 +1141,13 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Core Application & Smart TV Navigation Scripts -->
-  <script src="tv-navigation.js?v=9.6.0"></script>
-  <script src="app.js?v=9.6.0"></script>
+  <script src="tv-navigation.js?v=9.6.2"></script>
+  <script src="app.js?v=9.6.2"></script>
   <script>
     (function () {
       try {
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (otaVer && otaVer > '9.6.0') {
+        if (otaVer && otaVer > '9.6.2') {
           var navCode = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
           if (navCode.length > 500) {
             var s1 = document.createElement('script');

@@ -1,9 +1,9 @@
 {
-  "version": "9.6.0",
+  "version": "9.6.2",
   "native_apk_version": "9.6.0",
   "apk_download_url": "https://streamittvapp.github.io/stream-it-app/StreamIt-AndroidTV.apk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-08T22:06:00Z",
-  "notes": "v9.6.0 — Ultimate Android TV / Streamer Edition: Full 10-foot Top Header visibility on TV (Expanded Search, User Settings Menu on left with Telegram VOD, Category Nav), full D-Pad navigation for User Settings menu, Continue Watching card removal, Player Sources dropdown, Netflix Scene Thumbnail preview on remote scrubbing, and Self-Healing OTA boot engine."
+  "updated_at": "2026-11-08T23:36:00Z",
+  "notes": "v9.6.2 — Streamer Player Remote Controls Fix (Desktop untouched): Center remote button during movie playback immediately pauses on 1st press and resumes on 2nd press; Back button inside Subtitle Settings closes the settings overlay and returns directly to movie playback without exiting the movie."
 }
