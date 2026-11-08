@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.5.1';
+  var APP_VERSION = '9.5.2';
 
   // Embedded Cloud Vault Sync Key (XOR-73 encoded for zero-delay GitHub Cloud Vault read/write)
   var CLOUD_VAULT_SYNC_BYTES = [46, 33, 57, 22, 127, 49, 51, 27, 39, 44, 60, 44, 29, 122, 7, 31, 24, 6, 121, 112, 58, 32, 25, 60, 40, 39, 127, 39, 38, 26, 125, 59, 19, 34, 121, 56, 26, 63, 16, 49];
@@ -58,8 +58,7 @@
     { id: 'animation', label: 'אנימציה ומשפחה' },
     { id: 'docu', label: 'דוקומנטרי וביוגרפיה' },
     { id: 'israeli', label: 'יצירה ישראלית' },
-    { id: 'channels', label: 'ערוצים חיים (ישראל וארה״ב)' },
-    { id: 'youtube', label: 'יוטיוב • YouTube' }
+    { id: 'channels', label: 'ערוצים חיים (ישראל וארה״ב)' }
   ];
 
   // Dropdown 1: Streaming Giants & Global Catalogs (#providerFilterStrip)
@@ -6617,7 +6616,7 @@
     var renderTickerHeadlines = function (headlines) {
       var list = headlines.concat(headlines); // duplicate for seamless infinite loop
       track.innerHTML = list.map(function (h) {
-        return '<span class="live-news-ticker-item">' + escapeHtml(h) + ' <span class="live-news-sep">•</span></span>';
+        return '<span class="news-ticker-item">' + escapeHtml(h) + ' <span class="news-ticker-sep">•</span></span>';
       }).join('');
     };
 

@@ -3453,35 +3453,40 @@ body.auth-gate-locked #quickTestLoginBtn {
 .live-news-ticker-bar {
   flex: 1 1 260px;
   min-width: 220px;
-  height: 40px;
-  background: linear-gradient(90deg, rgba(16, 20, 30, 0.95) 0%, rgba(22, 26, 38, 0.95) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.11);
-  border-radius: 6px;
+  height: 36px;
+  min-height: 36px;
+  max-height: 36px;
+  background-color: #151515;
+  border: none;
+  border-radius: var(--radius-btn);
   display: flex;
   align-items: center;
+  padding: 0 5px;
+  gap: 8px;
   overflow: hidden;
   direction: rtl;
+  box-sizing: border-box;
 }
 
 .news-ticker-badge {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  height: 100%;
-  padding: 0 13px;
-  background: linear-gradient(135deg, #e50914 0%, #b80710 100%);
+  gap: 6px;
+  height: 26px;
+  padding: 0 10px;
+  background-color: var(--brand-red);
   color: #ffffff;
   font-size: 0.76rem;
-  font-weight: 800;
+  font-weight: 700;
+  border-radius: var(--radius-card);
   white-space: nowrap;
   flex-shrink: 0;
   z-index: 2;
-  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.5);
 }
 
 .news-live-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: #ffffff;
   animation: newsPulse 1.4s infinite ease-in-out;
@@ -3504,11 +3509,11 @@ body.auth-gate-locked #quickTestLoginBtn {
 .news-ticker-track {
   display: inline-flex;
   align-items: center;
-  gap: 34px;
+  gap: 28px;
   white-space: nowrap;
-  padding: 0 18px;
+  padding: 0 14px;
   will-change: transform;
-  animation: newsMarqueeRtl 52s linear infinite;
+  animation: newsMarqueeRtl 135s linear infinite;
 }
 
 .live-news-ticker-bar:hover .news-ticker-track {
@@ -3516,20 +3521,23 @@ body.auth-gate-locked #quickTestLoginBtn {
 }
 
 @keyframes newsMarqueeRtl {
-  0% { transform: translateX(-12%); }
-  100% { transform: translateX(65%); }
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(50%); }
 }
 
-.news-ticker-item {
+.news-ticker-item,
+.live-news-ticker-item {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.84rem;
+  font-size: 0.82rem;
   font-weight: 600;
+  line-height: 1;
   color: #e2e8f0;
 }
 
-.news-ticker-sep {
+.news-ticker-sep,
+.live-news-sep {
   color: #e50914;
   font-weight: 900;
   margin: 0 6px;
