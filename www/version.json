@@ -1,9 +1,9 @@
 {
-  "version": "9.4.9",
-  "native_apk_version": "9.4.9",
+  "version": "9.5.0",
+  "native_apk_version": "9.5.0",
   "apk_download_url": "https://is.gd/streamittv_apk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-08T19:27:00Z",
-  "notes": "v9.4.9 — Fixed Channel 12 (Keshet 12) and Channel 23 (Kan Educational 23) + verified all 24 live channels (3-step Master -> Variant -> .ts + CORS), unified all live broadcasts into a single Live Broadcast Hub, replaced all dummy Unsplash photos on channel tiles with branded official vector channel tiles, and added Direct IPTV / M3U8 Importer for yes / HOT / NEXT TV / Cellcom TV."
+  "updated_at": "2026-11-08T20:05:00Z",
+  "notes": "v9.5.0 — Restored full movie player control bar & timeline scrub slider (removed height: calc(100% + 66px) cut-off), added targeted Hebrew CC overlay over the embed foreign CC icon only, fixed Hebrew subtitle sync on movies like Verity (תעתוע) and self-healed subtitle overlay after live channel playback, and strictly blocked non-Israeli/Far-East titles from the Israeli catalog."
 }

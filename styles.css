@@ -1893,9 +1893,9 @@ body.tv-mode .poster-card:focus {
 
 .embed-player-container iframe {
   width: 100% !important;
-  height: calc(100% + 66px) !important;
+  height: 100% !important;
   border: none !important;
-  pointer-events: none !important;
+  pointer-events: auto !important;
 }
 
 .video-element,
@@ -2066,13 +2066,58 @@ body.tv-mode .poster-card:focus {
 .player-controls-overlay .player-top-bar,
 .player-controls-overlay .player-bottom-bar,
 .player-controls-overlay .subtitles-menu-panel,
-.player-controls-overlay .player-subs-menu {
+.player-controls-overlay .player-subs-menu,
+.player-controls-overlay .embed-cc-overlay-btn {
   pointer-events: auto;
 }
 
-/* Unified STREAM IT top & bottom controls remain active in both direct video and cloud embed modes */
+/* When playing a Cloud Embed / YouTube iframe, let the embedded player's native timeline & transport bar work 100% unobstructed while masking ONLY the foreign CC icon with our Hebrew CC button */
 .player-modal.embed-mode-active .player-controls-overlay {
   pointer-events: none;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.84) 0%, transparent 22%);
+}
+
+.player-modal.embed-mode-active .player-bottom-bar {
+  display: none !important;
+}
+
+.embed-cc-overlay-btn {
+  display: none;
+}
+
+.player-modal.embed-mode-active .embed-cc-overlay-btn {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  bottom: 8px;
+  right: 128px;
+  width: 42px;
+  height: 40px;
+  padding: 0 4px;
+  background-color: rgba(10, 10, 14, 0.96);
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  border-radius: 8px;
+  border: 1.5px solid rgba(229, 9, 20, 0.85);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
+  z-index: 28;
+  cursor: pointer;
+  pointer-events: auto !important;
+  transition: opacity 0.2s ease, background-color 0.15s ease;
+}
+
+.player-modal.embed-mode-active .embed-cc-overlay-btn:hover,
+.player-modal.embed-mode-active .embed-cc-overlay-btn.tv-focused {
+  background-color: var(--brand-red);
+  color: #ffffff;
+  opacity: 1 !important;
+}
+
+.player-controls-overlay.idle-hidden .embed-cc-overlay-btn {
+  opacity: 0.02;
+  pointer-events: auto !important;
 }
 
 .player-controls-overlay.idle-hidden,

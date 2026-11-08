@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.4.9';
+  var APP_VERSION = '9.5.0';
 
   // Default Zero-Account Public Telegram Channels (Free, No Personal Account or Phone Required)
   var DEFAULT_TELEGRAM_CHANNELS = [
@@ -1138,6 +1138,21 @@
     var heTitle = ISRAELI_TITLES[tmdbId] || rawTitleHe;
     var origTitle = raw.title_en || raw.originalTitle || raw.original_title || raw.original_name || '';
 
+    // Filter out untranslated Far-East / CJK / Thai / Indic scripts (e.g. Japanese ~ドクターX ~外科医・大門未知子) that have no Hebrew translation
+    var farEastScriptRe = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f\uac00-\ud7af\u0e00-\u0e7f\u0b80-\u0bff]/;
+    if (type !== 'channel' && farEastScriptRe.test(heTitle) && !/[\u0590-\u05FF]/.test(heTitle)) {
+      return null;
+    }
+
+    var origLang = String(raw.original_language || '').toLowerCase();
+    var origCountries = Array.isArray(raw.origin_country) ? raw.origin_country : [];
+    var isTrulyIsraeli =
+      type === 'channel' ||
+      rawIdStr.indexOf('il_') === 0 ||
+      origLang === 'he' ||
+      origCountries.indexOf('IL') !== -1 ||
+      (!origLang && Array.isArray(raw.genres) && raw.genres.indexOf('israeli') !== -1 && /[\u0590-\u05FF]/.test(heTitle));
+
     var channelNumber = String(raw.channelNumber || raw.channel_number || (rawIdStr.match(/\d+/) ? rawIdStr.match(/\d+/)[0] : 'LIVE'));
     var logoText = String(raw.logoText || raw.logo_text || heTitle.split('—')[0].trim().slice(0, 14));
     var subLabel = String(raw.subLabel || raw.sub_label || 'שידור חי ישיר HD');
@@ -1194,10 +1209,15 @@
       }
     }
     if (forcedGenreKey && genreKeys.indexOf(forcedGenreKey) === -1) {
-      genreKeys.push(forcedGenreKey);
+      if (forcedGenreKey !== 'israeli' || isTrulyIsraeli) {
+        genreKeys.push(forcedGenreKey);
+      }
     }
-    if (raw.original_language === 'he' && genreKeys.indexOf('israeli') === -1) {
+    if (isTrulyIsraeli && type !== 'channel' && genreKeys.indexOf('israeli') === -1) {
       genreKeys.push('israeli');
+    }
+    if (!isTrulyIsraeli && genreKeys.indexOf('israeli') !== -1) {
+      genreKeys = genreKeys.filter(function (gk) { return gk !== 'israeli'; });
     }
     if ((raw.source === 'telegram' || String(raw.id || '').indexOf('tg_') === 0) && genreKeys.indexOf('telegram') === -1) {
       genreKeys.push('telegram');
@@ -1207,7 +1227,7 @@
     }
 
     var genresHe = Array.isArray(raw.genres_he) && raw.genres_he.length
-      ? raw.genres_he
+      ? raw.genres_he.filter(function (gh) { return isTrulyIsraeli || gh.indexOf('ישראל') === -1; })
       : genreKeys.map(function (k) { return GENRE_HE_LABELS[k] || 'דרמה'; });
 
     var streamUrl = raw.stream_url || raw.streamUrl || raw.hls_url || raw.directUrl || '';
@@ -1249,6 +1269,7 @@
       overview: overview,
       poster: poster,
       backdrop: backdrop,
+      isIsraeli: isTrulyIsraeli,
       genres: genreKeys,
       genresHe: genresHe,
       streamUrl: streamUrl,
@@ -1918,10 +1939,18 @@
     var btn = document.getElementById('loadMoreCatalogBtn');
     if (btn) btn.textContent = 'טוען עוד סרטים וסדרות מהמאגר העולמי...';
 
-    var extraQueries = [
-      { url: '/movie/popular?language=he-IL&page=' + p, type: 'movie', genre: state.activeGenre !== 'all' ? state.activeGenre : null },
-      { url: '/tv/popular?language=he-IL&page=' + p, type: 'series', genre: state.activeGenre !== 'all' ? state.activeGenre : null }
-    ];
+    var extraQueries = [];
+    if (state.activeGenre === 'israeli') {
+      extraQueries.push(
+        { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_original_language=he&page=' + p, type: 'movie', genre: 'israeli' },
+        { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_original_language=he&page=' + p, type: 'series', genre: 'israeli' }
+      );
+    } else {
+      extraQueries.push(
+        { url: '/movie/popular?language=he-IL&page=' + p, type: 'movie', genre: null },
+        { url: '/tv/popular?language=he-IL&page=' + p, type: 'series', genre: null }
+      );
+    }
     if (state.activeYear !== 'all') {
       var yr = state.activeYear === '2010s' ? '2018' : (state.activeYear === '2000s' ? '2005' : (state.activeYear === 'classic' ? '1994' : state.activeYear));
       extraQueries.push({ url: '/discover/movie?language=he-IL&sort_by=popularity.desc&primary_release_year=' + yr + '&page=' + p, type: 'movie', genre: null });
@@ -1972,7 +2001,9 @@
       }
       if (existing) {
         if (forcedGenre && existing.genres.indexOf(forcedGenre) === -1) {
-          existing.genres.push(forcedGenre);
+          if (forcedGenre !== 'israeli' || existing.isIsraeli || norm.isIsraeli) {
+            existing.genres.push(forcedGenre);
+          }
         }
         if (!existing.imdbId && norm.imdbId) existing.imdbId = norm.imdbId;
         if (!existing.tmdbId && norm.tmdbId) existing.tmdbId = norm.tmdbId;
@@ -3924,8 +3955,15 @@
     embedContainer.innerHTML = '';
     video.classList.remove('hidden');
     if (subOverlay) {
+      var subTextSpan = document.getElementById('customSubtitleText');
+      if (!subTextSpan) {
+        subTextSpan = document.createElement('span');
+        subTextSpan.id = 'customSubtitleText';
+        subTextSpan.className = 'custom-subtitle-text';
+        subOverlay.appendChild(subTextSpan);
+      }
       if (isLiveChannel) {
-        subOverlay.innerHTML = '';
+        subTextSpan.textContent = '';
         subOverlay.classList.add('hidden');
       } else {
         subOverlay.classList.remove('hidden');
@@ -4056,6 +4094,7 @@
     state.playingMode = 'embed';
     state.embedStartOffsetSec = Number(startOffsetSec) || 0;
     state.embedCurrentTime = state.embedStartOffsetSec;
+    state.embedDuration = 7200;
     state.embedPaused = false;
     state.embedVerified = false;
     state.embedAutoPlayed = false;
@@ -4075,8 +4114,10 @@
     }
 
     state.embedSubTimer = setInterval(function () {
-      if (state.playingMode === 'embed' && !state.embedPaused && state.embedCurrentTime > 0) {
-        state.embedCurrentTime += 0.25;
+      if (state.playingMode === 'embed' && !state.embedPaused && (state.embedVerified || state.embedCurrentTime >= 0)) {
+        if (state.embedVerified) {
+          state.embedCurrentTime += 0.25;
+        }
         updateActiveSubtitleCue(state.embedCurrentTime);
       }
     }, 250);
@@ -4085,7 +4126,16 @@
     video.pause();
     video.classList.add('hidden');
     embedContainer.classList.remove('hidden');
-    if (subOverlay) subOverlay.classList.remove('hidden');
+    if (subOverlay) {
+      subOverlay.classList.remove('hidden');
+      if (!document.getElementById('customSubtitleText')) {
+        var restoredSpan = document.createElement('span');
+        restoredSpan.id = 'customSubtitleText';
+        restoredSpan.className = 'custom-subtitle-text';
+        subOverlay.appendChild(restoredSpan);
+      }
+    }
+    applySubtitleStyleToOverlay();
     if (spinner) spinner.classList.remove('hidden');
     if (loadingText) {
       loadingText.textContent = state.embedActiveServerKey === 'embed2'
@@ -4116,7 +4166,7 @@
       'sandbox="allow-scripts allow-same-origin allow-forms allow-presentation" ' +
       'referrerpolicy="origin" ' +
       'allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen ' +
-      'style="width:100%;height:calc(100% + 66px);border:none;background:#000;opacity:0;pointer-events:none;transition:opacity 0.25s ease;"></iframe>';
+      'style="width:100%;height:100%;border:none;background:#000;opacity:0;pointer-events:auto;transition:opacity 0.25s ease;"></iframe>';
 
     var iframe = document.getElementById('streamEmbedIframe');
 
@@ -4129,7 +4179,7 @@
       } catch (e) {}
     }, 600);
 
-    // Automatic Failover Watchdog: if `vidspark-player` does not verify within 7s (meaning title is missing on `vidora` and would fall back to `moviesapi.vip`), switch source automatically while iframe opacity is still 0!
+    // Automatic Failover Watchdog: allow up to 15s for multi-server probing (`Vertex -> Beta -> Nebula -> Vega`) inside `cdn.vidspark.to`
     state.embedWatchdogTimer = setTimeout(function () {
       if (state.playingMode === 'embed' && !state.embedVerified && state.playingItem) {
         if (state.embedActiveServerKey === 'embed1') {
@@ -4138,7 +4188,7 @@
           playYoutubeVideoOrTrailer(state.playingItem);
         }
       }
-    }, 7000);
+    }, 15000);
 
     if (iframe) {
       iframe.addEventListener('load', function () {
@@ -4146,6 +4196,17 @@
           if (iframe.contentWindow) {
             iframe.contentWindow.postMessage({ action: 'getStatus' }, '*');
           }
+          setTimeout(function () {
+            var curIfr = document.getElementById('streamEmbedIframe');
+            if (curIfr && state.playingMode === 'embed') {
+              curIfr.style.opacity = '1';
+              var sp = document.getElementById('playerLoadingSpinner');
+              if (sp) sp.classList.add('hidden');
+              if (!state.embedVerified) {
+                state.embedVerified = true;
+              }
+            }
+          }, 3200);
           if (window.AndroidTvBridge && typeof window.AndroidTvBridge.tapCenterOfScreen === 'function') {
             setTimeout(function () {
               var pm = document.getElementById('playerModal');
@@ -4157,6 +4218,14 @@
         } catch (e) {}
       });
     }
+  }
+
+  function getCurrentPlaybackTimeSec() {
+    if (state.playingMode === 'embed') {
+      return typeof state.embedCurrentTime === 'number' && state.embedCurrentTime >= 0 ? state.embedCurrentTime : 0;
+    }
+    var video = document.getElementById('videoElement');
+    return (video && typeof video.currentTime === 'number' && isFinite(video.currentTime)) ? video.currentTime : 0;
   }
 
   /**
@@ -4235,7 +4304,7 @@
     }
 
     renderSubtitlesMenu();
-    updateActiveSubtitleCue(0);
+    updateActiveSubtitleCue(getCurrentPlaybackTimeSec());
   }
 
   function parseWebVttOrSrtText(rawText) {
@@ -4302,8 +4371,14 @@
 
   function updateActiveSubtitleCue(currentTimeSec) {
     var overlay = document.getElementById('customSubtitleOverlay');
+    if (!overlay) return;
     var textSpan = document.getElementById('customSubtitleText');
-    if (!overlay || !textSpan) return;
+    if (!textSpan) {
+      overlay.innerHTML = '<span id="customSubtitleText" class="custom-subtitle-text"></span>';
+      textSpan = document.getElementById('customSubtitleText');
+      applySubtitleStyleToOverlay();
+    }
+    if (!textSpan) return;
 
     if (!state.subEnabled || state.activeSubTrackId === 'off' || !state.parsedCues.length) {
       textSpan.textContent = '';
@@ -4332,8 +4407,12 @@
 
   function applySubtitleStyleToOverlay() {
     var overlay = document.getElementById('customSubtitleOverlay');
-    var textSpan = document.getElementById('customSubtitleText');
     if (!overlay) return;
+    var textSpan = document.getElementById('customSubtitleText');
+    if (!textSpan) {
+      overlay.innerHTML = '<span id="customSubtitleText" class="custom-subtitle-text"></span>';
+      textSpan = document.getElementById('customSubtitleText');
+    }
     overlay.classList.remove(
       'sub-size-normal', 'sub-size-large', 'sub-size-xlarge',
       'sub-color-white', 'sub-color-yellow',
@@ -4452,8 +4531,7 @@
         }
 
         renderSubtitlesMenu();
-        var video = document.getElementById('videoElement');
-        updateActiveSubtitleCue(video ? video.currentTime : 0);
+        updateActiveSubtitleCue(getCurrentPlaybackTimeSec());
       });
     }
   }
@@ -5160,12 +5238,12 @@
     }
 
     // Listen to postMessage events from sandboxed VidSpark/Vidsrc player:
-    // 1. Verifies stream is live (`source === 'vidspark-player'`), reveals iframe, hides loading spinner, and auto-plays
+    // 1. Verifies stream is live (`source === 'vidspark-player' || source === 'moviesapi-player'`), reveals iframe, hides loading spinner, and auto-plays
     // 2. Keeps custom Hebrew subtitles synced with exact playback timestamp
     window.addEventListener('message', function (ev) {
       try {
         var d = ev && ev.data;
-        if (d && d.source === 'vidspark-player') {
+        if (d && (d.source === 'vidspark-player' || d.source === 'moviesapi-player')) {
           if (!state.embedVerified && state.playingMode === 'embed') {
             state.embedVerified = true;
             if (state.embedWatchdogTimer) {
@@ -5218,7 +5296,7 @@
       } catch (e) {}
     });
 
-    // Subtitles Menu Button (Top Bar + Bottom Bar) & Sync/Style/Background Controls
+    // Subtitles Menu Button (Top Bar + Bottom Bar + Embed CC Overlay) & Sync/Style/Background Controls
     var subsMenu = document.getElementById('playerSubsMenu');
     var toggleSubsMenuHandler = function (e) {
       e.stopPropagation();
@@ -5235,8 +5313,10 @@
     };
     var subsBtn = document.getElementById('playerSubsBtn');
     var topSubsBtn = document.getElementById('playerTopSubsBtn');
+    var embedCcBtn = document.getElementById('embedCcOverlayBtn');
     if (subsBtn) subsBtn.addEventListener('click', toggleSubsMenuHandler);
     if (topSubsBtn) topSubsBtn.addEventListener('click', toggleSubsMenuHandler);
+    if (embedCcBtn) embedCcBtn.addEventListener('click', toggleSubsMenuHandler);
 
     var syncMinus = document.getElementById('subSyncMinusBtn');
     var syncReset = document.getElementById('subSyncResetBtn');
@@ -5246,6 +5326,7 @@
         var sign = state.subOffsetSec > 0 ? '+' : '';
         syncReset.textContent = sign + state.subOffsetSec.toFixed(1) + 's';
       }
+      updateActiveSubtitleCue(getCurrentPlaybackTimeSec());
     };
     if (syncMinus) {
       syncMinus.addEventListener('click', function () {
@@ -5755,6 +5836,20 @@
             '<button id="actorSearchSubmitBtn" class="actor-search-submit-btn tv-focusable" type="button" aria-label="חפש שחקן">חפש</button>' +
           '</div>' +
         '</div>';
+    }
+
+    // Ensure Embed CC Overlay Button (`#embedCcOverlayBtn`) exists inside `#playerControlsOverlay` even on OTA-upgraded DOM
+    var ctrlOverlay = document.getElementById('playerControlsOverlay');
+    if (ctrlOverlay && !document.getElementById('embedCcOverlayBtn')) {
+      var ccBtn = document.createElement('button');
+      ccBtn.type = 'button';
+      ccBtn.id = 'embedCcOverlayBtn';
+      ccBtn.className = 'embed-cc-overlay-btn tv-focusable';
+      ccBtn.setAttribute('dir', 'rtl');
+      ccBtn.setAttribute('title', 'הגדרות כתוביות עברית');
+      ccBtn.setAttribute('aria-label', 'הגדרות כתוביות עברית');
+      ccBtn.innerHTML = '<span>עברית</span>';
+      ctrlOverlay.appendChild(ccBtn);
     }
 
     // Ensure Font Size +/- buttons exist in #playerSubsMenu even on OTA-upgraded DOM
