@@ -1,9 +1,9 @@
 {
-  "version": "9.6.2",
+  "version": "9.6.3",
   "native_apk_version": "9.6.0",
   "apk_download_url": "https://streamittvapp.github.io/stream-it-app/StreamIt-AndroidTV.apk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-08T23:36:00Z",
-  "notes": "v9.6.2 — Streamer Player Remote Controls Fix (Desktop untouched): Center remote button during movie playback immediately pauses on 1st press and resumes on 2nd press; Back button inside Subtitle Settings closes the settings overlay and returns directly to movie playback without exiting the movie."
+  "updated_at": "2026-11-09T00:21:00Z",
+  "notes": "v9.6.3 — Streamer UI/UX & Performance Overhaul (Desktop untouched): Removed all rounded corners, borders, red outlines, and white focus backgrounds across the Streamer (flat gray focus); expanded right side menu 2.5x with inline Search + Mini-Keyboard, inline Categories, Platforms, Years, and Actors lists, and bottom Profile + Settings bar; removed duplicate small hero logo; proportional Details Modal; jump-free 60fps D-Pad navigation."
 }

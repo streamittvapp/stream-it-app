@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.6.2';
+  var APP_VERSION = '9.6.3';
   var wasLegacyBooted = Boolean(window.__STREAMIT_V94_BOOTED);
   window.__STREAMIT_V94_BOOTED = true;
 
@@ -2614,6 +2614,44 @@
         renderCatalogShelves();
       });
     }
+
+    var tvCatList = document.getElementById('tvRailCategoriesList');
+    if (tvCatList) {
+      tvCatList.innerHTML = filters.map(function (gf) {
+        var isAct = state.activeGenre === gf.id;
+        return (
+          '<button type="button" class="tv-rail-item tv-focusable' + (isAct ? ' active' : '') + '" data-tv-genre="' + gf.id + '">' +
+            '<span>' + escapeHtml(gf.label) + '</span>' +
+          '</button>'
+        );
+      }).join('');
+      var tvBtns = tvCatList.querySelectorAll('[data-tv-genre]');
+      for (var t = 0; t < tvBtns.length; t++) {
+        tvBtns[t].addEventListener('click', function () {
+          var g = this.getAttribute('data-tv-genre') || 'all';
+          state.activeGenre = g;
+          state.tvInlineSearchQuery = '';
+          var sTxt = document.getElementById('tvRailSearchText');
+          if (sTxt) sTxt.textContent = 'חיפוש...';
+          var sClr = document.getElementById('tvRailSearchClearBtn');
+          if (sClr) sClr.classList.add('hidden');
+          state.gridPage = 1;
+          if (g === 'channels') {
+            state.activeCategory = 'channels';
+          } else if (g === 'youtube') {
+            state.activeCategory = 'youtube';
+          } else if (state.activeCategory === 'channels' || state.activeCategory === 'youtube') {
+            state.activeCategory = 'all';
+          }
+          renderGenreFilterStrip();
+          renderCatalogShelves();
+          var keepFocus = tvCatList.querySelector('[data-tv-genre="' + g + '"]');
+          if (keepFocus && typeof window.streamItFocusElement === 'function') {
+            window.streamItFocusElement(keepFocus, { scroll: false });
+          }
+        });
+      }
+    }
   }
 
   function renderProviderFilterStrip() {
@@ -2658,6 +2696,34 @@
           window.streamItFocusElement(focusTarget, { scroll: false });
         }
       });
+    }
+
+    var tvPlatList = document.getElementById('tvRailPlatformsList');
+    if (tvPlatList) {
+      tvPlatList.innerHTML = PROVIDER_FILTERS.map(function (pf) {
+        var isAct = state.activeProvider === pf.id;
+        var cleanLabel = String(pf.label || '').replace(/\s*\([^)]*\)/g, '');
+        return (
+          '<button type="button" class="tv-rail-item tv-focusable' + (isAct ? ' active' : '') + '" data-tv-provider="' + pf.id + '">' +
+            '<span>' + escapeHtml(cleanLabel) + '</span>' +
+          '</button>'
+        );
+      }).join('');
+      var tvPBtns = tvPlatList.querySelectorAll('[data-tv-provider]');
+      for (var tp = 0; tp < tvPBtns.length; tp++) {
+        tvPBtns[tp].addEventListener('click', function () {
+          var prov = this.getAttribute('data-tv-provider') || 'all';
+          state.activeProvider = prov;
+          state.tvInlineSearchQuery = '';
+          state.gridPage = 1;
+          renderProviderFilterStrip();
+          renderCatalogShelves();
+          var keepFocus = tvPlatList.querySelector('[data-tv-provider="' + prov + '"]');
+          if (keepFocus && typeof window.streamItFocusElement === 'function') {
+            window.streamItFocusElement(keepFocus, { scroll: false });
+          }
+        });
+      }
     }
   }
 
@@ -2706,6 +2772,36 @@
           window.streamItFocusElement(focusTarget, { scroll: false });
         }
       });
+    }
+
+    var tvYearList = document.getElementById('tvRailYearsList');
+    if (tvYearList) {
+      tvYearList.innerHTML = YEAR_FILTERS.map(function (yf) {
+        var isAct = state.activeYear === yf.id;
+        return (
+          '<button type="button" class="tv-rail-item tv-focusable' + (isAct ? ' active' : '') + '" data-tv-year="' + yf.id + '">' +
+            '<span>' + escapeHtml(yf.label) + '</span>' +
+          '</button>'
+        );
+      }).join('');
+      var tvYBtns = tvYearList.querySelectorAll('[data-tv-year]');
+      for (var ty = 0; ty < tvYBtns.length; ty++) {
+        tvYBtns[ty].addEventListener('click', async function () {
+          var y = this.getAttribute('data-tv-year') || 'all';
+          state.activeYear = y;
+          state.tvInlineSearchQuery = '';
+          state.gridPage = 1;
+          renderYearFilterStrip();
+          if (y !== 'all') {
+            await fetchMoviesByYear(y);
+          }
+          renderCatalogShelves();
+          var keepFocus = tvYearList.querySelector('[data-tv-year="' + y + '"]');
+          if (keepFocus && typeof window.streamItFocusElement === 'function') {
+            window.streamItFocusElement(keepFocus, { scroll: false });
+          }
+        });
+      }
     }
   }
 
@@ -2820,6 +2916,39 @@
 
     bindActorBtns(strip, false);
     bindActorBtns(tvMoreActorsGrid, true);
+
+    var tvActList = document.getElementById('tvRailActorsList');
+    if (tvActList) {
+      tvActList.innerHTML = ACTOR_FILTERS.map(function (af) {
+        var isAct = String(state.activeActorId) === String(af.id);
+        var actorLabel = af.name || af.label || '';
+        return (
+          '<button type="button" class="tv-rail-item tv-focusable' + (isAct ? ' active' : '') + '" ' +
+            'data-tv-actor-id="' + af.id + '" data-tv-actor-name="' + escapeHtml(actorLabel) + '">' +
+            '<span>' + escapeHtml(actorLabel) + '</span>' +
+          '</button>'
+        );
+      }).join('');
+      var tvABtns = tvActList.querySelectorAll('[data-tv-actor-id]');
+      for (var ta = 0; ta < tvABtns.length; ta++) {
+        tvABtns[ta].addEventListener('click', async function () {
+          var aid = this.getAttribute('data-tv-actor-id') || 'all';
+          var aname = this.getAttribute('data-tv-actor-name') || '';
+          state.activeActorId = aid;
+          state.activeActorName = aid === 'all' ? '' : aname;
+          state.tvInlineSearchQuery = '';
+          renderActorFilterStrip();
+          if (aid !== 'all') {
+            await fetchActorCredits(aid, aname);
+          }
+          renderCatalogShelves();
+          var keepFocus = tvActList.querySelector('[data-tv-actor-id="' + aid + '"]');
+          if (keepFocus && typeof window.streamItFocusElement === 'function') {
+            window.streamItFocusElement(keepFocus, { scroll: false });
+          }
+        });
+      }
+    }
   }
 
   async function fetchActorCredits(actorId, actorName) {
@@ -3072,7 +3201,21 @@
     var wlBtn = document.getElementById('heroWatchlistBtn');
 
     if (backdropEl) {
-      backdropEl.style.backgroundImage = 'url("' + (item.backdrop || item.poster) + '")';
+      var bgUrl = item.backdrop || item.poster || '';
+      if (document.body && document.body.classList.contains('tv-mode')) {
+        if (backdropEl.getAttribute('data-bg-url') !== bgUrl && bgUrl) {
+          backdropEl.setAttribute('data-bg-url', bgUrl);
+          var preImg = new Image();
+          preImg.onload = function () {
+            if (state.heroItem && state.heroItem.id === item.id) {
+              backdropEl.style.backgroundImage = 'url("' + bgUrl + '")';
+            }
+          };
+          preImg.src = bgUrl;
+        }
+      } else {
+        backdropEl.style.backgroundImage = 'url("' + bgUrl + '")';
+      }
     }
     if (catTagEl) {
       catTagEl.textContent = item.type === 'series' ? 'סדרת טלוויזיה' : (item.type === 'channel' ? 'שידור חי' : 'סרט קולנוע');
@@ -3133,6 +3276,10 @@
 
     var profBucket = ensureActiveProfileBucket();
     var activeProfile = getActiveSubUser();
+    var tvProfNameEl = document.getElementById('tvRailProfileName');
+    if (tvProfNameEl && activeProfile) {
+      tvProfNameEl.textContent = activeProfile.name;
+    }
     var allMovies = filterKidsItems(state.catalog.movies);
     var allSeries = filterKidsItems(state.catalog.series);
     var allChannels = state.catalog.channels;
@@ -3143,6 +3290,7 @@
     var provider = state.activeProvider || 'all';
     var yearKey = state.activeYear || 'all';
     var actorId = state.activeActorId || 'all';
+    var inlineQ = String(state.tvInlineSearchQuery || '').trim();
 
     // 1. Continue Watching Shelf (Per Sub-User Profile — Movies & Series ONLY, NEVER Live TV Channels!)
     var progressIds = Object.keys(profBucket.progress || {});
@@ -3399,8 +3547,21 @@
     var gridWallItems = [];
     var actorShowcaseHtml = '';
 
+    // 2c. Inline Side-Menu Search Query Active (`state.tvInlineSearchQuery`)
+    if (inlineQ.length >= 1) {
+      var qLow = inlineQ.toLowerCase();
+      var searchPool = allMovies.concat(allSeries);
+      var matchedItems = searchPool.filter(function (it) {
+        var t1 = String(it.title || '').toLowerCase();
+        var t2 = String(it.originalTitle || '').toLowerCase();
+        var c1 = String(it.castHe || '').toLowerCase();
+        return t1.indexOf(qLow) !== -1 || t2.indexOf(qLow) !== -1 || c1.indexOf(qLow) !== -1;
+      });
+      gridWallTitle = 'תוצאות חיפוש: "' + inlineQ + '" (' + matchedItems.length + ' כותרים)';
+      gridWallItems = matchedItems;
+    }
     // 3. Actor Filter Active -> Actor Showcase Header with Portrait Photo + Multi-Row & Multi-Column Poster Wall Grid
-    if (actorId !== 'all') {
+    else if (actorId !== 'all') {
       var actorList = state.actorMoviesCache[actorId] || [];
       var actorPhoto = state.activeActorPhoto || state.actorPhotosCache[actorId] || getFallbackActorAvatarSvg(state.activeActorName);
       var fallbackAvatar = getFallbackActorAvatarSvg(state.activeActorName);
@@ -6108,67 +6269,181 @@
       }
     });
 
-    // Streamer Right Side Rail (`#tvSideRail`): חיפוש | סוגות | פלטפורמות | לפי שנה | עוד
-    var catalogMainEl = document.getElementById('catalogMain');
-    if (catalogMainEl) {
-      catalogMainEl.addEventListener('scroll', function () {
-        if (document.body.classList.contains('tv-mode')) {
-          document.body.classList.toggle('tv-browsing-tiles', catalogMainEl.scrollTop > 18);
-        }
-      }, { passive: true });
-    }
+    // Streamer Right Side Menu (`#tvSideRail`):
+    // Top: Inline Search + Mini-Keyboard (`#tvRailMiniKeyboard`)
+    // Middle: Inline Lists (`קטגוריות`, `פלטפורמות`, `לפי שנה`, `שחקנים`)
+    // Bottom: User Profile (`#tvRailProfileBtn`) & Settings (`#tvRailSettingsBtn`)
+    var tvRailSearchBtn = document.getElementById('tvRailSearchBtn');
+    var tvRailSearchText = document.getElementById('tvRailSearchText');
+    var tvRailSearchClearBtn = document.getElementById('tvRailSearchClearBtn');
+    var tvRailMiniKeyboard = document.getElementById('tvRailMiniKeyboard');
+    var miniVkLang = 'HE';
 
-    var tvGenresRailBtn = document.getElementById('tvGenresRailBtn');
-    if (tvGenresRailBtn) {
-      tvGenresRailBtn.addEventListener('click', function (e) {
+    var applyInlineTvSearch = function (nextQ) {
+      state.tvInlineSearchQuery = String(nextQ || '');
+      if (tvRailSearchText) {
+        tvRailSearchText.textContent = state.tvInlineSearchQuery ? state.tvInlineSearchQuery : 'חיפוש...';
+      }
+      if (tvRailSearchClearBtn) {
+        tvRailSearchClearBtn.classList.toggle('hidden', !state.tvInlineSearchQuery);
+      }
+      renderCatalogShelves();
+      if (state.tvInlineSearchTimer) clearTimeout(state.tvInlineSearchTimer);
+      var qTrim = state.tvInlineSearchQuery.trim();
+      if (qTrim.length >= 2) {
+        state.tvInlineSearchTimer = setTimeout(async function () {
+          try {
+            var r = await fetch(TMDB_BASE + '/search/multi?api_key=' + TMDB_API_KEY + '&language=he-IL&query=' + encodeURIComponent(qTrim) + '&page=1');
+            if (r.ok) {
+              var d = await r.json();
+              if (d && Array.isArray(d.results) && d.results.length) {
+                var moviesArr = d.results.filter(function (x) { return x.media_type === 'movie' && x.poster_path; });
+                var seriesArr = d.results.filter(function (x) { return x.media_type === 'tv' && x.poster_path; });
+                if (moviesArr.length) mergeItemsIntoCatalog(moviesArr, 'movie', null);
+                if (seriesArr.length) mergeItemsIntoCatalog(seriesArr, 'series', null);
+                renderCatalogShelves();
+              }
+            }
+          } catch (e) {}
+        }, 380);
+      }
+    };
+
+    var renderTvRailMiniKeyboard = function () {
+      if (!tvRailMiniKeyboard) return;
+      var chars = miniVkLang === 'HE'
+        ? ['א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י', 'כ', 'ל', 'מ', 'נ', 'ס', 'ע', 'פ', 'צ', 'ק', 'ר', 'ש', 'ת', 'ם', 'ן', 'ץ', 'ף', 'ך', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        : ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+      var keysHtml = chars.map(function (ch) {
+        return '<button type="button" class="tv-mini-vk-key tv-focusable" data-mini-char="' + escapeHtml(ch) + '">' + escapeHtml(ch) + '</button>';
+      }).join('');
+      tvRailMiniKeyboard.innerHTML =
+        '<div class="tv-mini-vk-grid">' + keysHtml + '</div>' +
+        '<div class="tv-mini-vk-actions">' +
+          '<button type="button" class="tv-mini-vk-act tv-focusable" data-mini-act="lang">' + (miniVkLang === 'HE' ? 'EN' : 'עב') + '</button>' +
+          '<button type="button" class="tv-mini-vk-act tv-focusable" data-mini-act="space">רווח</button>' +
+          '<button type="button" class="tv-mini-vk-act tv-focusable" data-mini-act="back">⌫</button>' +
+          '<button type="button" class="tv-mini-vk-act tv-focusable" data-mini-act="clear">נקה</button>' +
+        '</div>';
+
+      var charBtns = tvRailMiniKeyboard.querySelectorAll('[data-mini-char]');
+      for (var c = 0; c < charBtns.length; c++) {
+        charBtns[c].addEventListener('click', function (e) {
+          e.stopPropagation();
+          var ch = this.getAttribute('data-mini-char') || '';
+          applyInlineTvSearch((state.tvInlineSearchQuery || '') + ch);
+        });
+      }
+      var actBtns = tvRailMiniKeyboard.querySelectorAll('[data-mini-act]');
+      for (var a = 0; a < actBtns.length; a++) {
+        actBtns[a].addEventListener('click', function (e) {
+          e.stopPropagation();
+          var act = this.getAttribute('data-mini-act');
+          if (act === 'lang') {
+            miniVkLang = miniVkLang === 'HE' ? 'EN' : 'HE';
+            renderTvRailMiniKeyboard();
+            var langBtn = tvRailMiniKeyboard.querySelector('[data-mini-act="lang"]');
+            if (langBtn && typeof window.streamItFocusElement === 'function') {
+              window.streamItFocusElement(langBtn, { scroll: false });
+            }
+          } else if (act === 'space') {
+            applyInlineTvSearch((state.tvInlineSearchQuery || '') + ' ');
+          } else if (act === 'back') {
+            var cur = state.tvInlineSearchQuery || '';
+            applyInlineTvSearch(cur.slice(0, -1));
+          } else if (act === 'clear') {
+            applyInlineTvSearch('');
+          }
+        });
+      }
+    };
+
+    if (tvRailSearchBtn && tvRailMiniKeyboard) {
+      renderTvRailMiniKeyboard();
+      tvRailSearchBtn.addEventListener('click', function (e) {
         e.stopPropagation();
-        closeAllExplorerDropdowns();
-        if (catalogMainEl) catalogMainEl.scrollTop = 0;
-        var activeGenreChip = document.querySelector('#genreFilterStrip .genre-chip-btn.active') ||
-          document.querySelector('#genreFilterStrip .genre-chip-btn');
-        if (activeGenreChip && typeof window.streamItFocusElement === 'function') {
-          window.streamItFocusElement(activeGenreChip, { scroll: true });
+        var isHidden = tvRailMiniKeyboard.classList.toggle('hidden');
+        tvRailSearchBtn.setAttribute('aria-expanded', isHidden ? 'false' : 'true');
+        if (!isHidden) {
+          var firstKey = tvRailMiniKeyboard.querySelector('.tv-mini-vk-key');
+          if (firstKey && typeof window.streamItFocusElement === 'function') {
+            window.streamItFocusElement(firstKey, { scroll: false });
+          }
         }
       });
     }
 
-    var tvPlatformsRailBtn = document.getElementById('tvPlatformsRailBtn');
-    if (tvPlatformsRailBtn) {
-      tvPlatformsRailBtn.addEventListener('click', function (e) {
+    if (tvRailSearchClearBtn) {
+      tvRailSearchClearBtn.addEventListener('click', function (e) {
         e.stopPropagation();
-        toggleExplorerDropdown('tvPlatformsRailBtn', 'providerDropdownPanel');
+        applyInlineTvSearch('');
+        if (tvRailSearchBtn && typeof window.streamItFocusElement === 'function') {
+          window.streamItFocusElement(tvRailSearchBtn, { scroll: false });
+        }
       });
     }
 
-    var tvYearsRailBtn = document.getElementById('tvYearsRailBtn');
-    if (tvYearsRailBtn) {
-      tvYearsRailBtn.addEventListener('click', function (e) {
+    var secTogglePairs = [
+      { btn: 'tvRailSecCategoriesBtn', list: 'tvRailCategoriesList' },
+      { btn: 'tvRailSecPlatformsBtn', list: 'tvRailPlatformsList' },
+      { btn: 'tvRailSecYearsBtn', list: 'tvRailYearsList' },
+      { btn: 'tvRailSecActorsBtn', list: 'tvRailActorsList' }
+    ];
+    secTogglePairs.forEach(function (pair) {
+      var bEl = document.getElementById(pair.btn);
+      var lEl = document.getElementById(pair.list);
+      if (bEl && lEl) {
+        bEl.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var isHidden = lEl.classList.toggle('hidden');
+          bEl.classList.toggle('open', !isHidden);
+          bEl.setAttribute('aria-expanded', isHidden ? 'false' : 'true');
+          var arrow = bEl.querySelector('.tv-rail-sec-arrow');
+          if (arrow) arrow.textContent = isHidden ? '◂' : '▾';
+        });
+      }
+    });
+
+    var tvRailProfileBtn = document.getElementById('tvRailProfileBtn');
+    if (tvRailProfileBtn) {
+      tvRailProfileBtn.addEventListener('click', function (e) {
         e.stopPropagation();
-        toggleExplorerDropdown('tvYearsRailBtn', 'yearDropdownPanel');
+        var openAuth = document.getElementById('openAuthModalBtn') || document.getElementById('openAuthBtn');
+        if (openAuth) {
+          openAuth.click();
+        } else {
+          var authMod = document.getElementById('authModal');
+          if (authMod) authMod.classList.remove('hidden');
+        }
       });
     }
 
     var tvMoreRailBtn = document.getElementById('tvMoreRailBtn');
+    var tvRailSettingsBtn = document.getElementById('tvRailSettingsBtn');
     var tvMoreModal = document.getElementById('tvMoreModal');
     var closeTvMoreModalBtn = document.getElementById('closeTvMoreModalBtn');
     var closeTvMoreModal = function (restoreFocusToRail) {
       if (tvMoreModal) tvMoreModal.classList.add('hidden');
-      if (restoreFocusToRail && tvMoreRailBtn && typeof window.streamItFocusElement === 'function') {
-        window.streamItFocusElement(tvMoreRailBtn, { scroll: false });
+      var targetBtn = tvRailSettingsBtn || tvMoreRailBtn;
+      if (restoreFocusToRail && targetBtn && typeof window.streamItFocusElement === 'function') {
+        window.streamItFocusElement(targetBtn, { scroll: false });
+      }
+    };
+    var openTvSettingsDrawer = function (e) {
+      if (e) e.stopPropagation();
+      if (!tvMoreModal) return;
+      renderActorFilterStrip();
+      tvMoreModal.classList.remove('hidden');
+      var firstMoreAction = tvMoreModal.querySelector('.tv-more-action-card');
+      if (firstMoreAction && typeof window.streamItFocusElement === 'function') {
+        window.streamItFocusElement(firstMoreAction, { scroll: false });
       }
     };
     if (tvMoreRailBtn && tvMoreModal) {
-      tvMoreRailBtn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        closeAllExplorerDropdowns();
-        renderActorFilterStrip();
-        tvMoreModal.classList.remove('hidden');
-        var firstMoreAction = tvMoreModal.querySelector('.tv-more-action-card') ||
-          document.getElementById('tvMoreActorSearchInput');
-        if (firstMoreAction && typeof window.streamItFocusElement === 'function') {
-          window.streamItFocusElement(firstMoreAction, { scroll: false });
-        }
-      });
+      tvMoreRailBtn.addEventListener('click', openTvSettingsDrawer);
+    }
+    if (tvRailSettingsBtn && tvMoreModal) {
+      tvRailSettingsBtn.addEventListener('click', openTvSettingsDrawer);
     }
     if (closeTvMoreModalBtn) {
       closeTvMoreModalBtn.addEventListener('click', function () {
@@ -7747,30 +8022,45 @@
       document.body.appendChild(tgMod);
     }
 
-    // Ensure #tvSideRail has the 5 Streamer buttons (חיפוש | סוגות | פלטפורמות | לפי שנה | עוד)
+    // Ensure #tvSideRail has the 2.5x Expanded Streamer Right Menu (חיפוש + מקלדת | קטגוריות | פלטפורמות | לפי שנה | שחקנים | פרופיל והגדרות)
     var tvSideRailEl = document.getElementById('tvSideRail');
-    if (tvSideRailEl && !document.getElementById('tvMoreRailBtn')) {
+    if (tvSideRailEl && !document.getElementById('tvRailListsScroll')) {
       tvSideRailEl.innerHTML =
-        '<div class="rail-nav">' +
-          '<button type="button" id="tvSearchRailBtn" class="rail-btn tv-focusable" aria-label="חיפוש">' +
-            '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M20 20l-3.8-3.8" /></svg>' +
-            '<span class="rail-label">חיפוש</span>' +
+        '<div id="tvRailSearchSection" class="tv-rail-search-section">' +
+          '<div class="tv-rail-search-row">' +
+            '<button type="button" id="tvRailSearchBtn" class="tv-rail-search-btn tv-focusable" aria-expanded="false" aria-label="חיפוש סרטים, סדרות ושחקנים">' +
+              '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M20 20l-4.2-4.2" /></svg>' +
+              '<span id="tvRailSearchText" class="tv-rail-search-text">חיפוש...</span>' +
+            '</button>' +
+            '<button type="button" id="tvRailSearchClearBtn" class="tv-rail-search-clear-btn tv-focusable hidden" aria-label="נקה חיפוש">✕</button>' +
+          '</div>' +
+          '<div id="tvRailMiniKeyboard" class="tv-rail-mini-keyboard hidden" dir="ltr" aria-label="מקלדת חיפוש מהירה"></div>' +
+        '</div>' +
+        '<div id="tvRailListsScroll" class="tv-rail-lists-scroll">' +
+          '<div class="tv-rail-section" data-rail-section="categories">' +
+            '<button type="button" id="tvRailSecCategoriesBtn" class="tv-rail-sec-header tv-focusable open" aria-expanded="true"><span>קטגוריות</span><span class="tv-rail-sec-arrow">▾</span></button>' +
+            '<div id="tvRailCategoriesList" class="tv-rail-sec-list"></div>' +
+          '</div>' +
+          '<div class="tv-rail-section" data-rail-section="platforms">' +
+            '<button type="button" id="tvRailSecPlatformsBtn" class="tv-rail-sec-header tv-focusable open" aria-expanded="true"><span>פלטפורמות</span><span class="tv-rail-sec-arrow">▾</span></button>' +
+            '<div id="tvRailPlatformsList" class="tv-rail-sec-list"></div>' +
+          '</div>' +
+          '<div class="tv-rail-section" data-rail-section="years">' +
+            '<button type="button" id="tvRailSecYearsBtn" class="tv-rail-sec-header tv-focusable open" aria-expanded="true"><span>לפי שנה</span><span class="tv-rail-sec-arrow">▾</span></button>' +
+            '<div id="tvRailYearsList" class="tv-rail-sec-list"></div>' +
+          '</div>' +
+          '<div class="tv-rail-section" data-rail-section="actors">' +
+            '<button type="button" id="tvRailSecActorsBtn" class="tv-rail-sec-header tv-focusable open" aria-expanded="true"><span>שחקנים</span><span class="tv-rail-sec-arrow">▾</span></button>' +
+            '<div id="tvRailActorsList" class="tv-rail-sec-list"></div>' +
+          '</div>' +
+        '</div>' +
+        '<div id="tvRailBottomBar" class="tv-rail-bottom-bar">' +
+          '<button type="button" id="tvRailProfileBtn" class="tv-rail-bottom-btn tv-rail-profile-btn tv-focusable" aria-label="פרופיל משתמש">' +
+            '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>' +
+            '<span id="tvRailProfileName" class="tv-rail-profile-name">ראשי</span>' +
           '</button>' +
-          '<button type="button" id="tvGenresRailBtn" class="rail-btn tv-focusable" aria-label="סוגות">' +
-            '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" /></svg>' +
-            '<span class="rail-label">סוגות</span>' +
-          '</button>' +
-          '<button type="button" id="tvPlatformsRailBtn" class="rail-btn tv-focusable" aria-label="פלטפורמות">' +
-            '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" /><path d="M8 21h8M12 17v4" /></svg>' +
-            '<span class="rail-label">פלטפורמות</span>' +
-          '</button>' +
-          '<button type="button" id="tvYearsRailBtn" class="rail-btn tv-focusable" aria-label="לפי שנה">' +
-            '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>' +
-            '<span class="rail-label">לפי שנה</span>' +
-          '</button>' +
-          '<button type="button" id="tvMoreRailBtn" class="rail-btn tv-focusable" aria-label="עוד">' +
-            '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="19" cy="12" r="2" /></svg>' +
-            '<span class="rail-label">עוד</span>' +
+          '<button type="button" id="tvRailSettingsBtn" class="tv-rail-bottom-btn tv-rail-settings-btn tv-focusable" aria-label="הגדרות">' +
+            '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>' +
           '</button>' +
         '</div>';
     }
@@ -7836,6 +8126,7 @@
   }
 
   function initLiveNewsTicker() {
+    if (document.body && document.body.classList.contains('tv-mode')) return;
     var track = document.getElementById('liveNewsTickerTrack');
     if (!track) return;
 

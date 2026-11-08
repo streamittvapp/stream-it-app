@@ -140,22 +140,19 @@
       el.setAttribute('tabindex', '0');
     }
 
-    try {
-      el.focus({ preventScroll: true });
-    } catch (e) {}
+    var isTv = Boolean(document.body && document.body.classList.contains('tv-mode'));
+    var tag = (el.tagName || '').toUpperCase();
+    if (!isTv || tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') {
+      try {
+        el.focus({ preventScroll: true });
+      } catch (e) {}
+    }
 
     if (el.closest('#mainStage')) {
       lastMainFocus = el;
     }
 
-    var isTv = document.body && document.body.classList.contains('tv-mode');
     var scrollBehavior = isTv ? 'auto' : 'smooth';
-
-    // Proportionally compact the Top Hero Banner on Streamer when browsing poster tiles below
-    if (isTv && el.closest('#mainStage, #topHeader')) {
-      var inPosterTiles = Boolean(el.closest('#continueWatchingSection, #catalogRowsContainer'));
-      document.body.classList.toggle('tv-browsing-tiles', inPosterTiles);
-    }
 
     // Horizontal strip or row scrolling
     var stripOrTrack = el.closest('.row-track, .genre-filter-strip');
@@ -172,22 +169,29 @@
       }
     }
 
-    // Vertical scrolling inside #catalogMain, #detailsModal, #searchModal, #tvMoreModal, or open dropdown panel
+    // Vertical scrolling inside #tvRailListsScroll, #catalogMain, #detailsModal, #searchModal, #tvMoreModal, or open dropdown panel
     if (options.scroll !== false) {
       var prevRow = prevFocused ? prevFocused.closest('.netflix-row') : null;
       var curRow = el.closest('.netflix-row');
       var sameNetflixRow = Boolean(prevRow && curRow && prevRow === curRow);
       if (!sameNetflixRow) {
         var scrollTarget = curRow || el;
-        var inCatalog = el.closest('#catalogMain');
-        var inDetails = el.closest('.details-modal-sheet');
-        var inSearch = el.closest('#searchModal');
-        var inTvMore = el.closest('#tvMoreModal');
-        var inDropdown = el.closest('.explorer-dropdown-panel');
-        if (inCatalog || inDetails || inSearch || inTvMore || inDropdown) {
-          try {
-            scrollTarget.scrollIntoView({ block: 'nearest', behavior: scrollBehavior });
-          } catch (e) {}
+        var scrollContainer = el.closest('#tvRailListsScroll, #catalogMain, .details-modal-sheet, #searchModal, #tvMoreModal, .explorer-dropdown-panel');
+        if (scrollContainer) {
+          if (isTv) {
+            var cRect = scrollContainer.getBoundingClientRect();
+            var tRect = scrollTarget.getBoundingClientRect();
+            var pad = 14;
+            if (tRect.bottom > cRect.bottom - pad) {
+              scrollContainer.scrollTop += (tRect.bottom - (cRect.bottom - pad));
+            } else if (tRect.top < cRect.top + pad) {
+              scrollContainer.scrollTop -= ((cRect.top + pad) - tRect.top);
+            }
+          } else {
+            try {
+              scrollTarget.scrollIntoView({ block: 'nearest', behavior: scrollBehavior });
+            } catch (e) {}
+          }
         }
       }
     }
@@ -199,7 +203,7 @@
         if (currentFocused === el) {
           window.previewCardInHero(el);
         }
-      }, 200);
+      }, isTv ? 260 : 200);
     }
 
     return true;
@@ -700,11 +704,35 @@
           topHeader.querySelectorAll('#brandLogo, .main-nav .nav-link, #headerQuickSearchInput, #openSearchBtn, #userSettingsMenuBtn')
         ).filter(isElementVisible)
       : [];
-    var railBtns = sideRail ? Array.prototype.slice.call(sideRail.querySelectorAll('.rail-btn, .tv-rail-btn')).filter(isElementVisible) : [];
+    var railBtns = sideRail ? Array.prototype.slice.call(sideRail.querySelectorAll('.tv-focusable')).filter(isElementVisible) : [];
     var heroBtns = heroStage ? Array.prototype.slice.call(heroStage.querySelectorAll('.tv-focusable')).filter(isElementVisible) : [];
     var rows = catalogMain ? Array.prototype.slice.call(catalogMain.querySelectorAll('.netflix-row')).filter(isElementVisible) : [];
     var wallGrid = catalogMain ? catalogMain.querySelector('.catalog-poster-grid') : null;
     var loadMoreBtn = document.getElementById('loadMoreCatalogBtn');
+
+    function focusPreferredRailItem() {
+      if (!sideRail || !railBtns.length) return false;
+      var searchBtn = document.getElementById('tvRailSearchBtn');
+      var activeListBtn = sideRail.querySelector('#tvRailListsScroll .tv-rail-item.active');
+      var target = (searchBtn && isElementVisible(searchBtn)) ? searchBtn : (activeListBtn || railBtns[0]);
+      return setFocus(target, { scroll: false });
+    }
+
+    function focusMainStageFromRail() {
+      if (lastMainFocus && isElementVisible(lastMainFocus)) {
+        return setFocus(lastMainFocus);
+      }
+      if (rows.length) {
+        var c = rows[0].querySelector('.poster-card');
+        if (c) return setFocus(c);
+      }
+      if (wallGrid) {
+        var wc = wallGrid.querySelector('.poster-card');
+        if (wc) return setFocus(wc);
+      }
+      if (heroBtns.length) return setFocus(heroBtns[0]);
+      return true;
+    }
 
     if (!currentFocused || !isElementVisible(currentFocused)) {
       if (rows.length) {
@@ -733,9 +761,7 @@
         if (topIdx > 0) {
           return setFocus(headerItems[topIdx - 1], { scroll: false });
         }
-        if (railBtns.length) {
-          return setFocus(railBtns[0], { scroll: false });
-        }
+        if (focusPreferredRailItem()) return true;
         return true;
       }
       if (direction === 'down') {
@@ -765,33 +791,113 @@
       }
     }
 
-    // A. Inside TV Right Side Rail (#tvSideRail: חיפוש | סוגות | פלטפורמות | לפי שנה | עוד)
+    // A. Inside TV Right Side Rail (#tvSideRail: חיפוש + מקלדת מובנית | קטגוריות | פלטפורמות | לפי שנה | שחקנים | פרופיל והגדרות)
     if (sideRail && sideRail.contains(currentFocused)) {
-      var rIdx = railBtns.indexOf(currentFocused);
-      if (direction === 'down') {
-        if (rIdx < railBtns.length - 1) return setFocus(railBtns[rIdx + 1], { scroll: false });
+      var railSearchBtn = document.getElementById('tvRailSearchBtn');
+      var railSearchClearBtn = document.getElementById('tvRailSearchClearBtn');
+      var miniVk = document.getElementById('tvRailMiniKeyboard');
+      var miniVkOpen = Boolean(miniVk && !miniVk.classList.contains('hidden') && isElementVisible(miniVk));
+      var railListItems = Array.prototype.slice.call(sideRail.querySelectorAll('#tvRailListsScroll .tv-rail-item')).filter(isElementVisible);
+      var railProfileBtn = document.getElementById('tvRailProfileBtn');
+      var railSettingsBtn = document.getElementById('tvRailSettingsBtn');
+
+      // A1. Search Header Row (#tvRailSearchBtn, #tvRailSearchClearBtn)
+      if (currentFocused === railSearchBtn || currentFocused === railSearchClearBtn) {
+        if (direction === 'left') {
+          if (currentFocused === railSearchBtn && railSearchClearBtn && isElementVisible(railSearchClearBtn)) {
+            return setFocus(railSearchClearBtn, { scroll: false });
+          }
+          return focusMainStageFromRail();
+        }
+        if (direction === 'right') {
+          if (currentFocused === railSearchClearBtn && railSearchBtn && isElementVisible(railSearchBtn)) {
+            return setFocus(railSearchBtn, { scroll: false });
+          }
+          return true;
+        }
+        if (direction === 'up') {
+          if (focusTopHeaderNav(false)) return true;
+          return true;
+        }
+        if (direction === 'down') {
+          if (miniVkOpen) {
+            var firstVkKey = miniVk.querySelector('.tv-rail-vk-key');
+            if (firstVkKey && isElementVisible(firstVkKey)) return setFocus(firstVkKey, { scroll: false });
+          }
+          if (railListItems.length) return setFocus(railListItems[0]);
+          if (railProfileBtn && isElementVisible(railProfileBtn)) return setFocus(railProfileBtn, { scroll: false });
+          return true;
+        }
+      }
+
+      // A2. Inline Mini-Keyboard (#tvRailMiniKeyboard)
+      if (miniVkOpen && miniVk.contains(currentFocused)) {
+        var vkKeys = Array.prototype.slice.call(miniVk.querySelectorAll('.tv-rail-vk-key')).filter(isElementVisible);
+        var nearVkKey = findNearestPhysical(currentFocused, direction, vkKeys);
+        if (nearVkKey) {
+          return setFocus(nearVkKey, { scroll: false });
+        }
+        if (direction === 'up') {
+          if (railSearchBtn && isElementVisible(railSearchBtn)) return setFocus(railSearchBtn, { scroll: false });
+          return true;
+        }
+        if (direction === 'down') {
+          if (railListItems.length) return setFocus(railListItems[0]);
+          if (railProfileBtn && isElementVisible(railProfileBtn)) return setFocus(railProfileBtn, { scroll: false });
+          return true;
+        }
+        if (direction === 'left') {
+          return focusMainStageFromRail();
+        }
         return true;
       }
-      if (direction === 'up') {
-        if (rIdx > 0) return setFocus(railBtns[rIdx - 1], { scroll: false });
-        if (focusTopHeaderNav(false)) return true;
+
+      // A3. Bottom Profile & Settings Bar (#tvRailProfileBtn, #tvRailSettingsBtn)
+      if (currentFocused === railProfileBtn || currentFocused === railSettingsBtn) {
+        if (direction === 'left') {
+          if (currentFocused === railProfileBtn && railSettingsBtn && isElementVisible(railSettingsBtn)) {
+            return setFocus(railSettingsBtn, { scroll: false });
+          }
+          return focusMainStageFromRail();
+        }
+        if (direction === 'right') {
+          if (currentFocused === railSettingsBtn && railProfileBtn && isElementVisible(railProfileBtn)) {
+            return setFocus(railProfileBtn, { scroll: false });
+          }
+          return true;
+        }
+        if (direction === 'up') {
+          if (railListItems.length) return setFocus(railListItems[railListItems.length - 1]);
+          if (railSearchBtn && isElementVisible(railSearchBtn)) return setFocus(railSearchBtn, { scroll: false });
+          return true;
+        }
         return true;
       }
-      if (direction === 'left') {
-        if (lastMainFocus && isElementVisible(lastMainFocus)) {
-          return setFocus(lastMainFocus);
+
+      // A4. Scrollable Lists (#tvRailListsScroll .tv-rail-item)
+      var lIdx = railListItems.indexOf(currentFocused);
+      if (lIdx !== -1) {
+        if (direction === 'down') {
+          if (lIdx < railListItems.length - 1) return setFocus(railListItems[lIdx + 1]);
+          if (railProfileBtn && isElementVisible(railProfileBtn)) return setFocus(railProfileBtn, { scroll: false });
+          return true;
         }
-        if (heroBtns.length) return setFocus(heroBtns[0]);
-        if (rows.length) {
-          var c = rows[0].querySelector('.poster-card');
-          if (c) return setFocus(c);
+        if (direction === 'up') {
+          if (lIdx > 0) return setFocus(railListItems[lIdx - 1]);
+          if (miniVkOpen) {
+            var vkAll = miniVk.querySelectorAll('.tv-rail-vk-key');
+            if (vkAll.length) return setFocus(vkAll[vkAll.length - 1], { scroll: false });
+          }
+          if (railSearchBtn && isElementVisible(railSearchBtn)) return setFocus(railSearchBtn, { scroll: false });
+          if (focusTopHeaderNav(false)) return true;
+          return true;
         }
-        if (wallGrid) {
-          var wc = wallGrid.querySelector('.poster-card');
-          if (wc) return setFocus(wc);
+        if (direction === 'left') {
+          return focusMainStageFromRail();
         }
         return true;
       }
+
       return true;
     }
 
@@ -804,10 +910,7 @@
       }
       if (direction === 'right') {
         if (hIdx > 0) return setFocus(heroBtns[hIdx - 1]);
-        if (railBtns.length) {
-          var activeRail = sideRail.querySelector('.rail-btn.active, .tv-rail-btn.active') || railBtns[0];
-          return setFocus(activeRail, { scroll: false });
-        }
+        if (focusPreferredRailItem()) return true;
         return true;
       }
       if (direction === 'down') {
@@ -862,10 +965,7 @@
         }
         if (direction === 'right') {
           if (sIdx > 0) return setFocus(stripItems[sIdx - 1]);
-          if (railBtns.length) {
-            var actRail = document.getElementById('tvGenresRailBtn') || sideRail.querySelector('.rail-btn.active') || railBtns[1] || railBtns[0];
-            return setFocus(actRail, { scroll: false });
-          }
+          if (focusPreferredRailItem()) return true;
           return true;
         }
       }
@@ -977,10 +1077,7 @@
       }
       if (direction === 'right') {
         if (cIdx > 0) return setFocus(cards[cIdx - 1]);
-        if (railBtns.length) {
-          var activeRailBtn = sideRail.querySelector('.rail-btn.active, .tv-rail-btn.active') || railBtns[1] || railBtns[0];
-          return setFocus(activeRailBtn, { scroll: false });
-        }
+        if (focusPreferredRailItem()) return true;
         return true;
       }
       if (direction === 'down') {
@@ -1051,9 +1148,8 @@
         return setFocus(nearGridEl);
       }
 
-      if (direction === 'right' && railBtns.length) {
-        var rBtn = sideRail.querySelector('.rail-btn.active, .tv-rail-btn.active') || railBtns[1] || railBtns[0];
-        return setFocus(rBtn, { scroll: false });
+      if (direction === 'right') {
+        if (focusPreferredRailItem()) return true;
       }
 
       if (direction === 'up') {
@@ -1353,8 +1449,21 @@
       } else {
         userSettingsPanel.classList.add('hidden');
       }
+      var railSetBtn = document.getElementById('tvRailSettingsBtn');
       var userMenuBtn = document.getElementById('userSettingsMenuBtn');
-      if (userMenuBtn && isElementVisible(userMenuBtn)) setFocus(userMenuBtn, { scroll: false });
+      if (railSetBtn && isElementVisible(railSetBtn)) setFocus(railSetBtn, { scroll: false });
+      else if (userMenuBtn && isElementVisible(userMenuBtn)) setFocus(userMenuBtn, { scroll: false });
+      return true;
+    }
+
+    var miniVkBack = document.getElementById('tvRailMiniKeyboard');
+    if (miniVkBack && !miniVkBack.classList.contains('hidden')) {
+      miniVkBack.classList.add('hidden');
+      var rSearchBtn = document.getElementById('tvRailSearchBtn');
+      if (rSearchBtn) {
+        rSearchBtn.setAttribute('aria-expanded', 'false');
+        if (isElementVisible(rSearchBtn)) setFocus(rSearchBtn, { scroll: false });
+      }
       return true;
     }
 
@@ -1362,13 +1471,9 @@
     if (openDropdown) {
       var wrap = openDropdown.closest('.explorer-dropdown-wrap');
       var trig = wrap ? wrap.querySelector('.explorer-dropdown-btn') : null;
-      var tvRailTrig = openDropdown.id === 'providerDropdownPanel'
-        ? document.getElementById('tvPlatformsRailBtn')
-        : (openDropdown.id === 'yearDropdownPanel' ? document.getElementById('tvYearsRailBtn') : null);
       if (typeof window.closeAllExplorerDropdowns === 'function') window.closeAllExplorerDropdowns();
       else openDropdown.classList.add('hidden');
-      if (tvRailTrig && isElementVisible(tvRailTrig)) setFocus(tvRailTrig, { scroll: false });
-      else if (trig && isElementVisible(trig)) setFocus(trig);
+      if (trig && isElementVisible(trig)) setFocus(trig);
       return true;
     }
 
@@ -1393,7 +1498,7 @@
 
     var sideRail = document.getElementById('tvSideRail');
     if (sideRail && isElementVisible(sideRail) && !sideRail.contains(currentFocused)) {
-      var activeRail = sideRail.querySelector('.rail-btn.active, .tv-rail-btn.active') || sideRail.querySelector('.rail-btn, .tv-rail-btn');
+      var activeRail = sideRail.querySelector('#tvRailSearchBtn') || sideRail.querySelector('.tv-rail-item.active') || sideRail.querySelector('.tv-focusable');
       if (activeRail) return setFocus(activeRail, { scroll: false });
     }
 

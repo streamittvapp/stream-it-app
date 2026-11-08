@@ -1122,102 +1122,349 @@ body.tv-mode #mobileBottomNav {
   display: none !important;
 }
 
-/* Delicate Right Side Rail on Streamer: חיפוש | סוגות | פלטפורמות | לפי שנה | עוד */
+/* =========================================================================
+   GLOBAL STREAMER RULES (body.tv-mode ONLY — Desktop Untouched):
+   1. Zero rounded corners anywhere (border-radius: 0 !important)
+   2. Zero borders/frames/outlines on tiles, buttons, or menus
+   3. Subtle flat gray focus on menus/buttons (no red borders, no white bg)
+   4. Zero GPU-heavy backdrop-filter / box-shadow / layout transitions for 60fps
+   ========================================================================= */
+body.tv-mode,
+body.tv-mode *,
+body.tv-mode *::before,
+body.tv-mode *::after {
+  border-radius: 0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+body.tv-mode *:focus,
+body.tv-mode .tv-focused {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Menu / Button Focus on Streamer: Flat Gray without Borders or White Background */
+body.tv-mode button.tv-focused,
+body.tv-mode button:focus,
+body.tv-mode .nav-link.tv-focused,
+body.tv-mode .nav-link:focus,
+body.tv-mode .brand-logo.tv-focused,
+body.tv-mode .btn-primary.tv-focused,
+body.tv-mode .btn-secondary.tv-focused,
+body.tv-mode .season-tab-btn.tv-focused,
+body.tv-mode .user-menu-item.tv-focused,
+body.tv-mode .tv-more-action-card.tv-focused,
+body.tv-mode .source-tab-btn.tv-focused,
+body.tv-mode .subs-chip-btn.tv-focused,
+body.tv-mode .sub-track-item.tv-focused,
+body.tv-mode .player-btn.tv-focused,
+body.tv-mode .details-sources-btn.tv-focused {
+  background-color: rgba(255, 255, 255, 0.16) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+body.tv-mode .nav-link.active,
+body.tv-mode .season-tab-btn.active,
+body.tv-mode .tv-rail-item.active {
+  background-color: rgba(255, 255, 255, 0.24) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+  outline: none !important;
+}
+
+/* 2.5x Expanded Right Side Menu on Streamer (148px):
+   Top: Search + Inline Mini-Keyboard
+   Middle: Inline Lists (קטגוריות | פלטפורמות | לפי שנה | שחקנים)
+   Bottom: User Profile & Settings Icon */
 body.tv-mode #tvSideRail {
   display: flex !important;
   flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
+  align-items: stretch;
+  justify-content: space-between;
   position: fixed;
   top: 0;
   right: 0;
   bottom: 0;
-  width: 56px;
-  padding: 52px 4px 14px 4px;
-  background: rgba(6, 8, 14, 0.94);
-  backdrop-filter: blur(18px);
-  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  width: 148px;
+  padding: 0;
+  background: #080a0f;
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
   z-index: 935;
-  gap: 6px;
+  overflow: hidden;
+  direction: rtl;
 }
 
-body.tv-mode #tvSideRail .rail-brand,
-body.tv-mode #tvSideRail .rail-bottom {
+body.tv-mode .tv-rail-search-section {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: #0b0e15;
+}
+
+body.tv-mode .tv-rail-search-row {
+  display: flex;
+  align-items: center;
+  height: 40px;
+}
+
+body.tv-mode .tv-rail-search-btn {
+  flex: 1;
+  height: 40px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-align: right;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+body.tv-mode .tv-rail-search-btn svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+body.tv-mode .tv-rail-search-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.tv-mode .tv-rail-search-clear-btn {
+  width: 28px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Compact Inline Mini-Keyboard under Search (YouTube / Netflix TV Style: Zero borders, zero bg, subtle press/focus) */
+body.tv-mode .tv-rail-mini-keyboard {
+  padding: 4px 6px 6px 6px;
+  background: #06080c;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  direction: ltr;
+}
+
+body.tv-mode .tv-rail-mini-keyboard.hidden {
   display: none !important;
 }
 
-body.tv-mode #tvSideRail .rail-nav {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  gap: 6px;
+body.tv-mode .tv-mini-vk-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1px;
 }
 
-body.tv-mode #tvSideRail .rail-btn {
+body.tv-mode .tv-mini-vk-key,
+body.tv-mode .tv-mini-vk-act {
+  height: 22px;
+  padding: 0;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 0.7rem;
+  font-weight: 600;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  width: 48px;
-  min-height: 46px;
-  padding: 5px 2px;
-  border-radius: 10px;
-  border: 1px solid transparent;
-  background: rgba(255, 255, 255, 0.03);
-  color: rgba(255, 255, 255, 0.72);
   cursor: pointer;
-  transition: all 0.16s ease;
 }
 
-body.tv-mode #tvSideRail .rail-btn svg {
-  width: 16px;
-  height: 16px;
+body.tv-mode .tv-mini-vk-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  margin-top: 2px;
+  padding-top: 2px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+body.tv-mode .tv-mini-vk-act {
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+body.tv-mode .tv-mini-vk-key.tv-focused,
+body.tv-mode .tv-mini-vk-key:focus,
+body.tv-mode .tv-mini-vk-act.tv-focused,
+body.tv-mode .tv-mini-vk-act:focus {
+  background-color: rgba(255, 255, 255, 0.16) !important;
+  color: #ffffff !important;
+  font-weight: 800;
+}
+
+/* Scrollable Inline Lists inside Right Side Menu: קטגוריות | פלטפורמות | לפי שנה | שחקנים */
+body.tv-mode .tv-rail-lists-scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  padding: 4px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+body.tv-mode .tv-rail-lists-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+body.tv-mode .tv-rail-section {
+  display: flex;
+  flex-direction: column;
+}
+
+body.tv-mode .tv-rail-sec-header {
+  width: 100%;
+  height: 28px;
+  padding: 0 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: none;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.72rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: right;
+  cursor: pointer;
+}
+
+body.tv-mode .tv-rail-sec-arrow {
+  font-size: 0.65rem;
+  opacity: 0.65;
+}
+
+body.tv-mode .tv-rail-sec-list {
+  display: flex;
+  flex-direction: column;
+  padding: 2px 0 4px 0;
+}
+
+body.tv-mode .tv-rail-sec-list.hidden {
+  display: none !important;
+}
+
+body.tv-mode .tv-rail-item {
+  width: 100%;
+  min-height: 24px;
+  padding: 3px 14px 3px 8px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 0.68rem;
+  font-weight: 500;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+body.tv-mode .tv-rail-item.tv-focused,
+body.tv-mode .tv-rail-item:focus {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+}
+
+body.tv-mode .tv-rail-item.active {
+  background-color: rgba(255, 255, 255, 0.22) !important;
+  color: #ffffff !important;
+  font-weight: 700;
+}
+
+/* Bottom Bar inside Right Side Menu: User Profile & Settings Icon */
+body.tv-mode .tv-rail-bottom-bar {
+  flex-shrink: 0;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: #06080c;
+  gap: 4px;
+}
+
+body.tv-mode .tv-rail-bottom-btn {
+  height: 30px;
+  padding: 0 8px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.68rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+body.tv-mode .tv-rail-profile-btn {
+  flex: 1;
+  min-width: 0;
+}
+
+body.tv-mode .tv-rail-profile-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.tv-mode .tv-rail-settings-btn {
+  width: 30px;
+  padding: 0;
+  justify-content: center;
   flex-shrink: 0;
 }
 
-body.tv-mode #tvSideRail .rail-label {
-  font-size: 0.62rem;
-  font-weight: 700;
-  line-height: 1.05;
-  text-align: center;
-  white-space: nowrap;
+body.tv-mode .tv-rail-bottom-btn svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
 }
 
-body.tv-mode #tvSideRail .rail-btn.active {
-  background: rgba(229, 9, 20, 0.18);
-  border-color: rgba(229, 9, 20, 0.48);
-  color: #ffffff;
-}
-
-body.tv-mode #tvSideRail .rail-btn.tv-focused,
-body.tv-mode #tvSideRail .rail-btn:focus {
-  background: #ffffff !important;
-  color: #000000 !important;
-  border-color: var(--brand-red) !important;
-  outline: 2px solid var(--brand-red) !important;
-  outline-offset: 1px;
-  transform: scale(1.05);
-}
-
-/* Compact Top Header on Streamer: ONLY ראשי | סרטים | סדרות | ערוצים | הרשימה שלי */
+/* Compact Top Header on Streamer: ONLY ראשי | סרטים | סדרות | ערוצים | הרשימה שלי + Main STREAM IT Logo */
 body.tv-mode #topHeader {
   display: block !important;
   position: fixed;
   top: 0;
-  right: 56px;
+  right: 148px;
   left: 0;
-  height: 44px;
-  background: rgba(6, 8, 14, 0.95);
-  backdrop-filter: blur(18px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  height: 40px;
+  background: #080a0f;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   z-index: 920;
 }
 
 body.tv-mode #topHeader .header-inner {
-  height: 44px;
-  padding: 0 2.5vw;
+  height: 40px;
+  padding: 0 2vw;
   gap: 12px;
   justify-content: flex-start;
 }
@@ -1225,26 +1472,26 @@ body.tv-mode #topHeader .header-inner {
 body.tv-mode #topHeader .header-right {
   width: 100%;
   justify-content: space-between;
-  gap: 14px;
+  gap: 12px;
 }
 
-/* Keep STREAM IT logo on a single line — never break */
+/* Keep main STREAM IT logo on a single line — never break */
 body.tv-mode #topHeader .brand-logo {
-  font-size: 1.15rem;
+  font-size: 1.08rem;
   white-space: nowrap !important;
   flex-shrink: 0 !important;
   letter-spacing: 1px;
+  padding: 2px 6px;
 }
 
 body.tv-mode #topHeader .main-nav {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   flex-wrap: nowrap;
   overflow: hidden;
 }
 
-/* Hide extra top-bar items on Streamer so only the 5 requested tabs appear */
 body.tv-mode #topHeader .header-left,
 body.tv-mode #topHeader .nav-link[data-category="telegram"],
 body.tv-mode #topHeader .nav-link[data-category="youtube"] {
@@ -1252,117 +1499,95 @@ body.tv-mode #topHeader .nav-link[data-category="youtube"] {
 }
 
 body.tv-mode #topHeader .nav-link {
-  height: 28px;
-  padding: 0 11px;
-  font-size: 0.78rem;
-  border-radius: 999px;
+  height: 26px;
+  padding: 0 10px;
+  font-size: 0.74rem;
   white-space: nowrap;
+  border: none !important;
 }
 
-body.tv-mode #topHeader .nav-link.tv-focused,
-body.tv-mode #topHeader .brand-logo.tv-focused {
-  background-color: #ffffff !important;
-  color: #000000 !important;
-  font-weight: 800;
-  outline: 2px solid var(--brand-red) !important;
-  outline-offset: 2px;
-  transform: scale(1.04);
-}
-
-/* Main Stage offset for 44px Top Header + 56px Right Side Rail */
+/* Main Stage offset for 40px Top Header + 148px Right Side Menu */
 body.tv-mode #mainStage {
   height: 100vh;
-  padding-top: 44px;
-  margin-right: 56px;
-  width: calc(100vw - 56px);
+  padding-top: 40px;
+  margin-right: 148px;
+  width: calc(100vw - 148px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-/* Top ~1/3 Screen Hero Banner on Streamer (shrinks smoothly when browsing tiles below) */
-body.tv-mode #heroBillboard {
-  flex: 0 0 31vh;
-  height: 31vh;
-  min-height: 22vh;
-  max-height: 31vh;
-  padding: 1vh 2.5vw;
-  align-items: center;
-  transition: flex-basis 0.25s cubic-bezier(0.22, 1, 0.36, 1),
-              height 0.25s cubic-bezier(0.22, 1, 0.36, 1),
-              max-height 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
+/* Fixed ~1/3 Screen Hero Banner on Streamer (Zero height layout transitions = Zero scroll jumping!) */
+body.tv-mode #heroBillboard,
 body.tv-mode.tv-browsing-tiles #heroBillboard {
-  flex: 0 0 26vh;
-  height: 26vh;
-  max-height: 26vh;
+  flex: 0 0 29vh;
+  height: 29vh;
+  min-height: 29vh;
+  max-height: 29vh;
+  padding: 1vh 2vw;
+  align-items: center;
+  transition: none !important;
 }
 
 body.tv-mode .hero-content {
-  max-width: 66vw;
-  gap: 4px;
+  max-width: 62vw;
+  gap: 3px;
 }
 
-body.tv-mode #heroCategoryBadge {
-  font-size: 0.62rem;
-  padding: 2px 7px;
-  margin-bottom: 1px;
+/* Hide the small duplicate app logo/tag row above the movie title on Streamer */
+body.tv-mode .hero-tag-row,
+body.tv-mode .hero-brand-mark,
+body.tv-mode #heroCategoryTag {
+  display: none !important;
 }
 
-body.tv-mode .hero-title {
-  font-size: clamp(1.18rem, 1.9vw, 1.58rem);
+body.tv-mode .hero-title,
+body.tv-mode.tv-browsing-tiles .hero-title {
+  font-size: clamp(1.12rem, 1.75vw, 1.45rem);
   line-height: 1.12;
   margin: 0;
 }
 
-body.tv-mode.tv-browsing-tiles .hero-title {
-  font-size: clamp(1.05rem, 1.65vw, 1.38rem);
-}
-
-body.tv-mode .hero-meta-row {
+body.tv-mode .hero-meta {
   gap: 6px;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
 }
 
-body.tv-mode .hero-overview {
-  font-size: 0.76rem;
-  line-height: 1.35;
-  -webkit-line-clamp: 2;
-  max-width: 58vw;
-  margin: 1px 0 3px 0;
-}
-
+body.tv-mode .hero-overview,
 body.tv-mode.tv-browsing-tiles .hero-overview {
-  font-size: 0.72rem;
+  font-size: 0.73rem;
+  line-height: 1.32;
   -webkit-line-clamp: 2;
+  max-width: 54vw;
+  margin: 1px 0 3px 0;
 }
 
 /* Compact Hero Action Buttons on Streamer: הפעל | מידע נוסף | + */
 body.tv-mode .hero-actions {
-  gap: 7px;
+  gap: 6px;
   margin-top: 2px;
 }
 
 body.tv-mode .hero-actions .btn-primary,
 body.tv-mode .hero-actions .btn-secondary {
-  height: 28px;
-  padding: 0 12px;
-  font-size: 0.74rem;
-  border-radius: 6px;
+  height: 26px;
+  padding: 0 11px;
+  font-size: 0.72rem;
   gap: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: none;
 }
 
 body.tv-mode .hero-actions .btn-primary svg,
 body.tv-mode .hero-actions .btn-secondary svg {
-  width: 13px;
-  height: 13px;
+  width: 12px;
+  height: 12px;
 }
 
-/* Compact '+' Watchlist Button on Streamer */
 body.tv-mode #heroWatchlistBtn {
-  width: 28px;
-  min-width: 28px;
+  width: 26px;
+  min-width: 26px;
   padding: 0 !important;
   justify-content: center;
 }
@@ -1372,117 +1597,244 @@ body.tv-mode #heroWatchlistBtn #heroWatchlistText {
 }
 
 body.tv-mode #heroWatchlistBtn #heroWatchlistIcon {
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 800;
   line-height: 1;
 }
 
 /* Bottom ~2/3 Poster Tiles & Shelves on Streamer */
-body.tv-mode #catalogMain {
+body.tv-mode #catalogMain,
+body.tv-mode.tv-browsing-tiles #catalogMain {
   flex: 1 1 auto;
-  height: calc(69vh - 44px);
+  height: calc(71vh - 40px);
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 0;
+  padding: 6px 0 0 0;
   scrollbar-width: none;
-}
-
-body.tv-mode.tv-browsing-tiles #catalogMain {
-  height: calc(74vh - 44px);
 }
 
 body.tv-mode #catalogMain::-webkit-scrollbar {
   display: none;
 }
 
-body.tv-mode .catalog-explorer-bar {
-  padding: 3px 2.5vw 6px 2.5vw;
-  gap: 4px;
-}
-
-/* Compact Genre Chips on Streamer */
-body.tv-mode .genre-filter-strip {
-  gap: 5px;
-  padding: 2px 0;
-}
-
-body.tv-mode .genre-chip-btn {
-  height: 25px;
-  padding: 0 10px;
-  font-size: 0.72rem;
-  border-radius: 999px;
-}
-
-/* Hide News Ticker, Actors, and inline dropdown triggers on Streamer (moved to Right Rail & 'עוד') */
-body.tv-mode #liveNewsTickerBar,
-body.tv-mode #actorDropdownWrap,
-body.tv-mode .actor-search-box,
-body.tv-mode #providerDropdownBtn,
-body.tv-mode #yearDropdownBtn {
+/* Hide Center-Stage Explorer Bar completely on Streamer (All lists live inside #tvSideRail!) */
+body.tv-mode #catalogExplorerBar,
+body.tv-mode .catalog-explorer-bar,
+body.tv-mode #liveNewsTickerBar {
   display: none !important;
 }
 
-body.tv-mode #explorerDropdownsBar {
-  height: 0 !important;
-  min-height: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: none !important;
-}
-
-/* Floating TV Panels when 'פלטפורמות' or 'לפי שנה' is clicked from the Right Side Rail */
-body.tv-mode #providerDropdownPanel,
-body.tv-mode #yearDropdownPanel {
-  position: fixed !important;
-  top: 56px !important;
-  right: 68px !important;
-  left: auto !important;
-  width: min(560px, 78vw) !important;
-  max-height: 76vh !important;
-  z-index: 2300 !important;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.92) !important;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
-}
-
 body.tv-mode #continueWatchingSection {
-  padding: 0 2.5vw;
-  margin-bottom: 8px;
+  padding: 0 2vw;
+  margin-bottom: 6px;
 }
 
 body.tv-mode #catalogRowsContainer {
-  padding: 0 2.5vw 5vh 2.5vw;
-  gap: 10px;
+  padding: 0 2vw 5vh 2vw;
+  gap: 8px;
 }
 
 body.tv-mode .row-title {
-  font-size: 0.88rem;
+  font-size: 0.84rem;
   margin-bottom: 2px;
 }
 
 body.tv-mode .row-track {
-  gap: 9px;
-  padding: 4px 4px 8px 4px;
+  gap: 8px;
+  padding: 2px 0 6px 0;
+  scroll-behavior: auto !important;
 }
 
 body.tv-mode .poster-card {
-  flex: 0 0 112px;
+  flex: 0 0 106px;
+  border: none !important;
+  outline: none !important;
+  transition: none !important;
 }
 
 body.tv-mode .catalog-poster-grid {
   grid-template-columns: repeat(8, 1fr);
-  gap: 9px;
+  gap: 8px;
 }
 
-/* ZERO text drawers or clutter on TV poster cards */
 body.tv-mode .poster-hover-overlay {
   display: none !important;
 }
 
+/* Borderless Poster Focus on Streamer: No frame/outline, subtle brightness & lift */
 body.tv-mode .poster-card.tv-focused,
 body.tv-mode .poster-card:focus {
-  transform: scale(1.04);
-  outline: 2.5px solid #FFFFFF;
-  outline-offset: 2px;
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  filter: brightness(1.22);
+  transform: scale(1.03);
+  z-index: 4;
+}
+
+/* =========================================================================
+   PROPORTIONAL & COMPACT DETAILS MODAL (#detailsModal) ON STREAMER
+   ========================================================================= */
+body.tv-mode #detailsModal .details-modal-sheet {
+  width: 78vw;
+  max-width: 940px;
+  max-height: 86vh;
+  background: #0c0e14;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+body.tv-mode #detailsModal .details-hero {
+  height: 155px;
+  min-height: 155px;
+  padding: 12px 18px;
+}
+
+body.tv-mode #detailsModal .modal-close-btn {
+  top: 10px;
+  left: 10px;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+}
+
+body.tv-mode #detailsModal .details-hero-content {
+  gap: 4px;
+}
+
+body.tv-mode #detailsModal .details-badge {
+  font-size: 0.62rem;
+  padding: 1px 6px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+body.tv-mode #detailsModal .details-title {
+  font-size: 1.2rem;
+  line-height: 1.15;
+  margin: 0;
+}
+
+body.tv-mode #detailsModal .details-orig-title {
+  font-size: 0.7rem;
+  margin: 0;
+}
+
+body.tv-mode #detailsModal .details-meta {
+  font-size: 0.7rem;
+  gap: 6px;
+}
+
+body.tv-mode #detailsModal .details-actions {
+  gap: 6px;
+  margin-top: 4px;
+}
+
+body.tv-mode #detailsModal .details-actions .btn-primary,
+body.tv-mode #detailsModal .details-actions .btn-secondary,
+body.tv-mode #detailsModal .details-sources-btn {
+  height: 26px;
+  padding: 0 10px;
+  font-size: 0.7rem;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: none !important;
+}
+
+body.tv-mode #detailsModal .details-actions svg {
+  width: 12px;
+  height: 12px;
+}
+
+body.tv-mode #detailsModal .details-body {
+  padding: 10px 18px 16px 18px;
+  gap: 10px;
+}
+
+body.tv-mode #detailsModal .details-info-grid {
+  grid-template-columns: 2.3fr 1fr;
+  gap: 14px;
+}
+
+body.tv-mode #detailsModal .details-overview {
+  font-size: 0.74rem;
+  line-height: 1.38;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+body.tv-mode #detailsModal .details-side-col {
+  font-size: 0.68rem;
+  gap: 4px;
+}
+
+body.tv-mode #detailsModal .details-episodes-section {
+  gap: 8px;
+  padding-top: 6px;
+  background: transparent;
+}
+
+body.tv-mode #detailsModal .episodes-header {
+  gap: 8px;
+}
+
+body.tv-mode #detailsModal .episodes-section-title {
+  font-size: 0.84rem;
+}
+
+body.tv-mode #detailsModal .season-selector {
+  gap: 4px;
+}
+
+body.tv-mode #detailsModal .season-tab-btn {
+  height: 24px;
+  padding: 0 9px;
+  font-size: 0.68rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.78);
+  border: none;
+}
+
+body.tv-mode #detailsModal .episodes-grid {
+  grid-template-columns: repeat(5, 1fr);
+  gap: 7px;
+}
+
+body.tv-mode #detailsModal .episode-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: none !important;
+}
+
+body.tv-mode #detailsModal .episode-card.tv-focused,
+body.tv-mode #detailsModal .episode-card:focus {
+  background: rgba(255, 255, 255, 0.16) !important;
+}
+
+body.tv-mode #detailsModal .ep-num-badge {
+  font-size: 0.62rem;
+  padding: 1px 5px;
+  bottom: 4px;
+  right: 4px;
+}
+
+body.tv-mode #detailsModal .ep-info {
+  padding: 5px 7px;
+  gap: 2px;
+}
+
+body.tv-mode #detailsModal .ep-title {
+  font-size: 0.7rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.tv-mode #detailsModal .ep-desc {
+  font-size: 0.62rem;
+  -webkit-line-clamp: 1;
 }
 
 /* =========================================================================
