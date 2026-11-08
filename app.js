@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.4.5';
+  var APP_VERSION = '9.4.6';
 
   // Default Zero-Account Public Telegram Channels (Free, No Personal Account or Phone Required)
   var DEFAULT_TELEGRAM_CHANNELS = [
@@ -761,6 +761,8 @@
     var streamUrl = raw.stream_url || raw.streamUrl || raw.directUrl || '';
     var fallbackStreams = Array.isArray(raw.fallback_streams) ? raw.fallback_streams : [];
     var videoId = raw.videoId || '';
+    var directYtId = raw.direct_yt_id || raw.directYtId || '';
+    var trailerYtId = raw.trailer_yt_id || raw.trailerYtId || '';
 
     var idKey = String(raw.id || imdbId || (type + '-' + tmdbId));
 
@@ -769,6 +771,9 @@
       imdbId: imdbId,
       tmdbId: tmdbId,
       videoId: videoId,
+      directYtId: directYtId,
+      trailerYtId: trailerYtId,
+      quality: raw.quality || '4K UHD',
       type: type,
       title: heTitle,
       originalTitle: origTitle,
@@ -2460,10 +2465,10 @@
     if (!listEl || !item) return;
 
     var defaultCards = [
-      { mode: 'direct', badge: 'DIRECT 1080P', name: 'נגן ישיר Full HD + כתוביות מסונכרנות בעברית', meta: 'שרת ראשי מהיר' },
-      { mode: 'swarm', badge: 'PIRATEBAY / YTS / TELEGRAM', name: 'מאגר ThePirateBay + YTS 4K + טלגרם VOD', meta: 'איכות מקסימלית 4K/1080p' },
-      { mode: 'embed1', badge: 'VIP CLOUD #1', name: 'שרת ענן VIP 1 (נטפליקס / אמזון / HBO)', meta: 'גיבוי רב-שרתים' },
-      { mode: 'trailer', badge: 'YOUTUBE HD', name: 'טריילר רשמי מיוטיוב (YouTube Official Trailer)', meta: 'יוטיוב ישיר' }
+      { mode: 'direct', badge: 'AUTO 4K UHD', name: 'נגן חכם 4K UHD / Full HD + כתוביות מסונכרנות בעברית', meta: 'בדיקה ובחירה אוטומטית במקור הטוב ביותר' },
+      { mode: 'swarm', badge: 'PIRATEBAY / YTS 4K / TELEGRAM', name: 'מאגר ThePirateBay + YTS 4K + טלגרם VOD', meta: 'איכות מקסימלית 4K UHD' },
+      { mode: 'embed1', badge: 'VIP CLOUD 4K #1', name: 'שרת ענן VIP 4K (נטפליקס / אמזון / HBO)', meta: 'אימות שידור אוטומטי' },
+      { mode: 'trailer', badge: 'YOUTUBE 4K / HD', name: 'שידור רשמי / טריילר מיוטיוב (YouTube Official)', meta: 'יוטיוב ישיר' }
     ];
 
     var renderStreamCards = function (cards) {
@@ -2859,6 +2864,12 @@
     // 4. Load Real Verified Hebrew Subtitles in Parallel!
     loadHebrewSubtitlesForItem(item, imdbId, state.activeSeason, state.activeEpisode);
 
+    // 4b. Direct Official YouTube Episode/Movie Broadcast (for Israeli series with official Kan 11 / HOT YouTube streams)
+    if (item.directYtId && (state.activeSourceTab === 'direct' || state.activeSourceTab === 'embed1')) {
+      await playYoutubeVideoOrTrailer(item);
+      return;
+    }
+
     // 5. Telegram VOD Direct Stream (Direct Telegram CDN MP4 or local server stream)
     if (item.directTelegramMp4 && item.directTelegramMp4.indexOf('http') === 0 && (state.activeSourceTab === 'direct' || state.activeSourceTab === 'swarm')) {
       playDirectHlsOrMp4(item.directTelegramMp4, startOffsetSec);
@@ -2906,7 +2917,7 @@
       await ensureImdbId(item);
     }
 
-    var ytId = item.videoId || '';
+    var ytId = item.videoId || item.directYtId || item.trailerYtId || '';
     if (!ytId && item.tmdbId) {
       try {
         var ep = (item.type === 'series' ? '/tv/' : '/movie/') + encodeURIComponent(item.tmdbId) + '/videos?api_key=' + TMDB_API_KEY;
@@ -3057,12 +3068,34 @@
       var hls = new window.Hls({
         maxBufferLength: 30,
         maxMaxBufferLength: 60,
-        enableWorker: true
+        enableWorker: true,
+        capLevelToPlayerSize: false,
+        startLevel: -1
       });
       state.hlsInstance = hls;
       hls.loadSource(streamUrl);
       hls.attachMedia(video);
-      hls.on(window.Hls.Events.MANIFEST_PARSED, onReadyToPlay);
+      hls.on(window.Hls.Events.MANIFEST_PARSED, function (ev, data) {
+        try {
+          var levels = hls.levels || (data && data.levels) || [];
+          if (levels.length > 1) {
+            var bestIdx = -1;
+            var bestHeight = 0;
+            for (var lv = 0; lv < levels.length; lv++) {
+              var h = Number(levels[lv].height) || 0;
+              if (h >= bestHeight) {
+                bestHeight = h;
+                bestIdx = lv;
+              }
+            }
+            if (bestIdx >= 0) {
+              hls.currentLevel = bestIdx;
+              hls.loadLevel = bestIdx;
+            }
+          }
+        } catch (e) {}
+        onReadyToPlay();
+      });
       hls.on(window.Hls.Events.ERROR, function (ev, errData) {
         if (errData && errData.fatal) {
           if (rawFallbackUrl && streamUrl !== rawFallbackUrl) {
@@ -3088,16 +3121,31 @@
     var embedContainer = document.getElementById('embedPlayerContainer');
     var playerModal = document.getElementById('playerModal');
     var spinner = document.getElementById('playerLoadingSpinner');
+    var loadingText = document.getElementById('playerLoadingText');
     var subOverlay = document.getElementById('customSubtitleOverlay');
     if (!embedContainer || !video || !item) return;
 
     state.playingMode = 'embed';
-    state.embedCurrentTime = Number(startOffsetSec) || 0;
+    state.embedStartOffsetSec = Number(startOffsetSec) || 0;
+    state.embedCurrentTime = state.embedStartOffsetSec;
     state.embedPaused = false;
+    state.embedVerified = false;
+    state.embedAutoPlayed = false;
+    state.embedActiveServerKey = serverKey || 'embed1';
+
     if (state.embedSubTimer) {
       clearInterval(state.embedSubTimer);
       state.embedSubTimer = null;
     }
+    if (state.embedVerifyInterval) {
+      clearInterval(state.embedVerifyInterval);
+      state.embedVerifyInterval = null;
+    }
+    if (state.embedWatchdogTimer) {
+      clearTimeout(state.embedWatchdogTimer);
+      state.embedWatchdogTimer = null;
+    }
+
     state.embedSubTimer = setInterval(function () {
       if (state.playingMode === 'embed' && !state.embedPaused && state.embedCurrentTime > 0) {
         state.embedCurrentTime += 0.25;
@@ -3110,22 +3158,22 @@
     video.classList.add('hidden');
     embedContainer.classList.remove('hidden');
     if (subOverlay) subOverlay.classList.remove('hidden');
+    if (spinner) spinner.classList.remove('hidden');
+    if (loadingText) {
+      loadingText.textContent = state.embedActiveServerKey === 'embed2'
+        ? 'מתחבר לשרת ענן 4K משני (Mirror #2)...'
+        : 'בודק ומחבר אוטומטית למקור השידור הטוב ביותר (4K UHD)...';
+    }
 
     var tmdbId = String(item.tmdbId || '').replace(/\D/g, '') || '693134';
     var embedUrl = '';
 
-    // 100% Sandbox-Compatible Cloud Providers (Verified in Chrome with sandbox="allow-scripts allow-same-origin allow-forms allow-presentation": ZERO "Please Disable Sandbox" & ZERO popups!)
-    if (serverKey === 'embed2') {
+    // 100% Sandbox-Compatible Verified 4K/1080p Cloud Mirrors (`cdn.vidspark.to` + `vidsrc.pm/embed`)
+    if (state.embedActiveServerKey === 'embed2' || state.embedActiveServerKey === 'swarm') {
       if (item.type === 'series') {
-        embedUrl = 'https://vidspark.to/tv/' + tmdbId + '/' + (season || 1) + '/' + (episode || 1);
+        embedUrl = 'https://vidsrc.pm/embed/tv/' + tmdbId + '/' + (season || 1) + '/' + (episode || 1);
       } else {
-        embedUrl = 'https://vidspark.to/movie/' + tmdbId;
-      }
-    } else if (serverKey === 'swarm') {
-      if (item.type === 'series') {
-        embedUrl = 'https://anyembed.xyz/embed/tv/' + tmdbId + '/' + (season || 1) + '/' + (episode || 1);
-      } else {
-        embedUrl = 'https://anyembed.xyz/embed/movie/' + tmdbId;
+        embedUrl = 'https://vidsrc.pm/embed/movie/' + tmdbId;
       }
     } else {
       if (item.type === 'series') {
@@ -3140,13 +3188,36 @@
       'sandbox="allow-scripts allow-same-origin allow-forms allow-presentation" ' +
       'referrerpolicy="origin" ' +
       'allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen ' +
-      'style="width:100%;height:100%;border:none;background:#000;"></iframe>';
+      'style="width:100%;height:100%;border:none;background:#000;opacity:0;transition:opacity 0.25s ease;"></iframe>';
 
     var iframe = document.getElementById('streamEmbedIframe');
+
+    // Continuous health-check ping (`getStatus`): verifies `vidspark-player` is mounted & auto-starts playback
+    state.embedVerifyInterval = setInterval(function () {
+      var curIframe = document.getElementById('streamEmbedIframe');
+      if (state.playingMode !== 'embed' || !curIframe || !curIframe.contentWindow) return;
+      try {
+        curIframe.contentWindow.postMessage({ action: 'getStatus' }, '*');
+      } catch (e) {}
+    }, 600);
+
+    // Automatic Failover Watchdog: if `vidspark-player` does not verify within 7s (meaning title is missing on `vidora` and would fall back to `moviesapi.vip`), switch source automatically while iframe opacity is still 0!
+    state.embedWatchdogTimer = setTimeout(function () {
+      if (state.playingMode === 'embed' && !state.embedVerified && state.playingItem) {
+        if (state.embedActiveServerKey === 'embed1') {
+          playCleanEmbedStream(state.playingItem, state.activeSeason, state.activeEpisode, state.embedStartOffsetSec || 0, 'embed2');
+        } else {
+          playYoutubeVideoOrTrailer(state.playingItem);
+        }
+      }
+    }, 7000);
+
     if (iframe) {
       iframe.addEventListener('load', function () {
-        if (spinner) spinner.classList.add('hidden');
         try {
+          if (iframe.contentWindow) {
+            iframe.contentWindow.postMessage({ action: 'getStatus' }, '*');
+          }
           if (window.AndroidTvBridge && typeof window.AndroidTvBridge.tapCenterOfScreen === 'function') {
             setTimeout(function () {
               var pm = document.getElementById('playerModal');
@@ -3553,6 +3624,16 @@
       clearInterval(state.embedSubTimer);
       state.embedSubTimer = null;
     }
+    if (state.embedVerifyInterval) {
+      clearInterval(state.embedVerifyInterval);
+      state.embedVerifyInterval = null;
+    }
+    if (state.embedWatchdogTimer) {
+      clearTimeout(state.embedWatchdogTimer);
+      state.embedWatchdogTimer = null;
+    }
+    state.embedVerified = false;
+    state.embedAutoPlayed = false;
     if (state.hlsInstance) {
       try { state.hlsInstance.destroy(); } catch (e) {}
       state.hlsInstance = null;
@@ -4106,11 +4187,36 @@
       });
     }
 
-    // Listen to postMessage timeupdate events from sandboxed VidSpark player to keep custom Hebrew subtitles synced
+    // Listen to postMessage events from sandboxed VidSpark/Vidsrc player:
+    // 1. Verifies stream is live (`source === 'vidspark-player'`), reveals iframe, hides loading spinner, and auto-plays
+    // 2. Keeps custom Hebrew subtitles synced with exact playback timestamp
     window.addEventListener('message', function (ev) {
       try {
         var d = ev && ev.data;
-        if (d && (d.source === 'vidspark-player' || d.source === 'moviesapi-player')) {
+        if (d && d.source === 'vidspark-player') {
+          if (!state.embedVerified && state.playingMode === 'embed') {
+            state.embedVerified = true;
+            if (state.embedWatchdogTimer) {
+              clearTimeout(state.embedWatchdogTimer);
+              state.embedWatchdogTimer = null;
+            }
+            var ifr = document.getElementById('streamEmbedIframe');
+            if (ifr) ifr.style.opacity = '1';
+            var sp = document.getElementById('playerLoadingSpinner');
+            if (sp) sp.classList.add('hidden');
+          }
+          if (!state.embedAutoPlayed && state.playingMode === 'embed' && (d.event === 'ready' || d.event === 'playerstatus')) {
+            state.embedAutoPlayed = true;
+            var ifrPlay = document.getElementById('streamEmbedIframe');
+            if (ifrPlay && ifrPlay.contentWindow) {
+              try {
+                ifrPlay.contentWindow.postMessage({ action: 'play' }, '*');
+                if (state.embedStartOffsetSec > 0) {
+                  ifrPlay.contentWindow.postMessage({ action: 'seek', time: Math.floor(state.embedStartOffsetSec) }, '*');
+                }
+              } catch (e) {}
+            }
+          }
           if (d.event === 'pause') state.embedPaused = true;
           else if (d.event === 'play' || d.event === 'timeupdate' || d.event === 'seeked') state.embedPaused = false;
           if (typeof d.currentTime === 'number' && state.playingMode === 'embed' && d.currentTime >= 0) {

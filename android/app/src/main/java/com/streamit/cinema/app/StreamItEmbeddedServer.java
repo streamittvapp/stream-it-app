@@ -304,32 +304,73 @@ public class StreamItEmbeddedServer {
             directStreamCache.put(cacheKey, new CachedItem(now, payloadStr));
             return payloadStr;
         } catch (Exception e) {
-            // Secondary Direct HLS Fallback via cdn.vidspark.to (vjej -> img1.hscow.com direct m3u8)
+            // Secondary Direct 4K/1080p HLS Multi-Server Resolver via cdn.vidspark.to & vidsrc.pm (b4tz 1080p/4K -> w7dn 1080p -> vjej)
             if (!tmdbId.isEmpty()) {
-                try {
-                    String vpPath = ("series".equalsIgnoreCase(itemType) || "tv".equalsIgnoreCase(itemType))
-                            ? ("/api/vidora/v1/tv/" + tmdbId + "/" + season + "/" + episode + "?source=vjej")
-                            : ("/api/vidora/v1/movie/" + tmdbId + "?source=vjej");
-                    Map<String, String> hVp = new HashMap<>();
-                    hVp.put("User-Agent", USER_AGENT);
-                    hVp.put("Referer", "https://cdn.vidspark.to/");
-                    hVp.put("x-player-key", "f3b72e73c80c9a996574379798703796a1936efa3516a7105cb0e43048b46b5a");
-                    String vpRaw = new String(httpGetBytes("https://cdn.vidspark.to" + vpPath, hVp, 6000), StandardCharsets.UTF_8);
-                    JSONObject vpObj = new JSONObject(vpRaw);
-                    JSONArray sources = vpObj.optJSONArray("sources");
-                    if (sources != null && sources.length() > 0) {
-                        String directM3u8 = sources.getJSONObject(0).optString("url", "");
-                        if (directM3u8.startsWith("http")) {
-                            JSONObject fb = new JSONObject();
-                            fb.put("ok", true);
-                            fb.put("imdb_id", imdbId);
-                            fb.put("streamUrl", directM3u8);
-                            String fbStr = fb.toString();
-                            directStreamCache.put(cacheKey, new CachedItem(now, fbStr));
-                            return fbStr;
+                String[] vidoraHosts = new String[]{"https://cdn.vidspark.to", "https://vidsrc.pm"};
+                String[] vidoraSources = new String[]{"b4tz", "w7dn", "vjej"};
+                for (String host : vidoraHosts) {
+                    for (String srcKey : vidoraSources) {
+                        try {
+                            String vpPath = ("series".equalsIgnoreCase(itemType) || "tv".equalsIgnoreCase(itemType))
+                                    ? ("/api/vidora/v1/tv/" + tmdbId + "/" + season + "/" + episode + "?source=" + srcKey)
+                                    : ("/api/vidora/v1/movie/" + tmdbId + "?source=" + srcKey);
+                            Map<String, String> hVp = new HashMap<>();
+                            hVp.put("User-Agent", USER_AGENT);
+                            hVp.put("Referer", host + "/");
+                            hVp.put("x-player-key", "f3b72e73c80c9a996574379798703796a1936efa3516a7105cb0e43048b46b5a");
+                            String vpRaw = new String(httpGetBytes(host + vpPath, hVp, 4500), StandardCharsets.UTF_8);
+                            JSONObject vpObj = new JSONObject(vpRaw);
+                            JSONArray sources = vpObj.optJSONArray("sources");
+                            if (sources != null && sources.length() > 0) {
+                                String rawStreamUrl = sources.getJSONObject(0).optString("url", "");
+                                if (rawStreamUrl.startsWith("http")) {
+                                    String finalStreamUrl = rawStreamUrl;
+                                    // Unwrap proxy URLs (?url=https%3A%2F%2F...&data=base64) to stream 1080p/4K directly via local /api/hls-proxy
+                                    if (rawStreamUrl.contains("url=")) {
+                                        try {
+                                            String innerM3u8 = "";
+                                            String innerOrigin = "https://cloudnestra.com";
+                                            URI uWrap = new URI(rawStreamUrl);
+                                            String qWrap = uWrap.getRawQuery();
+                                            if (qWrap != null) {
+                                                for (String pair : qWrap.split("&")) {
+                                                    int idx = pair.indexOf('=');
+                                                    if (idx > 0) {
+                                                        String k = pair.substring(0, idx);
+                                                        String v = URLDecoder.decode(pair.substring(idx + 1), "UTF-8");
+                                                        if ("url".equals(k)) {
+                                                            innerM3u8 = v;
+                                                        } else if ("data".equals(k)) {
+                                                            String decData = new String(Base64.decode(v, Base64.DEFAULT), StandardCharsets.UTF_8);
+                                                            for (String dPart : decData.split("\\|")) {
+                                                                if (dPart.startsWith("Origin=")) {
+                                                                    innerOrigin = dPart.substring("Origin=".length()).trim();
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            if (innerM3u8.startsWith("http")) {
+                                                finalStreamUrl = "http://127.0.0.1:" + PORT + "/api/hls-proxy?url="
+                                                        + URLEncoder.encode(innerM3u8, "UTF-8")
+                                                        + "&origin=" + URLEncoder.encode(innerOrigin, "UTF-8");
+                                            }
+                                        } catch (Exception ignoredUnwrap) {
+                                        }
+                                    }
+                                    JSONObject fb = new JSONObject();
+                                    fb.put("ok", true);
+                                    fb.put("imdb_id", imdbId);
+                                    fb.put("streamUrl", finalStreamUrl);
+                                    String fbStr = fb.toString();
+                                    directStreamCache.put(cacheKey, new CachedItem(now, fbStr));
+                                    return fbStr;
+                                }
+                            }
+                        } catch (Exception ignored) {
                         }
                     }
-                } catch (Exception ignored) {
                 }
             }
             try {

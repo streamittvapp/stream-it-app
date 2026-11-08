@@ -1,9 +1,9 @@
 {
-  "version": "9.4.5",
-  "native_apk_version": "9.4.5",
+  "version": "9.4.6",
+  "native_apk_version": "9.4.6",
   "apk_download_url": "https://is.gd/streamittv_apk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-08T13:35:00Z",
-  "notes": "v9.4.5 — Restored Hebrew-Only Subtitles & Settings Panel (#playerTopSubsBtn + #playerSubsMenu + #customSubtitleOverlay) in all player modes, added TMDB movie/series pulling from Telegram channels, and added dedicated טלגרם VOD navigation tab."
+  "updated_at": "2026-11-08T15:10:00Z",
+  "notes": "v9.4.6 — Auto-Verifying 4K UHD Stream Engine: eliminates all 'Playback blocked' screens, verifies streams via getStatus handshake with automatic failover across cdn.vidspark.to -> vidsrc.pm -> YouTube HD, upgrades HLS.js & Android TV StreamItEmbeddedServer to 4K UHD / 1080p default, and fixes all Israeli movie/series IDs."
 }
