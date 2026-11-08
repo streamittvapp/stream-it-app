@@ -1022,7 +1022,7 @@
         const jsonContent = JSON.stringify(vaultData, null, 2);
         const b64Content = btoa(unescape(encodeURIComponent(jsonContent)));
         let pushedAny = false;
-        const repos = ['stream-it-app', 'stream-it'];
+        const repos = ['stream-it-app'];
         for (const repo of repos) {
           try {
             const apiUrl = `https://api.github.com/repos/streamittvapp/${repo}/contents/data/accounts_vault.json`;
