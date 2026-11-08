@@ -1,7 +1,7 @@
 {
-  "version": "9.4.1",
-  "native_apk_version": "9.4",
-  "updated_at": "2026-11-08T09:16:00+02:00",
+  "version": "9.4.2",
+  "native_apk_version": "9.4.2",
+  "updated_at": "2026-11-08T10:28:00+02:00",
   "ota_cdn_base": "https://is.gd",
   "apk_download_url": "https://is.gd/streamittv_apk",
   "features": [

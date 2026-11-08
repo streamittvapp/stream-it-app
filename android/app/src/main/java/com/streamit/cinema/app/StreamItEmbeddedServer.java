@@ -129,7 +129,7 @@ public class StreamItEmbeddedServer {
             Map<String, String> params = parseQuery(query);
 
             if ("/api/health".equals(path)) {
-                byte[] body = "{\"ok\":true,\"mode\":\"android_embedded_server\",\"version\":\"9.3.0\",\"ota_ver_url\":\"https://is.gd/streamit_ver\",\"ota_apk_url\":\"https://is.gd/streamit_apk\"}"
+                byte[] body = "{\"ok\":true,\"mode\":\"android_embedded_server\",\"version\":\"9.4.2\",\"ota_ver_url\":\"https://is.gd/streamittv_ver\",\"ota_apk_url\":\"https://is.gd/streamittv_apk\"}"
                         .getBytes(StandardCharsets.UTF_8);
                 sendResponse(out, 200, "application/json; charset=utf-8", body);
             } else if ("/api/ota".equals(path)) {
@@ -294,7 +294,7 @@ public class StreamItEmbeddedServer {
             headers.put("User-Agent", USER_AGENT);
             headers.put("Cache-Control", "no-cache, no-store, must-revalidate");
             headers.put("Pragma", "no-cache");
-            HttpResult res = httpGetWithFinalUrl("https://is.gd/streamit_" + k, headers, 8000);
+            HttpResult res = httpGetWithFinalUrl("https://is.gd/streamittv_" + k, headers, 8000);
             return new String(res.bytes, StandardCharsets.UTF_8);
         } catch (Exception e) {
             return "";

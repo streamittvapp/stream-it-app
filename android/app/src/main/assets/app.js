@@ -10,7 +10,12 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.4.0';
+  var APP_VERSION = '9.4.2';
+
+  // Browser-level anti-popup & anti-ad shield: block all window.open popups globally
+  try {
+    window.open = function () { return null; };
+  } catch (e) {}
   var TMDB_API_KEY = '3fd2be6f0c70a2a598f084ddfb75487c';
   var TMDB_BASE = 'https://api.themoviedb.org/3';
   var TMDB_IMG_POSTER = 'https://image.tmdb.org/t/p/w500';
@@ -2543,6 +2548,7 @@
 
     embedContainer.innerHTML =
       '<iframe id="streamEmbedIframe" src="' + escapeHtml(ytEmbedUrl) + '" ' +
+      'sandbox="allow-scripts allow-same-origin allow-forms allow-presentation" ' +
       'allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen ' +
       'style="width:100%;height:100%;border:none;background:#000;"></iframe>';
 
@@ -2701,26 +2707,28 @@
 
     if (serverKey === 'embed2') {
       if (item.type === 'series') {
-        embedUrl = 'https://multiembed.mov/?video_id=' + encodeURIComponent(imdbId) + '&s=' + (season || 1) + '&e=' + (episode || 1);
+        embedUrl = 'https://vidsrc.pm/embed/tv/' + encodeURIComponent(imdbId) + '/' + (season || 1) + '/' + (episode || 1) + '?autoplay=1';
       } else {
-        embedUrl = 'https://multiembed.mov/?video_id=' + encodeURIComponent(imdbId);
+        embedUrl = 'https://vidsrc.pm/embed/movie/' + encodeURIComponent(imdbId) + '?autoplay=1';
       }
     } else if (serverKey === 'swarm') {
       if (item.type === 'series') {
-        embedUrl = 'https://vidsrc.me/embed/tv?imdb=' + encodeURIComponent(imdbId) + '&season=' + (season || 1) + '&episode=' + (episode || 1) + '&ds_lang=he';
+        embedUrl = 'https://www.nontongo.win/embed/tv/' + tmdbId + '/' + (season || 1) + '/' + (episode || 1);
       } else {
-        embedUrl = 'https://vidsrc.me/embed/movie?imdb=' + encodeURIComponent(imdbId) + '&ds_lang=he';
+        embedUrl = 'https://www.nontongo.win/embed/movie/' + tmdbId;
       }
     } else {
       if (item.type === 'series') {
-        embedUrl = 'https://vidlink.pro/tv/' + tmdbId + '/' + (season || 1) + '/' + (episode || 1) + '?primaryColor=E50914&autoplay=true&ds_lang=he' + startParam;
+        embedUrl = 'https://vidlink.pro/tv/' + tmdbId + '/' + (season || 1) + '/' + (episode || 1) + '?primaryColor=E50914&autoplay=true&ds_lang=he&limitAds=true' + startParam;
       } else {
-        embedUrl = 'https://vidlink.pro/movie/' + tmdbId + '?primaryColor=E50914&autoplay=true&ds_lang=he' + startParam;
+        embedUrl = 'https://vidlink.pro/movie/' + tmdbId + '?primaryColor=E50914&autoplay=true&ds_lang=he&limitAds=true' + startParam;
       }
     }
 
     embedContainer.innerHTML =
       '<iframe id="streamEmbedIframe" src="' + escapeHtml(embedUrl) + '" ' +
+      'sandbox="allow-scripts allow-same-origin allow-forms allow-presentation" ' +
+      'referrerpolicy="origin" ' +
       'allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen ' +
       'style="width:100%;height:100%;border:none;background:#000;"></iframe>';
 
