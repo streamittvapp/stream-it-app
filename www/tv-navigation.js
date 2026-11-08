@@ -19,6 +19,9 @@
   var heroPreviewDebounceTimer = null;
   var lastPlayerOverlayDismissedAt = 0;
   var lastBackHandledAt = 0;
+  var lastCmdAt = 0;
+  var lastCmdDir = '';
+  var lastFocusedDescriptor = null;
 
   function clearPlayerFocus() {
     var player = document.getElementById('playerModal');
@@ -71,6 +74,7 @@
     if (!el || !el.isConnected || el.disabled) return false;
     if (el.classList.contains('hidden')) return false;
     if (el.closest('.hidden')) return false;
+    if (el.closest('.tv-rail-sec-list:not(.open)')) return false;
     return el.offsetWidth > 2 && el.offsetHeight > 2;
   }
 
@@ -146,11 +150,42 @@
       try {
         el.focus({ preventScroll: true });
       } catch (e) {}
+    } else if (document.activeElement && document.activeElement !== document.body && document.activeElement !== el) {
+      try {
+        document.activeElement.blur();
+      } catch (e) {}
     }
 
     if (el.closest('#mainStage')) {
       lastMainFocus = el;
     }
+
+    // Record descriptor so if a container re-renders in the background, focus recovers in-place without jumping
+    var pRow = el.closest('.netflix-row');
+    var allR = pRow ? Array.prototype.slice.call(document.querySelectorAll('#catalogMain .netflix-row')) : [];
+    var rIdx = pRow ? allR.indexOf(pRow) : -1;
+    var cIdx = -1;
+    if (pRow) {
+      cIdx = Array.prototype.slice.call(pRow.querySelectorAll('.poster-card')).indexOf(el);
+    } else if (el.closest('.catalog-poster-grid')) {
+      cIdx = Array.prototype.slice.call(document.querySelectorAll('#catalogMain .catalog-poster-grid .poster-card')).indexOf(el);
+    }
+    lastFocusedDescriptor = {
+      id: el.id || '',
+      itemId: el.getAttribute('data-item-id') || '',
+      tvGenre: el.getAttribute('data-tv-genre') || '',
+      tvProvider: el.getAttribute('data-tv-provider') || '',
+      tvYear: el.getAttribute('data-tv-year') || '',
+      tvActor: el.getAttribute('data-tv-actor-id') || '',
+      miniChar: el.getAttribute('data-mini-char') || '',
+      miniAct: el.getAttribute('data-mini-act') || '',
+      category: el.getAttribute('data-category') || '',
+      rowIdx: rIdx,
+      colIdx: cIdx,
+      inSideRail: Boolean(el.closest('#tvSideRail')),
+      inTopHeader: Boolean(el.closest('#topHeader')),
+      inHero: Boolean(el.closest('#heroBillboard'))
+    };
 
     var scrollBehavior = isTv ? 'auto' : 'smooth';
 
@@ -699,9 +734,13 @@
     var explorerBar = document.getElementById('catalogExplorerBar');
     var catalogMain = document.getElementById('catalogMain');
 
+    var isTvMode = Boolean(document.body && document.body.classList.contains('tv-mode'));
+    var headerSelector = isTvMode
+      ? '.main-nav .nav-link, #headerQuickSearchInput, #openSearchBtn, #userSettingsMenuBtn'
+      : '#brandLogo, .main-nav .nav-link, #headerQuickSearchInput, #openSearchBtn, #userSettingsMenuBtn';
     var headerItems = topHeader
       ? Array.prototype.slice.call(
-          topHeader.querySelectorAll('#brandLogo, .main-nav .nav-link, #headerQuickSearchInput, #openSearchBtn, #userSettingsMenuBtn')
+          topHeader.querySelectorAll(headerSelector)
         ).filter(isElementVisible)
       : [];
     var railBtns = sideRail ? Array.prototype.slice.call(sideRail.querySelectorAll('.tv-focusable')).filter(isElementVisible) : [];
@@ -711,11 +750,19 @@
     var loadMoreBtn = document.getElementById('loadMoreCatalogBtn');
 
     function focusPreferredRailItem() {
-      if (!sideRail || !railBtns.length) return false;
+      if (!sideRail) return false;
       var searchBtn = document.getElementById('tvRailSearchBtn');
-      var activeListBtn = sideRail.querySelector('#tvRailListsScroll .tv-rail-item.active');
-      var target = (searchBtn && isElementVisible(searchBtn)) ? searchBtn : (activeListBtn || railBtns[0]);
-      return setFocus(target, { scroll: false });
+      if (searchBtn && isElementVisible(searchBtn)) {
+        return setFocus(searchBtn, { scroll: false });
+      }
+      var activeListBtn = sideRail.querySelector('#tvRailListsScroll .tv-rail-sec-list.open .tv-rail-item.active');
+      if (activeListBtn && isElementVisible(activeListBtn)) {
+        return setFocus(activeListBtn, { scroll: false });
+      }
+      if (railBtns.length) {
+        return setFocus(railBtns[0], { scroll: false });
+      }
+      return false;
     }
 
     function focusMainStageFromRail() {
@@ -724,14 +771,48 @@
       }
       if (rows.length) {
         var c = rows[0].querySelector('.poster-card');
-        if (c) return setFocus(c);
+        if (c && isElementVisible(c)) return setFocus(c);
       }
       if (wallGrid) {
         var wc = wallGrid.querySelector('.poster-card');
-        if (wc) return setFocus(wc);
+        if (wc && isElementVisible(wc)) return setFocus(wc);
       }
       if (heroBtns.length) return setFocus(heroBtns[0]);
       return true;
+    }
+
+    if ((!currentFocused || !isElementVisible(currentFocused)) && lastFocusedDescriptor) {
+      var d = lastFocusedDescriptor;
+      var recovered = null;
+      if (d.id) recovered = document.getElementById(d.id);
+      if (!recovered && d.inSideRail && sideRail) {
+        if (d.miniChar) recovered = sideRail.querySelector('[data-mini-char="' + d.miniChar.replace(/"/g, '\\"') + '"]');
+        else if (d.miniAct) recovered = sideRail.querySelector('[data-mini-act="' + d.miniAct + '"]');
+        else if (d.tvGenre) recovered = sideRail.querySelector('[data-tv-genre="' + d.tvGenre + '"]');
+        else if (d.tvProvider) recovered = sideRail.querySelector('[data-tv-provider="' + d.tvProvider + '"]');
+        else if (d.tvYear) recovered = sideRail.querySelector('[data-tv-year="' + d.tvYear + '"]');
+        else if (d.tvActor) recovered = sideRail.querySelector('[data-tv-actor-id="' + d.tvActor + '"]');
+      }
+      if (!recovered && d.rowIdx >= 0 && rows.length) {
+        var rTarget = rows[Math.min(d.rowIdx, rows.length - 1)];
+        if (rTarget) {
+          if (d.itemId) recovered = rTarget.querySelector('.poster-card[data-item-id="' + d.itemId.replace(/"/g, '\\"') + '"]');
+          if (!recovered && d.colIdx >= 0) {
+            var rCards = rTarget.querySelectorAll('.poster-card');
+            if (rCards.length) recovered = rCards[Math.min(d.colIdx, rCards.length - 1)];
+          }
+        }
+      }
+      if (!recovered && d.colIdx >= 0 && wallGrid) {
+        if (d.itemId) recovered = wallGrid.querySelector('.poster-card[data-item-id="' + d.itemId.replace(/"/g, '\\"') + '"]');
+        if (!recovered) {
+          var wCards = wallGrid.querySelectorAll('.poster-card');
+          if (wCards.length) recovered = wCards[Math.min(d.colIdx, wCards.length - 1)];
+        }
+      }
+      if (recovered && isElementVisible(recovered)) {
+        setFocus(recovered, { scroll: false });
+      }
     }
 
     if (!currentFocused || !isElementVisible(currentFocused)) {
@@ -791,13 +872,15 @@
       }
     }
 
-    // A. Inside TV Right Side Rail (#tvSideRail: חיפוש + מקלדת מובנית | קטגוריות | פלטפורמות | לפי שנה | שחקנים | פרופיל והגדרות)
+    // A. Inside TV Right Side Rail (#tvSideRail: חיפוש + מקלדת מובנית | אקורדיון קטגוריות / פלטפורמות / לפי שנה / שחקנים | פרופיל והגדרות)
     if (sideRail && sideRail.contains(currentFocused)) {
       var railSearchBtn = document.getElementById('tvRailSearchBtn');
       var railSearchClearBtn = document.getElementById('tvRailSearchClearBtn');
       var miniVk = document.getElementById('tvRailMiniKeyboard');
       var miniVkOpen = Boolean(miniVk && !miniVk.classList.contains('hidden') && isElementVisible(miniVk));
-      var railListItems = Array.prototype.slice.call(sideRail.querySelectorAll('#tvRailListsScroll .tv-rail-item')).filter(isElementVisible);
+      var railListItems = Array.prototype.slice.call(
+        sideRail.querySelectorAll('#tvRailListsScroll .tv-rail-sec-header, #tvRailListsScroll .tv-rail-sec-list.open .tv-rail-item')
+      ).filter(isElementVisible);
       var railProfileBtn = document.getElementById('tvRailProfileBtn');
       var railSettingsBtn = document.getElementById('tvRailSettingsBtn');
 
@@ -821,7 +904,7 @@
         }
         if (direction === 'down') {
           if (miniVkOpen) {
-            var firstVkKey = miniVk.querySelector('.tv-rail-vk-key');
+            var firstVkKey = miniVk.querySelector('.tv-mini-vk-key');
             if (firstVkKey && isElementVisible(firstVkKey)) return setFocus(firstVkKey, { scroll: false });
           }
           if (railListItems.length) return setFocus(railListItems[0]);
@@ -830,26 +913,75 @@
         }
       }
 
-      // A2. Inline Mini-Keyboard (#tvRailMiniKeyboard)
+      // A2. Inline Mini-Keyboard (#tvRailMiniKeyboard — Deterministic 6-Column Grid + 4-Button Action Row)
       if (miniVkOpen && miniVk.contains(currentFocused)) {
-        var vkKeys = Array.prototype.slice.call(miniVk.querySelectorAll('.tv-rail-vk-key')).filter(isElementVisible);
-        var nearVkKey = findNearestPhysical(currentFocused, direction, vkKeys);
-        if (nearVkKey) {
-          return setFocus(nearVkKey, { scroll: false });
-        }
-        if (direction === 'up') {
-          if (railSearchBtn && isElementVisible(railSearchBtn)) return setFocus(railSearchBtn, { scroll: false });
+        var charKeys = Array.prototype.slice.call(miniVk.querySelectorAll('.tv-mini-vk-key')).filter(isElementVisible);
+        var actKeys = Array.prototype.slice.call(miniVk.querySelectorAll('.tv-mini-vk-act')).filter(isElementVisible);
+        var chIdx = charKeys.indexOf(currentFocused);
+        if (chIdx !== -1) {
+          var vkCols = 6;
+          var chRow = Math.floor(chIdx / vkCols);
+          var chCol = chIdx % vkCols;
+          if (direction === 'right') {
+            if (chCol < vkCols - 1 && chIdx + 1 < charKeys.length) {
+              return setFocus(charKeys[chIdx + 1], { scroll: false });
+            }
+            return true;
+          }
+          if (direction === 'left') {
+            if (chCol > 0) {
+              return setFocus(charKeys[chIdx - 1], { scroll: false });
+            }
+            return focusMainStageFromRail();
+          }
+          if (direction === 'up') {
+            if (chIdx - vkCols >= 0) {
+              return setFocus(charKeys[chIdx - vkCols], { scroll: false });
+            }
+            if (railSearchBtn && isElementVisible(railSearchBtn)) return setFocus(railSearchBtn, { scroll: false });
+            return true;
+          }
+          if (direction === 'down') {
+            if (chIdx + vkCols < charKeys.length) {
+              return setFocus(charKeys[chIdx + vkCols], { scroll: false });
+            }
+            if (actKeys.length) {
+              var targetActIdx = Math.min(actKeys.length - 1, Math.floor((chCol * actKeys.length) / vkCols));
+              return setFocus(actKeys[targetActIdx], { scroll: false });
+            }
+            if (railListItems.length) return setFocus(railListItems[0]);
+            return true;
+          }
           return true;
         }
-        if (direction === 'down') {
-          if (railListItems.length) return setFocus(railListItems[0]);
-          if (railProfileBtn && isElementVisible(railProfileBtn)) return setFocus(railProfileBtn, { scroll: false });
+
+        var actIdx = actKeys.indexOf(currentFocused);
+        if (actIdx !== -1) {
+          if (direction === 'right') {
+            if (actIdx < actKeys.length - 1) return setFocus(actKeys[actIdx + 1], { scroll: false });
+            return true;
+          }
+          if (direction === 'left') {
+            if (actIdx > 0) return setFocus(actKeys[actIdx - 1], { scroll: false });
+            return focusMainStageFromRail();
+          }
+          if (direction === 'up') {
+            if (charKeys.length >= 6) {
+              var lastRowStart = Math.floor((charKeys.length - 1) / 6) * 6;
+              var colMap = Math.min(5, Math.round((actIdx * 5) / Math.max(1, actKeys.length - 1)));
+              var upChar = charKeys[Math.min(charKeys.length - 1, lastRowStart + colMap)];
+              if (upChar) return setFocus(upChar, { scroll: false });
+            }
+            if (railSearchBtn && isElementVisible(railSearchBtn)) return setFocus(railSearchBtn, { scroll: false });
+            return true;
+          }
+          if (direction === 'down') {
+            if (railListItems.length) return setFocus(railListItems[0]);
+            if (railProfileBtn && isElementVisible(railProfileBtn)) return setFocus(railProfileBtn, { scroll: false });
+            return true;
+          }
           return true;
         }
-        if (direction === 'left') {
-          return focusMainStageFromRail();
-        }
-        return true;
       }
 
       // A3. Bottom Profile & Settings Bar (#tvRailProfileBtn, #tvRailSettingsBtn)
@@ -874,7 +1006,7 @@
         return true;
       }
 
-      // A4. Scrollable Lists (#tvRailListsScroll .tv-rail-item)
+      // A4. Scrollable Accordion Headers & Open Section Items (#tvRailListsScroll)
       var lIdx = railListItems.indexOf(currentFocused);
       if (lIdx !== -1) {
         if (direction === 'down') {
@@ -885,8 +1017,8 @@
         if (direction === 'up') {
           if (lIdx > 0) return setFocus(railListItems[lIdx - 1]);
           if (miniVkOpen) {
-            var vkAll = miniVk.querySelectorAll('.tv-rail-vk-key');
-            if (vkAll.length) return setFocus(vkAll[vkAll.length - 1], { scroll: false });
+            var vkActs = miniVk.querySelectorAll('.tv-mini-vk-act');
+            if (vkActs.length) return setFocus(vkActs[0], { scroll: false });
           }
           if (railSearchBtn && isElementVisible(railSearchBtn)) return setFocus(railSearchBtn, { scroll: false });
           if (focusTopHeaderNav(false)) return true;
@@ -1129,6 +1261,69 @@
 
     // E. Inside Multi-Row & Multi-Column Poster Wall Grid (.catalog-poster-grid), Live TV Hub Banner, Telegram Banner, #clearActorFilterBtn, or #loadMoreCatalogBtn
     var clearActorBtn = document.getElementById('clearActorFilterBtn');
+    if (wallGrid && wallGrid.contains(currentFocused) && currentFocused.classList.contains('poster-card')) {
+      var wallCards = Array.prototype.slice.call(wallGrid.querySelectorAll('.poster-card')).filter(isElementVisible);
+      var wIdx = wallCards.indexOf(currentFocused);
+      if (wIdx !== -1 && wallCards.length > 0) {
+        var cols = 1;
+        var row0Top = wallCards[0].offsetTop;
+        for (var ci = 1; ci < Math.min(12, wallCards.length); ci++) {
+          if (Math.abs(wallCards[ci].offsetTop - row0Top) <= 18) cols++;
+          else break;
+        }
+        var wCol = wIdx % cols;
+        var wRow = Math.floor(wIdx / cols);
+        if (direction === 'left') {
+          if (wCol < cols - 1 && wIdx + 1 < wallCards.length) {
+            return setFocus(wallCards[wIdx + 1]);
+          }
+          return true;
+        }
+        if (direction === 'right') {
+          if (wCol > 0) {
+            return setFocus(wallCards[wIdx - 1]);
+          }
+          if (focusPreferredRailItem()) return true;
+          return true;
+        }
+        if (direction === 'down') {
+          if (wIdx + cols < wallCards.length) {
+            return setFocus(wallCards[wIdx + cols]);
+          }
+          var lastRowIdx = Math.floor((wallCards.length - 1) / cols);
+          if (wRow < lastRowIdx) {
+            return setFocus(wallCards[wallCards.length - 1]);
+          }
+          if (loadMoreBtn && isElementVisible(loadMoreBtn)) {
+            return setFocus(loadMoreBtn);
+          }
+          return true;
+        }
+        if (direction === 'up') {
+          if (wIdx - cols >= 0) {
+            return setFocus(wallCards[wIdx - cols]);
+          }
+          if (clearActorBtn && isElementVisible(clearActorBtn)) {
+            return setFocus(clearActorBtn);
+          }
+          if (rows.length) {
+            var lastRowCardsUp = Array.prototype.slice.call(rows[rows.length - 1].querySelectorAll('.poster-card')).filter(isElementVisible);
+            if (lastRowCardsUp.length) {
+              return setFocus(lastRowCardsUp[Math.min(wCol, lastRowCardsUp.length - 1)]);
+            }
+          }
+          var dropBarGridUp0 = document.getElementById('explorerDropdownsBar');
+          if (dropBarGridUp0 && isElementVisible(dropBarGridUp0)) {
+            var dbBtn0 = dropBarGridUp0.querySelector('.explorer-dropdown-btn');
+            if (dbBtn0) return setFocus(dbBtn0);
+          }
+          if (heroBtns.length) return setFocus(heroBtns[0]);
+          if (focusTopHeaderNav(false)) return true;
+          return true;
+        }
+      }
+    }
+
     if (
       (wallGrid && wallGrid.contains(currentFocused)) ||
       (catalogMain && catalogMain.contains(currentFocused)) ||
@@ -1509,6 +1704,13 @@
    * Master Remote D-Pad & Keyboard Dispatcher
    */
   function handleRemoteCommand(directionOrAction) {
+    var nowCmd = Date.now();
+    if (directionOrAction === lastCmdDir && nowCmd - lastCmdAt < 45) {
+      return true;
+    }
+    lastCmdDir = directionOrAction;
+    lastCmdAt = nowCmd;
+
     if (directionOrAction === 'back') {
       return handleBackButton();
     }

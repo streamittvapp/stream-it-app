@@ -5194,3 +5194,249 @@ body.auth-gate-locked #quickTestLoginBtn {
   overflow-y: auto;
   padding: 4px;
 }
+
+/* =========================================================================
+   MASTER STREAMER FINAL OVERRIDES (body.tv-mode ONLY — Desktop 100% Untouched)
+   Placed at the very end of styles.css for highest cascade priority:
+   1. Zero borders, frames, outlines, or rounded corners anywhere on Streamer
+   2. Lighter gray focus (rgba(255,255,255,0.28)) on buttons, menus, and tiles
+   3. Zero white background or frame when selecting #brandLogo
+   4. Soft Accordion animation for Right Side Menu (#tvSideRail)
+   5. Top Clock (#tvTopClock) to the left of "הרשימה שלי"
+   ========================================================================= */
+body:not(.tv-mode) #tvTopClock {
+  display: none !important;
+}
+
+body.tv-mode #tvTopClock {
+  display: inline-flex !important;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.86);
+  padding: 0 10px;
+  margin-right: 6px;
+  letter-spacing: 0.05em;
+  background: transparent !important;
+  border: none !important;
+}
+
+body.tv-mode,
+body.tv-mode *,
+body.tv-mode *::before,
+body.tv-mode *::after {
+  border-radius: 0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Strip all ugly frames, borders, and white backgrounds across all Streamer elements */
+body.tv-mode button,
+body.tv-mode a,
+body.tv-mode input,
+body.tv-mode select,
+body.tv-mode .tv-focusable,
+body.tv-mode .nav-link,
+body.tv-mode .btn-primary,
+body.tv-mode .btn-secondary,
+body.tv-mode .icon-btn,
+body.tv-mode .modal-close-btn,
+body.tv-mode .channel-tile-card,
+body.tv-mode .channel-tile-emblem-box,
+body.tv-mode .channel-tile-num-badge,
+body.tv-mode .channel-tile-play-circle,
+body.tv-mode .live-hub-banner,
+body.tv-mode .live-hub-pill,
+body.tv-mode .live-importer-panel,
+body.tv-mode .tv-more-modal-card,
+body.tv-mode .tv-more-action-card,
+body.tv-mode .tv-more-action-icon,
+body.tv-mode .tv-more-actor-input,
+body.tv-mode .tv-more-actor-btn,
+body.tv-mode .user-settings-dropdown-panel,
+body.tv-mode .user-menu-header-card,
+body.tv-mode .user-menu-item,
+body.tv-mode .user-menu-prof-chip,
+body.tv-mode .details-modal-sheet,
+body.tv-mode .details-sources-btn,
+body.tv-mode .details-sources-dropdown-panel,
+body.tv-mode .stream-source-card,
+body.tv-mode .episode-card,
+body.tv-mode .season-tab-btn,
+body.tv-mode .auth-modal-card,
+body.tv-mode .sub-user-card,
+body.tv-mode .player-subs-menu,
+body.tv-mode .player-source-tabs,
+body.tv-mode .source-tab-btn,
+body.tv-mode .subs-chip-btn,
+body.tv-mode .sub-track-item,
+body.tv-mode .player-btn,
+body.tv-mode .cw-clear-all-btn,
+body.tv-mode .cw-card-remove-btn,
+body.tv-mode .cw-card-info-btn,
+body.tv-mode .vk-key,
+body.tv-mode .vk-action-btn {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Remove default white background on .btn-primary on Streamer */
+body.tv-mode .btn-primary,
+body.tv-mode .btn-secondary {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff !important;
+}
+
+/* Main STREAM IT Logo (#brandLogo): Never white background, never border */
+body.tv-mode #brandLogo,
+body.tv-mode .brand-logo {
+  background: transparent !important;
+  color: #e50914 !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  padding: 2px 8px !important;
+}
+
+body.tv-mode #brandLogo.tv-focused,
+body.tv-mode #brandLogo:focus,
+body.tv-mode #brandLogo:hover,
+body.tv-mode .brand-logo.tv-focused,
+body.tv-mode .brand-logo:focus {
+  background-color: rgba(255, 255, 255, 0.28) !important;
+  color: #ff2e38 !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Lighter Gray Focus (rgba(255, 255, 255, 0.28)) for all Menus, Buttons & Controls on Streamer */
+body.tv-mode button.tv-focused,
+body.tv-mode button:focus,
+body.tv-mode .nav-link.tv-focused,
+body.tv-mode .nav-link:focus,
+body.tv-mode .btn-primary.tv-focused,
+body.tv-mode .btn-secondary.tv-focused,
+body.tv-mode .tv-rail-search-btn.tv-focused,
+body.tv-mode .tv-rail-search-clear-btn.tv-focused,
+body.tv-mode .tv-rail-sec-header.tv-focused,
+body.tv-mode .tv-rail-item.tv-focused,
+body.tv-mode .tv-rail-bottom-btn.tv-focused,
+body.tv-mode .tv-mini-vk-key.tv-focused,
+body.tv-mode .tv-mini-vk-act.tv-focused,
+body.tv-mode .season-tab-btn.tv-focused,
+body.tv-mode .user-menu-item.tv-focused,
+body.tv-mode .user-menu-prof-chip.tv-focused,
+body.tv-mode .tv-more-action-card.tv-focused,
+body.tv-mode .tv-more-actor-btn.tv-focused,
+body.tv-mode .source-tab-btn.tv-focused,
+body.tv-mode .subs-chip-btn.tv-focused,
+body.tv-mode .sub-track-item.tv-focused,
+body.tv-mode .player-btn.tv-focused,
+body.tv-mode .details-sources-btn.tv-focused,
+body.tv-mode .stream-source-card.tv-focused,
+body.tv-mode .cw-clear-all-btn.tv-focused,
+body.tv-mode .cw-card-remove-btn.tv-focused,
+body.tv-mode .cw-card-info-btn.tv-focused,
+body.tv-mode .vk-key.tv-focused,
+body.tv-mode .vk-action-btn.tv-focused {
+  background-color: rgba(255, 255, 255, 0.28) !important;
+  color: #ffffff !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Active / Selected state in menus (slightly brighter flat gray) */
+body.tv-mode .nav-link.active,
+body.tv-mode .season-tab-btn.active,
+body.tv-mode .tv-rail-item.active,
+body.tv-mode .source-tab-btn.active,
+body.tv-mode .subs-chip-btn.active,
+body.tv-mode .sub-track-item.active {
+  background-color: rgba(255, 255, 255, 0.36) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* Lighter Gray Highlight on Poster Tiles, Episode Tiles & Channel Tiles (Zero Frame/Border) */
+body.tv-mode .poster-card.tv-focused,
+body.tv-mode .poster-card:focus {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  filter: brightness(1.30) !important;
+  transform: scale(1.035) !important;
+  z-index: 4;
+}
+
+body.tv-mode .poster-card.tv-focused .poster-image-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.22);
+  pointer-events: none;
+}
+
+body.tv-mode #detailsModal .episode-card.tv-focused,
+body.tv-mode #detailsModal .episode-card:focus,
+body.tv-mode .channel-tile-card.tv-focused,
+body.tv-mode .channel-tile-card:focus {
+  background: rgba(255, 255, 255, 0.28) !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  transform: scale(1.02) !important;
+}
+
+/* Soft Accordion in Right Side Menu (#tvSideRail) */
+body.tv-mode .tv-rail-sec-header {
+  height: 30px;
+  padding: 0 10px;
+  background: rgba(255, 255, 255, 0.04) !important;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.74rem;
+  font-weight: 700;
+  transition: background-color 0.15s ease;
+}
+
+body.tv-mode .tv-rail-sec-header.open {
+  background: rgba(255, 255, 255, 0.14) !important;
+  color: #ffffff;
+}
+
+body.tv-mode .tv-rail-sec-arrow {
+  font-size: 0.68rem;
+  transition: transform 0.22s ease;
+}
+
+body.tv-mode .tv-rail-sec-list {
+  display: flex !important;
+  flex-direction: column;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  padding: 0;
+  transition: max-height 0.25s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease, padding 0.2s ease;
+}
+
+body.tv-mode .tv-rail-sec-list.open {
+  max-height: 280px;
+  opacity: 1;
+  overflow-y: auto;
+  padding: 2px 0 6px 0;
+  scrollbar-width: none;
+}
+
+body.tv-mode .tv-rail-sec-list.open::-webkit-scrollbar {
+  display: none;
+}
+

@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&family=Rubik:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
-  <link rel="stylesheet" href="styles.css?v=9.6.3" />
+  <link rel="stylesheet" href="styles.css?v=9.6.4" />
   <script>
     (function () {
       try {
@@ -31,7 +31,7 @@
           });
         }
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (!otaVer || otaVer <= '9.6.3') {
+        if (!otaVer || otaVer <= '9.6.4') {
           localStorage.removeItem('streamit_ota_css_v9');
           localStorage.removeItem('streamit_ota_app_js_v9');
           localStorage.removeItem('streamit_ota_tv_nav_v9');
@@ -67,6 +67,7 @@
           <button type="button" class="nav-link tv-focusable" data-category="channels" aria-label="ערוצים">ערוצים</button>
           <button type="button" class="nav-link tv-focusable" data-category="youtube" aria-label="יוטיוב">יוטיוב</button>
           <button type="button" class="nav-link tv-focusable" data-category="mylist" aria-label="הרשימה שלי">הרשימה שלי</button>
+          <span id="tvTopClock" class="tv-top-clock" dir="ltr" aria-label="שעה נוכחית"></span>
         </nav>
       </div>
 
@@ -215,36 +216,36 @@
       <div id="tvRailMiniKeyboard" class="tv-rail-mini-keyboard hidden" dir="ltr" aria-label="מקלדת חיפוש מהירה"></div>
     </div>
 
-    <!-- 2. Inline Lists: קטגוריות | פלטפורמות | לפי שנה | שחקנים -->
+    <!-- 2. Inline Soft-Accordion Lists: קטגוריות | פלטפורמות | לפי שנה | שחקנים -->
     <div id="tvRailListsScroll" class="tv-rail-lists-scroll">
       <div class="tv-rail-section" data-rail-section="categories">
-        <button type="button" id="tvRailSecCategoriesBtn" class="tv-rail-sec-header tv-focusable open" aria-expanded="true">
+        <button type="button" id="tvRailSecCategoriesBtn" class="tv-rail-sec-header tv-focusable" aria-expanded="false">
           <span>קטגוריות</span>
-          <span class="tv-rail-sec-arrow">▾</span>
+          <span class="tv-rail-sec-arrow">◂</span>
         </button>
         <div id="tvRailCategoriesList" class="tv-rail-sec-list"></div>
       </div>
 
       <div class="tv-rail-section" data-rail-section="platforms">
-        <button type="button" id="tvRailSecPlatformsBtn" class="tv-rail-sec-header tv-focusable open" aria-expanded="true">
+        <button type="button" id="tvRailSecPlatformsBtn" class="tv-rail-sec-header tv-focusable" aria-expanded="false">
           <span>פלטפורמות</span>
-          <span class="tv-rail-sec-arrow">▾</span>
+          <span class="tv-rail-sec-arrow">◂</span>
         </button>
         <div id="tvRailPlatformsList" class="tv-rail-sec-list"></div>
       </div>
 
       <div class="tv-rail-section" data-rail-section="years">
-        <button type="button" id="tvRailSecYearsBtn" class="tv-rail-sec-header tv-focusable open" aria-expanded="true">
+        <button type="button" id="tvRailSecYearsBtn" class="tv-rail-sec-header tv-focusable" aria-expanded="false">
           <span>לפי שנה</span>
-          <span class="tv-rail-sec-arrow">▾</span>
+          <span class="tv-rail-sec-arrow">◂</span>
         </button>
         <div id="tvRailYearsList" class="tv-rail-sec-list"></div>
       </div>
 
       <div class="tv-rail-section" data-rail-section="actors">
-        <button type="button" id="tvRailSecActorsBtn" class="tv-rail-sec-header tv-focusable open" aria-expanded="true">
+        <button type="button" id="tvRailSecActorsBtn" class="tv-rail-sec-header tv-focusable" aria-expanded="false">
           <span>שחקנים</span>
-          <span class="tv-rail-sec-arrow">▾</span>
+          <span class="tv-rail-sec-arrow">◂</span>
         </button>
         <div id="tvRailActorsList" class="tv-rail-sec-list"></div>
       </div>
@@ -1163,13 +1164,13 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Core Application & Smart TV Navigation Scripts -->
-  <script src="tv-navigation.js?v=9.6.3"></script>
-  <script src="app.js?v=9.6.3"></script>
+  <script src="tv-navigation.js?v=9.6.4"></script>
+  <script src="app.js?v=9.6.4"></script>
   <script>
     (function () {
       try {
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (otaVer && otaVer > '9.6.3') {
+        if (otaVer && otaVer > '9.6.4') {
           var navCode = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
           if (navCode.length > 500) {
             var s1 = document.createElement('script');
