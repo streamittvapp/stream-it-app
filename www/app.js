@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.5.3';
+  var APP_VERSION = '9.5.4';
 
   // Embedded Cloud Vault Sync Key (XOR-73 encoded for zero-delay GitHub Cloud Vault read/write)
   var CLOUD_VAULT_SYNC_BYTES = [46, 33, 57, 22, 127, 49, 51, 27, 39, 44, 60, 44, 29, 122, 7, 31, 24, 6, 121, 112, 58, 32, 25, 60, 40, 39, 127, 39, 38, 26, 125, 59, 19, 34, 121, 56, 26, 63, 16, 49];
@@ -1349,8 +1349,68 @@
   }
 
   /**
-   * Per-Sub-User State Persistence
+   * Per-Account & Per-Sub-User Strictly Isolated State Persistence
+   * Every account (`state.user.email`) gets its own completely separate profiles, watch history (`progress`), and watchlist!
    */
+  function getUserAccountNamespace() {
+    var email = (state.user && state.user.email) ? String(state.user.email).trim().toLowerCase() : 'guest_unauthenticated';
+    return email.replace(/[^a-z0-9@._-]/g, '_');
+  }
+
+  function buildDefaultSubUsersForAccount() {
+    var primaryName = (state.user && state.user.name) ? state.user.name : 'פרופיל ראשי';
+    var maxProf = (state.user && Number(state.user.max_profiles) > 0) ? Number(state.user.max_profiles) : 5;
+    var list = [
+      { id: 'prof-main', name: primaryName, color: '#E50914', isKids: false, isPrimary: true },
+      { id: 'prof-living', name: 'סלון', color: '#2563EB', isKids: false, isPrimary: false },
+      { id: 'prof-bedroom', name: 'חדר שינה', color: '#059669', isKids: false, isPrimary: false },
+      { id: 'prof-kids', name: 'ילדים ונוער', color: '#D97706', isKids: true, isPrimary: false }
+    ];
+    return list.slice(0, Math.max(1, maxProf));
+  }
+
+  function loadAccountScopedState() {
+    var ns = getUserAccountNamespace();
+    state.subUsers = buildDefaultSubUsersForAccount();
+    state.activeSubUserId = 'prof-main';
+    state.profileData = {};
+
+    if (!state.user || !state.user.email) {
+      ensureActiveProfileBucket();
+      return;
+    }
+
+    try {
+      var su = localStorage.getItem('streamit_subusers_v954_' + ns);
+      if (su) {
+        var parsedSu = JSON.parse(su);
+        if (Array.isArray(parsedSu) && parsedSu.length) {
+          state.subUsers = parsedSu;
+          // Ensure primary profile always reflects the account's name rather than another user's name
+          if (state.subUsers[0] && state.subUsers[0].isPrimary && state.user.name && state.subUsers[0].name === 'ראשי (VIP)' && state.user.email !== 'streamittvapp@gmail.com') {
+            state.subUsers[0].name = state.user.name;
+          }
+        }
+      }
+    } catch (e) {}
+
+    try {
+      var actId = localStorage.getItem('streamit_active_subuser_v954_' + ns);
+      if (actId && state.subUsers.some(function (u) { return u.id === actId; })) {
+        state.activeSubUserId = actId;
+      }
+    } catch (e) {}
+
+    try {
+      var pd = localStorage.getItem('streamit_profile_data_v954_' + ns);
+      if (pd) {
+        state.profileData = JSON.parse(pd) || {};
+      }
+    } catch (e) {}
+
+    ensureActiveProfileBucket();
+  }
+
   function loadLocalStorageState() {
     try {
       var usr = localStorage.getItem('streamit_user_v9');
@@ -1363,25 +1423,7 @@
       }
     } catch (e) {}
 
-    try {
-      var su = localStorage.getItem('streamit_subusers_v9');
-      if (su) {
-        var parsedSu = JSON.parse(su);
-        if (Array.isArray(parsedSu) && parsedSu.length) state.subUsers = parsedSu;
-      }
-    } catch (e) {}
-
-    try {
-      var actId = localStorage.getItem('streamit_active_subuser_v9');
-      if (actId && state.subUsers.some(function (u) { return u.id === actId; })) {
-        state.activeSubUserId = actId;
-      }
-    } catch (e) {}
-
-    try {
-      var pd = localStorage.getItem('streamit_profile_data_v9');
-      if (pd) state.profileData = JSON.parse(pd) || {};
-    } catch (e) {}
+    loadAccountScopedState();
 
     try {
       var sp = localStorage.getItem('streamit_sub_prefs_v947');
@@ -1394,8 +1436,6 @@
         if (typeof p.bottomPct === 'number') state.subBottomPct = p.bottomPct;
       }
     } catch (e) {}
-
-    ensureActiveProfileBucket();
   }
 
   function ensureActiveProfileBucket() {
@@ -1410,14 +1450,16 @@
     for (var i = 0; i < state.subUsers.length; i++) {
       if (state.subUsers[i].id === state.activeSubUserId) return state.subUsers[i];
     }
-    return state.subUsers[0] || DEFAULT_SUB_USERS[0];
+    return state.subUsers[0] || buildDefaultSubUsersForAccount()[0];
   }
 
   function saveSubUsersState() {
+    if (!state.user || !state.user.email) return;
+    var ns = getUserAccountNamespace();
     try {
-      localStorage.setItem('streamit_subusers_v9', JSON.stringify(state.subUsers));
-      localStorage.setItem('streamit_active_subuser_v9', state.activeSubUserId);
-      localStorage.setItem('streamit_profile_data_v9', JSON.stringify(state.profileData));
+      localStorage.setItem('streamit_subusers_v954_' + ns, JSON.stringify(state.subUsers));
+      localStorage.setItem('streamit_active_subuser_v954_' + ns, state.activeSubUserId);
+      localStorage.setItem('streamit_profile_data_v954_' + ns, JSON.stringify(state.profileData));
     } catch (e) {}
   }
 
@@ -5626,7 +5668,9 @@
     try {
       localStorage.setItem('streamit_user_v9', JSON.stringify(state.user));
     } catch (e) {}
+    loadAccountScopedState();
     updateAuthUi();
+    renderCatalogShelves();
     var modal = document.getElementById('authModal');
     if (modal) modal.classList.add('hidden');
     var firstCard = document.querySelector('#catalogRowsContainer .poster-card') || document.getElementById('heroPlayBtn');
@@ -5663,6 +5707,19 @@
    * Bind All UI Controls
    */
   function bindUiEvents() {
+    window.addEventListener('storage', function (e) {
+      if (e && e.key === 'streamit_user_v9') {
+        try {
+          state.user = e.newValue ? JSON.parse(e.newValue) : null;
+        } catch (err) {
+          state.user = null;
+        }
+        loadAccountScopedState();
+        updateAuthUi();
+        renderCatalogShelves();
+      }
+    });
+
     window.addEventListener('scroll', function () {
       var hdr = document.getElementById('topHeader');
       if (!hdr) return;
@@ -6668,14 +6725,17 @@
         state.user = {
           name: verifiedAccount.name || emailVal.split('@')[0],
           email: verifiedAccount.email || emailVal,
-          role: verifiedAccount.role || 'member'
+          role: verifiedAccount.role || 'member',
+          max_profiles: Number(verifiedAccount.max_profiles || 5)
         };
         if (emailIn) emailIn.value = '';
         if (passIn) passIn.value = '';
         try {
           localStorage.setItem('streamit_user_v9', JSON.stringify(state.user));
         } catch (err) {}
+        loadAccountScopedState();
         updateAuthUi();
+        renderCatalogShelves();
         if (typeof window.closeStreamItKeyboard === 'function') window.closeStreamItKeyboard();
         var am = document.getElementById('authModal');
         if (am) am.classList.add('hidden');
@@ -6690,11 +6750,13 @@
       logoutBtn.addEventListener('click', function () {
         state.user = null;
         try { localStorage.removeItem('streamit_user_v9'); } catch (e) {}
+        loadAccountScopedState();
         var emailIn = document.getElementById('authEmailInput');
         var passIn = document.getElementById('authPasswordInput');
         if (emailIn) emailIn.value = '';
         if (passIn) passIn.value = '';
         updateAuthUi();
+        renderCatalogShelves();
       });
     }
   }
