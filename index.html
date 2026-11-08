@@ -319,6 +319,19 @@
             />
             <button type="button" id="actorSearchSubmitBtn" class="actor-search-submit-btn tv-focusable" aria-label="חפש שחקן">חפש</button>
           </div>
+
+          <!-- Live Running News & Cinema Ticker (#liveNewsTickerBar) — Symmetrical Full-Width Balance -->
+          <div id="liveNewsTickerBar" class="live-news-ticker-bar" aria-label="פיד מבזקי חדשות ועדכונים בזמן אמת">
+            <div class="news-ticker-badge">
+              <span class="news-live-dot"></span>
+              <span>מבזקים LIVE</span>
+            </div>
+            <div class="news-ticker-viewport">
+              <div id="liveNewsTickerTrack" class="news-ticker-track">
+                <span class="news-ticker-item">טוען מבזקי חדשות ועדכוני שידורים בזמן אמת...</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -597,6 +610,13 @@
               </div>
             </div>
 
+            <button type="button" id="playerTopFullscreenBtn" class="explorer-dropdown-btn details-sources-btn tv-focusable" aria-label="מסך מלא">
+              <svg class="dropdown-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+              </svg>
+              <span id="playerTopFullscreenLabel">מסך מלא</span>
+            </button>
+
             <button type="button" id="closePlayerBtn" class="player-btn player-close-btn tv-focusable" aria-label="סגור נגן וחזור">
               <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
                 <path d="M18 6L6 18M6 6l12 12" />
@@ -604,6 +624,16 @@
               <span>יציאה</span>
             </button>
           </div>
+        </div>
+
+        <!-- Netflix-Style Seek Thumbnail & Subtitle Preview Card (#seekThumbnailPreview) -->
+        <div id="seekThumbnailPreview" class="seek-thumbnail-preview hidden" dir="ltr" aria-hidden="true">
+          <div id="seekThumbImageBox" class="seek-thumb-image-box">
+            <canvas id="seekThumbCanvas" class="seek-thumb-canvas hidden" width="220" height="124"></canvas>
+            <div id="seekThumbBackdrop" class="seek-thumb-backdrop"></div>
+            <span id="seekThumbTimeBadge" class="seek-thumb-time-badge">00:00</span>
+          </div>
+          <div id="seekThumbCueText" class="seek-thumb-cue-text" dir="rtl"></div>
         </div>
 
         <!-- Bottom Bar (STRICT LTR PHYSICAL DIRECTION) -->
@@ -664,13 +694,30 @@
                 </svg>
                 <span>כתוביות עברית</span>
               </button>
+
+              <button type="button" id="playerFullscreenBtn" class="player-btn tv-focusable" aria-label="מסך מלא">
+                <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                  <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+                </svg>
+                <span>מסך מלא</span>
+              </button>
             </div>
           </div>
         </div>
 
-        <!-- Targeted Hebrew CC Button Covering ONLY the Embed's Foreign CC Icon (Leaves Timeline & Transport 100% Interactive) -->
+        <!-- Interactive Embed Timeline Hover & Scrub Strip (#embedTimelineHoverStrip) for Netflix Thumbnail Preview -->
+        <div id="embedTimelineHoverStrip" class="embed-timeline-hover-strip" dir="ltr" title="גרור או לחץ להרצה קדימה/אחורה עם תצוגה מקדימה"></div>
+
+        <!-- Targeted Hebrew CC Button Covering ONLY the Embed's Foreign CC Icon -->
         <button type="button" id="embedCcOverlayBtn" class="embed-cc-overlay-btn tv-focusable" dir="rtl" title="הגדרות כתוביות עברית" aria-label="הגדרות כתוביות עברית">
           <span>עברית</span>
+        </button>
+
+        <!-- Targeted Fullscreen Button Covering the Embed's Bottom-Right Fullscreen Icon so Fullscreen & Subtitles Work 100% Together -->
+        <button type="button" id="embedFullscreenOverlayBtn" class="embed-fullscreen-overlay-btn tv-focusable" dir="ltr" title="מסך מלא (עם כתוביות בעברית)" aria-label="מסך מלא">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+          </svg>
         </button>
 
         <!-- Subtitles & Sync Control Panel Popover (#playerSubsMenu) — Always Accessible in BOTH Video & Embed Modes -->
@@ -930,13 +977,13 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Core Application & Smart TV Navigation Scripts -->
-  <script src="tv-navigation.js?v=9.5.0"></script>
-  <script src="app.js?v=9.5.0"></script>
+  <script src="tv-navigation.js?v=9.5.1"></script>
+  <script src="app.js?v=9.5.1"></script>
   <script>
     (function () {
       try {
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (otaVer && otaVer > '9.5.0') {
+        if (otaVer && otaVer > '9.5.1') {
           var navCode = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
           if (navCode.length > 500) {
             var s1 = document.createElement('script');

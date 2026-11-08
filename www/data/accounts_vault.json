@@ -8,8 +8,25 @@
     "passHash": "01884b718ab9bed7c127b90f1880cc671e1d836488a9cc912c875547f4196a0f",
     "altHashes": [
       "cc43dbd645eaf3e9d95c618efdcdce07265ec7a56ad9dad5e25b8b1e9795881b",
-      "ba113970b3c49b0fad970547ddf74cd4c29cef8eed9eb6fbf69f4e66077a68b3"
+      "ba113970b3c49b0fad970547ddf74cd4c29cef8eed9eb6fbf69f4e66077a68b3",
+      "87052e5234e2d16be34b669974c4ef58e2e538811644a49e759317b2399ca84e",
+      "1122b10a9ac9e035c12b5d8fae69f352535d7b9cdc370087409303d23e075cbb"
     ],
-    "updatedAt": "2026-11-08T08:15:00Z"
+    "updatedAt": "2026-11-08T18:05:00Z"
+  },
+  "bensahaltv@gmail.com": {
+    "email": "bensahaltv@gmail.com",
+    "display_name": "BENSAHAL TV",
+    "status": "approved",
+    "role": "admin",
+    "max_profiles": 5,
+    "autoBindPassword": true,
+    "passHash": "464b8cd36206cb24044ce1b63d95b3b2eb99c8b27aa85f8a3ff5ab1c274d71e2",
+    "altHashes": [
+      "a6d1cc08fbe31eacc9ce0a96f2be493bfaf9b3bae82912fa8d0eb90a9c102007",
+      "ee8f6551394e61f2529e2306ea878df430422bd895b6a71f8d915a16117d26e7",
+      "201d6744f30d417c34428a55de656731723b7a749b60b8106176f085e17f05c9"
+    ],
+    "updatedAt": "2026-11-08T18:05:00Z"
   }
 }
