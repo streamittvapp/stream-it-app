@@ -536,7 +536,7 @@
       <div id="embedPlayerContainer" class="embed-player-container hidden"></div>
 
       <!-- Custom RTL Cinema Subtitle Stage (#customSubtitleOverlay) -->
-      <div id="customSubtitleOverlay" class="custom-subtitle-overlay sub-size-large sub-color-white sub-bg-dark" dir="rtl" aria-live="off">
+      <div id="customSubtitleOverlay" class="custom-subtitle-overlay sub-size-xlarge sub-color-white sub-bg-none" dir="rtl" aria-live="off">
         <span id="customSubtitleText" class="custom-subtitle-text"></span>
       </div>
 
@@ -680,10 +680,15 @@
 
           <div class="subs-control-section">
             <div class="subs-control-label">גודל גופן</div>
-            <div class="subs-options-row">
+            <div class="subs-options-row" dir="ltr">
+              <button type="button" id="subFontMinusBtn" class="subs-chip-btn tv-focusable" dir="ltr" aria-label="הקטן גודל גופן">-</button>
+              <button type="button" id="subFontResetBtn" class="subs-chip-btn active tv-focusable" dir="ltr" aria-label="גודל גופן נוכחי">42px</button>
+              <button type="button" id="subFontPlusBtn" class="subs-chip-btn tv-focusable" dir="ltr" aria-label="הגדל גודל גופן">+</button>
+            </div>
+            <div class="subs-options-row" style="margin-top:4px;">
               <button type="button" class="subs-chip-btn sub-size-btn tv-focusable" data-sub-size="normal" aria-label="גודל רגיל">רגיל</button>
-              <button type="button" class="subs-chip-btn sub-size-btn active tv-focusable" data-sub-size="large" aria-label="גודל גדול">גדול</button>
-              <button type="button" class="subs-chip-btn sub-size-btn tv-focusable" data-sub-size="xlarge" aria-label="גודל ענק">ענק</button>
+              <button type="button" class="subs-chip-btn sub-size-btn tv-focusable" data-sub-size="large" aria-label="גודל גדול">גדול</button>
+              <button type="button" class="subs-chip-btn sub-size-btn active tv-focusable" data-sub-size="xlarge" aria-label="גודל ענק">ענק</button>
             </div>
           </div>
 
@@ -698,8 +703,8 @@
           <div class="subs-control-section">
             <div class="subs-control-label">רקע כתוביות</div>
             <div class="subs-options-row">
-              <button type="button" class="subs-chip-btn sub-bg-btn tv-focusable" data-sub-bg="none" aria-label="ללא רקע שקוף">ללא רקע (שקוף)</button>
-              <button type="button" class="subs-chip-btn sub-bg-btn active tv-focusable" data-sub-bg="dark" aria-label="רקע כהה">רקע כהה</button>
+              <button type="button" class="subs-chip-btn sub-bg-btn active tv-focusable" data-sub-bg="none" aria-label="ללא רקע שקוף">ללא רקע (שקוף)</button>
+              <button type="button" class="subs-chip-btn sub-bg-btn tv-focusable" data-sub-bg="dark" aria-label="רקע כהה">רקע כהה</button>
             </div>
           </div>
 
@@ -708,7 +713,7 @@
             <div class="subs-options-row">
               <button type="button" id="subPosDownBtn" class="subs-chip-btn tv-focusable" aria-label="הורד כתוביות למטה">למטה יותר</button>
               <button type="button" id="subPosBottomMaxBtn" class="subs-chip-btn tv-focusable" aria-label="הצמד לתחתית המסך">צמוד לתחתית</button>
-              <button type="button" id="subPosResetBtn" class="subs-chip-btn active tv-focusable" aria-label="מיקום כתוביות נוכחי">5%</button>
+              <button type="button" id="subPosResetBtn" class="subs-chip-btn active tv-focusable" aria-label="מיקום כתוביות נוכחי">3.5%</button>
               <button type="button" id="subPosUpBtn" class="subs-chip-btn tv-focusable" aria-label="הרם כתוביות למעלה">למעלה יותר</button>
             </div>
           </div>
@@ -915,13 +920,13 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Core Application & Smart TV Navigation Scripts -->
-  <script src="tv-navigation.js?v=9.4.6"></script>
-  <script src="app.js?v=9.4.6"></script>
+  <script src="tv-navigation.js?v=9.4.7"></script>
+  <script src="app.js?v=9.4.7"></script>
   <script>
     (function () {
       try {
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (otaVer && otaVer > '9.4.6') {
+        if (otaVer && otaVer > '9.4.7') {
           var navCode = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
           if (navCode.length > 500) {
             var s1 = document.createElement('script');

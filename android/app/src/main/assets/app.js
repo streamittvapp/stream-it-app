@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.4.6';
+  var APP_VERSION = '9.4.7';
 
   // Default Zero-Account Public Telegram Channels (Free, No Personal Account or Phone Required)
   var DEFAULT_TELEGRAM_CHANNELS = [
@@ -560,16 +560,17 @@
     hlsInstance: null,
     playerIdleTimer: null,
     skipIntroHideTimer: null,
-    // Subtitles state
+    // Subtitles state (Defaults per Elan's specification: ענק 42px, לבן, ללא רקע שקוף, 3.5%)
     parsedCues: [],
     subtitleTracks: [],
     activeSubTrackId: 'he-auto',
     subEnabled: true,
     subOffsetSec: 0,
-    subSize: 'large', // 'normal' | 'large' | 'xlarge'
-    subColor: 'white', // 'white' | 'yellow'
-    subBg: 'dark', // 'dark' | 'none'
-    subBottomPct: 5, // % distance from bottom of screen (1% to 22%, default 5% near bottom)
+    subSize: 'xlarge', // 'normal' | 'large' | 'xlarge' (Default: ענק)
+    subFontPx: 42, // Free font size in px with + / - buttons (16px to 84px, default 42px = ענק)
+    subColor: 'white', // 'white' | 'yellow' (Default: לבן)
+    subBg: 'none', // 'none' | 'dark' (Default: ללא רקע שקוף)
+    subBottomPct: 3.5, // % distance from bottom of screen (Default: 3.5%)
     // Search state
     searchFilter: 'all',
     searchDebounce: null,
@@ -635,10 +636,11 @@
     } catch (e) {}
 
     try {
-      var sp = localStorage.getItem('streamit_sub_prefs_v9');
+      var sp = localStorage.getItem('streamit_sub_prefs_v947');
       if (sp) {
         var p = JSON.parse(sp);
         if (p.size) state.subSize = p.size;
+        if (typeof p.fontPx === 'number' && p.fontPx >= 14 && p.fontPx <= 96) state.subFontPx = p.fontPx;
         if (p.color) state.subColor = p.color;
         if (p.bg) state.subBg = p.bg;
         if (typeof p.bottomPct === 'number') state.subBottomPct = p.bottomPct;
@@ -673,11 +675,12 @@
 
   function saveSubtitlePrefs() {
     try {
-      localStorage.setItem('streamit_sub_prefs_v9', JSON.stringify({
-        size: state.subSize,
-        color: state.subColor,
-        bg: state.subBg || 'dark',
-        bottomPct: typeof state.subBottomPct === 'number' ? state.subBottomPct : 5
+      localStorage.setItem('streamit_sub_prefs_v947', JSON.stringify({
+        size: state.subSize || 'xlarge',
+        fontPx: typeof state.subFontPx === 'number' ? state.subFontPx : 42,
+        color: state.subColor || 'white',
+        bg: state.subBg || 'none',
+        bottomPct: typeof state.subBottomPct === 'number' ? state.subBottomPct : 3.5
       }));
     } catch (e) {}
   }
@@ -1365,22 +1368,8 @@
       item.tmdbId = '';
     }
 
-    // 1. If we have tmdbId but no imdbId, resolve imdbId via /external_ids
-    if ((!item.imdbId || item.imdbId.indexOf('tt') !== 0) && cleanTmdb) {
-      try {
-        var endpoint = (item.type === 'series' ? '/tv/' : '/movie/') + encodeURIComponent(cleanTmdb) + '/external_ids?api_key=' + TMDB_API_KEY;
-        var res = await fetch(TMDB_BASE + endpoint);
-        if (res.ok) {
-          var data = await res.json();
-          if (data && data.imdb_id) {
-            item.imdbId = data.imdb_id;
-          }
-        }
-      } catch (e) {}
-    }
-
-    // 2. If we have imdbId (`tt...`) but no real numeric tmdbId, resolve tmdbId via TMDB /find/{imdbId}
-    if (!cleanTmdb && item.imdbId && item.imdbId.indexOf('tt') === 0) {
+    // 1. Dynamically resolve/verify authoritative TMDB ID via TMDB /find/{imdbId} for ANY title in the world
+    if (!item._tmdbVerified && item.imdbId && item.imdbId.indexOf('tt') === 0) {
       try {
         var findUrl = TMDB_BASE + '/find/' + encodeURIComponent(item.imdbId) + '?api_key=' + TMDB_API_KEY + '&external_source=imdb_id&language=he-IL';
         var fRes = await fetch(findUrl);
@@ -1390,7 +1379,42 @@
             ? ((fData.tv_results && fData.tv_results[0]) || (fData.movie_results && fData.movie_results[0]))
             : ((fData.movie_results && fData.movie_results[0]) || (fData.tv_results && fData.tv_results[0]));
           if (hit && hit.id) {
-            item.tmdbId = String(hit.id);
+            cleanTmdb = String(hit.id);
+            item.tmdbId = cleanTmdb;
+            item._tmdbVerified = true;
+          }
+        }
+      } catch (e) {}
+    }
+
+    // 2. If still no TMDB ID, dynamically search TMDB by title (`originalTitle` or `title`)
+    if (!cleanTmdb) {
+      var qTitle = item.originalTitle || item.title || '';
+      if (qTitle) {
+        try {
+          var sPath = (item.type === 'series' ? '/search/tv' : '/search/movie') + '?api_key=' + TMDB_API_KEY + '&language=he-IL&query=' + encodeURIComponent(qTitle);
+          var sRes = await fetch(TMDB_BASE + sPath);
+          if (sRes.ok) {
+            var sData = await sRes.json();
+            if (sData && Array.isArray(sData.results) && sData.results[0] && sData.results[0].id) {
+              cleanTmdb = String(sData.results[0].id);
+              item.tmdbId = cleanTmdb;
+              item._tmdbVerified = true;
+            }
+          }
+        } catch (e) {}
+      }
+    }
+
+    // 3. If we have tmdbId but no imdbId, resolve imdbId via /external_ids
+    if ((!item.imdbId || item.imdbId.indexOf('tt') !== 0) && cleanTmdb) {
+      try {
+        var endpoint = (item.type === 'series' ? '/tv/' : '/movie/') + encodeURIComponent(cleanTmdb) + '/external_ids?api_key=' + TMDB_API_KEY;
+        var res = await fetch(TMDB_BASE + endpoint);
+        if (res.ok) {
+          var data = await res.json();
+          if (data && data.imdb_id) {
+            item.imdbId = data.imdb_id;
           }
         }
       } catch (e) {}
@@ -3188,7 +3212,7 @@
       'sandbox="allow-scripts allow-same-origin allow-forms allow-presentation" ' +
       'referrerpolicy="origin" ' +
       'allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen ' +
-      'style="width:100%;height:100%;border:none;background:#000;opacity:0;transition:opacity 0.25s ease;"></iframe>';
+      'style="width:100%;height:calc(100% + 66px);border:none;background:#000;opacity:0;pointer-events:none;transition:opacity 0.25s ease;"></iframe>';
 
     var iframe = document.getElementById('streamEmbedIframe');
 
@@ -3404,17 +3428,45 @@
 
   function applySubtitleStyleToOverlay() {
     var overlay = document.getElementById('customSubtitleOverlay');
+    var textSpan = document.getElementById('customSubtitleText');
     if (!overlay) return;
     overlay.classList.remove(
       'sub-size-normal', 'sub-size-large', 'sub-size-xlarge',
       'sub-color-white', 'sub-color-yellow',
       'sub-bg-dark', 'sub-bg-none'
     );
-    overlay.classList.add('sub-size-' + (state.subSize || 'large'));
+    overlay.classList.add('sub-size-' + (state.subSize || 'xlarge'));
     overlay.classList.add('sub-color-' + (state.subColor || 'white'));
-    overlay.classList.add('sub-bg-' + (state.subBg || 'dark'));
+    overlay.classList.add('sub-bg-' + (state.subBg || 'none'));
 
-    var bottomPct = typeof state.subBottomPct === 'number' ? state.subBottomPct : 5;
+    var fontPx = typeof state.subFontPx === 'number' ? state.subFontPx : 42;
+    fontPx = Math.max(16, Math.min(84, Math.round(fontPx)));
+    state.subFontPx = fontPx;
+    if (textSpan) {
+      textSpan.style.fontSize = fontPx + 'px';
+    }
+
+    var fontResetBtn = document.getElementById('subFontResetBtn');
+    if (fontResetBtn) {
+      fontResetBtn.textContent = fontPx + 'px';
+    }
+
+    var sizeBtns = document.querySelectorAll('[data-sub-size]');
+    for (var s = 0; s < sizeBtns.length; s++) {
+      var szAttr = sizeBtns[s].getAttribute('data-sub-size');
+      var matchesPreset =
+        (szAttr === 'normal' && fontPx === 26) ||
+        (szAttr === 'large' && fontPx === 34) ||
+        (szAttr === 'xlarge' && fontPx === 42);
+      sizeBtns[s].classList.toggle('active', matchesPreset);
+    }
+
+    var colorBtns = document.querySelectorAll('[data-sub-color]');
+    for (var c = 0; c < colorBtns.length; c++) {
+      colorBtns[c].classList.toggle('active', colorBtns[c].getAttribute('data-sub-color') === (state.subColor || 'white'));
+    }
+
+    var bottomPct = typeof state.subBottomPct === 'number' ? state.subBottomPct : 3.5;
     bottomPct = Math.max(1, Math.min(24, bottomPct));
     state.subBottomPct = bottomPct;
     overlay.style.bottom = bottomPct + 'vh';
@@ -3426,19 +3478,35 @@
 
     var bgBtns = document.querySelectorAll('[data-sub-bg]');
     for (var b = 0; b < bgBtns.length; b++) {
-      bgBtns[b].classList.toggle('active', bgBtns[b].getAttribute('data-sub-bg') === (state.subBg || 'dark'));
+      bgBtns[b].classList.toggle('active', bgBtns[b].getAttribute('data-sub-bg') === (state.subBg || 'none'));
     }
   }
 
+  function adjustSubtitleFontSize(deltaPx) {
+    var currentPx = typeof state.subFontPx === 'number' ? state.subFontPx : 42;
+    var nextPx = Math.max(16, Math.min(84, Math.round(currentPx + deltaPx)));
+    state.subFontPx = nextPx;
+    if (nextPx <= 28) state.subSize = 'normal';
+    else if (nextPx <= 37) state.subSize = 'large';
+    else state.subSize = 'xlarge';
+    applySubtitleStyleToOverlay();
+    saveSubtitlePrefs();
+    var subStatusEl = document.getElementById('playerSubtitleStatus');
+    if (subStatusEl) {
+      subStatusEl.textContent = 'גודל גופן כתוביות נשמר כברירת מחדל: ' + state.subFontPx + 'px';
+    }
+  }
+  window.adjustSubtitleFontSize = adjustSubtitleFontSize;
+
   function adjustSubtitleVerticalPosition(deltaPct) {
-    var current = typeof state.subBottomPct === 'number' ? state.subBottomPct : 5;
+    var current = typeof state.subBottomPct === 'number' ? state.subBottomPct : 3.5;
     var next = Math.round((current + deltaPct) * 10) / 10;
     state.subBottomPct = Math.max(1, Math.min(24, next));
     applySubtitleStyleToOverlay();
     saveSubtitlePrefs();
     var subStatusEl = document.getElementById('playerSubtitleStatus');
     if (subStatusEl) {
-      subStatusEl.textContent = 'מיקום כתוביות מותאם: ' + state.subBottomPct + '% מתחתית המסך';
+      subStatusEl.textContent = 'מיקום כתוביות נשמר כברירת מחדל: ' + state.subBottomPct + '% מתחתית המסך';
     }
   }
   window.adjustSubtitleVerticalPosition = adjustSubtitleVerticalPosition;
@@ -4217,10 +4285,29 @@
               } catch (e) {}
             }
           }
-          if (d.event === 'pause') state.embedPaused = true;
-          else if (d.event === 'play' || d.event === 'timeupdate' || d.event === 'seeked') state.embedPaused = false;
+          if (typeof d.paused === 'boolean' && state.playingMode === 'embed') {
+            state.embedPaused = d.paused;
+            updatePlayPauseIcon(d.paused);
+          } else if (d.event === 'pause') {
+            state.embedPaused = true;
+            updatePlayPauseIcon(true);
+          } else if (d.event === 'play' || d.event === 'timeupdate' || d.event === 'seeked') {
+            state.embedPaused = false;
+            updatePlayPauseIcon(false);
+          }
+          if (typeof d.duration === 'number' && isFinite(d.duration) && d.duration > 0 && state.playingMode === 'embed') {
+            state.embedDuration = d.duration;
+            var totEmbedEl = document.getElementById('playerTotalTime');
+            if (totEmbedEl) totEmbedEl.textContent = formatSeconds(d.duration);
+          }
           if (typeof d.currentTime === 'number' && state.playingMode === 'embed' && d.currentTime >= 0) {
             state.embedCurrentTime = d.currentTime;
+            var curEmbedEl = document.getElementById('playerCurrentTime');
+            if (curEmbedEl) curEmbedEl.textContent = formatSeconds(d.currentTime);
+            var seekEmbedEl = document.getElementById('playerSeekSlider');
+            if (seekEmbedEl && state.embedDuration > 0) {
+              seekEmbedEl.value = String(Math.round((d.currentTime / state.embedDuration) * 1000));
+            }
             updateActiveSubtitleCue(d.currentTime);
           }
         }
@@ -4275,13 +4362,34 @@
       });
     }
 
+    var fontMinusBtn = document.getElementById('subFontMinusBtn');
+    var fontResetBtn = document.getElementById('subFontResetBtn');
+    var fontPlusBtn = document.getElementById('subFontPlusBtn');
+    if (fontMinusBtn) {
+      fontMinusBtn.addEventListener('click', function () {
+        adjustSubtitleFontSize(-2);
+      });
+    }
+    if (fontResetBtn) {
+      fontResetBtn.addEventListener('click', function () {
+        state.subFontPx = 42;
+        state.subSize = 'xlarge';
+        applySubtitleStyleToOverlay();
+        saveSubtitlePrefs();
+      });
+    }
+    if (fontPlusBtn) {
+      fontPlusBtn.addEventListener('click', function () {
+        adjustSubtitleFontSize(2);
+      });
+    }
+
     var sizeBtns = document.querySelectorAll('[data-sub-size]');
     for (var sz = 0; sz < sizeBtns.length; sz++) {
       sizeBtns[sz].addEventListener('click', function () {
-        state.subSize = this.getAttribute('data-sub-size') || 'large';
-        for (var j = 0; j < sizeBtns.length; j++) {
-          sizeBtns[j].classList.toggle('active', sizeBtns[j] === this);
-        }
+        var chosen = this.getAttribute('data-sub-size') || 'xlarge';
+        state.subSize = chosen;
+        state.subFontPx = chosen === 'normal' ? 26 : (chosen === 'large' ? 34 : 42);
         applySubtitleStyleToOverlay();
         saveSubtitlePrefs();
       });
@@ -4291,9 +4399,6 @@
     for (var cl = 0; cl < colorBtns.length; cl++) {
       colorBtns[cl].addEventListener('click', function () {
         state.subColor = this.getAttribute('data-sub-color') || 'white';
-        for (var j = 0; j < colorBtns.length; j++) {
-          colorBtns[j].classList.toggle('active', colorBtns[j] === this);
-        }
         applySubtitleStyleToOverlay();
         saveSubtitlePrefs();
       });
@@ -4302,10 +4407,7 @@
     var bgBtns = document.querySelectorAll('[data-sub-bg]');
     for (var bg = 0; bg < bgBtns.length; bg++) {
       bgBtns[bg].addEventListener('click', function () {
-        state.subBg = this.getAttribute('data-sub-bg') || 'dark';
-        for (var j = 0; j < bgBtns.length; j++) {
-          bgBtns[j].classList.toggle('active', bgBtns[j] === this);
-        }
+        state.subBg = this.getAttribute('data-sub-bg') || 'none';
         applySubtitleStyleToOverlay();
         saveSubtitlePrefs();
       });
@@ -4330,7 +4432,7 @@
     }
     if (subPosResetBtn) {
       subPosResetBtn.addEventListener('click', function () {
-        state.subBottomPct = 5;
+        state.subBottomPct = 3.5;
         applySubtitleStyleToOverlay();
         saveSubtitlePrefs();
       });
@@ -4346,9 +4448,19 @@
     if (seekSlider && video) {
       seekSlider.addEventListener('input', function () {
         wakePlayerControls();
-        if (video.duration && isFinite(video.duration)) {
+        if (state.playingMode === 'video' && video.duration && isFinite(video.duration)) {
           video.currentTime = (Number(this.value) / 1000) * video.duration;
           updateActiveSubtitleCue(video.currentTime);
+        } else if (state.playingMode === 'embed' && state.embedDuration > 0) {
+          var targetEmbedSec = (Number(this.value) / 1000) * state.embedDuration;
+          state.embedCurrentTime = targetEmbedSec;
+          updateActiveSubtitleCue(targetEmbedSec);
+          var ifr = document.getElementById('streamEmbedIframe');
+          if (ifr && ifr.contentWindow) {
+            try {
+              ifr.contentWindow.postMessage({ action: 'seek', time: Math.floor(targetEmbedSec) }, '*');
+            } catch (e) {}
+          }
         }
       });
     }
@@ -4381,7 +4493,13 @@
     if (playerModal) {
       playerModal.addEventListener('mousemove', wakePlayerControls, { passive: true });
       playerModal.addEventListener('click', function (e) {
-        if (e.target === playerModal || e.target === video) {
+        if (
+          e.target === playerModal ||
+          e.target === video ||
+          e.target.id === 'embedPlayerContainer' ||
+          e.target.classList.contains('player-stage') ||
+          e.target.id === 'playerControlsOverlay'
+        ) {
           togglePlayPause();
         }
       });
@@ -4735,19 +4853,21 @@
         '</div>';
     }
 
-    var subMenuPanel = document.getElementById('subtitlesMenuPanel');
-    if (subMenuPanel && !document.getElementById('subPosDownBtn')) {
-      var posSec = document.createElement('div');
-      posSec.className = 'sub-menu-section';
-      posSec.innerHTML =
-        '<span class="sub-menu-label">מיקום כתוביות במסך (שליטה עם השלט)</span>' +
-        '<div class="sub-sync-row">' +
-          '<button id="subPosDownBtn" class="sub-opt-btn tv-focusable" type="button">למטה יותר</button>' +
-          '<button id="subPosBottomMaxBtn" class="sub-opt-btn tv-focusable" type="button">צמוד לתחתית</button>' +
-          '<button id="subPosResetBtn" class="sub-opt-btn active tv-focusable" type="button">5%</button>' +
-          '<button id="subPosUpBtn" class="sub-opt-btn tv-focusable" type="button">למעלה יותר</button>' +
-        '</div>';
-      subMenuPanel.appendChild(posSec);
+    // Ensure Font Size +/- buttons exist in #playerSubsMenu even on OTA-upgraded DOM
+    var firstSizeBtn = document.querySelector('#playerSubsMenu [data-sub-size="normal"]');
+    if (firstSizeBtn && !document.getElementById('subFontMinusBtn')) {
+      var sizeRow = firstSizeBtn.parentNode;
+      if (sizeRow && sizeRow.parentNode) {
+        var pmRow = document.createElement('div');
+        pmRow.className = 'subs-options-row';
+        pmRow.setAttribute('dir', 'ltr');
+        pmRow.style.marginBottom = '4px';
+        pmRow.innerHTML =
+          '<button type="button" id="subFontMinusBtn" class="subs-chip-btn tv-focusable" dir="ltr" aria-label="הקטן גודל גופן">-</button>' +
+          '<button type="button" id="subFontResetBtn" class="subs-chip-btn active tv-focusable" dir="ltr" aria-label="גודל גופן נוכחי">42px</button>' +
+          '<button type="button" id="subFontPlusBtn" class="subs-chip-btn tv-focusable" dir="ltr" aria-label="הגדל גודל גופן">+</button>';
+        sizeRow.parentNode.insertBefore(pmRow, sizeRow);
+      }
     }
 
     // Upgrade Details Modal to place "מקורות" dropdown button on the right of "עונות ופרקים"

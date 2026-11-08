@@ -1888,6 +1888,14 @@ body.tv-mode .poster-card:focus {
   width: 100% !important;
   height: 100% !important;
   background-color: #000000 !important;
+  overflow: hidden !important;
+}
+
+.embed-player-container iframe {
+  width: 100% !important;
+  height: calc(100% + 66px) !important;
+  border: none !important;
+  pointer-events: none !important;
 }
 
 .video-element,
@@ -1909,7 +1917,7 @@ body.tv-mode .poster-card:focus {
 #customSubtitleOverlay,
 .custom-subtitle-overlay {
   position: absolute;
-  bottom: 5vh;
+  bottom: 3.5vh;
   left: 6%;
   right: 6%;
   z-index: 25;
@@ -2062,13 +2070,9 @@ body.tv-mode .poster-card:focus {
   pointer-events: auto;
 }
 
-/* When playing a Cloud Embed / YouTube iframe, let the embedded player's native bottom bar work unobstructed while keeping our Hebrew Subtitle Overlay & Top Subtitle Settings Button active */
+/* Unified STREAM IT top & bottom controls remain active in both direct video and cloud embed modes */
 .player-modal.embed-mode-active .player-controls-overlay {
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.84) 0%, transparent 22%);
-}
-
-.player-modal.embed-mode-active .player-bottom-bar {
-  display: none !important;
+  pointer-events: none;
 }
 
 .player-controls-overlay.idle-hidden,

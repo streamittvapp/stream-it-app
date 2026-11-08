@@ -1,9 +1,9 @@
 {
-  "version": "9.4.6",
-  "native_apk_version": "9.4.6",
+  "version": "9.4.7",
+  "native_apk_version": "9.4.7",
   "apk_download_url": "https://is.gd/streamittv_apk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-08T15:10:00Z",
-  "notes": "v9.4.6 — Auto-Verifying 4K UHD Stream Engine: eliminates all 'Playback blocked' screens, verifies streams via getStatus handshake with automatic failover across cdn.vidspark.to -> vidsrc.pm -> YouTube HD, upgrades HLS.js & Android TV StreamItEmbeddedServer to 4K UHD / 1080p default, and fixes all Israeli movie/series IDs."
+  "updated_at": "2026-11-08T15:35:00Z",
+  "notes": "v9.4.7 — Removed third-party embed CC/server controls bar in favor of unified STREAM IT Hebrew subtitles & player bar, set default subtitle style to ענק (42px) + לבן + ללא רקע (שקוף) + 3.5% with free +/- font size controls saved as default, and made TMDB/IMDb ID verification 100% dynamic across all titles."
 }
