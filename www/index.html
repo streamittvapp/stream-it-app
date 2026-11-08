@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&family=Rubik:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
-  <link rel="stylesheet" href="styles.css?v=9.4.2" />
+  <link rel="stylesheet" href="styles.css?v=9.4.3" />
   <script>
     (function () {
       try {
@@ -32,7 +32,7 @@
         }
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
         var otaCss = localStorage.getItem('streamit_ota_css_v9') || '';
-        if (otaVer && otaVer > '9.4.2' && otaCss.length > 500) {
+        if (otaVer && otaVer > '9.4.3' && otaCss.length > 500) {
           var st = document.createElement('style');
           st.id = 'streamit-ota-live-style-v9';
           st.textContent = otaCss;
@@ -545,20 +545,35 @@
             <span id="playerSubtitleStatus" class="player-subtitle-status">כתוביות בעברית פעילות</span>
           </div>
 
-          <div id="playerSourceTabs" class="player-source-tabs" role="tablist" aria-label="בחירת מקור שידור">
-            <button type="button" class="source-tab-btn tv-focusable active" data-source-mode="direct" aria-label="נגן ישיר 1080p Plyr">נגן ישיר 1080p (Plyr)</button>
-            <button type="button" class="source-tab-btn tv-focusable" data-source-mode="embed1" aria-label="שרת ענן 1 VIP">שרת ענן 1 (VIP)</button>
-            <button type="button" class="source-tab-btn tv-focusable" data-source-mode="embed2" aria-label="שרת ענן 2 Multi">שרת ענן 2 (Multi)</button>
-            <button type="button" class="source-tab-btn tv-focusable" data-source-mode="swarm" aria-label="טלגרם או PirateBay">טלגרם / PirateBay</button>
-            <button type="button" class="source-tab-btn tv-focusable" data-source-mode="trailer" aria-label="טריילר יוטיוב">טריילר יוטיוב</button>
-          </div>
+          <div class="player-top-actions">
+            <div id="playerSourcesDropdownWrap" class="details-sources-dropdown-wrap player-sources-dropdown-wrap">
+              <button type="button" id="playerSourcesDropdownBtn" class="explorer-dropdown-btn details-sources-btn tv-focusable" aria-haspopup="listbox" aria-expanded="false">
+                <svg class="dropdown-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                  <polyline points="2 17 12 22 22 17" />
+                  <polyline points="2 12 12 17 22 12" />
+                </svg>
+                <span>מקורות</span>
+                <svg class="dropdown-chevron" viewBox="0 0 24 24" aria-hidden="true">
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
+              <div id="playerSourceTabs" class="player-source-tabs details-sources-dropdown-panel hidden" role="listbox" aria-label="בחירת מקור שידור">
+                <button type="button" class="source-tab-btn tv-focusable active" data-source-mode="direct" aria-label="נגן ישיר 1080p Plyr">נגן ישיר 1080p (Plyr)</button>
+                <button type="button" class="source-tab-btn tv-focusable" data-source-mode="embed1" aria-label="שרת ענן 1 VIP">שרת ענן 1 (VIP)</button>
+                <button type="button" class="source-tab-btn tv-focusable" data-source-mode="embed2" aria-label="שרת ענן 2 Multi">שרת ענן 2 (Multi)</button>
+                <button type="button" class="source-tab-btn tv-focusable" data-source-mode="swarm" aria-label="טלגרם או PirateBay">טלגרם / PirateBay</button>
+                <button type="button" class="source-tab-btn tv-focusable" data-source-mode="trailer" aria-label="טריילר יוטיוב">טריילר יוטיוב</button>
+              </div>
+            </div>
 
-          <button type="button" id="closePlayerBtn" class="player-btn player-close-btn tv-focusable" aria-label="סגור נגן וחזור">
-            <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-            <span>יציאה</span>
-          </button>
+            <button type="button" id="closePlayerBtn" class="player-btn player-close-btn tv-focusable" aria-label="סגור נגן וחזור">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+              <span>יציאה</span>
+            </button>
+          </div>
         </div>
 
         <!-- Bottom Bar (STRICT LTR PHYSICAL DIRECTION) -->
@@ -818,13 +833,13 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Core Application & Smart TV Navigation Scripts -->
-  <script src="tv-navigation.js?v=9.4.2"></script>
-  <script src="app.js?v=9.4.2"></script>
+  <script src="tv-navigation.js?v=9.4.3"></script>
+  <script src="app.js?v=9.4.3"></script>
   <script>
     (function () {
       try {
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (otaVer && otaVer > '9.4.2') {
+        if (otaVer && otaVer > '9.4.3') {
           var navCode = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
           if (navCode.length > 500) {
             var s1 = document.createElement('script');

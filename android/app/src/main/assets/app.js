@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.4.2';
+  var APP_VERSION = '9.4.3';
 
   // Browser-level anti-popup & anti-ad shield: block all window.open popups globally
   try {
@@ -2408,6 +2408,11 @@
 
     if (!playerModal || !video || !embedContainer) return;
 
+    var playerSourcePanel = document.getElementById('playerSourceTabs');
+    var playerSourceDropBtn = document.getElementById('playerSourcesDropdownBtn');
+    if (playerSourcePanel) playerSourcePanel.classList.add('hidden');
+    if (playerSourceDropBtn) playerSourceDropBtn.setAttribute('aria-expanded', 'false');
+
     var srcTabs = document.querySelectorAll('#playerSourceTabs .source-tab-btn');
     for (var t = 0; t < srcTabs.length; t++) {
       srcTabs[t].classList.toggle('active', srcTabs[t].getAttribute('data-source-mode') === state.activeSourceTab);
@@ -2564,28 +2569,30 @@
     if (!hasLocalBackend()) return '';
     var apiBase = getApiBase();
     var mediaType = item.type === 'series' ? 'series' : 'movie';
+    var tmdbId = String(item.tmdbId || '').replace(/\D/g, '');
     var data = null;
 
-    // A. Try AndroidTvBridge on Android TV first
+    // A. Try non-blocking `/api/direct-stream` on `127.0.0.1:8092` first (12s timeout so cold WASM/HLS resolution never times out)
     try {
-      if (window.AndroidTvBridge && typeof window.AndroidTvBridge.resolveDirectStreamJson === 'function') {
-        var rawJson = window.AndroidTvBridge.resolveDirectStreamJson(mediaType, item.tmdbId || '', imdbId, season || 1, episode || 1);
-        if (rawJson) data = JSON.parse(rawJson);
-      }
+      var ctrl = new AbortController();
+      var timer = setTimeout(function () { ctrl.abort(); }, 12000);
+      var url = apiBase + '/api/direct-stream?type=' + encodeURIComponent(mediaType) +
+        '&imdb_id=' + encodeURIComponent(imdbId) +
+        '&tmdb_id=' + encodeURIComponent(tmdbId) +
+        '&season=' + (season || 1) +
+        '&episode=' + (episode || 1);
+      var res = await fetch(url, { signal: ctrl.signal });
+      clearTimeout(timer);
+      if (res.ok) data = await res.json();
     } catch (e) {}
 
-    // B. Try `/api/direct-stream` on `127.0.0.1:8092`
+    // B. Fallback to AndroidTvBridge on Android TV if needed
     if (!data || !data.ok) {
       try {
-        var ctrl = new AbortController();
-        var timer = setTimeout(function () { ctrl.abort(); }, 4500);
-        var url = apiBase + '/api/direct-stream?type=' + encodeURIComponent(mediaType) +
-          '&imdb_id=' + encodeURIComponent(imdbId) +
-          '&season=' + (season || 1) +
-          '&episode=' + (episode || 1);
-        var res = await fetch(url, { signal: ctrl.signal });
-        clearTimeout(timer);
-        if (res.ok) data = await res.json();
+        if (window.AndroidTvBridge && typeof window.AndroidTvBridge.resolveDirectStreamJson === 'function') {
+          var rawJson = window.AndroidTvBridge.resolveDirectStreamJson(mediaType, tmdbId, imdbId, season || 1, episode || 1);
+          if (rawJson) data = JSON.parse(rawJson);
+        }
       } catch (e) {}
     }
 
@@ -2701,27 +2708,26 @@
     embedContainer.classList.remove('hidden');
 
     var tmdbId = String(item.tmdbId || '').replace(/\D/g, '') || '693134';
-    var imdbId = item.imdbId || 'tt15239678';
-    var startParam = startOffsetSec > 0 ? ('&start=' + Math.floor(startOffsetSec) + '&t=' + Math.floor(startOffsetSec)) : '';
     var embedUrl = '';
 
+    // 100% Sandbox-Compatible Cloud Providers (Verified in Chrome with sandbox="allow-scripts allow-same-origin allow-forms allow-presentation": ZERO "Please Disable Sandbox" & ZERO popups!)
     if (serverKey === 'embed2') {
       if (item.type === 'series') {
-        embedUrl = 'https://vidsrc.pm/embed/tv/' + encodeURIComponent(imdbId) + '/' + (season || 1) + '/' + (episode || 1) + '?autoplay=1';
+        embedUrl = 'https://vidspark.to/tv/' + tmdbId + '/' + (season || 1) + '/' + (episode || 1);
       } else {
-        embedUrl = 'https://vidsrc.pm/embed/movie/' + encodeURIComponent(imdbId) + '?autoplay=1';
+        embedUrl = 'https://vidspark.to/movie/' + tmdbId;
       }
     } else if (serverKey === 'swarm') {
       if (item.type === 'series') {
-        embedUrl = 'https://www.nontongo.win/embed/tv/' + tmdbId + '/' + (season || 1) + '/' + (episode || 1);
+        embedUrl = 'https://anyembed.xyz/embed/tv/' + tmdbId + '/' + (season || 1) + '/' + (episode || 1);
       } else {
-        embedUrl = 'https://www.nontongo.win/embed/movie/' + tmdbId;
+        embedUrl = 'https://anyembed.xyz/embed/movie/' + tmdbId;
       }
     } else {
       if (item.type === 'series') {
-        embedUrl = 'https://vidlink.pro/tv/' + tmdbId + '/' + (season || 1) + '/' + (episode || 1) + '?primaryColor=E50914&autoplay=true&ds_lang=he&limitAds=true' + startParam;
+        embedUrl = 'https://cdn.vidspark.to/tv/' + tmdbId + '/' + (season || 1) + '/' + (episode || 1);
       } else {
-        embedUrl = 'https://vidlink.pro/movie/' + tmdbId + '?primaryColor=E50914&autoplay=true&ds_lang=he&limitAds=true' + startParam;
+        embedUrl = 'https://cdn.vidspark.to/movie/' + tmdbId;
       }
     }
 
@@ -3643,16 +3649,48 @@
       });
     }
 
-    // Player Source Switcher Tabs (`direct` | `embed1` | `embed2` | `swarm` | `trailer`)
+    // Player Sources Dropdown (`מקורות`) & Switcher Tabs (`direct` | `embed1` | `embed2` | `swarm` | `trailer`)
+    var playerSourcesBtn = document.getElementById('playerSourcesDropdownBtn');
+    var playerSourceTabsPanel = document.getElementById('playerSourceTabs');
+    if (playerSourcesBtn && playerSourceTabsPanel) {
+      playerSourcesBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        wakePlayerControls();
+        var isHidden = playerSourceTabsPanel.classList.toggle('hidden');
+        playerSourcesBtn.setAttribute('aria-expanded', isHidden ? 'false' : 'true');
+        if (!isHidden) {
+          var activeTab = playerSourceTabsPanel.querySelector('.source-tab-btn.active') || playerSourceTabsPanel.querySelector('.source-tab-btn');
+          if (activeTab && typeof window.streamItFocusElement === 'function') {
+            window.streamItFocusElement(activeTab);
+          }
+        }
+      });
+    }
+
     var sourceTabs = document.querySelectorAll('#playerSourceTabs .source-tab-btn');
     for (var st = 0; st < sourceTabs.length; st++) {
-      sourceTabs[st].addEventListener('click', function () {
+      sourceTabs[st].addEventListener('click', function (e) {
+        e.stopPropagation();
         var mode = this.getAttribute('data-source-mode') || 'direct';
+        if (playerSourceTabsPanel) playerSourceTabsPanel.classList.add('hidden');
+        if (playerSourcesBtn) playerSourcesBtn.setAttribute('aria-expanded', 'false');
         if (state.playingItem) {
           startPlayback(state.playingItem, state.activeSeason, state.activeEpisode, 0, mode);
         }
       });
     }
+
+    // Listen to postMessage timeupdate events from sandboxed VidSpark player to keep custom Hebrew subtitles synced
+    window.addEventListener('message', function (ev) {
+      try {
+        var d = ev && ev.data;
+        if (d && (d.source === 'vidspark-player' || d.source === 'moviesapi-player') && typeof d.currentTime === 'number') {
+          if (state.playingMode === 'embed' && d.currentTime > 0) {
+            updateActiveSubtitleCue(d.currentTime);
+          }
+        }
+      } catch (e) {}
+    });
 
     // Subtitles Menu Button & Sync/Style/Background Controls
     var subsBtn = document.getElementById('playerSubsBtn');

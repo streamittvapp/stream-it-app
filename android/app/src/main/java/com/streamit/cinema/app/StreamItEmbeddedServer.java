@@ -1,6 +1,7 @@
 package com.streamit.cinema.app;
 
 import android.util.Base64;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -129,7 +130,7 @@ public class StreamItEmbeddedServer {
             Map<String, String> params = parseQuery(query);
 
             if ("/api/health".equals(path)) {
-                byte[] body = "{\"ok\":true,\"mode\":\"android_embedded_server\",\"version\":\"9.4.2\",\"ota_ver_url\":\"https://is.gd/streamittv_ver\",\"ota_apk_url\":\"https://is.gd/streamittv_apk\"}"
+                byte[] body = "{\"ok\":true,\"mode\":\"android_embedded_server\",\"version\":\"9.4.3\",\"ota_ver_url\":\"https://is.gd/streamittv_ver\",\"ota_apk_url\":\"https://is.gd/streamittv_apk\"}"
                         .getBytes(StandardCharsets.UTF_8);
                 sendResponse(out, 200, "application/json; charset=utf-8", body);
             } else if ("/api/ota".equals(path)) {
@@ -152,12 +153,17 @@ public class StreamItEmbeddedServer {
     }
 
     public String resolveDirectStreamSync(String rawType, String rawImdbId, String rawSeason, String rawEpisode) {
+        return resolveDirectStreamSync(rawType, rawImdbId, "", rawSeason, rawEpisode);
+    }
+
+    public String resolveDirectStreamSync(String rawType, String rawImdbId, String rawTmdbId, String rawSeason, String rawEpisode) {
         String itemType = (rawType != null && !rawType.trim().isEmpty()) ? rawType.trim() : "movie";
         String imdbId = (rawImdbId != null && !rawImdbId.trim().isEmpty()) ? rawImdbId.split(":")[0].trim() : "tt15239678";
+        String tmdbId = (rawTmdbId != null) ? rawTmdbId.replaceAll("\\D", "") : "";
         String season = (rawSeason != null && !rawSeason.trim().isEmpty()) ? rawSeason.trim() : "1";
         String episode = (rawEpisode != null && !rawEpisode.trim().isEmpty()) ? rawEpisode.trim() : "1";
 
-        String cacheKey = itemType + ":" + imdbId + ":" + season + ":" + episode;
+        String cacheKey = itemType + ":" + imdbId + ":" + tmdbId + ":" + season + ":" + episode;
         long now = System.currentTimeMillis();
         CachedItem cached = directStreamCache.get(cacheKey);
         if (cached != null && (now - cached.timestampMs) < 900_000L) {
@@ -267,6 +273,34 @@ public class StreamItEmbeddedServer {
             directStreamCache.put(cacheKey, new CachedItem(now, payloadStr));
             return payloadStr;
         } catch (Exception e) {
+            // Secondary Direct HLS Fallback via cdn.vidspark.to (vjej -> img1.hscow.com direct m3u8)
+            if (!tmdbId.isEmpty()) {
+                try {
+                    String vpPath = ("series".equalsIgnoreCase(itemType) || "tv".equalsIgnoreCase(itemType))
+                            ? ("/api/vidora/v1/tv/" + tmdbId + "/" + season + "/" + episode + "?source=vjej")
+                            : ("/api/vidora/v1/movie/" + tmdbId + "?source=vjej");
+                    Map<String, String> hVp = new HashMap<>();
+                    hVp.put("User-Agent", USER_AGENT);
+                    hVp.put("Referer", "https://cdn.vidspark.to/");
+                    hVp.put("x-player-key", "f3b72e73c80c9a996574379798703796a1936efa3516a7105cb0e43048b46b5a");
+                    String vpRaw = new String(httpGetBytes("https://cdn.vidspark.to" + vpPath, hVp, 6000), StandardCharsets.UTF_8);
+                    JSONObject vpObj = new JSONObject(vpRaw);
+                    JSONArray sources = vpObj.optJSONArray("sources");
+                    if (sources != null && sources.length() > 0) {
+                        String directM3u8 = sources.getJSONObject(0).optString("url", "");
+                        if (directM3u8.startsWith("http")) {
+                            JSONObject fb = new JSONObject();
+                            fb.put("ok", true);
+                            fb.put("imdb_id", imdbId);
+                            fb.put("streamUrl", directM3u8);
+                            String fbStr = fb.toString();
+                            directStreamCache.put(cacheKey, new CachedItem(now, fbStr));
+                            return fbStr;
+                        }
+                    }
+                } catch (Exception ignored) {
+                }
+            }
             try {
                 JSONObject err = new JSONObject();
                 err.put("ok", false);
@@ -323,9 +357,10 @@ public class StreamItEmbeddedServer {
     private void handleDirectStream(OutputStream out, Map<String, String> params) throws Exception {
         String itemType = getOrDefault(params, "type", "movie").trim();
         String imdbId = getOrDefault(params, "imdb_id", getOrDefault(params, "id", "tt15239678")).split(":")[0].trim();
+        String tmdbId = getOrDefault(params, "tmdb_id", "").trim();
         String season = getOrDefault(params, "season", "1").trim();
         String episode = getOrDefault(params, "episode", "1").trim();
-        String jsonStr = resolveDirectStreamSync(itemType, imdbId, season, episode);
+        String jsonStr = resolveDirectStreamSync(itemType, imdbId, tmdbId, season, episode);
         sendResponse(out, 200, "application/json; charset=utf-8", jsonStr.getBytes(StandardCharsets.UTF_8));
     }
 

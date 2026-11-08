@@ -246,7 +246,7 @@
       "title_he": "האביר האפל",
       "title_en": "The Dark Knight",
       "year": 2008,
-      "imdb_rating": 9.0,
+      "imdb_rating": 9,
       "age_rating": "14+",
       "runtime_he": "2 שעות ו-32 דק'",
       "quality": "1080p Full HD",
@@ -504,7 +504,7 @@
       "title_he": "חולית: חלק ראשון",
       "title_en": "Dune: Part One",
       "year": 2021,
-      "imdb_rating": 8.0,
+      "imdb_rating": 8,
       "age_rating": "14+",
       "runtime_he": "2 שעות ו-35 דק'",
       "quality": "1080p Full HD",
@@ -605,12 +605,12 @@
     {
       "id": "tt1185616",
       "imdb_id": "tt1185616",
-      "tmdb_id": 14896,
+      "tmdb_id": 8885,
       "type": "movie",
       "title_he": "ואלס עם באשיר",
       "title_en": "Waltz with Bashir",
       "year": 2008,
-      "imdb_rating": 8.0,
+      "imdb_rating": 8,
       "age_rating": "16+",
       "runtime_he": "שעה ו-30 דק'",
       "quality": "1080p HD",
@@ -643,12 +643,12 @@
     {
       "id": "tt0792966",
       "imdb_id": "tt0792966",
-      "tmdb_id": 13919,
+      "tmdb_id": 17460,
       "type": "movie",
       "title_he": "בופור",
       "title_en": "Beaufort",
       "year": 2007,
-      "imdb_rating": 7.0,
+      "imdb_rating": 7,
       "age_rating": "14+",
       "runtime_he": "2 שעות ו-11 דק'",
       "quality": "1080p HD",
@@ -675,7 +675,7 @@
         "https://images.metahub.space/background/medium/tt0792966/img"
       ],
       "default_release": "Beaufort.2007.1080p.WEB-DL.x264.HEBREW.mp4",
-      "fps": 25.0
+      "fps": 25
     },
     {
       "id": "tt3501632",
@@ -1134,7 +1134,7 @@
     {
       "id": "tt4565380",
       "imdb_id": "tt4565380",
-      "tmdb_id": 62320,
+      "tmdb_id": 69557,
       "type": "series",
       "title_he": "פאודה",
       "title_en": "Fauda",
@@ -1213,7 +1213,7 @@
     {
       "id": "tt10574558",
       "imdb_id": "tt10574558",
-      "tmdb_id": 103666,
+      "tmdb_id": 97400,
       "type": "series",
       "title_he": "טהרן",
       "title_en": "Tehran",
@@ -1268,7 +1268,7 @@
     {
       "id": "tt9140560",
       "imdb_id": "tt9140560",
-      "tmdb_id": 82684,
+      "tmdb_id": 85271,
       "type": "series",
       "title_he": "קופה ראשית",
       "title_en": "Checkout (Kupa Rashit)",

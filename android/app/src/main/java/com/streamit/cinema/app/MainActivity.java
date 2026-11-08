@@ -26,8 +26,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends BridgeActivity {
-    private static final String INSTALLED_APP_VERSION = "9.4.2";
-    private static final String INSTALLED_NATIVE_APK_VERSION = "9.4.2";
+    private static final String INSTALLED_APP_VERSION = "9.4.3";
+    private static final String INSTALLED_NATIVE_APK_VERSION = "9.4.3";
     private static final String OTA_PREFS_NAME = "streamit_ota_prefs";
     private StreamItEmbeddedServer embeddedServer;
     private volatile boolean apkUpdateInProgress = false;
@@ -68,6 +68,7 @@ public class MainActivity extends BridgeActivity {
                 return embeddedServer.resolveDirectStreamSync(
                         type,
                         resolvedId,
+                        tmdbId != null ? tmdbId : "",
                         String.valueOf(season > 0 ? season : 1),
                         String.valueOf(episode > 0 ? episode : 1)
                 );
