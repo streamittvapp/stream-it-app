@@ -709,6 +709,7 @@
    */
   function openVirtualKeyboard(inputEl) {
     if (!inputEl) return;
+    if (!document.body || !document.body.classList.contains('tv-mode')) return;
     activeVkInput = inputEl;
     var vk = document.getElementById('tvVirtualKeyboard');
     if (!vk) return;
@@ -934,8 +935,11 @@
       var tag = (currentFocused.tagName || '').toUpperCase();
       var type = (currentFocused.getAttribute('type') || '').toLowerCase();
       if (tag === 'INPUT' && type !== 'range' && type !== 'checkbox' && type !== 'submit') {
-        openVirtualKeyboard(currentFocused);
-        return true;
+        if (document.body && document.body.classList.contains('tv-mode')) {
+          openVirtualKeyboard(currentFocused);
+          return true;
+        }
+        return false;
       }
 
       currentFocused.click();
@@ -1062,8 +1066,10 @@
 
     if (!dir) return;
 
-    if (isTextInput && !vkOpen && (dir === 'left' || dir === 'right') && !document.body.classList.contains('tv-mode')) {
-      return;
+    if (isTextInput && !vkOpen && !document.body.classList.contains('tv-mode')) {
+      if (dir === 'left' || dir === 'right' || dir === 'select') {
+        return;
+      }
     }
 
     e.preventDefault();

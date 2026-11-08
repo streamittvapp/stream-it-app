@@ -3960,6 +3960,7 @@
           localStorage.setItem('streamit_user_v9', JSON.stringify(state.user));
         } catch (err) {}
         updateAuthUi();
+        if (typeof window.closeStreamItKeyboard === 'function') window.closeStreamItKeyboard();
         var am = document.getElementById('authModal');
         if (am) am.classList.add('hidden');
         var heroPlay = document.getElementById('heroPlayBtn');

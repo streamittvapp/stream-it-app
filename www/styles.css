@@ -2584,6 +2584,11 @@ body.tv-mode .poster-card:focus {
 /* =========================================================================
    17. UNIVERSAL TV ON-SCREEN KEYBOARD (#tvVirtualKeyboard) — STRICT LTR
    ========================================================================= */
+body:not(.tv-mode) #tvVirtualKeyboard,
+body:not(.tv-mode) .tv-virtual-keyboard {
+  display: none !important;
+}
+
 #tvVirtualKeyboard,
 .tv-virtual-keyboard {
   position: fixed;
