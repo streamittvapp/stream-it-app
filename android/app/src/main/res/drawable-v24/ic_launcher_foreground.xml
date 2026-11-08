@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportHeight="108"
+    android:viewportWidth="108">
+    <!-- Outer subtle dark card frame -->
+    <path
+        android:fillColor="#12121A"
+        android:pathData="M24,24h60v60h-60z" />
+    <!-- Top Crimson Bar of Bold Cinema 'S' -->
+    <path
+        android:fillColor="#E50914"
+        android:pathData="M31,29h34v11h-23v8h23v31h-34v-11h23v-9h-23z" />
+    <!-- Glowing White Cinema Play Triangle Accent -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M68,42L83,54L68,66Z" />
+</vector>

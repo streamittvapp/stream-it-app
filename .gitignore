@@ -1,0 +1,25 @@
+# Environment & Secrets
+.env
+.env.*
+*.pem
+*.key
+serviceAccountKey.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+
+# Node / Capacitor
+node_modules/
+dist/
+.firebase/
+android/.gradle/
+android/build/
+android/app/build/
+android/capacitor-cordova-android-plugins/build/
+android/local.properties
+*.log
+data/subtitles_cache/

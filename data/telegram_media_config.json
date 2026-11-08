@@ -1,0 +1,39 @@
+{
+  "connected": true,
+  "connection_mode": "media_only_isolated",
+  "strict_zero_chats_policy": true,
+  "account_label": "מצב סרטים וסדרות בלבד (ללא גישה לצ'אטים אישיים 🔒)",
+  "user_handle": "",
+  "bot_stream_bridge": "",
+  "channels": [
+    {
+      "username": "Movies_Hebrew_4K",
+      "title_he": "סרטים ב-4K ו-1080p עם תרגום מובנה",
+      "category": "movies",
+      "enabled": true,
+      "verified_media_only": true
+    },
+    {
+      "username": "Series_Israel_VOD",
+      "title_he": "סדרות טלוויזיה ובינג' — פרקים מלאים HD",
+      "category": "series",
+      "enabled": true,
+      "verified_media_only": true
+    },
+    {
+      "username": "ProMovies_Direct",
+      "title_he": "ארכיון קולנוע בינלאומי (Direct MP4/MKV)",
+      "category": "movies",
+      "enabled": true,
+      "verified_media_only": true
+    },
+    {
+      "username": "Israeli_Cinema_VOD",
+      "title_he": "קולנוע ויצירה ישראלית מלאה",
+      "category": "israeli",
+      "enabled": true,
+      "verified_media_only": true
+    }
+  ],
+  "updated_at": 1793871738
+}

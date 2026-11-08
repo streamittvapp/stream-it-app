@@ -1,0 +1,139 @@
+{
+  "watchlist": [
+    "tt15239678",
+    "tt15398776",
+    "tt0903747",
+    "tt11280740"
+  ],
+  "continue_watching": [
+    {
+      "id": "tt4565380",
+      "type": "series",
+      "title_he": "פאודה",
+      "title_en": "Fauda",
+      "season": 1,
+      "episode": 1,
+      "progress_pct": 22,
+      "updated_at": 1793874521
+    },
+    {
+      "id": "tt0816692",
+      "type": "movie",
+      "title_he": "בין כוכבים",
+      "title_en": "Interstellar",
+      "season": 1,
+      "episode": 1,
+      "progress_pct": 22,
+      "updated_at": 1793870083
+    },
+    {
+      "id": "tt11280740",
+      "type": "series",
+      "title_he": "ניתוק",
+      "title_en": "Severance",
+      "season": 1,
+      "episode": 1,
+      "progress_pct": 22,
+      "updated_at": 1793867333
+    },
+    {
+      "id": "tt15239678",
+      "type": "movie",
+      "title_he": "חולית: חלק שני",
+      "title_en": "Dune: Part Two",
+      "progress_sec": 1840,
+      "duration_sec": 9960,
+      "progress_pct": 18,
+      "updated_at": 1793860155
+    }
+  ],
+  "installed_addons": [
+    {
+      "id": "org.stremio.torrentio",
+      "name": "Torrentio Ultra 4K",
+      "name_he": "טורנטיו אולטרה (Torrentio 4K & 1080p)",
+      "description_he": "מנוע חיפוש טורנטים גלובלי בזמן אמת מבית Stremio — כולל איכות 4K UHD, Dolby Vision, HDR10+ ו-BluRay REMUX.",
+      "version": "0.0.14",
+      "types": [
+        "movie",
+        "series"
+      ],
+      "manifest_url": "https://torrentio.strem.fun/manifest.json",
+      "enabled": true,
+      "official": true,
+      "badge_he": "פעיל • מקורות 4K/1080p"
+    },
+    {
+      "id": "il.streamit.autosub.ai",
+      "name": "AutoSub Sync AI Hebrew",
+      "name_he": "מנוע AutoSub AI — כתוביות בעברית ללא דיליי",
+      "description_he": "אימות חתימת שחרור, מניעת סחיפת FPS, תיקון קידוד Windows-1255/UTF-8 ופיסוק כיווני RTL אוטומטי.",
+      "version": "2.4.0",
+      "types": [
+        "subtitles",
+        "movie",
+        "series"
+      ],
+      "manifest_url": "https://opensubtitles-v3.strem.io/manifest.json",
+      "enabled": true,
+      "official": true,
+      "badge_he": "פעיל • סנכרון אוטומטי"
+    },
+    {
+      "id": "com.linvo.cinemeta",
+      "name": "Cinemeta Hebrew Localized",
+      "name_he": "קטלוג Cinemeta מתורגם לעברית",
+      "description_he": "קטלוג הסרטים והסדרות הרשמי עם תקצירים, ז'אנרים, שחקנים ופרקים מתורגמים לעברית מלאה.",
+      "version": "3.0.12",
+      "types": [
+        "movie",
+        "series"
+      ],
+      "manifest_url": "https://v3-cinemeta.strem.io/manifest.json",
+      "enabled": true,
+      "official": true,
+      "badge_he": "פעיל • קטלוג עברי"
+    },
+    {
+      "id": "org.stremio.yts",
+      "name": "YTS Fast-Stream",
+      "name_he": "YTS — הזרמה מהירה לסלולר וטלוויזיות",
+      "description_he": "מקורות וידאו קלים ומהירים במיוחד בפורמט 1080p/720p המתאימים לסטרימרים, טלוויזיות חכמות וסמארטפונים.",
+      "version": "1.2.0",
+      "types": [
+        "movie"
+      ],
+      "manifest_url": "https://yts.mx/api/v2/list_movies.json",
+      "enabled": true,
+      "official": true,
+      "badge_he": "פעיל • מהיר במיוחד"
+    },
+    {
+      "id": "il.streamit.livetv",
+      "name": "Israel Live TV & Sports HD",
+      "name_he": "ערוצי ישראל והעולם בשידור חי (עידן+ HD)",
+      "description_he": "שידור חי ישיר של כאן 11, קשת 12, רשת 13, עכשיו 14, i24NEWS, ספורט, טבע וחדשות.",
+      "version": "1.5.0",
+      "types": [
+        "live",
+        "tv"
+      ],
+      "manifest_url": "http://localhost:8092/manifest.json",
+      "enabled": true,
+      "official": true,
+      "badge_he": "פעיל • שידור חי"
+    }
+  ],
+  "subtitle_prefs": {
+    "auto_attach_hebrew": true,
+    "auto_verify_sync": true,
+    "rtl_punctuation_fix": true,
+    "font_size": "large",
+    "background_opacity": 0.65,
+    "color": "#FFFFFF",
+    "accent_highlight": "#00E5FF",
+    "default_offset_ms": 0
+  },
+  "device_mode": "auto",
+  "updated_at": 1793874521
+}

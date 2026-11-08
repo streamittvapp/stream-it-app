@@ -1,0 +1,15 @@
+{
+  "streamittvapp@gmail.com": {
+    "email": "streamittvapp@gmail.com",
+    "display_name": "מנהל ראשי (VIP / משפחתי)",
+    "status": "approved",
+    "role": "admin",
+    "max_profiles": 5,
+    "passHash": "01884b718ab9bed7c127b90f1880cc671e1d836488a9cc912c875547f4196a0f",
+    "altHashes": [
+      "cc43dbd645eaf3e9d95c618efdcdce07265ec7a56ad9dad5e25b8b1e9795881b",
+      "ba113970b3c49b0fad970547ddf74cd4c29cef8eed9eb6fbf69f4e66077a68b3"
+    ],
+    "updatedAt": "2026-11-08T08:15:00Z"
+  }
+}

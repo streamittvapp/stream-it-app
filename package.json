@@ -1,0 +1,21 @@
+{
+  "name": "stream-it-cinema",
+  "version": "5.0.0",
+  "private": true,
+  "description": "STREAM IT — Encrypted Multi-Profile Cinema & Streamer Platform",
+  "scripts": {
+    "start": "python server.py 8092",
+    "build": "python build_www.py",
+    "cap:init": "npx @capacitor/cli init \"STREAM IT\" com.streamit.cinema.app --web-dir www",
+    "cap:add:android": "npx @capacitor/cli add android",
+    "cap:sync": "python build_www.py && npx @capacitor/cli sync android",
+    "cap:open:android": "npx @capacitor/cli open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/core": "^6.2.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.2.0"
+  }
+}

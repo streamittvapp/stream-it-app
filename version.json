@@ -1,0 +1,13 @@
+{
+  "version": "9.4.0",
+  "native_apk_version": "9.4",
+  "updated_at": "2026-11-08T08:16:00+02:00",
+  "ota_cdn_base": "https://is.gd",
+  "apk_download_url": "https://is.gd/streamittv_apk",
+  "features": [
+    "Reorganized Catalog Explorer: Open Genres Strip + Sleek Dropdowns (Streaming Companies, Release Years, Actors Gallery with Portrait Photos)",
+    "Working Hebrew & English Actor Search (55+ Built-in Actors incl. Bruce Willis + Wikipedia Langlinks + TMDB Credits & Portrait Showcase Banner)",
+    "Hebrew Subtitle Punctuation Anchored on the Left + Remote-Controlled Subtitle Vertical Position (1% to 24% from Bottom)",
+    "Ultra-Fast 60fps Streamer Remote D-Pad Navigation (< 0.2ms visibility check + debounced hero preview + instant TV scroll) & 10% Compact UI Scale"
+  ]
+}
