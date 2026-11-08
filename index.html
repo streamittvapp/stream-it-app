@@ -558,6 +558,23 @@
         <span id="customSubtitleText" class="custom-subtitle-text"></span>
       </div>
 
+      <!-- Auto-Resume Playback Floating Banner (#resumePlaybackToast) -->
+      <div id="resumePlaybackToast" class="resume-playback-toast hidden" dir="rtl" aria-live="polite">
+        <span id="resumePlaybackToastText">ממשיך צפייה מנקודת העצירה...</span>
+        <button type="button" id="resumeRestartFromZeroBtn" class="resume-restart-btn tv-focusable">התחל מהתחלה (00:00)</button>
+      </div>
+
+      <!-- Netflix-Style Seek Thumbnail & Subtitle Preview Card (#seekThumbnailPreview) — Outside Controls Overlay so Never Hidden -->
+      <div id="seekThumbnailPreview" class="seek-thumbnail-preview hidden" dir="ltr" aria-hidden="true">
+        <div id="seekThumbImageBox" class="seek-thumb-image-box">
+          <img id="seekThumbImg" class="seek-thumb-img" src="" alt="" />
+          <div id="seekThumbBackdrop" class="seek-thumb-backdrop"></div>
+          <span id="seekThumbSceneBadge" class="seek-thumb-scene-badge">תצוגת סצנה</span>
+          <span id="seekThumbTimeBadge" class="seek-thumb-time-badge">00:00</span>
+        </div>
+        <div id="seekThumbCueText" class="seek-thumb-cue-text" dir="rtl"></div>
+      </div>
+
       <div id="playerLoadingSpinner" class="player-loading-spinner hidden" aria-live="polite">
         <svg viewBox="0 0 50 50" class="spinner-svg" aria-hidden="true">
           <circle cx="25" cy="25" r="20" fill="none" stroke-width="4" />
@@ -624,16 +641,6 @@
               <span>יציאה</span>
             </button>
           </div>
-        </div>
-
-        <!-- Netflix-Style Seek Thumbnail & Subtitle Preview Card (#seekThumbnailPreview) -->
-        <div id="seekThumbnailPreview" class="seek-thumbnail-preview hidden" dir="ltr" aria-hidden="true">
-          <div id="seekThumbImageBox" class="seek-thumb-image-box">
-            <canvas id="seekThumbCanvas" class="seek-thumb-canvas hidden" width="220" height="124"></canvas>
-            <div id="seekThumbBackdrop" class="seek-thumb-backdrop"></div>
-            <span id="seekThumbTimeBadge" class="seek-thumb-time-badge">00:00</span>
-          </div>
-          <div id="seekThumbCueText" class="seek-thumb-cue-text" dir="rtl"></div>
         </div>
 
         <!-- Bottom Bar (STRICT LTR PHYSICAL DIRECTION) -->
@@ -706,7 +713,12 @@
         </div>
 
         <!-- Interactive Embed Timeline Hover & Scrub Strip (#embedTimelineHoverStrip) for Netflix Thumbnail Preview -->
-        <div id="embedTimelineHoverStrip" class="embed-timeline-hover-strip" dir="ltr" title="גרור או לחץ להרצה קדימה/אחורה עם תצוגה מקדימה"></div>
+        <div id="embedTimelineHoverStrip" class="embed-timeline-hover-strip" dir="ltr" title="גרור או לחץ להרצה קדימה/אחורה עם תצוגת סצנות מקדימה">
+          <div class="embed-timeline-rail">
+            <div id="embedTimelineProgressFill" class="embed-timeline-progress-fill"></div>
+            <div id="embedTimelineHoverDot" class="embed-timeline-hover-dot"></div>
+          </div>
+        </div>
 
         <!-- Targeted Hebrew CC Button Covering ONLY the Embed's Foreign CC Icon -->
         <button type="button" id="embedCcOverlayBtn" class="embed-cc-overlay-btn tv-focusable" dir="rtl" title="הגדרות כתוביות עברית" aria-label="הגדרות כתוביות עברית">
@@ -848,17 +860,20 @@
         <span>כניסה מהירה (בדיקות)</span>
       </button>
 
-      <form id="authForm" class="auth-form" novalidate>
+      <form id="authForm" class="auth-form" autocomplete="off" novalidate>
         <div class="form-group">
           <label for="authEmailInput" class="form-label">כתובת אימייל (מנוי מאושר)</label>
           <input
             type="email"
             id="authEmailInput"
+            name="streamit_login_email_nofill"
             class="form-input tv-focusable"
             dir="ltr"
             value=""
-            placeholder="name@example.com"
+            placeholder="הזן כתובת אימייל..."
             autocomplete="off"
+            readonly
+            onfocus="this.removeAttribute('readonly');"
           />
         </div>
 
@@ -867,11 +882,14 @@
           <input
             type="password"
             id="authPasswordInput"
+            name="streamit_login_pass_nofill"
             class="form-input tv-focusable"
             dir="ltr"
             value=""
-            placeholder="••••••••"
-            autocomplete="off"
+            placeholder="הזן סיסמה..."
+            autocomplete="new-password"
+            readonly
+            onfocus="this.removeAttribute('readonly');"
           />
         </div>
 

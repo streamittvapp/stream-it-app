@@ -671,15 +671,15 @@
         <p class="gate-subtitle">ממשק הניהול נעול ומוגן. הזן כתובת אימייל וסיסמת מנהל מאושרת כדי לגשת לניהול המנויים והרשאות הגישה.</p>
       </div>
 
-      <form id="adminGateForm" class="gate-form" novalidate>
+      <form id="adminGateForm" class="gate-form" autocomplete="off" novalidate>
         <div class="field-group">
           <label for="adminGateEmail">אימייל מנהל מערכת</label>
-          <input id="adminGateEmail" type="email" class="glass-input ltr-input" placeholder="bensahaltv@gmail.com" autocomplete="username" required />
+          <input id="adminGateEmail" name="admin_gate_email_nofill" type="email" class="glass-input ltr-input" value="" placeholder="הזן אימייל מנהל..." autocomplete="off" readonly onfocus="this.removeAttribute('readonly');" required />
         </div>
 
         <div class="field-group">
           <label for="adminGatePassword">סיסמת מנהל</label>
-          <input id="adminGatePassword" type="password" class="glass-input ltr-input" placeholder="••••••••" autocomplete="current-password" required />
+          <input id="adminGatePassword" name="admin_gate_pass_nofill" type="password" class="glass-input ltr-input" value="" placeholder="הזן סיסמת מנהל..." autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly');" required />
         </div>
 
         <button type="submit" id="adminGateSubmitBtn" class="btn-gate-submit">אימות וכניסה לממשק הניהול</button>
@@ -779,20 +779,20 @@
             </div>
           </div>
 
-          <form id="createUserForm" class="form-grid-users">
+          <form id="createUserForm" class="form-grid-users" autocomplete="off">
             <div class="field-group">
               <label for="newUserEmail">כתובת אימייל של המנוי</label>
-              <input id="newUserEmail" type="email" class="glass-input ltr-input" placeholder="bensahaltv@gmail.com" required />
+              <input id="newUserEmail" name="new_user_email_nofill" type="email" class="glass-input ltr-input" value="" placeholder="הזן אימייל למנוי החדש..." autocomplete="off" readonly onfocus="this.removeAttribute('readonly');" required />
             </div>
 
             <div class="field-group">
               <label for="newUserName">שם תצוגה / משפחה</label>
-              <input id="newUserName" type="text" class="glass-input" placeholder="BENSAHAL TV" required />
+              <input id="newUserName" name="new_user_name_nofill" type="text" class="glass-input" value="" placeholder="שם המנוי..." autocomplete="off" required />
             </div>
 
             <div class="field-group">
               <label for="newUserPassword">סיסמת כניסה למנוי</label>
-              <input id="newUserPassword" type="text" class="glass-input ltr-input" placeholder="הזן סיסמה קבועה..." required />
+              <input id="newUserPassword" name="new_user_pass_nofill" type="text" class="glass-input ltr-input" value="" placeholder="הגדר סיסמה למנוי..." autocomplete="off" readonly onfocus="this.removeAttribute('readonly');" required />
             </div>
 
             <div class="field-group">
@@ -908,14 +908,16 @@
           status: 'approved',
           role: 'admin',
           max_profiles: 5,
-          passHash: '01884b718ab9bed7c127b90f1880cc671e1d836488a9cc912c875547f4196a0f',
+          passHash: 'f9d26c67c77cf8b3bd03f985cc6785c493c34505dfda9edf9259d04ffb88f5b1',
           altHashes: [
-            'cc43dbd645eaf3e9d95c618efdcdce07265ec7a56ad9dad5e25b8b1e9795881b',
+            'f9d26c67c77cf8b3bd03f985cc6785c493c34505dfda9edf9259d04ffb88f5b1',
+            '01884b718ab9bed7c127b90f1880cc671e1d836488a9cc912c875547f4196a0f',
+            'b935bf959e686e20500064a8328e798338a2ee91215b4311b5eec4cee08dd447',
             'ba113970b3c49b0fad970547ddf74cd4c29cef8eed9eb6fbf69f4e66077a68b3',
-            '87052e5234e2d16be34b669974c4ef58e2e538811644a49e759317b2399ca84e',
-            '1122b10a9ac9e035c12b5d8fae69f352535d7b9cdc370087409303d23e075cbb'
+            'cc43dbd645eaf3e9d95c618efdcdce07265ec7a56ad9dad5e25b8b1e9795881b',
+            '79fae471cb66b40e90730f0a80a74037c957514b76df6d6569c8d0511aa0cc8c'
           ],
-          updatedAt: '2026-11-08T18:05:00Z'
+          updatedAt: '2026-11-08T21:05:00Z'
         },
         'bensahaltv@gmail.com': {
           email: 'bensahaltv@gmail.com',
@@ -923,14 +925,17 @@
           status: 'approved',
           role: 'admin',
           max_profiles: 5,
-          autoBindPassword: true,
-          passHash: '464b8cd36206cb24044ce1b63d95b3b2eb99c8b27aa85f8a3ff5ab1c274d71e2',
+          autoBindPassword: false,
+          passHash: '442d9adebd866a1e4e841ac20221e48e5f1f1a83a6cffbbc772c88daad99dc6a',
           altHashes: [
-            'a6d1cc08fbe31eacc9ce0a96f2be493bfaf9b3bae82912fa8d0eb90a9c102007',
-            'ee8f6551394e61f2529e2306ea878df430422bd895b6a71f8d915a16117d26e7',
-            '201d6744f30d417c34428a55de656731723b7a749b60b8106176f085e17f05c9'
+            '442d9adebd866a1e4e841ac20221e48e5f1f1a83a6cffbbc772c88daad99dc6a',
+            '464b8cd36206cb24044ce1b63d95b3b2eb99c8b27aa85f8a3ff5ab1c274d71e2',
+            '05acb7f2d87df2245ef9d0a451e32ee70385003e903484146ec66e199fac8f58',
+            '49e805e15c0bc53e1f8279fcbec5555ca9d16791bbe92f6e176820ecf2403281',
+            '201d6744f30d417c34428a55de656731723b7a749b60b8106176f085e17f05c9',
+            '5e92c5bcd3d1b34930d93ea100a64bd8471afaab605b344feb222038bc51b860'
           ],
-          updatedAt: '2026-11-08T18:05:00Z'
+          updatedAt: '2026-11-08T21:05:00Z'
         }
       };
 
@@ -1135,10 +1140,13 @@
 
       function unlockAdminConsole(email) {
         state.adminEmail = email;
-        sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify({ email: email, ts: Date.now() }));
         var gate = document.getElementById('adminLoginGate');
         var app = document.getElementById('adminProtectedApp');
         var badge = document.getElementById('loggedAdminBadge');
+        var emailIn = document.getElementById('adminGateEmail');
+        var passIn = document.getElementById('adminGatePassword');
+        if (emailIn) emailIn.value = '';
+        if (passIn) passIn.value = '';
         if (gate) gate.classList.add('hidden');
         if (app) app.classList.remove('hidden');
         if (badge) badge.textContent = 'מחובר: ' + email;
@@ -1152,7 +1160,9 @@
         state.adminEmail = '';
         var gate = document.getElementById('adminLoginGate');
         var app = document.getElementById('adminProtectedApp');
+        var emailIn = document.getElementById('adminGateEmail');
         var passIn = document.getElementById('adminGatePassword');
+        if (emailIn) emailIn.value = '';
         if (passIn) passIn.value = '';
         if (app) app.classList.add('hidden');
         if (gate) gate.classList.remove('hidden');
@@ -1200,6 +1210,7 @@
               '<td style="direction:ltr;text-align:right;color:var(--text-muted);font-size:0.8rem;">' + escapeHtml((u.updatedAt || '').slice(0, 16)) + '</td>' +
               '<td>' +
                 '<div class="row-actions">' +
+                  '<button type="button" class="btn btn-success btn-sm" data-action="autologin" data-email="' + escapeHtml(u.email) + '">⚡ חבר כעת לאפליקציה</button>' +
                   (isApproved
                     ? '<button type="button" class="btn btn-warning btn-sm" data-action="block" data-email="' + escapeHtml(u.email) + '">השהה</button>'
                     : '<button type="button" class="btn btn-success btn-sm" data-action="approve" data-email="' + escapeHtml(u.email) + '">אשר מנוי</button>') +
@@ -1222,6 +1233,21 @@
         var email = (this.getAttribute('data-email') || '').toLowerCase();
         if (!email || !state.vault[email]) return;
 
+        if (action === 'autologin') {
+          var uRec = state.vault[email];
+          try {
+            localStorage.setItem('streamit_user_v9', JSON.stringify({
+              name: uRec.display_name || email.split('@')[0],
+              email: email,
+              role: uRec.role || 'member'
+            }));
+          } catch (e) {}
+          showToast('המנוי ' + (uRec.display_name || email) + ' חובר אוטומטית! מעביר לאפליקציה...');
+          setTimeout(function () {
+            window.location.href = 'index.html';
+          }, 600);
+          return;
+        }
         if (action === 'approve' || action === 'block') {
           state.vault[email].status = action === 'approve' ? 'approved' : 'blocked';
           state.vault[email].updatedAt = new Date().toISOString().slice(0, 16).replace('T', ' ');
@@ -1377,11 +1403,20 @@
           passEl.value = '';
           renderUsersTable();
 
+          // Automatically connect this newly created approved user in the browser as well
+          try {
+            localStorage.setItem('streamit_user_v9', JSON.stringify({
+              name: name || email.split('@')[0],
+              email: email,
+              role: roleEl ? roleEl.value : 'member'
+            }));
+          } catch (e) {}
+
           var synced = await pushVaultToGitHubCloud();
           if (btn) btn.textContent = '+ שמור וסנכרן לענן';
           showToast(synced
-            ? ('המנוי ' + email + ' אושר וסונכרן מיד לענן! ניתן להתחבר כעת מכל מכשיר.')
-            : ('המנוי ' + email + ' נשמר בהצלחה!'));
+            ? ('המנוי ' + email + ' הוקם, חובר אוטומטית ומסונכרן לענן!')
+            : ('המנוי ' + email + ' הוקם וחובר אוטומטית!'));
         });
       }
 
@@ -1442,16 +1477,10 @@
         });
       }
 
-      // Check existing admin session in current tab
+      // Always start locked with clean, empty username/password fields (never save credentials)
       (async function initAdmin() {
+        sessionStorage.removeItem(ADMIN_SESSION_KEY);
         await loadVaultFromCloud();
-        try {
-          var sess = JSON.parse(sessionStorage.getItem(ADMIN_SESSION_KEY) || 'null');
-          if (sess && sess.email && state.vault[sess.email] && (Date.now() - Number(sess.ts || 0) < 3600000 * 6)) {
-            unlockAdminConsole(sess.email);
-            return;
-          }
-        } catch (e) {}
         lockAdminConsole();
       })();
     })();

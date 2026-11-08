@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.5.2';
+  var APP_VERSION = '9.5.3';
 
   // Embedded Cloud Vault Sync Key (XOR-73 encoded for zero-delay GitHub Cloud Vault read/write)
   var CLOUD_VAULT_SYNC_BYTES = [46, 33, 57, 22, 127, 49, 51, 27, 39, 44, 60, 44, 29, 122, 7, 31, 24, 6, 121, 112, 58, 32, 25, 60, 40, 39, 127, 39, 38, 26, 125, 59, 19, 34, 121, 56, 26, 63, 16, 49];
@@ -3641,6 +3641,7 @@
 
   function bindPosterCardEvents(root) {
     var cards = root.querySelectorAll('.poster-card');
+    var isContinueRow = Boolean(root && (root.id === 'continueWatchingRow' || (root.closest && root.closest('#continueWatchingSection'))));
     for (var i = 0; i < cards.length; i++) {
       cards[i].addEventListener('click', function () {
         var id = this.getAttribute('data-item-id');
@@ -3648,6 +3649,12 @@
         if (!item) return;
         if (item.type === 'channel' || item.type === 'youtube') {
           startPlayback(item, 1, 1);
+        } else if (isContinueRow || (this.closest && this.closest('#continueWatchingSection'))) {
+          var profBucket = ensureActiveProfileBucket();
+          var saved = profBucket.progress ? profBucket.progress[item.id] : null;
+          var sNum = (saved && saved.season) ? saved.season : 1;
+          var eNum = (saved && saved.episode) ? saved.episode : 1;
+          startPlayback(item, sNum, eNum);
         } else {
           openDetailsModal(item);
         }
@@ -3753,8 +3760,22 @@
 
     modal.classList.remove('hidden');
     var playBtn = document.getElementById('detailsPlayBtn');
-    if (playBtn && typeof window.streamItFocusElement === 'function') {
-      window.streamItFocusElement(playBtn);
+    if (playBtn) {
+      var profBucket = ensureActiveProfileBucket();
+      var savedProg = profBucket.progress ? profBucket.progress[item.id] : null;
+      var playSpan = playBtn.querySelector('span');
+      if (savedProg && savedProg.currentTime > 15 && savedProg.percent < 96 && item.type !== 'channel' && item.type !== 'youtube') {
+        state.activeSeason = savedProg.season || 1;
+        state.activeEpisode = savedProg.episode || 1;
+        if (playSpan) {
+          playSpan.textContent = 'המשך צפייה (' + formatSeconds(savedProg.currentTime) + ')';
+        }
+      } else if (playSpan) {
+        playSpan.textContent = 'הפעל';
+      }
+      if (typeof window.streamItFocusElement === 'function') {
+        window.streamItFocusElement(playBtn);
+      }
     }
   }
 
@@ -4157,6 +4178,30 @@
     wakePlayerControls();
 
     scheduleSkipIntroButton(item.type === 'series', startOffsetSec);
+
+    // Show or hide the Auto-Resume Playback Toast Banner (`#resumePlaybackToast`)
+    var resumeToast = document.getElementById('resumePlaybackToast');
+    var resumeToastText = document.getElementById('resumePlaybackToastText');
+    if (state.resumeToastHideTimer) {
+      clearTimeout(state.resumeToastHideTimer);
+      state.resumeToastHideTimer = null;
+    }
+    if (resumeToast) {
+      if (resumedFromSaved && startOffsetSec > 15) {
+        if (resumeToastText) {
+          resumeToastText.textContent = '▶ ממשיך צפייה מנקודת העצירה (' + formatSeconds(startOffsetSec) + ')';
+        }
+        resumeToast.classList.remove('hidden');
+        state.resumeToastHideTimer = setTimeout(function () {
+          resumeToast.classList.add('hidden');
+        }, 8500);
+      } else {
+        resumeToast.classList.add('hidden');
+      }
+    }
+
+    // Fetch real scene stills from TMDB for Netflix-style Seek Thumbnail Preview (`#seekThumbnailPreview`)
+    fetchSceneThumbnailsForItem(item, state.activeSeason, state.activeEpisode);
 
     var skipBtn = document.getElementById('skipIntroOverlayBtn');
     var playPauseBtn = document.getElementById('playerPlayPauseBtn');
@@ -4561,6 +4606,20 @@
           state.embedCurrentTime += 0.25;
         }
         updateActiveSubtitleCue(state.embedCurrentTime);
+
+        var curTimeInt = Math.floor(state.embedCurrentTime);
+        var curEmbedEl = document.getElementById('playerCurrentTime');
+        if (curEmbedEl) curEmbedEl.textContent = formatSeconds(curTimeInt);
+        var durEst = state.embedDuration > 0 ? state.embedDuration : 5400;
+        var fillEl = document.getElementById('embedTimelineProgressFill');
+        if (fillEl && durEst > 0) {
+          fillEl.style.width = Math.min(100, Math.max(0, (state.embedCurrentTime / durEst) * 100)).toFixed(2) + '%';
+        }
+
+        // Save playback progress reliably every 5 seconds in Embed mode too
+        if (curTimeInt > 12 && Math.round(state.embedCurrentTime * 4) % 20 === 0) {
+          savePlaybackProgressForCurrentItem(curTimeInt, durEst);
+        }
       }
     }, 250);
 
@@ -4589,19 +4648,22 @@
     var embedUrl = '';
 
     // 100% Sandbox-Compatible Verified 4K/1080p Cloud Mirrors (`cdn.vidspark.to` + `vidsrc.pm/embed`)
+    var startQuery = state.embedStartOffsetSec > 15 ? ('?start=' + Math.floor(state.embedStartOffsetSec) + '&t=' + Math.floor(state.embedStartOffsetSec)) : '';
     if (state.embedActiveServerKey === 'embed2' || state.embedActiveServerKey === 'swarm') {
       if (item.type === 'series') {
-        embedUrl = 'https://vidsrc.pm/embed/tv/' + tmdbId + '/' + (season || 1) + '/' + (episode || 1);
+        embedUrl = 'https://vidsrc.pm/embed/tv/' + tmdbId + '/' + (season || 1) + '/' + (episode || 1) + startQuery;
       } else {
-        embedUrl = 'https://vidsrc.pm/embed/movie/' + tmdbId;
+        embedUrl = 'https://vidsrc.pm/embed/movie/' + tmdbId + startQuery;
       }
     } else {
       if (item.type === 'series') {
-        embedUrl = 'https://cdn.vidspark.to/tv/' + tmdbId + '/' + (season || 1) + '/' + (episode || 1);
+        embedUrl = 'https://cdn.vidspark.to/tv/' + tmdbId + '/' + (season || 1) + '/' + (episode || 1) + startQuery;
       } else {
-        embedUrl = 'https://cdn.vidspark.to/movie/' + tmdbId;
+        embedUrl = 'https://cdn.vidspark.to/movie/' + tmdbId + startQuery;
       }
     }
+
+    state.embedResumeSeekDone = !(state.embedStartOffsetSec > 15);
 
     embedContainer.innerHTML =
       '<iframe id="streamEmbedIframe" src="' + escapeHtml(embedUrl) + '" ' +
@@ -4646,6 +4708,12 @@
               if (sp) sp.classList.add('hidden');
               if (!state.embedVerified) {
                 state.embedVerified = true;
+              }
+              if (state.embedStartOffsetSec > 15 && curIfr.contentWindow) {
+                try {
+                  curIfr.contentWindow.postMessage({ action: 'seek', time: Math.floor(state.embedStartOffsetSec) }, '*');
+                  curIfr.contentWindow.postMessage({ command: 'seek', time: Math.floor(state.embedStartOffsetSec) }, '*');
+                } catch (e) {}
               }
             }
           }, 3200);
@@ -5225,7 +5293,7 @@
   window.togglePlayerFullscreen = togglePlayerFullscreen;
 
   function findSubtitleCueTextAtTime(sec) {
-    var cues = state.activeSubtitleCues || [];
+    var cues = (state.parsedCues && state.parsedCues.length) ? state.parsedCues : (state.activeSubtitleCues || []);
     if (!cues.length) return '';
     var adj = sec - (state.subOffsetSec || 0);
     for (var i = 0; i < cues.length; i++) {
@@ -5233,9 +5301,9 @@
         return cues[i].text;
       }
     }
-    // Nearest cue within 12 seconds for scrubbing context
+    // Nearest cue within 15 seconds for scrubbing context
     var best = '';
-    var bestDist = 12;
+    var bestDist = 15;
     for (var j = 0; j < cues.length; j++) {
       var d = Math.abs(cues[j].start - adj);
       if (d < bestDist) {
@@ -5246,11 +5314,43 @@
     return best;
   }
 
+  async function fetchSceneThumbnailsForItem(item, season, episode) {
+    state.seekSceneStills = [];
+    if (!item || item.type === 'channel' || item.type === 'youtube') return;
+    if (item.backdrop) state.seekSceneStills.push(item.backdrop);
+    if (item.poster && item.poster !== item.backdrop) state.seekSceneStills.push(item.poster);
+
+    var cleanTmdb = String(item.tmdbId || '').replace(/\D/g, '');
+    if (!cleanTmdb) return;
+
+    try {
+      var endpoint = item.type === 'series'
+        ? (TMDB_BASE + '/tv/' + encodeURIComponent(cleanTmdb) + '/images?api_key=' + TMDB_API_KEY)
+        : (TMDB_BASE + '/movie/' + encodeURIComponent(cleanTmdb) + '/images?api_key=' + TMDB_API_KEY);
+      var res = await fetch(endpoint);
+      if (res.ok) {
+        var data = await res.json();
+        var backdrops = (data && Array.isArray(data.backdrops)) ? data.backdrops : [];
+        var stills = [];
+        for (var i = 0; i < Math.min(28, backdrops.length); i++) {
+          if (backdrops[i] && backdrops[i].file_path) {
+            stills.push('https://image.tmdb.org/t/p/w500' + backdrops[i].file_path);
+          }
+        }
+        if (stills.length >= 2) {
+          state.seekSceneStills = stills;
+        }
+      }
+    } catch (e) {}
+  }
+
   function showSeekThumbnailPreview(targetSec, clientX, containerRect) {
     var previewEl = document.getElementById('seekThumbnailPreview');
     var imgEl = document.getElementById('seekThumbImg');
-    var timeEl = document.getElementById('seekThumbTime');
-    var cueEl = document.getElementById('seekThumbCue');
+    var backdropEl = document.getElementById('seekThumbBackdrop');
+    var sceneBadgeEl = document.getElementById('seekThumbSceneBadge');
+    var timeEl = document.getElementById('seekThumbTimeBadge') || document.getElementById('seekThumbTime');
+    var cueEl = document.getElementById('seekThumbCueText') || document.getElementById('seekThumbCue');
     if (!previewEl || !timeEl) return;
 
     var dur = 0;
@@ -5266,16 +5366,32 @@
     targetSec = Math.max(0, Math.min(dur, Number(targetSec) || 0));
     timeEl.textContent = formatSeconds(targetSec);
 
-    if (imgEl && state.playingItem) {
-      var thumbSrc = state.playingItem.backdrop || state.playingItem.poster || '';
-      if (thumbSrc && imgEl.getAttribute('src') !== thumbSrc) {
+    var pct = dur > 0 ? Math.max(0, Math.min(0.999, targetSec / dur)) : 0;
+    var stills = (state.seekSceneStills && state.seekSceneStills.length)
+      ? state.seekSceneStills
+      : (state.playingItem ? [state.playingItem.backdrop || state.playingItem.poster || ''] : []);
+
+    var sceneIdx = stills.length > 1 ? Math.floor(pct * stills.length) : 0;
+    var thumbSrc = stills[sceneIdx] || (state.playingItem ? (state.playingItem.backdrop || state.playingItem.poster || '') : '');
+
+    if (sceneBadgeEl) {
+      var totalChapters = Math.max(12, stills.length);
+      var curChapter = Math.min(totalChapters, Math.floor(pct * totalChapters) + 1);
+      sceneBadgeEl.textContent = 'סצנה ' + curChapter + ' / ' + totalChapters;
+    }
+
+    if (imgEl && thumbSrc) {
+      if (imgEl.getAttribute('src') !== thumbSrc) {
         imgEl.setAttribute('src', thumbSrc);
       }
-      // Subtle scene progression pan & brightness variation across timeline
-      var pct = dur > 0 ? (targetSec / dur) : 0;
-      var panX = Math.round(pct * 100);
-      var panY = Math.round(35 + Math.sin(pct * Math.PI * 6) * 25);
+      var panX = Math.round(((pct * 12) % 1) * 100);
+      var panY = Math.round(35 + Math.sin(pct * Math.PI * 8) * 22);
       imgEl.style.objectPosition = panX + '% ' + panY + '%';
+    }
+    if (backdropEl && thumbSrc) {
+      backdropEl.style.backgroundImage = 'url("' + thumbSrc + '")';
+      var bgX = Math.round(((pct * 10) % 1) * 100);
+      backdropEl.style.backgroundPosition = bgX + '% center';
     }
 
     if (cueEl) {
@@ -5284,14 +5400,14 @@
     }
 
     var vw = window.innerWidth || 1280;
-    var clampedX = Math.max(125, Math.min(vw - 125, clientX || Math.round(vw / 2)));
+    var clampedX = Math.max(130, Math.min(vw - 130, clientX || Math.round(vw / 2)));
     previewEl.style.left = clampedX + 'px';
     previewEl.classList.remove('hidden');
 
     if (state.seekPreviewHideTimer) clearTimeout(state.seekPreviewHideTimer);
     state.seekPreviewHideTimer = setTimeout(function () {
       previewEl.classList.add('hidden');
-    }, 1800);
+    }, 2200);
   }
 
   function formatSeconds(sec) {
@@ -5856,12 +5972,30 @@
             if (totEmbedEl) totEmbedEl.textContent = formatSeconds(d.duration);
           }
           if (typeof d.currentTime === 'number' && state.playingMode === 'embed' && d.currentTime >= 0) {
+            // If we have a saved resume offset and the embed player just started from 0, seek it to the saved second
+            if (!state.embedResumeSeekDone && state.embedStartOffsetSec > 15 && state.embedDuration > 30) {
+              if (d.currentTime < state.embedStartOffsetSec - 8) {
+                var ifrResume = document.getElementById('streamEmbedIframe');
+                if (ifrResume && ifrResume.contentWindow) {
+                  try {
+                    ifrResume.contentWindow.postMessage({ action: 'seek', time: Math.floor(state.embedStartOffsetSec) }, '*');
+                    ifrResume.contentWindow.postMessage({ command: 'seek', time: Math.floor(state.embedStartOffsetSec) }, '*');
+                  } catch (e) {}
+                }
+              } else {
+                state.embedResumeSeekDone = true;
+              }
+            }
             state.embedCurrentTime = d.currentTime;
             var curEmbedEl = document.getElementById('playerCurrentTime');
             if (curEmbedEl) curEmbedEl.textContent = formatSeconds(d.currentTime);
             var seekEmbedEl = document.getElementById('playerSeekSlider');
             if (seekEmbedEl && state.embedDuration > 0) {
               seekEmbedEl.value = String(Math.round((d.currentTime / state.embedDuration) * 1000));
+            }
+            var fillBarEl = document.getElementById('embedTimelineProgressFill');
+            if (fillBarEl && state.embedDuration > 0) {
+              fillBarEl.style.width = Math.min(100, Math.max(0, (d.currentTime / state.embedDuration) * 100)).toFixed(2) + '%';
             }
             updateActiveSubtitleCue(d.currentTime);
             if (Math.floor(d.currentTime) > 12 && Math.floor(d.currentTime) % 5 === 0) {
@@ -6076,36 +6210,103 @@
       });
     }
 
+    var restartZeroBtn = document.getElementById('resumeRestartFromZeroBtn');
+    if (restartZeroBtn) {
+      restartZeroBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var resumeToast = document.getElementById('resumePlaybackToast');
+        if (resumeToast) resumeToast.classList.add('hidden');
+        state.embedStartOffsetSec = 0;
+        state.embedResumeSeekDone = true;
+        if (state.playingItem) {
+          var profBucket = ensureActiveProfileBucket();
+          if (profBucket.progress && profBucket.progress[state.playingItem.id]) {
+            delete profBucket.progress[state.playingItem.id];
+            saveSubUsersState();
+          }
+          if (state.playingMode === 'video') {
+            var vEl = document.getElementById('videoElement');
+            if (vEl) vEl.currentTime = 0;
+          } else if (state.playingMode === 'embed') {
+            state.embedCurrentTime = 0;
+            updateActiveSubtitleCue(0);
+            var ifr = document.getElementById('streamEmbedIframe');
+            if (ifr && ifr.contentWindow) {
+              try {
+                ifr.contentWindow.postMessage({ action: 'seek', time: 0 }, '*');
+                ifr.contentWindow.postMessage({ command: 'seek', time: 0 }, '*');
+              } catch (err) {}
+            }
+          }
+        }
+      });
+    }
+
     if (embedHoverStrip) {
+      var isStripDragging = false;
       var calcStripTargetSec = function (ev, stripEl) {
         var rect = stripEl.getBoundingClientRect();
         var ratio = rect.width > 0 ? Math.max(0, Math.min(1, (ev.clientX - rect.left) / rect.width)) : 0.5;
         var dur = (state.embedDuration > 0 ? state.embedDuration : 5400);
-        return { sec: ratio * dur, dur: dur, rect: rect };
+        return { sec: ratio * dur, dur: dur, ratio: ratio, rect: rect };
       };
-      embedHoverStrip.addEventListener('mousemove', function (ev) {
-        var info = calcStripTargetSec(ev, this);
-        showSeekThumbnailPreview(info.sec, ev.clientX, info.rect);
-      });
-      embedHoverStrip.addEventListener('mouseleave', function () {
-        var previewEl = document.getElementById('seekThumbnailPreview');
-        if (previewEl) previewEl.classList.add('hidden');
-      });
-      embedHoverStrip.addEventListener('click', function (ev) {
-        ev.stopPropagation();
-        var info = calcStripTargetSec(ev, this);
+      var applyEmbedSeekTo = function (info, clientX) {
         state.embedCurrentTime = info.sec;
+        state.embedResumeSeekDone = true;
         updateActiveSubtitleCue(info.sec);
         savePlaybackProgressForCurrentItem(info.sec, info.dur);
-        showSeekThumbnailPreview(info.sec, ev.clientX, info.rect);
+        var fillBar = document.getElementById('embedTimelineProgressFill');
+        if (fillBar) fillBar.style.width = (info.ratio * 100).toFixed(2) + '%';
+        showSeekThumbnailPreview(info.sec, clientX, info.rect);
         var ifr = document.getElementById('streamEmbedIframe');
         if (ifr && ifr.contentWindow) {
           try {
             ifr.contentWindow.postMessage({ action: 'seek', time: Math.floor(info.sec) }, '*');
+            ifr.contentWindow.postMessage({ command: 'seek', time: Math.floor(info.sec) }, '*');
           } catch (e) {}
         }
+      };
+      embedHoverStrip.addEventListener('mousemove', function (ev) {
+        wakePlayerControls();
+        var info = calcStripTargetSec(ev, this);
+        var hoverDot = document.getElementById('embedTimelineHoverDot');
+        if (hoverDot) hoverDot.style.left = (info.ratio * 100).toFixed(2) + '%';
+        showSeekThumbnailPreview(info.sec, ev.clientX, info.rect);
+        if (isStripDragging) {
+          applyEmbedSeekTo(info, ev.clientX);
+        }
+      });
+      embedHoverStrip.addEventListener('mousedown', function (ev) {
+        ev.stopPropagation();
+        isStripDragging = true;
+        var info = calcStripTargetSec(ev, this);
+        applyEmbedSeekTo(info, ev.clientX);
+      });
+      window.addEventListener('mouseup', function () {
+        isStripDragging = false;
+      });
+      embedHoverStrip.addEventListener('mouseleave', function () {
+        if (!isStripDragging) {
+          var previewEl = document.getElementById('seekThumbnailPreview');
+          if (previewEl) previewEl.classList.add('hidden');
+        }
+      });
+      embedHoverStrip.addEventListener('click', function (ev) {
+        ev.stopPropagation();
+        var info = calcStripTargetSec(ev, this);
+        applyEmbedSeekTo(info, ev.clientX);
       });
     }
+
+    window.addEventListener('beforeunload', function () {
+      var curT = getCurrentPlaybackTimeSec();
+      if (curT > 12 && state.playingItem) {
+        var durT = (state.playingMode === 'video' && document.getElementById('videoElement'))
+          ? (document.getElementById('videoElement').duration || 0)
+          : (state.embedDuration || 5400);
+        savePlaybackProgressForCurrentItem(curT, durT);
+      }
+    });
 
     if (video) {
       video.addEventListener('timeupdate', function () {
@@ -6310,10 +6511,14 @@
           status: 'approved',
           role: 'admin',
           max_profiles: 5,
-          passHash: '01884b718ab9bed7c127b90f1880cc671e1d836488a9cc912c875547f4196a0f',
+          passHash: 'f9d26c67c77cf8b3bd03f985cc6785c493c34505dfda9edf9259d04ffb88f5b1',
           altHashes: [
+            'f9d26c67c77cf8b3bd03f985cc6785c493c34505dfda9edf9259d04ffb88f5b1',
+            '01884b718ab9bed7c127b90f1880cc671e1d836488a9cc912c875547f4196a0f',
+            'b935bf959e686e20500064a8328e798338a2ee91215b4311b5eec4cee08dd447',
+            'ba113970b3c49b0fad970547ddf74cd4c29cef8eed9eb6fbf69f4e66077a68b3',
             'cc43dbd645eaf3e9d95c618efdcdce07265ec7a56ad9dad5e25b8b1e9795881b',
-            'ba113970b3c49b0fad970547ddf74cd4c29cef8eed9eb6fbf69f4e66077a68b3'
+            '79fae471cb66b40e90730f0a80a74037c957514b76df6d6569c8d0511aa0cc8c'
           ]
         },
         'bensahaltv@gmail.com': {
@@ -6322,15 +6527,15 @@
           status: 'approved',
           role: 'admin',
           max_profiles: 5,
-          autoBindPassword: true,
-          passHash: 'ee49354558295be98290985c6b0e57536dfadfa64d2c71f9538410c215061013',
+          autoBindPassword: false,
+          passHash: '442d9adebd866a1e4e841ac20221e48e5f1f1a83a6cffbbc772c88daad99dc6a',
           altHashes: [
-            'ef256c8ce7eb8c94cd6a54f741c2448db89d0142516dc21be41164a9da25884a',
-            '6583194650c74028d18523d6ab4509b881f17de36a35e9bf31059958e2f6351a',
-            '8be0304f47910099116f455264ff69a8f1b501204629a578ef9e973514783e1f',
-            'bc3772f611fe2ca94eb3d03bf0e5bf8239784819b5cf29199c6278016867e363',
-            'b88b98bc11f67e723eb64c8f6ebff61742ef31fc5868fd0b3a05ffbbbe9db990',
-            '36b52ffbd8de14e0ff7fc8ab3c761b1846b820c7f228e48c57fb16e3f5b19b65'
+            '442d9adebd866a1e4e841ac20221e48e5f1f1a83a6cffbbc772c88daad99dc6a',
+            '464b8cd36206cb24044ce1b63d95b3b2eb99c8b27aa85f8a3ff5ab1c274d71e2',
+            '05acb7f2d87df2245ef9d0a451e32ee70385003e903484146ec66e199fac8f58',
+            '49e805e15c0bc53e1f8279fcbec5555ca9d16791bbe92f6e176820ecf2403281',
+            '201d6744f30d417c34428a55de656731723b7a749b60b8106176f085e17f05c9',
+            '5e92c5bcd3d1b34930d93ea100a64bd8471afaab605b344feb222038bc51b860'
           ]
         }
       };
@@ -6465,6 +6670,8 @@
           email: verifiedAccount.email || emailVal,
           role: verifiedAccount.role || 'member'
         };
+        if (emailIn) emailIn.value = '';
+        if (passIn) passIn.value = '';
         try {
           localStorage.setItem('streamit_user_v9', JSON.stringify(state.user));
         } catch (err) {}
