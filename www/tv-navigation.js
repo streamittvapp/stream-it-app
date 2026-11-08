@@ -68,6 +68,9 @@
     var player = document.getElementById('playerModal');
     if (player && !player.classList.contains('hidden')) return player;
 
+    var tgModal = document.getElementById('telegramModal');
+    if (tgModal && !tgModal.classList.contains('hidden')) return tgModal;
+
     var auth = document.getElementById('authModal');
     if (auth && !auth.classList.contains('hidden')) return auth;
 
@@ -82,6 +85,9 @@
 
     var search = document.getElementById('searchModal');
     if (search && !search.classList.contains('hidden')) return search;
+
+    var userSettingsPanel = document.getElementById('userSettingsDropdownPanel');
+    if (userSettingsPanel && !userSettingsPanel.classList.contains('hidden')) return userSettingsPanel;
 
     var openDropdown = document.querySelector('.explorer-dropdown-panel:not(.hidden)');
     if (openDropdown) return openDropdown;
@@ -313,15 +319,33 @@
 
     var controlsOverlay = document.getElementById('playerControlsOverlay');
     var subsMenu = document.getElementById('playerSubsMenu');
+    var sourceTabsPanel = document.getElementById('playerSourceTabs');
+    var seekSlider = document.getElementById('playerSeekSlider');
 
-    // Direct Remote Control of Subtitle Vertical Position when Player Controls are idle-hidden!
-    if (controlsOverlay && controlsOverlay.classList.contains('idle-hidden') && (!subsMenu || subsMenu.classList.contains('hidden'))) {
+    // Direct Remote Control when Player Controls are idle-hidden:
+    // Up/Down = Subtitle Vertical Position; Right/Left = Instant ±10s Seek + Netflix Scene Thumbnail Preview!
+    if (
+      controlsOverlay &&
+      controlsOverlay.classList.contains('idle-hidden') &&
+      (!subsMenu || subsMenu.classList.contains('hidden')) &&
+      (!sourceTabsPanel || sourceTabsPanel.classList.contains('hidden'))
+    ) {
       if (direction === 'down' && typeof window.adjustSubtitleVerticalPosition === 'function') {
         window.adjustSubtitleVerticalPosition(-1.5);
         return true;
       }
       if (direction === 'up' && typeof window.adjustSubtitleVerticalPosition === 'function') {
         window.adjustSubtitleVerticalPosition(1.5);
+        return true;
+      }
+      if (direction === 'right' && typeof window.seekVideoBy === 'function') {
+        window.seekVideoBy(10);
+        if (seekSlider && isElementVisible(seekSlider)) setFocus(seekSlider, { scroll: false });
+        return true;
+      }
+      if (direction === 'left' && typeof window.seekVideoBy === 'function') {
+        window.seekVideoBy(-10);
+        if (seekSlider && isElementVisible(seekSlider)) setFocus(seekSlider, { scroll: false });
         return true;
       }
     }
@@ -331,14 +355,21 @@
     }
 
     var skipBtn = document.getElementById('skipIntroOverlayBtn');
+    var resumeRestartBtn = document.getElementById('resumeRestartFromZeroBtn');
+    var topSubsBtn = document.getElementById('playerTopSubsBtn');
+    var sourcesDropBtn = document.getElementById('playerSourcesDropdownBtn');
+    var topFsBtn = document.getElementById('playerTopFullscreenBtn');
     var closeBtn = document.getElementById('closePlayerBtn');
-    var seekSlider = document.getElementById('playerSeekSlider');
     var playPauseBtn = document.getElementById('playerPlayPauseBtn');
     var rewindBtn = document.getElementById('playerRewindBtn');
     var forwardBtn = document.getElementById('playerForwardBtn');
     var nextEpBtn = document.getElementById('playerNextEpBtn');
     var subsBtn = document.getElementById('playerSubsBtn');
+    var fullscreenBtn = document.getElementById('playerFullscreenBtn');
+    var embedCcBtn = document.getElementById('embedCcOverlayBtn');
+    var embedFsBtn = document.getElementById('embedFullscreenOverlayBtn');
 
+    // 1. Open Subtitles Menu (#playerSubsMenu)
     if (subsMenu && !subsMenu.classList.contains('hidden')) {
       var subItems = Array.prototype.slice.call(subsMenu.querySelectorAll('button')).filter(isElementVisible);
       var nearSub = findNearestPhysical(currentFocused, direction, subItems);
@@ -347,27 +378,78 @@
       if (direction === 'down') {
         if (sIdx < subItems.length - 1) return setFocus(subItems[sIdx + 1]);
         subsMenu.classList.add('hidden');
-        return setFocus(subsBtn);
+        return setFocus(subsBtn && isElementVisible(subsBtn) ? subsBtn : (topSubsBtn || closeBtn));
       }
       if (direction === 'up') {
         if (sIdx > 0) return setFocus(subItems[sIdx - 1]);
+        subsMenu.classList.add('hidden');
+        return setFocus(topSubsBtn && isElementVisible(topSubsBtn) ? topSubsBtn : (subsBtn || closeBtn));
+      }
+      return true;
+    }
+
+    // 2. Open Player Sources Dropdown (#playerSourceTabs)
+    if (sourceTabsPanel && !sourceTabsPanel.classList.contains('hidden')) {
+      var srcItems = Array.prototype.slice.call(sourceTabsPanel.querySelectorAll('.source-tab-btn')).filter(isElementVisible);
+      var srcIdx = srcItems.indexOf(currentFocused);
+      if (srcIdx === -1 && srcItems.length) {
+        return setFocus(srcItems[0]);
+      }
+      if (direction === 'down') {
+        if (srcIdx < srcItems.length - 1) return setFocus(srcItems[srcIdx + 1]);
+        return true;
+      }
+      if (direction === 'up') {
+        if (srcIdx > 0) return setFocus(srcItems[srcIdx - 1]);
+        sourceTabsPanel.classList.add('hidden');
+        if (sourcesDropBtn) {
+          sourcesDropBtn.setAttribute('aria-expanded', 'false');
+          return setFocus(sourcesDropBtn);
+        }
+        return true;
+      }
+      if (direction === 'left' || direction === 'right') {
+        sourceTabsPanel.classList.add('hidden');
+        if (sourcesDropBtn) {
+          sourcesDropBtn.setAttribute('aria-expanded', 'false');
+          return setFocus(sourcesDropBtn);
+        }
         return true;
       }
       return true;
     }
 
-    var topBarBtns = Array.prototype.slice.call(player.querySelectorAll('#closePlayerBtn, #playerSourceTabs .source-tab-btn')).filter(isElementVisible);
-    var transportBtns = [playPauseBtn, rewindBtn, forwardBtn, nextEpBtn, subsBtn].filter(function (b) {
-      return b && !b.classList.contains('hidden');
-    });
+    var topBarBtns = [topSubsBtn, sourcesDropBtn, topFsBtn, closeBtn].filter(isElementVisible);
+    var transportBtns = [playPauseBtn, rewindBtn, forwardBtn, nextEpBtn, subsBtn, fullscreenBtn].filter(isElementVisible);
+    var embedOverlayBtns = [embedCcBtn, embedFsBtn].filter(isElementVisible);
+    var isEmbedMode = player.classList.contains('embed-mode-active');
 
-    if (!currentFocused || !player.contains(currentFocused)) {
-      if (skipBtn && !skipBtn.classList.contains('hidden')) return setFocus(skipBtn);
-      if (playPauseBtn) return setFocus(playPauseBtn);
+    if (!currentFocused || !player.contains(currentFocused) || !isElementVisible(currentFocused)) {
+      if (skipBtn && isElementVisible(skipBtn)) return setFocus(skipBtn);
+      if (resumeRestartBtn && isElementVisible(resumeRestartBtn)) return setFocus(resumeRestartBtn);
+      if (!isEmbedMode && playPauseBtn && isElementVisible(playPauseBtn)) return setFocus(playPauseBtn);
+      if (topBarBtns.length) return setFocus(topBarBtns[0]);
       if (closeBtn) return setFocus(closeBtn);
       return true;
     }
 
+    // 3. Resume Playback Toast Button (#resumeRestartFromZeroBtn)
+    if (currentFocused === resumeRestartBtn) {
+      if (direction === 'up') {
+        if (topBarBtns.length) return setFocus(topBarBtns[0]);
+        return true;
+      }
+      if (direction === 'down') {
+        if (skipBtn && isElementVisible(skipBtn)) return setFocus(skipBtn);
+        if (!isEmbedMode && seekSlider && isElementVisible(seekSlider)) return setFocus(seekSlider);
+        if (!isEmbedMode && playPauseBtn && isElementVisible(playPauseBtn)) return setFocus(playPauseBtn);
+        if (isEmbedMode && embedOverlayBtns.length) return setFocus(embedOverlayBtns[0]);
+        return true;
+      }
+      return true;
+    }
+
+    // 4. Timeline Seek Slider (#playerSeekSlider)
     if (currentFocused === seekSlider) {
       if (direction === 'right') {
         if (typeof window.seekVideoBy === 'function') window.seekVideoBy(10);
@@ -378,29 +460,35 @@
         return true;
       }
       if (direction === 'down') {
-        if (playPauseBtn) return setFocus(playPauseBtn);
+        if (playPauseBtn && isElementVisible(playPauseBtn)) return setFocus(playPauseBtn);
+        if (transportBtns.length) return setFocus(transportBtns[0]);
         return true;
       }
       if (direction === 'up') {
-        if (skipBtn && !skipBtn.classList.contains('hidden')) return setFocus(skipBtn);
+        if (skipBtn && isElementVisible(skipBtn)) return setFocus(skipBtn);
+        if (resumeRestartBtn && isElementVisible(resumeRestartBtn)) return setFocus(resumeRestartBtn);
         if (topBarBtns.length) return setFocus(topBarBtns[0]);
         return true;
       }
     }
 
+    // 5. Skip Intro Button (#skipIntroOverlayBtn)
     if (currentFocused === skipBtn) {
       if (direction === 'down') {
-        if (seekSlider) return setFocus(seekSlider);
-        if (playPauseBtn) return setFocus(playPauseBtn);
+        if (!isEmbedMode && seekSlider && isElementVisible(seekSlider)) return setFocus(seekSlider);
+        if (!isEmbedMode && playPauseBtn && isElementVisible(playPauseBtn)) return setFocus(playPauseBtn);
+        if (isEmbedMode && embedOverlayBtns.length) return setFocus(embedOverlayBtns[0]);
         return true;
       }
       if (direction === 'up') {
+        if (resumeRestartBtn && isElementVisible(resumeRestartBtn)) return setFocus(resumeRestartBtn);
         if (topBarBtns.length) return setFocus(topBarBtns[0]);
         return true;
       }
       return true;
     }
 
+    // 6. Top Bar Buttons (#playerTopSubsBtn, #playerSourcesDropdownBtn, #playerTopFullscreenBtn, #closePlayerBtn)
     if (topBarBtns.indexOf(currentFocused) !== -1) {
       if (direction === 'left' || direction === 'right') {
         var nearTop = findNearestPhysical(currentFocused, direction, topBarBtns);
@@ -408,14 +496,34 @@
         return true;
       }
       if (direction === 'down') {
-        if (skipBtn && !skipBtn.classList.contains('hidden')) return setFocus(skipBtn);
-        if (seekSlider) return setFocus(seekSlider);
-        if (playPauseBtn) return setFocus(playPauseBtn);
+        if (resumeRestartBtn && isElementVisible(resumeRestartBtn)) return setFocus(resumeRestartBtn);
+        if (skipBtn && isElementVisible(skipBtn)) return setFocus(skipBtn);
+        if (!isEmbedMode && seekSlider && isElementVisible(seekSlider)) return setFocus(seekSlider);
+        if (!isEmbedMode && playPauseBtn && isElementVisible(playPauseBtn)) return setFocus(playPauseBtn);
+        if (isEmbedMode && embedOverlayBtns.length) return setFocus(embedOverlayBtns[0]);
         return true;
       }
       return true;
     }
 
+    // 7. Embed Mode Bottom-Right Overlay Buttons (#embedCcOverlayBtn, #embedFullscreenOverlayBtn)
+    var eIdx = embedOverlayBtns.indexOf(currentFocused);
+    if (eIdx !== -1) {
+      if (direction === 'left' || direction === 'right') {
+        var nearEmbedBtn = findNearestPhysical(currentFocused, direction, embedOverlayBtns);
+        if (nearEmbedBtn) return setFocus(nearEmbedBtn);
+        return true;
+      }
+      if (direction === 'up') {
+        if (skipBtn && isElementVisible(skipBtn)) return setFocus(skipBtn);
+        if (resumeRestartBtn && isElementVisible(resumeRestartBtn)) return setFocus(resumeRestartBtn);
+        if (topBarBtns.length) return setFocus(topBarBtns[0]);
+        return true;
+      }
+      return true;
+    }
+
+    // 8. Bottom Transport Row Buttons (#playerPlayPauseBtn, -10s, +10s, NextEp, Subs, Fullscreen)
     var tIdx = transportBtns.indexOf(currentFocused);
     if (tIdx !== -1) {
       if (direction === 'right') {
@@ -427,20 +535,102 @@
         return true;
       }
       if (direction === 'up') {
-        if (seekSlider) return setFocus(seekSlider);
-        if (closeBtn) return setFocus(closeBtn);
+        if (seekSlider && isElementVisible(seekSlider)) return setFocus(seekSlider);
+        if (topBarBtns.length) return setFocus(topBarBtns[0]);
         return true;
       }
       return true;
     }
 
-    if (playPauseBtn) return setFocus(playPauseBtn);
+    if (!isEmbedMode && playPauseBtn && isElementVisible(playPauseBtn)) return setFocus(playPauseBtn);
+    if (topBarBtns.length) return setFocus(topBarBtns[0]);
     return true;
   }
 
   /**
+   * Deterministic Navigation inside User Settings Dropdown Menu (#userSettingsDropdownPanel)
+   */
+  function navigateUserSettingsDropdown(direction) {
+    var panel = document.getElementById('userSettingsDropdownPanel');
+    var triggerBtn = document.getElementById('userSettingsMenuBtn');
+    if (!panel || panel.classList.contains('hidden')) return false;
+
+    var profileChips = Array.prototype.slice.call(panel.querySelectorAll('.user-menu-prof-chip, .user-menu-profile-chip')).filter(isElementVisible);
+    var menuItems = Array.prototype.slice.call(panel.querySelectorAll('.user-menu-item')).filter(isElementVisible);
+
+    if (!currentFocused || !panel.contains(currentFocused) || !isElementVisible(currentFocused)) {
+      if (menuItems.length) return setFocus(menuItems[0], { scroll: false });
+      if (profileChips.length) return setFocus(profileChips[0], { scroll: false });
+      return false;
+    }
+
+    var pIdx = profileChips.indexOf(currentFocused);
+    if (pIdx !== -1) {
+      if (direction === 'left') {
+        if (pIdx < profileChips.length - 1) return setFocus(profileChips[pIdx + 1], { scroll: false });
+        return true;
+      }
+      if (direction === 'right') {
+        if (pIdx > 0) return setFocus(profileChips[pIdx - 1], { scroll: false });
+        return true;
+      }
+      if (direction === 'down') {
+        if (menuItems.length) return setFocus(menuItems[0], { scroll: false });
+        return true;
+      }
+      if (direction === 'up') {
+        if (typeof window.closeUserSettingsDropdown === 'function') window.closeUserSettingsDropdown();
+        else panel.classList.add('hidden');
+        if (triggerBtn && isElementVisible(triggerBtn)) return setFocus(triggerBtn, { scroll: false });
+        return true;
+      }
+      return true;
+    }
+
+    var mIdx = menuItems.indexOf(currentFocused);
+    if (mIdx !== -1) {
+      if (direction === 'down') {
+        if (mIdx < menuItems.length - 1) return setFocus(menuItems[mIdx + 1], { scroll: false });
+        return true;
+      }
+      if (direction === 'up') {
+        if (mIdx > 0) return setFocus(menuItems[mIdx - 1], { scroll: false });
+        if (profileChips.length) return setFocus(profileChips[0], { scroll: false });
+        if (typeof window.closeUserSettingsDropdown === 'function') window.closeUserSettingsDropdown();
+        else panel.classList.add('hidden');
+        if (triggerBtn && isElementVisible(triggerBtn)) return setFocus(triggerBtn, { scroll: false });
+        return true;
+      }
+      return true;
+    }
+
+    return true;
+  }
+
+  /**
+   * Helper to focus the active or first navigation item inside Top Header (#topHeader)
+   */
+  function focusTopHeaderNav(preferLeftSide) {
+    var topHeader = document.getElementById('topHeader');
+    if (!topHeader || !isElementVisible(topHeader)) return false;
+    if (preferLeftSide) {
+      var userBtn = document.getElementById('userSettingsMenuBtn');
+      var searchIn = document.getElementById('headerQuickSearchInput');
+      if (searchIn && isElementVisible(searchIn)) return setFocus(searchIn, { scroll: false });
+      if (userBtn && isElementVisible(userBtn)) return setFocus(userBtn, { scroll: false });
+    }
+    var activeNav = topHeader.querySelector('.main-nav .nav-link.active') ||
+      topHeader.querySelector('.main-nav .nav-link') ||
+      document.getElementById('brandLogo');
+    if (activeNav && isElementVisible(activeNav)) {
+      return setFocus(activeNav, { scroll: false });
+    }
+    return false;
+  }
+
+  /**
    * Deterministic Navigation on Home Stage
-   * Handles: Side Rail, Hero Stage, 3-Strip Explorer Bar, Horizontal Rows, and Multi-Row/Column Poster Grid
+   * Handles: Top Header, Side Rail, Hero Stage, Explorer Bar, Continue Watching Actions, Horizontal Rows, and Poster Grid
    */
   function navigateHomeStage(direction) {
     // Ultra-fast O(1) sibling shortcut when moving horizontally inside a shelf row-track
@@ -460,11 +650,17 @@
       }
     }
 
+    var topHeader = document.getElementById('topHeader');
     var sideRail = document.getElementById('tvSideRail');
     var heroStage = document.getElementById('heroBillboard');
     var explorerBar = document.getElementById('catalogExplorerBar');
     var catalogMain = document.getElementById('catalogMain');
 
+    var headerItems = topHeader
+      ? Array.prototype.slice.call(
+          topHeader.querySelectorAll('#brandLogo, .main-nav .nav-link, #headerQuickSearchInput, #openSearchBtn, #userSettingsMenuBtn')
+        ).filter(isElementVisible)
+      : [];
     var railBtns = sideRail ? Array.prototype.slice.call(sideRail.querySelectorAll('.tv-rail-btn')).filter(isElementVisible) : [];
     var heroBtns = heroStage ? Array.prototype.slice.call(heroStage.querySelectorAll('.tv-focusable')).filter(isElementVisible) : [];
     var rows = catalogMain ? Array.prototype.slice.call(catalogMain.querySelectorAll('.netflix-row')).filter(isElementVisible) : [];
@@ -481,7 +677,50 @@
         if (firstWallCard) return setFocus(firstWallCard);
       }
       if (heroBtns.length) return setFocus(heroBtns[0]);
+      if (headerItems.length) return setFocus(headerItems[0]);
       return false;
+    }
+
+    // A0. Inside Top Header (#topHeader: Brand Logo, Category Nav Links, Expanded Search Box, User Settings Menu Button)
+    if (topHeader && topHeader.contains(currentFocused)) {
+      var topIdx = headerItems.indexOf(currentFocused);
+      if (direction === 'left') {
+        if (topIdx !== -1 && topIdx < headerItems.length - 1) {
+          return setFocus(headerItems[topIdx + 1], { scroll: false });
+        }
+        return true;
+      }
+      if (direction === 'right') {
+        if (topIdx > 0) {
+          return setFocus(headerItems[topIdx - 1], { scroll: false });
+        }
+        return true;
+      }
+      if (direction === 'down') {
+        if (heroBtns.length) return setFocus(heroBtns[0]);
+        var genreStripTop = document.getElementById('genreFilterStrip');
+        if (genreStripTop && isElementVisible(genreStripTop)) {
+          var gActive = genreStripTop.querySelector('.genre-chip-btn.active') || genreStripTop.querySelector('.genre-chip-btn');
+          if (gActive && isElementVisible(gActive)) return setFocus(gActive);
+        }
+        var dropBarTop = document.getElementById('explorerDropdownsBar');
+        if (dropBarTop && isElementVisible(dropBarTop)) {
+          var dBtnTop = dropBarTop.querySelector('.explorer-dropdown-btn');
+          if (dBtnTop && isElementVisible(dBtnTop)) return setFocus(dBtnTop);
+        }
+        if (rows.length) {
+          var r0Card = rows[0].querySelector('.poster-card');
+          if (r0Card) return setFocus(r0Card);
+        }
+        if (wallGrid) {
+          var w0Card = wallGrid.querySelector('.poster-card');
+          if (w0Card) return setFocus(w0Card);
+        }
+        return true;
+      }
+      if (direction === 'up') {
+        return true;
+      }
     }
 
     // A. Inside TV Right Side Rail (#tvSideRail)
@@ -545,8 +784,7 @@
         return true;
       }
       if (direction === 'up') {
-        var topNav = document.querySelector('#topHeader .nav-link.active, #topHeader .nav-link');
-        if (topNav && isElementVisible(topNav)) return setFocus(topNav);
+        if (focusTopHeaderNav(false)) return true;
         return true;
       }
     }
@@ -614,15 +852,76 @@
           if (gBtnUp) return setFocus(gBtnUp);
         }
         if (heroBtns.length) return setFocus(heroBtns[0]);
+        if (focusTopHeaderNav(false)) return true;
         return true;
       }
     }
 
-    // D. Inside Horizontal Poster Rows (.netflix-row)
+    // D. Inside Horizontal Poster Rows (.netflix-row), including Continue Watching Card Action Buttons (.cw-card-info-btn, .cw-card-remove-btn, #clearContinueWatchingBtn)
     var currentRow = currentFocused.closest('.netflix-row');
     if (currentRow) {
       var rowIdx = rows.indexOf(currentRow);
       var cards = Array.prototype.slice.call(currentRow.querySelectorAll('.poster-card')).filter(isElementVisible);
+      var clearCwBtn = document.getElementById('clearContinueWatchingBtn');
+
+      // Sub-case D1: Focused on #clearContinueWatchingBtn ("נקה רשימת המשך צפייה")
+      if (currentFocused === clearCwBtn) {
+        if (direction === 'down' || direction === 'right') {
+          if (cards.length) return setFocus(cards[0]);
+          return true;
+        }
+        if (direction === 'up') {
+          var dropBarCw = document.getElementById('explorerDropdownsBar');
+          if (dropBarCw && isElementVisible(dropBarCw)) {
+            var dBtnCw = dropBarCw.querySelector('.explorer-dropdown-btn');
+            if (dBtnCw) return setFocus(dBtnCw);
+          }
+          if (heroBtns.length) return setFocus(heroBtns[0]);
+          if (focusTopHeaderNav(false)) return true;
+        }
+        return true;
+      }
+
+      // Sub-case D2: Focused on Continue Watching Card Action Badge (.cw-card-info-btn ⓘ or .cw-card-remove-btn ✕)
+      if (currentFocused.classList.contains('cw-card-info-btn') || currentFocused.classList.contains('cw-card-remove-btn')) {
+        var parentCard = currentFocused.closest('.poster-card');
+        var infoBtn = parentCard ? parentCard.querySelector('.cw-card-info-btn') : null;
+        var remBtn = parentCard ? parentCard.querySelector('.cw-card-remove-btn') : null;
+        if (direction === 'down') {
+          if (parentCard && isElementVisible(parentCard)) return setFocus(parentCard);
+          if (cards.length) return setFocus(cards[0]);
+          return true;
+        }
+        if (direction === 'left') {
+          if (currentFocused === infoBtn && remBtn && isElementVisible(remBtn)) {
+            return setFocus(remBtn);
+          }
+          if (clearCwBtn && isElementVisible(clearCwBtn)) {
+            return setFocus(clearCwBtn);
+          }
+          return true;
+        }
+        if (direction === 'right') {
+          if (currentFocused === remBtn && infoBtn && isElementVisible(infoBtn)) {
+            return setFocus(infoBtn);
+          }
+          return true;
+        }
+        if (direction === 'up') {
+          if (clearCwBtn && isElementVisible(clearCwBtn)) {
+            return setFocus(clearCwBtn);
+          }
+          var dropBarFromBadge = document.getElementById('explorerDropdownsBar');
+          if (dropBarFromBadge && isElementVisible(dropBarFromBadge)) {
+            var dBtnFromBadge = dropBarFromBadge.querySelector('.explorer-dropdown-btn');
+            if (dBtnFromBadge) return setFocus(dBtnFromBadge);
+          }
+          if (heroBtns.length) return setFocus(heroBtns[0]);
+          if (focusTopHeaderNav(false)) return true;
+        }
+        return true;
+      }
+
       var cIdx = cards.indexOf(currentFocused);
 
       if (direction === 'left') {
@@ -653,6 +952,14 @@
         return true;
       }
       if (direction === 'up') {
+        // If focused on a Continue Watching card (.cw-poster-card), pressing Up focuses its ⓘ Info / ✕ Remove buttons on the card!
+        if (currentFocused.classList.contains('cw-poster-card')) {
+          var cwInfoBtn = currentFocused.querySelector('.cw-card-info-btn');
+          var cwRemBtn = currentFocused.querySelector('.cw-card-remove-btn');
+          if (cwInfoBtn && isElementVisible(cwInfoBtn)) return setFocus(cwInfoBtn);
+          if (cwRemBtn && isElementVisible(cwRemBtn)) return setFocus(cwRemBtn);
+          if (clearCwBtn && isElementVisible(clearCwBtn)) return setFocus(clearCwBtn);
+        }
         if (rowIdx > 0) {
           var prevCards = Array.prototype.slice.call(rows[rowIdx - 1].querySelectorAll('.poster-card')).filter(isElementVisible);
           if (prevCards.length) {
@@ -671,15 +978,25 @@
           if (activeG && isElementVisible(activeG)) return setFocus(activeG);
         }
         if (heroBtns.length) return setFocus(heroBtns[0]);
+        if (focusTopHeaderNav(false)) return true;
         return true;
       }
     }
 
-    // E. Inside Multi-Row & Multi-Column Poster Wall Grid (.catalog-poster-grid), #clearActorFilterBtn, or #loadMoreCatalogBtn
+    // E. Inside Multi-Row & Multi-Column Poster Wall Grid (.catalog-poster-grid), Live TV Hub Banner, Telegram Banner, #clearActorFilterBtn, or #loadMoreCatalogBtn
     var clearActorBtn = document.getElementById('clearActorFilterBtn');
-    if ((wallGrid && wallGrid.contains(currentFocused)) || currentFocused === loadMoreBtn || currentFocused === clearActorBtn) {
+    if (
+      (wallGrid && wallGrid.contains(currentFocused)) ||
+      (catalogMain && catalogMain.contains(currentFocused)) ||
+      currentFocused === loadMoreBtn ||
+      currentFocused === clearActorBtn
+    ) {
       var gridCandidates = catalogMain
-        ? Array.prototype.slice.call(catalogMain.querySelectorAll('.catalog-poster-grid .poster-card, #clearActorFilterBtn, #loadMoreCatalogBtn, .youtube-hub-bar .tv-focusable')).filter(isElementVisible)
+        ? Array.prototype.slice.call(
+            catalogMain.querySelectorAll(
+              '.catalog-poster-grid .poster-card, #clearActorFilterBtn, #loadMoreCatalogBtn, .youtube-hub-bar .tv-focusable, .live-hub-banner .tv-focusable, #liveM3uImporterPanel .tv-focusable, .tg-category-banner .tv-focusable'
+            )
+          ).filter(isElementVisible)
         : [];
 
       var nearGridEl = findNearestPhysical(currentFocused, direction, gridCandidates);
@@ -703,6 +1020,7 @@
           if (dbBtn) return setFocus(dbBtn);
         }
         if (heroBtns.length) return setFocus(heroBtns[0]);
+        if (focusTopHeaderNav(false)) return true;
       }
       return true;
     }
@@ -858,8 +1176,19 @@
     var subsMenu = document.getElementById('playerSubsMenu');
     if (subsMenu && !subsMenu.classList.contains('hidden')) {
       subsMenu.classList.add('hidden');
-      var subsBtn = document.getElementById('playerSubsBtn');
-      if (subsBtn) setFocus(subsBtn);
+      var subsBtn = document.getElementById('playerSubsBtn') || document.getElementById('playerTopSubsBtn');
+      if (subsBtn && isElementVisible(subsBtn)) setFocus(subsBtn);
+      return true;
+    }
+
+    var sourceTabsPanel = document.getElementById('playerSourceTabs');
+    if (sourceTabsPanel && !sourceTabsPanel.classList.contains('hidden')) {
+      sourceTabsPanel.classList.add('hidden');
+      var srcDropBtn = document.getElementById('playerSourcesDropdownBtn');
+      if (srcDropBtn) {
+        srcDropBtn.setAttribute('aria-expanded', 'false');
+        if (isElementVisible(srcDropBtn)) setFocus(srcDropBtn);
+      }
       return true;
     }
 
@@ -870,6 +1199,13 @@
       } else {
         player.classList.add('hidden');
       }
+      if (lastMainFocus && isElementVisible(lastMainFocus)) setFocus(lastMainFocus);
+      return true;
+    }
+
+    var tgModal = document.getElementById('telegramModal');
+    if (tgModal && !tgModal.classList.contains('hidden')) {
+      tgModal.classList.add('hidden');
       if (lastMainFocus && isElementVisible(lastMainFocus)) setFocus(lastMainFocus);
       return true;
     }
@@ -909,6 +1245,18 @@
       return true;
     }
 
+    var userSettingsPanel = document.getElementById('userSettingsDropdownPanel');
+    if (userSettingsPanel && !userSettingsPanel.classList.contains('hidden')) {
+      if (typeof window.closeUserSettingsDropdown === 'function') {
+        window.closeUserSettingsDropdown();
+      } else {
+        userSettingsPanel.classList.add('hidden');
+      }
+      var userMenuBtn = document.getElementById('userSettingsMenuBtn');
+      if (userMenuBtn && isElementVisible(userMenuBtn)) setFocus(userMenuBtn, { scroll: false });
+      return true;
+    }
+
     var openDropdown = document.querySelector('.explorer-dropdown-panel:not(.hidden)');
     if (openDropdown) {
       var wrap = openDropdown.closest('.explorer-dropdown-wrap');
@@ -917,6 +1265,25 @@
       else openDropdown.classList.add('hidden');
       if (trig && isElementVisible(trig)) setFocus(trig);
       return true;
+    }
+
+    var liveImporter = document.getElementById('liveM3uImporterPanel');
+    if (liveImporter && !liveImporter.classList.contains('hidden')) {
+      liveImporter.classList.add('hidden');
+      var impBtn = document.getElementById('openLiveImporterBtn');
+      if (impBtn && isElementVisible(impBtn)) setFocus(impBtn);
+      return true;
+    }
+
+    // On Home Stage: if scrolled down or not inside #topHeader, Back scrolls to top & focuses Top Header!
+    var catalogMain = document.getElementById('catalogMain');
+    var topHeader = document.getElementById('topHeader');
+    if (catalogMain && catalogMain.scrollTop > 60) {
+      catalogMain.scrollTop = 0;
+      if (focusTopHeaderNav(false)) return true;
+    }
+    if (topHeader && isElementVisible(topHeader) && (!currentFocused || !topHeader.contains(currentFocused))) {
+      if (focusTopHeaderNav(false)) return true;
     }
 
     var sideRail = document.getElementById('tvSideRail');
@@ -973,6 +1340,11 @@
       return navigatePlayerModal(directionOrAction);
     }
 
+    var userSettingsPanel = document.getElementById('userSettingsDropdownPanel');
+    if (userSettingsPanel && !userSettingsPanel.classList.contains('hidden')) {
+      return navigateUserSettingsDropdown(directionOrAction);
+    }
+
     var activeScope = getActiveScope();
     if (activeScope === document.body || (activeScope && activeScope.classList && activeScope.classList.contains('explorer-dropdown-panel'))) {
       if (navigateHomeStage(directionOrAction)) return true;
@@ -1027,7 +1399,13 @@
     closeKeyboard: closeVirtualKeyboard
   };
 
-  window.addEventListener('keydown', function (e) {
+  if (window.__streamItTvKeydownHandler) {
+    try {
+      window.removeEventListener('keydown', window.__streamItTvKeydownHandler, true);
+    } catch (e) {}
+  }
+
+  window.__streamItTvKeydownHandler = function (e) {
     var key = e.key;
     var code = e.keyCode;
 
@@ -1092,13 +1470,21 @@
     e.preventDefault();
     e.stopPropagation();
     handleRemoteCommand(dir);
-  }, true);
+  };
 
-  document.addEventListener('DOMContentLoaded', function () {
+  window.addEventListener('keydown', window.__streamItTvKeydownHandler, true);
+
+  function initTvNavigationEngine() {
     applyTvModeClass();
     bindVirtualKeyboardActions();
     ensureInitialTvFocus();
     setTimeout(ensureInitialTvFocus, 350);
     setTimeout(ensureInitialTvFocus, 900);
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTvNavigationEngine);
+  } else {
+    initTvNavigationEngine();
+  }
 })();

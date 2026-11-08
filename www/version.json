@@ -1,9 +1,9 @@
 {
-  "version": "9.5.4",
-  "native_apk_version": "9.5.0",
-  "apk_download_url": "https://is.gd/streamittv_apk",
+  "version": "9.6.0",
+  "native_apk_version": "9.6.0",
+  "apk_download_url": "https://streamittvapp.github.io/stream-it-app/StreamIt-AndroidTV.apk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-08T21:25:00Z",
-  "notes": "v9.5.4 — Slowed down live news ticker speed with 11+ Israeli news/cinema/sport/tech RSS sources, added User Settings dropdown menu on the left of the top header containing the Telegram channels button, and widened the search fields."
+  "updated_at": "2026-11-08T22:06:00Z",
+  "notes": "v9.6.0 — Ultimate Android TV / Streamer Edition: Full 10-foot Top Header visibility on TV (Expanded Search, User Settings Menu on left with Telegram VOD, Category Nav), full D-Pad navigation for User Settings menu, Continue Watching card removal, Player Sources dropdown, Netflix Scene Thumbnail preview on remote scrubbing, and Self-Healing OTA boot engine."
 }

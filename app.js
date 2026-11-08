@@ -10,7 +10,9 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.5.4';
+  var APP_VERSION = '9.6.0';
+  var wasLegacyBooted = Boolean(window.__STREAMIT_V94_BOOTED);
+  window.__STREAMIT_V94_BOOTED = true;
 
   // Embedded Cloud Vault Sync Key (XOR-73 encoded for zero-delay GitHub Cloud Vault read/write)
   var CLOUD_VAULT_SYNC_BYTES = [46, 33, 57, 22, 127, 49, 51, 27, 39, 44, 60, 44, 29, 122, 7, 31, 24, 6, 121, 112, 58, 32, 25, 60, 40, 39, 127, 39, 38, 26, 125, 59, 19, 34, 121, 56, 26, 63, 16, 49];
@@ -2500,9 +2502,41 @@
           localStorage.setItem('streamit_ota_app_js_v9', jsTxt);
         }
         localStorage.setItem('streamit_ota_version_v9', verObj.version);
+        if (verObj.version !== APP_VERSION) {
+          try {
+            var reloadKey = 'streamit_ota_reloaded_' + verObj.version;
+            if (!sessionStorage.getItem(reloadKey)) {
+              sessionStorage.setItem(reloadKey, '1');
+              window.location.reload();
+            }
+          } catch (eRel) {}
+        }
       }
     } catch (e) {}
   }
+
+  function showCinemaToast(message) {
+    if (!message) return;
+    var container = document.getElementById('toastContainer');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'toastContainer';
+      container.className = 'toast-container';
+      container.setAttribute('aria-live', 'polite');
+      document.body.appendChild(container);
+    }
+    var item = document.createElement('div');
+    item.className = 'cinema-toast-item';
+    item.textContent = message;
+    container.appendChild(item);
+    setTimeout(function () {
+      if (item && item.parentNode) {
+        item.parentNode.removeChild(item);
+      }
+    }, 2800);
+  }
+  window.showCinemaToast = showCinemaToast;
+  window.showToast = showCinemaToast;
 
   /**
    * Reorganized Explorer: Open Genres Strip (`#genreFilterStrip`) + Sleek Dropdowns (`#providerDropdownWrap`, `#yearDropdownWrap`, `#actorDropdownWrap`)
@@ -3631,6 +3665,7 @@
 
   function removeFromContinueWatching(itemId) {
     if (!itemId) return;
+    var removedItem = findItemById(itemId);
     var profBucket = ensureActiveProfileBucket();
     if (profBucket && profBucket.progress && profBucket.progress[itemId]) {
       delete profBucket.progress[itemId];
@@ -3647,7 +3682,19 @@
     var remBtn = document.getElementById('detailsRemoveCwBtn');
     if (remBtn && state.detailsItem && String(state.detailsItem.id) === String(itemId)) {
       remBtn.classList.add('hidden');
+      var playBtn = document.getElementById('detailsPlayBtn');
+      if (playBtn && typeof window.streamItFocusElement === 'function') {
+        window.streamItFocusElement(playBtn, { scroll: false });
+      }
+    } else if (document.getElementById('detailsModal') && document.getElementById('detailsModal').classList.contains('hidden')) {
+      var nextCwCard = document.querySelector('#continueWatchingRow .poster-card') ||
+        document.querySelector('#catalogRowsContainer .poster-card') ||
+        document.getElementById('heroPlayBtn');
+      if (nextCwCard && typeof window.streamItFocusElement === 'function') {
+        window.streamItFocusElement(nextCwCard, { scroll: false });
+      }
     }
+    showCinemaToast(removedItem && removedItem.title ? ('הוסר מהמשך צפייה: ' + removedItem.title) : 'הוסר מרשימת המשך הצפייה');
   }
 
   function clearAllContinueWatching() {
@@ -3659,6 +3706,11 @@
     }
     var remBtn = document.getElementById('detailsRemoveCwBtn');
     if (remBtn) remBtn.classList.add('hidden');
+    var fallbackFocus = document.querySelector('#catalogRowsContainer .poster-card') || document.getElementById('heroPlayBtn');
+    if (fallbackFocus && typeof window.streamItFocusElement === 'function') {
+      window.streamItFocusElement(fallbackFocus, { scroll: false });
+    }
+    showCinemaToast('רשימת המשך הצפייה נוקתה');
   }
 
   function renderPosterCardHtml(item, opts) {
@@ -5232,21 +5284,46 @@
   function seekVideoBy(deltaSeconds) {
     wakePlayerControls();
     var video = document.getElementById('videoElement');
+    var seekSlider = document.getElementById('playerSeekSlider');
+    var curEl = document.getElementById('playerCurrentTime');
+    var fillBar = document.getElementById('embedTimelineProgressFill');
     if (state.playingMode === 'video' && video && !video.classList.contains('hidden')) {
+      var dur = (video.duration && isFinite(video.duration)) ? video.duration : 0;
       var next = Math.max(0, (video.currentTime || 0) + deltaSeconds);
-      if (video.duration && isFinite(video.duration)) {
-        next = Math.min(video.duration, next);
+      if (dur > 0) {
+        next = Math.min(dur, next);
       }
       video.currentTime = next;
       updateActiveSubtitleCue(next);
+      if (curEl) curEl.textContent = formatSeconds(next);
+      if (seekSlider && dur > 0) {
+        var ratio = next / dur;
+        seekSlider.value = String(Math.round(ratio * 1000));
+        var rect = seekSlider.getBoundingClientRect();
+        var thumbX = (rect && rect.width) ? (rect.left + ratio * rect.width) : Math.round((window.innerWidth || 1280) / 2);
+        showSeekThumbnailPreview(next, thumbX, rect);
+      }
     } else if (state.playingMode === 'embed') {
       var iframe = document.getElementById('streamEmbedIframe');
-      var nextEmbed = Math.max(0, (state.embedCurrentTime || 0) + deltaSeconds);
+      var eDur = (state.embedDuration && state.embedDuration > 0) ? state.embedDuration : 5400;
+      var nextEmbed = Math.max(0, Math.min(eDur, (state.embedCurrentTime || 0) + deltaSeconds));
       state.embedCurrentTime = nextEmbed;
       updateActiveSubtitleCue(nextEmbed);
+      if (curEl) curEl.textContent = formatSeconds(nextEmbed);
+      var eRatio = eDur > 0 ? (nextEmbed / eDur) : 0;
+      if (seekSlider) {
+        seekSlider.value = String(Math.round(eRatio * 1000));
+      }
+      if (fillBar) {
+        fillBar.style.width = (eRatio * 100).toFixed(2) + '%';
+      }
+      var sRect = seekSlider ? seekSlider.getBoundingClientRect() : null;
+      var eThumbX = (sRect && sRect.width) ? (sRect.left + eRatio * sRect.width) : Math.round((window.innerWidth || 1280) * (0.15 + eRatio * 0.7));
+      showSeekThumbnailPreview(nextEmbed, eThumbX, sRect);
       if (iframe && iframe.contentWindow) {
         try {
           iframe.contentWindow.postMessage({ action: 'seek', time: Math.floor(nextEmbed) }, '*');
+          iframe.contentWindow.postMessage({ command: 'seek', time: Math.floor(nextEmbed) }, '*');
         } catch (e) {}
       }
     }
@@ -5994,6 +6071,8 @@
     if (userMenuRefreshBtn) {
       userMenuRefreshBtn.addEventListener('click', function () {
         closeUserSettingsDropdown();
+        showCinemaToast('מסנכרן קטלוג, ערוצים, מבזקים ועדכוני ענן...');
+        checkCloudOtaUpdates();
         initLiveNewsTicker();
         syncTelegramPublicChannels(true);
         renderCatalogShelves();
@@ -7247,6 +7326,137 @@
         '<span>נקה רשימת המשך צפייה</span>';
       cwHeader.appendChild(clrBtn);
     }
+
+    // Ensure Telegram VOD nav link exists in #topHeader .main-nav on older APK DOMs
+    var mainNav = document.querySelector('#topHeader .main-nav');
+    if (mainNav && !mainNav.querySelector('[data-category="telegram"]')) {
+      var tgNavBtn = document.createElement('button');
+      tgNavBtn.type = 'button';
+      tgNavBtn.className = 'nav-link tv-focusable';
+      tgNavBtn.setAttribute('data-category', 'telegram');
+      tgNavBtn.setAttribute('aria-label', 'סרטים וסדרות מטלגרם');
+      tgNavBtn.textContent = 'טלגרם VOD';
+      var seriesNavBtn = mainNav.querySelector('[data-category="series"]');
+      if (seriesNavBtn && seriesNavBtn.nextSibling) {
+        mainNav.insertBefore(tgNavBtn, seriesNavBtn.nextSibling);
+      } else {
+        mainNav.appendChild(tgNavBtn);
+      }
+    }
+
+    // Ensure #liveNewsTickerBar exists inside #explorerDropdownsBar even when #explorerDropdownsBar already existed on older APK DOMs
+    var expDropBar = document.getElementById('explorerDropdownsBar');
+    if (expDropBar && !document.getElementById('liveNewsTickerBar')) {
+      var tickerDiv = document.createElement('div');
+      tickerDiv.id = 'liveNewsTickerBar';
+      tickerDiv.className = 'live-news-ticker-bar';
+      tickerDiv.setAttribute('aria-label', 'פיד מבזקי חדשות ועדכונים בזמן אמת');
+      tickerDiv.innerHTML =
+        '<div class="news-ticker-badge">' +
+          '<span class="news-live-dot"></span>' +
+          '<span>מבזקים LIVE</span>' +
+        '</div>' +
+        '<div class="news-ticker-viewport">' +
+          '<div id="liveNewsTickerTrack" class="news-ticker-track">' +
+            '<span class="news-ticker-item">טוען מבזקי חדשות ועדכוני שידורים בזמן אמת...</span>' +
+          '</div>' +
+        '</div>';
+      expDropBar.appendChild(tickerDiv);
+    }
+
+    // Ensure #resumePlaybackToast and #seekThumbnailPreview exist inside #playerModal .player-stage on older APK DOMs
+    var playerStage = document.querySelector('#playerModal .player-stage');
+    if (playerStage && !document.getElementById('resumePlaybackToast')) {
+      var resToast = document.createElement('div');
+      resToast.id = 'resumePlaybackToast';
+      resToast.className = 'resume-playback-toast hidden';
+      resToast.setAttribute('dir', 'rtl');
+      resToast.setAttribute('aria-live', 'polite');
+      resToast.innerHTML =
+        '<span id="resumePlaybackToastText">ממשיך צפייה מנקודת העצירה...</span>' +
+        '<button type="button" id="resumeRestartFromZeroBtn" class="resume-restart-btn tv-focusable">התחל מהתחלה (00:00)</button>';
+      playerStage.appendChild(resToast);
+    }
+    if (playerStage && !document.getElementById('seekThumbnailPreview')) {
+      var seekPrev = document.createElement('div');
+      seekPrev.id = 'seekThumbnailPreview';
+      seekPrev.className = 'seek-thumbnail-preview hidden';
+      seekPrev.setAttribute('dir', 'ltr');
+      seekPrev.setAttribute('aria-hidden', 'true');
+      seekPrev.innerHTML =
+        '<div id="seekThumbImageBox" class="seek-thumb-image-box">' +
+          '<img id="seekThumbImg" class="seek-thumb-img" src="" alt="" />' +
+          '<div id="seekThumbBackdrop" class="seek-thumb-backdrop"></div>' +
+          '<span id="seekThumbSceneBadge" class="seek-thumb-scene-badge">תצוגת סצנה</span>' +
+          '<span id="seekThumbTimeBadge" class="seek-thumb-time-badge">00:00</span>' +
+        '</div>' +
+        '<div id="seekThumbCueText" class="seek-thumb-cue-text" dir="rtl"></div>';
+      playerStage.appendChild(seekPrev);
+    }
+
+    // Ensure #embedTimelineHoverStrip and #embedFullscreenOverlayBtn exist inside #playerControlsOverlay on older APK DOMs
+    if (ctrlOverlay && !document.getElementById('embedTimelineHoverStrip')) {
+      var hoverStrip = document.createElement('div');
+      hoverStrip.id = 'embedTimelineHoverStrip';
+      hoverStrip.className = 'embed-timeline-hover-strip';
+      hoverStrip.setAttribute('dir', 'ltr');
+      hoverStrip.innerHTML =
+        '<div class="embed-timeline-rail">' +
+          '<div id="embedTimelineProgressFill" class="embed-timeline-progress-fill"></div>' +
+          '<div id="embedTimelineHoverDot" class="embed-timeline-hover-dot"></div>' +
+        '</div>';
+      ctrlOverlay.appendChild(hoverStrip);
+    }
+    if (ctrlOverlay && !document.getElementById('embedFullscreenOverlayBtn')) {
+      var fsOvBtn = document.createElement('button');
+      fsOvBtn.type = 'button';
+      fsOvBtn.id = 'embedFullscreenOverlayBtn';
+      fsOvBtn.className = 'embed-fullscreen-overlay-btn tv-focusable';
+      fsOvBtn.setAttribute('dir', 'ltr');
+      fsOvBtn.setAttribute('title', 'מסך מלא (עם כתוביות בעברית)');
+      fsOvBtn.setAttribute('aria-label', 'מסך מלא');
+      fsOvBtn.innerHTML =
+        '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">' +
+          '<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />' +
+        '</svg>';
+      ctrlOverlay.appendChild(fsOvBtn);
+    }
+
+    // Ensure #telegramModal exists in document.body on older APK DOMs
+    if (!document.getElementById('telegramModal')) {
+      var tgMod = document.createElement('div');
+      tgMod.id = 'telegramModal';
+      tgMod.className = 'modal-overlay hidden';
+      tgMod.setAttribute('role', 'dialog');
+      tgMod.setAttribute('aria-modal', 'true');
+      tgMod.setAttribute('aria-labelledby', 'telegramModalHeading');
+      tgMod.innerHTML =
+        '<div class="auth-modal-card tg-modal-card">' +
+          '<div class="auth-card-header">' +
+            '<div>' +
+              '<h2 id="telegramModalHeading" class="auth-heading">טלגרם קולנוע VOD — חיבור ערוצים חינמי</h2>' +
+              '<p class="tg-modal-sub">ללא חשבון אישי וללא מספר טלפון • שאיבה אוטומטית של סרטים, סדרות ווידאו מערוצי טלגרם ציבוריים</p>' +
+            '</div>' +
+            '<button type="button" id="closeTelegramModalBtn" class="modal-close-btn tv-focusable" aria-label="סגור חלון טלגרם">' +
+              '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12" /></svg>' +
+            '</button>' +
+          '</div>' +
+          '<div class="tg-add-channel-bar">' +
+            '<input type="text" id="tgChannelInput" class="form-input tg-channel-input tv-focusable" dir="ltr" placeholder="@channel_name או https://t.me/BoxOffice..." aria-label="שם ערוץ טלגרם או קישור לערוץ" autocomplete="off" />' +
+            '<button type="button" id="tgAddChannelBtn" class="btn-primary tg-add-btn tv-focusable" aria-label="חבר ערוץ טלגרם"><span>+ חבר ערוץ</span></button>' +
+            '<button type="button" id="tgSyncAllBtn" class="btn-secondary tg-sync-btn tv-focusable" aria-label="סנכרן את כל הערוצים"><span>סנכרן הכל</span></button>' +
+          '</div>' +
+          '<div id="tgSyncStatusMsg" class="tg-sync-status" aria-live="polite"></div>' +
+          '<div class="tg-section-header">' +
+            '<h3 class="sub-users-heading">ערוצי טלגרם מחוברים כעת:</h3>' +
+            '<button type="button" id="tgFilterCatalogBtn" class="btn-secondary tg-filter-cat-btn tv-focusable" aria-label="הצג את כל תכני הטלגרם בקטלוג"><span>הצג בקטלוג הראשי</span></button>' +
+          '</div>' +
+          '<div id="tgConnectedChannelsList" class="tg-channels-grid"></div>' +
+          '<div class="tg-section-header"><h3 class="sub-users-heading">תכנים אחרונים שנשאבו מערוצי הטלגרם:</h3></div>' +
+          '<div id="tgRecentPostsGrid" class="tg-recent-posts-grid"></div>' +
+        '</div>';
+      document.body.appendChild(tgMod);
+    }
   }
 
   function initLiveNewsTicker() {
@@ -7267,8 +7477,8 @@
 
       if (!normalized.length) return;
 
-      // Ultra-calm broadcast crawl speed: ~28 seconds per headline (minimum 460s for full loop)
-      var durSec = Math.max(460, normalized.length * 28);
+      // Balanced broadcast crawl speed: ~15 seconds per headline (minimum 210s for full loop)
+      var durSec = Math.max(210, Math.round(normalized.length * 15));
       track.style.animationDuration = durSec + 's';
 
       var list = normalized.concat(normalized); // duplicate for seamless infinite loop
@@ -7395,14 +7605,29 @@
   }
 
   function bootStreamItApp() {
-    if (window.__STREAMIT_V94_BOOTED) return;
-    window.__STREAMIT_V94_BOOTED = true;
+    if (window.__STREAMIT_V960_BOOTED) return;
+    window.__STREAMIT_V960_BOOTED = true;
+
+    // If an older bundled APK script ran 1ms earlier, strip its stale DOM listeners via cloneNode(true)
+    if (wasLegacyBooted) {
+      var rootContainers = ['topHeader', 'tvSideRail', 'mainStage', 'searchModal', 'detailsModal', 'playerModal', 'authModal', 'telegramModal'];
+      for (var rc = 0; rc < rootContainers.length; rc++) {
+        var el = document.getElementById(rootContainers[rc]);
+        if (el && el.parentNode) {
+          el.parentNode.replaceChild(el.cloneNode(true), el);
+        }
+      }
+    }
+
     upgradeDomFromV93ToV94IfNeeded();
     loadLocalStorageState();
     updateAuthUi();
     bindUiEvents();
     initLiveNewsTicker();
     loadCatalog();
+    if (window.TVNavigation && typeof window.TVNavigation.ensureInitialFocus === 'function') {
+      window.TVNavigation.ensureInitialFocus();
+    }
   }
 
   if (document.readyState === 'loading') {

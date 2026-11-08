@@ -26,8 +26,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends BridgeActivity {
-    private static final String INSTALLED_APP_VERSION = "9.4.5";
-    private static final String INSTALLED_NATIVE_APK_VERSION = "9.4.5";
+    private static final String INSTALLED_APP_VERSION = "9.6.0";
+    private static final String INSTALLED_NATIVE_APK_VERSION = "9.6.0";
     private static final String OTA_PREFS_NAME = "streamit_ota_prefs";
     private StreamItEmbeddedServer embeddedServer;
     private volatile boolean apkUpdateInProgress = false;

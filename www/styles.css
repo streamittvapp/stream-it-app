@@ -1108,7 +1108,7 @@ video {
 }
 
 /* =========================================================================
-   9. PLATFORM LAYOUT 1: SMART TV MODE (body.tv-mode) — 10% MORE COMPACT
+   9. PLATFORM LAYOUT 1: SMART TV & STREAMER MODE (body.tv-mode) — 10-FOOT PRO UI
    ========================================================================= */
 body.tv-mode {
   height: 100vh;
@@ -1118,46 +1118,95 @@ body.tv-mode {
   font-size: 14px;
 }
 
-body.tv-mode #topHeader,
+body.tv-mode #tvSideRail,
 body.tv-mode #mobileBottomNav {
   display: none !important;
 }
 
-body.tv-mode #tvSideRail {
-  display: flex;
-  width: 64px;
+body.tv-mode #topHeader {
+  display: block !important;
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 58px;
+  background: rgba(6, 8, 14, 0.96);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 920;
+}
+
+body.tv-mode #topHeader .header-inner {
+  padding: 0 4vw;
+  gap: 16px;
+}
+
+body.tv-mode #topHeader .header-right {
+  gap: 18px;
+}
+
+body.tv-mode #topHeader .brand-logo {
+  font-size: 1.42rem;
+}
+
+body.tv-mode #topHeader .nav-link {
+  height: 36px;
+  padding: 0 12px;
+  font-size: 0.88rem;
+}
+
+body.tv-mode #topHeader .nav-link.tv-focused,
+body.tv-mode #topHeader .brand-logo.tv-focused {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  font-weight: 800;
+  outline: 3px solid var(--brand-red) !important;
+  outline-offset: 2px;
+  transform: scale(1.05);
+}
+
+body.tv-mode #topHeader .header-search-box {
+  width: clamp(230px, 22vw, 350px);
+  height: 38px;
+}
+
+body.tv-mode #topHeader .header-search-box:has(.tv-focused) {
+  background-color: rgba(30, 34, 48, 0.98);
+  border-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.65);
 }
 
 body.tv-mode #mainStage {
   height: 100vh;
+  padding-top: 58px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-/* Top 38% Fixed Live Hero Stage on TV (10% more compact so more catalog rows fit below) */
+/* Top 34% Fixed Live Hero Stage on TV (leaves generous room for Top Header + Catalog Rows) */
 body.tv-mode #heroBillboard {
-  flex: 0 0 38vh;
-  height: 38vh;
-  min-height: 38vh;
-  max-height: 38vh;
-  padding: 2vh 82px 1.5vh 4vw;
+  flex: 0 0 34vh;
+  height: 34vh;
+  min-height: 34vh;
+  max-height: 34vh;
+  padding: 1.5vh 4vw;
   align-items: center;
 }
 
 body.tv-mode .hero-content {
-  max-width: 56vw;
+  max-width: 58vw;
   gap: 6px;
 }
 
 body.tv-mode .hero-title {
-  font-size: clamp(1.5rem, 2.5vw, 2.15rem);
+  font-size: clamp(1.45rem, 2.4vw, 2.05rem);
 }
 
 body.tv-mode .hero-overview {
-  font-size: 0.86rem;
+  font-size: 0.85rem;
   -webkit-line-clamp: 2;
-  max-width: 50vw;
+  max-width: 52vw;
 }
 
 body.tv-mode .hero-actions .btn-primary,
@@ -1167,10 +1216,10 @@ body.tv-mode .hero-actions .btn-secondary {
   font-size: 0.85rem;
 }
 
-/* Bottom 62% Poster Shelves & Multi-Row Grid on TV with 4vw Overscan Safe-Area */
+/* Bottom 66% Poster Shelves & Multi-Row Grid on TV with 4vw Symmetrical Safe-Area */
 body.tv-mode #catalogMain {
-  flex: 0 0 62vh;
-  height: 62vh;
+  flex: 1 1 auto;
+  height: calc(66vh - 58px);
   overflow-y: auto;
   overflow-x: hidden;
   padding: 0;
@@ -1182,17 +1231,17 @@ body.tv-mode #catalogMain::-webkit-scrollbar {
 }
 
 body.tv-mode .catalog-explorer-bar {
-  padding: 4px 82px 10px 4vw;
+  padding: 6px 4vw 10px 4vw;
   gap: 6px;
 }
 
 body.tv-mode #continueWatchingSection {
-  padding: 0 82px 0 4vw;
+  padding: 0 4vw;
   margin-bottom: 12px;
 }
 
 body.tv-mode #catalogRowsContainer {
-  padding: 0 82px 5vh 4vw;
+  padding: 0 4vw 5vh 4vw;
   gap: 14px;
 }
 
@@ -3520,7 +3569,7 @@ body.auth-gate-locked #quickTestLoginBtn {
   white-space: nowrap;
   padding: 0 18px;
   will-change: transform;
-  animation: newsMarqueeRtl 420s linear infinite;
+  animation: newsMarqueeRtl 230s linear infinite;
 }
 
 .live-news-ticker-bar:hover .news-ticker-track {
@@ -4325,4 +4374,80 @@ body.auth-gate-locked #quickTestLoginBtn {
 
 .details-remove-cw-btn.hidden {
   display: none !important;
+}
+
+/* =========================================================================
+   Streamer 10-Foot Focus Polish & Toast Notifications (v9.6.0)
+   ========================================================================= */
+.user-menu-prof-chip.tv-focused,
+.user-menu-profile-chip.tv-focused {
+  background: var(--brand-red) !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+  outline: 2px solid #ffffff !important;
+  transform: scale(1.05);
+}
+
+.user-menu-item.tv-focused {
+  background: rgba(229, 9, 20, 0.24) !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+  outline: 2px solid #ffffff !important;
+  transform: translateX(-2px);
+}
+
+.user-menu-item.tv-focused .user-menu-item-sub {
+  color: #f1f5f9 !important;
+}
+
+.cw-poster-card.tv-focused .cw-card-remove-btn,
+.cw-poster-card.tv-focused .cw-card-info-btn,
+.cw-poster-card:has(.tv-focused) .cw-card-remove-btn,
+.cw-poster-card:has(.tv-focused) .cw-card-info-btn {
+  opacity: 1 !important;
+}
+
+.cw-card-remove-btn.tv-focused {
+  background: var(--brand-red) !important;
+  border: 2px solid #ffffff !important;
+  color: #ffffff !important;
+  outline: 2px solid #ffffff !important;
+  transform: scale(1.18) !important;
+}
+
+.cw-card-info-btn.tv-focused {
+  background: #ffffff !important;
+  border: 2px solid var(--brand-red) !important;
+  color: #000000 !important;
+  outline: 2px solid #ffffff !important;
+  transform: scale(1.18) !important;
+}
+
+.cinema-toast-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 18px;
+  background: rgba(12, 16, 26, 0.96);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-right: 4px solid var(--brand-red);
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 0.88rem;
+  font-weight: 700;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.85);
+  direction: rtl;
+  animation: toastSlideUp 0.22s cubic-bezier(0.2, 0, 0, 1);
+}
+
+@keyframes toastSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
