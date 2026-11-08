@@ -130,7 +130,7 @@ public class StreamItEmbeddedServer {
             Map<String, String> params = parseQuery(query);
 
             if ("/api/health".equals(path)) {
-                byte[] body = "{\"ok\":true,\"mode\":\"android_embedded_server\",\"version\":\"9.4.4\",\"ota_ver_url\":\"https://is.gd/streamittv_ver\",\"ota_apk_url\":\"https://is.gd/streamittv_apk\"}"
+                byte[] body = "{\"ok\":true,\"mode\":\"android_embedded_server\",\"version\":\"9.4.5\",\"ota_ver_url\":\"https://is.gd/streamittv_ver\",\"ota_apk_url\":\"https://is.gd/streamittv_apk\"}"
                         .getBytes(StandardCharsets.UTF_8);
                 sendResponse(out, 200, "application/json; charset=utf-8", body);
             } else if ("/api/ota".equals(path)) {
@@ -170,6 +170,35 @@ public class StreamItEmbeddedServer {
         CachedItem cached = directStreamCache.get(cacheKey);
         if (cached != null && (now - cached.timestampMs) < 900_000L) {
             return cached.value;
+        }
+
+        // Primary Fast Direct HLS Extractor via cdn.vidspark.to (vjej -> direct CORS-enabled .m3u8 in ~0.3s)
+        if (!tmdbId.isEmpty()) {
+            try {
+                String vpPath = ("series".equalsIgnoreCase(itemType) || "tv".equalsIgnoreCase(itemType))
+                        ? ("/api/vidora/v1/tv/" + tmdbId + "/" + season + "/" + episode + "?source=vjej")
+                        : ("/api/vidora/v1/movie/" + tmdbId + "?source=vjej");
+                Map<String, String> hVp = new HashMap<>();
+                hVp.put("User-Agent", USER_AGENT);
+                hVp.put("Referer", "https://cdn.vidspark.to/");
+                hVp.put("x-player-key", "f3b72e73c80c9a996574379798703796a1936efa3516a7105cb0e43048b46b5a");
+                String vpRaw = new String(httpGetBytes("https://cdn.vidspark.to" + vpPath, hVp, 5000), StandardCharsets.UTF_8);
+                JSONObject vpObj = new JSONObject(vpRaw);
+                JSONArray sources = vpObj.optJSONArray("sources");
+                if (sources != null && sources.length() > 0) {
+                    String directM3u8 = sources.getJSONObject(0).optString("url", "");
+                    if (directM3u8.startsWith("http")) {
+                        JSONObject fb = new JSONObject();
+                        fb.put("ok", true);
+                        fb.put("imdb_id", imdbId);
+                        fb.put("streamUrl", directM3u8);
+                        String fbStr = fb.toString();
+                        directStreamCache.put(cacheKey, new CachedItem(now, fbStr));
+                        return fbStr;
+                    }
+                }
+            } catch (Exception ignored) {
+            }
         }
 
         try {

@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&family=Rubik:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
-  <link rel="stylesheet" href="styles.css?v=9.4.4" />
+  <link rel="stylesheet" href="styles.css?v=9.4.5" />
   <script>
     (function () {
       try {
@@ -32,7 +32,7 @@
         }
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
         var otaCss = localStorage.getItem('streamit_ota_css_v9') || '';
-        if (otaVer && otaVer > '9.4.4' && otaCss.length > 500) {
+        if (otaVer && otaVer > '9.4.5' && otaCss.length > 500) {
           var st = document.createElement('style');
           st.id = 'streamit-ota-live-style-v9';
           st.textContent = otaCss;
@@ -58,6 +58,7 @@
           <button type="button" class="nav-link active tv-focusable" data-category="all" aria-label="ראשי">ראשי</button>
           <button type="button" class="nav-link tv-focusable" data-category="movies" aria-label="סרטים">סרטים</button>
           <button type="button" class="nav-link tv-focusable" data-category="series" aria-label="סדרות">סדרות</button>
+          <button type="button" class="nav-link tv-focusable" data-category="telegram" aria-label="סרטים וסדרות מטלגרם">טלגרם VOD</button>
           <button type="button" class="nav-link tv-focusable" data-category="channels" aria-label="ערוצים">ערוצים</button>
           <button type="button" class="nav-link tv-focusable" data-category="youtube" aria-label="יוטיוב">יוטיוב</button>
           <button type="button" class="nav-link tv-focusable" data-category="mylist" aria-label="הרשימה שלי">הרשימה שלי</button>
@@ -70,7 +71,7 @@
             <path d="M22 2L11 13" />
             <path d="M22 2L15 22l-4-9-9-4 20-7z" />
           </svg>
-          <span class="header-btn-text">טלגרם VOD</span>
+          <span class="header-btn-text">+ ערוצי טלגרם</span>
         </button>
 
         <button type="button" id="openSearchBtn" class="header-icon-btn tv-focusable" aria-label="חיפוש קטלוג">
@@ -562,6 +563,14 @@
           </div>
 
           <div class="player-top-actions">
+            <button type="button" id="playerTopSubsBtn" class="explorer-dropdown-btn details-sources-btn player-top-subs-btn tv-focusable" aria-label="הגדרות כתוביות בעברית וסנכרון">
+              <svg class="dropdown-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <path d="M6 12h4M12 12h6M6 16h8M16 16h2" />
+              </svg>
+              <span>כתוביות עברית (הגדרות)</span>
+            </button>
+
             <div id="playerSourcesDropdownWrap" class="details-sources-dropdown-wrap player-sources-dropdown-wrap">
               <button type="button" id="playerSourcesDropdownBtn" class="explorer-dropdown-btn details-sources-btn tv-focusable" aria-haspopup="listbox" aria-expanded="false">
                 <svg class="dropdown-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -652,55 +661,55 @@
               </button>
             </div>
           </div>
+        </div>
 
-          <!-- Subtitles & Sync Control Panel Popover (#playerSubsMenu) -->
-          <div id="playerSubsMenu" class="player-subs-menu hidden" dir="rtl" role="menu" aria-label="תפריט כתוביות וסנכרון">
-            <div class="subs-menu-header">כתוביות וסנכרון בעברית</div>
+        <!-- Subtitles & Sync Control Panel Popover (#playerSubsMenu) — Always Accessible in BOTH Video & Embed Modes -->
+        <div id="playerSubsMenu" class="player-subs-menu hidden" dir="rtl" role="menu" aria-label="תפריט כתוביות וסנכרון בעברית בלבד">
+          <div class="subs-menu-header">הגדרות כתוביות וסנכרון (עברית בלבד)</div>
 
-            <div id="subsListContainer" class="subs-list-container"></div>
+          <div id="subsListContainer" class="subs-list-container"></div>
 
-            <div class="subs-control-section">
-              <div class="subs-control-label">סנכרון תזמון כתוביות</div>
-              <div class="subs-sync-row" dir="ltr">
-                <button type="button" id="subSyncMinusBtn" class="subs-chip-btn tv-focusable" dir="ltr" aria-label="הקדם כתוביות בחצי שנייה">-0.5s</button>
-                <button type="button" id="subSyncResetBtn" class="subs-chip-btn active tv-focusable" dir="ltr" aria-label="אפס סנכרון כתוביות">0.0s</button>
-                <button type="button" id="subSyncPlusBtn" class="subs-chip-btn tv-focusable" dir="ltr" aria-label="אחר כתוביות בחצי שנייה">+0.5s</button>
-              </div>
+          <div class="subs-control-section">
+            <div class="subs-control-label">סנכרון תזמון כתוביות</div>
+            <div class="subs-sync-row" dir="ltr">
+              <button type="button" id="subSyncMinusBtn" class="subs-chip-btn tv-focusable" dir="ltr" aria-label="הקדם כתוביות בחצי שנייה">-0.5s</button>
+              <button type="button" id="subSyncResetBtn" class="subs-chip-btn active tv-focusable" dir="ltr" aria-label="אפס סנכרון כתוביות">0.0s</button>
+              <button type="button" id="subSyncPlusBtn" class="subs-chip-btn tv-focusable" dir="ltr" aria-label="אחר כתוביות בחצי שנייה">+0.5s</button>
             </div>
+          </div>
 
-            <div class="subs-control-section">
-              <div class="subs-control-label">גודל גופן</div>
-              <div class="subs-options-row">
-                <button type="button" class="subs-chip-btn sub-size-btn tv-focusable" data-sub-size="normal" aria-label="גודל רגיל">רגיל</button>
-                <button type="button" class="subs-chip-btn sub-size-btn active tv-focusable" data-sub-size="large" aria-label="גודל גדול">גדול</button>
-                <button type="button" class="subs-chip-btn sub-size-btn tv-focusable" data-sub-size="xlarge" aria-label="גודל ענק">ענק</button>
-              </div>
+          <div class="subs-control-section">
+            <div class="subs-control-label">גודל גופן</div>
+            <div class="subs-options-row">
+              <button type="button" class="subs-chip-btn sub-size-btn tv-focusable" data-sub-size="normal" aria-label="גודל רגיל">רגיל</button>
+              <button type="button" class="subs-chip-btn sub-size-btn active tv-focusable" data-sub-size="large" aria-label="גודל גדול">גדול</button>
+              <button type="button" class="subs-chip-btn sub-size-btn tv-focusable" data-sub-size="xlarge" aria-label="גודל ענק">ענק</button>
             </div>
+          </div>
 
-            <div class="subs-control-section">
-              <div class="subs-control-label">צבע כתוביות</div>
-              <div class="subs-options-row">
-                <button type="button" class="subs-chip-btn sub-color-btn active tv-focusable" data-sub-color="white" aria-label="צבע לבן">לבן</button>
-                <button type="button" class="subs-chip-btn sub-color-btn tv-focusable" data-sub-color="yellow" aria-label="צבע צהוב">צהוב</button>
-              </div>
+          <div class="subs-control-section">
+            <div class="subs-control-label">צבע כתוביות</div>
+            <div class="subs-options-row">
+              <button type="button" class="subs-chip-btn sub-color-btn active tv-focusable" data-sub-color="white" aria-label="צבע לבן">לבן</button>
+              <button type="button" class="subs-chip-btn sub-color-btn tv-focusable" data-sub-color="yellow" aria-label="צבע צהוב">צהוב</button>
             </div>
+          </div>
 
-            <div class="subs-control-section">
-              <div class="subs-control-label">רקע כתוביות</div>
-              <div class="subs-options-row">
-                <button type="button" class="subs-chip-btn sub-bg-btn tv-focusable" data-sub-bg="none" aria-label="ללא רקע שקוף">ללא רקע (שקוף)</button>
-                <button type="button" class="subs-chip-btn sub-bg-btn active tv-focusable" data-sub-bg="dark" aria-label="רקע כהה">רקע כהה</button>
-              </div>
+          <div class="subs-control-section">
+            <div class="subs-control-label">רקע כתוביות</div>
+            <div class="subs-options-row">
+              <button type="button" class="subs-chip-btn sub-bg-btn tv-focusable" data-sub-bg="none" aria-label="ללא רקע שקוף">ללא רקע (שקוף)</button>
+              <button type="button" class="subs-chip-btn sub-bg-btn active tv-focusable" data-sub-bg="dark" aria-label="רקע כהה">רקע כהה</button>
             </div>
+          </div>
 
-            <div class="subs-control-section">
-              <div class="subs-control-label">מיקום כתוביות במסך (שליטה עם השלט)</div>
-              <div class="subs-options-row">
-                <button type="button" id="subPosDownBtn" class="subs-chip-btn tv-focusable" aria-label="הורד כתוביות למטה">למטה יותר</button>
-                <button type="button" id="subPosBottomMaxBtn" class="subs-chip-btn tv-focusable" aria-label="הצמד לתחתית המסך">צמוד לתחתית</button>
-                <button type="button" id="subPosResetBtn" class="subs-chip-btn active tv-focusable" aria-label="מיקום כתוביות נוכחי">5%</button>
-                <button type="button" id="subPosUpBtn" class="subs-chip-btn tv-focusable" aria-label="הרם כתוביות למעלה">למעלה יותר</button>
-              </div>
+          <div class="subs-control-section">
+            <div class="subs-control-label">מיקום כתוביות במסך (שליטה עם השלט)</div>
+            <div class="subs-options-row">
+              <button type="button" id="subPosDownBtn" class="subs-chip-btn tv-focusable" aria-label="הורד כתוביות למטה">למטה יותר</button>
+              <button type="button" id="subPosBottomMaxBtn" class="subs-chip-btn tv-focusable" aria-label="הצמד לתחתית המסך">צמוד לתחתית</button>
+              <button type="button" id="subPosResetBtn" class="subs-chip-btn active tv-focusable" aria-label="מיקום כתוביות נוכחי">5%</button>
+              <button type="button" id="subPosUpBtn" class="subs-chip-btn tv-focusable" aria-label="הרם כתוביות למעלה">למעלה יותר</button>
             </div>
           </div>
         </div>
@@ -906,13 +915,13 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Core Application & Smart TV Navigation Scripts -->
-  <script src="tv-navigation.js?v=9.4.4"></script>
-  <script src="app.js?v=9.4.4"></script>
+  <script src="tv-navigation.js?v=9.4.5"></script>
+  <script src="app.js?v=9.4.5"></script>
   <script>
     (function () {
       try {
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (otaVer && otaVer > '9.4.4') {
+        if (otaVer && otaVer > '9.4.5') {
           var navCode = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
           if (navCode.length > 500) {
             var s1 = document.createElement('script');

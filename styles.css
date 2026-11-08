@@ -2057,24 +2057,25 @@ body.tv-mode .poster-card:focus {
 
 .player-controls-overlay .player-top-bar,
 .player-controls-overlay .player-bottom-bar,
-.player-controls-overlay .subtitles-menu-panel {
+.player-controls-overlay .subtitles-menu-panel,
+.player-controls-overlay .player-subs-menu {
   pointer-events: auto;
 }
 
-/* When playing a Cloud Embed / YouTube iframe, let the embedded player's native bottom bar work unobstructed */
+/* When playing a Cloud Embed / YouTube iframe, let the embedded player's native bottom bar work unobstructed while keeping our Hebrew Subtitle Overlay & Top Subtitle Settings Button active */
 .player-modal.embed-mode-active .player-controls-overlay {
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.84) 0%, transparent 22%);
 }
 
-.player-modal.embed-mode-active .player-bottom-bar,
-.player-modal.embed-mode-active #customSubtitleOverlay {
+.player-modal.embed-mode-active .player-bottom-bar {
   display: none !important;
 }
 
 .player-controls-overlay.idle-hidden,
 .player-controls-overlay.idle-hidden .player-top-bar,
 .player-controls-overlay.idle-hidden .player-bottom-bar,
-.player-controls-overlay.idle-hidden .subtitles-menu-panel {
+.player-controls-overlay.idle-hidden .subtitles-menu-panel,
+.player-controls-overlay.idle-hidden .player-subs-menu {
   opacity: 0;
   pointer-events: none !important;
 }
@@ -2264,20 +2265,24 @@ body.tv-mode .poster-card:focus {
 /* Subtitles & Sync Control Panel Popover (#playerSubsMenu) */
 .player-subs-menu {
   position: absolute;
-  bottom: 112px;
-  right: 0;
-  width: 350px;
+  top: 86px;
+  left: 4vw;
+  width: 360px;
   max-width: 92vw;
-  background-color: var(--bg-surface);
-  border-radius: var(--radius-btn);
-  border: none;
+  max-height: calc(100vh - 110px);
+  overflow-y: auto;
+  background-color: rgba(14, 14, 18, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.92);
+  border-radius: 10px;
   padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 11px;
-  z-index: 35;
+  z-index: 300;
   direction: rtl;
   text-align: right;
+  pointer-events: auto;
 }
 
 .subs-menu-header {
@@ -2958,21 +2963,64 @@ body.auth-gate-locked #quickTestLoginBtn {
 
 .tg-recent-posts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+  gap: 12px;
 }
 
 .tg-post-card {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
+  gap: 8px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
   text-align: right;
   color: #ffffff;
   cursor: pointer;
+}
+
+.tg-post-poster-wrap {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+  background: #111;
+}
+
+.tg-post-poster-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.tg-post-play-pill {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  left: 8px;
+  background: rgba(229, 9, 20, 0.94);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 5px 8px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.tg-category-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  background: linear-gradient(90deg, rgba(34, 158, 217, 0.18) 0%, rgba(18, 18, 24, 0.95) 100%);
+  border: 1px solid rgba(34, 158, 217, 0.45);
+  border-radius: 8px;
 }
 
 .tg-post-card:hover,

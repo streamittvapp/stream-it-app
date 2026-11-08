@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.4.4';
+  var APP_VERSION = '9.4.5';
 
   // Default Zero-Account Public Telegram Channels (Free, No Personal Account or Phone Required)
   var DEFAULT_TELEGRAM_CHANNELS = [
@@ -1063,35 +1063,97 @@
       }
     }));
 
-    // Enrich discovered Telegram posts with TMDB or direct Telegram video stream
-    for (var d = 0; d < discoveredPosts.length; d++) {
-      var post = discoveredPosts[d];
-      if (post.videoUrl && post.videoUrl.indexOf('http') === 0) {
-        var directItem = normalizeItem({
-          id: post.id,
-          title: post.title,
-          original_title: '@' + post.channel,
-          type: 'movie',
-          source: 'telegram',
-          year: 2025,
-          rating: 8.6,
-          quality: 'TG DIRECT MP4',
-          genres: ['telegram', 'action'],
-          poster: post.photoUrl || (allMovies[d % Math.max(1, allMovies.length)] ? allMovies[d % allMovies.length].poster : ''),
-          backdrop: post.photoUrl || (allMovies[d % Math.max(1, allMovies.length)] ? allMovies[d % allMovies.length].backdrop : ''),
-          overview: '[@' + post.channel + '] ' + post.text,
-          stream_url: post.videoUrl
-        }, 'movie', 'telegram');
-        if (directItem) {
-          directItem.telegramChannel = '@' + post.channel;
-          directItem.directTelegramMp4 = post.videoUrl;
-          var exists = state.catalog.movies.some(function (x) { return x.id === directItem.id; });
-          if (!exists) {
-            state.catalog.movies.unshift(directItem);
+    // Enrich ALL discovered Telegram posts with TMDB Search (Movies & Series) + direct Telegram video streams
+    await Promise.all(discoveredPosts.slice(0, 18).map(async function (post, idx) {
+      try {
+        var matchedTmdbRaw = null;
+        var matchedType = 'movie';
+        var cleanQuery = String(post.title || '')
+          .replace(/[@#][a-zA-Z0-9_]+/g, '')
+          .replace(/\(\d{4}\)/g, '')
+          .replace(/[^\u0590-\u05FFa-zA-Z0-9\s:']/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .slice(0, 42);
+
+        if (post.imdbId) {
+          var fRes = await fetch(TMDB_BASE + '/find/' + encodeURIComponent(post.imdbId) + '?api_key=' + TMDB_API_KEY + '&external_source=imdb_id&language=he-IL');
+          if (fRes.ok) {
+            var fData = await fRes.json();
+            if (fData && fData.movie_results && fData.movie_results[0]) {
+              matchedTmdbRaw = fData.movie_results[0];
+              matchedType = 'movie';
+            } else if (fData && fData.tv_results && fData.tv_results[0]) {
+              matchedTmdbRaw = fData.tv_results[0];
+              matchedType = 'series';
+            }
           }
         }
-      }
-    }
+
+        if (!matchedTmdbRaw && cleanQuery.length >= 2) {
+          var sRes = await fetch(TMDB_BASE + '/search/multi?api_key=' + TMDB_API_KEY + '&language=he-IL&query=' + encodeURIComponent(cleanQuery));
+          if (sRes.ok) {
+            var sData = await sRes.json();
+            var hits = (sData && Array.isArray(sData.results)) ? sData.results : [];
+            for (var h = 0; h < hits.length; h++) {
+              if ((hits[h].media_type === 'movie' || hits[h].media_type === 'tv') && (hits[h].poster_path || hits[h].backdrop_path)) {
+                matchedTmdbRaw = hits[h];
+                matchedType = hits[h].media_type === 'tv' ? 'series' : 'movie';
+                break;
+              }
+            }
+          }
+        }
+
+        if (matchedTmdbRaw) {
+          var normMatched = normalizeItem(matchedTmdbRaw, matchedType, 'telegram');
+          if (normMatched) {
+            normMatched.telegramChannel = '@' + post.channel;
+            if (post.videoUrl && post.videoUrl.indexOf('http') === 0) {
+              normMatched.directTelegramMp4 = post.videoUrl;
+            }
+            normMatched.overview = '📱 [נמשך מערוץ הטלגרם @' + post.channel + '] ' + (normMatched.overview || post.text || '');
+            var targetArr = matchedType === 'series' ? state.catalog.series : state.catalog.movies;
+            var existing = targetArr.find(function (x) { return x.id === normMatched.id || (x.tmdbId && x.tmdbId === normMatched.tmdbId); });
+            if (existing) {
+              if (existing.genres.indexOf('telegram') === -1) existing.genres.push('telegram');
+              existing.telegramChannel = '@' + post.channel;
+              if (post.videoUrl) existing.directTelegramMp4 = post.videoUrl;
+            } else {
+              targetArr.unshift(normMatched);
+            }
+            return;
+          }
+        }
+
+        if (post.videoUrl && post.videoUrl.indexOf('http') === 0) {
+          var fallbackPoster = post.photoUrl || (allMovies[idx % Math.max(1, allMovies.length)] ? allMovies[idx % allMovies.length].poster : '');
+          var directItem = normalizeItem({
+            id: post.id,
+            title: post.title,
+            original_title: '@' + post.channel,
+            type: 'movie',
+            source: 'telegram',
+            year: 2025,
+            rating: 8.6,
+            quality: 'TG DIRECT MP4',
+            genres: ['telegram', 'action'],
+            poster: fallbackPoster,
+            backdrop: fallbackPoster,
+            overview: '📱 [נמשך מערוץ הטלגרם @' + post.channel + '] ' + post.text,
+            stream_url: post.videoUrl
+          }, 'movie', 'telegram');
+          if (directItem) {
+            directItem.telegramChannel = '@' + post.channel;
+            directItem.directTelegramMp4 = post.videoUrl;
+            var existsDirect = state.catalog.movies.some(function (x) { return x.id === directItem.id; });
+            if (!existsDirect) {
+              state.catalog.movies.unshift(directItem);
+            }
+          }
+        }
+      } catch (e) {}
+    }));
 
     state.telegramPosts = discoveredPosts.reverse();
     renderCatalogShelves();
@@ -1149,16 +1211,19 @@
     if (recentEl) {
       var tgItems = filterByGenre(state.catalog.movies || [], 'telegram')
         .concat(filterByGenre(state.catalog.series || [], 'telegram'))
-        .slice(0, 12);
+        .slice(0, 18);
       var postHtml = '';
       for (var p = 0; p < tgItems.length; p++) {
         var item = tgItems[p];
         var chTag = item.telegramChannel || ('@' + channels[p % Math.max(1, channels.length)].handle);
         postHtml +=
           '<button type="button" class="tg-post-card tv-focusable" data-tg-open-id="' + escapeHtml(item.id) + '">' +
-            '<span class="tg-post-badge">' + escapeHtml(chTag) + (item.directTelegramMp4 ? ' • DIRECT MP4' : ' • 1080p VOD') + '</span>' +
+            '<div class="tg-post-poster-wrap">' +
+              '<img class="tg-post-poster-img" src="' + escapeHtml(item.poster || item.backdrop || '') + '" alt="' + escapeHtml(item.title) + '" loading="lazy" />' +
+              '<span class="tg-post-play-pill">▶ צפה עכשיו</span>' +
+            '</div>' +
+            '<span class="tg-post-badge">' + escapeHtml(chTag) + ' • 1080p</span>' +
             '<span class="tg-post-title">' + escapeHtml(item.title) + '</span>' +
-            '<span class="tg-post-desc">' + escapeHtml(item.overview || '') + '</span>' +
           '</button>';
       }
       recentEl.innerHTML = postHtml;
@@ -2084,6 +2149,23 @@
       shelves.push({ title: 'סדרות נטפליקס, HBO, אפל TV+ ואמאזון', items: filterByGenre(allSeries, 'netflix').concat(filterByGenre(allSeries, 'hbo'), filterByGenre(allSeries, 'apple'), filterByGenre(allSeries, 'amazon')).slice(0, 20) });
       gridWallTitle = 'כל הסדרות במאגר העולמי (' + allSeries.length + ' סדרות בשורות ועמודות)';
       gridWallItems = allSeries;
+    } else if (cat === 'telegram') {
+      var tgMovies = filterByGenre(allMovies, 'telegram');
+      var tgSeries = filterByGenre(allSeries, 'telegram');
+      var tgAll = tgMovies.concat(tgSeries);
+      var chCount = getConnectedTelegramChannels().length;
+      actorShowcaseHtml =
+        '<div class="tg-category-banner">' +
+          '<div>' +
+            '<strong style="font-size:1.05rem;color:#fff;display:block;">טלגרם קולנוע VOD — סרטים וסדרות שנמשכו מערוצי הטלגרם (' + chCount + ' ערוצים מחוברים)</strong>' +
+            '<span style="font-size:0.84rem;color:#9ca3af;">לחץ על כל סרט או סדרה למטה לצפייה ישירה ב-1080p עם תרגום מובנה בעברית בלבד</span>' +
+          '</div>' +
+          '<button type="button" id="openTgModalFromBannerBtn" class="btn-primary tv-focusable" style="height:38px;padding:0 16px;font-size:0.85rem;">+ הוסף / נהל ערוצי טלגרם</button>' +
+        '</div>';
+      shelves.push({ title: 'סרטים שנמשכו מערוצי הטלגרם (' + tgMovies.length + ' סרטים)', items: tgMovies.slice(0, 24) });
+      shelves.push({ title: 'סדרות שנמשכו מערוצי הטלגרם (' + tgSeries.length + ' סדרות)', items: tgSeries.slice(0, 20) });
+      gridWallTitle = 'כל סרטי וסדרות הטלגרם (' + tgAll.length + ' כותרים זמינים לצפייה מיידית)';
+      gridWallItems = tgAll;
     } else if (cat === 'channels' || genre === 'channels') {
       shelves.push({ title: 'ערוצי ישראל בשידור חי (עידן+ HD)', items: allChannels.slice(0, 8) });
       shelves.push({ title: 'ערוצי חדשות וספורט מארצות הברית והעולם (US News & Sports 24/7)', items: allChannels.slice(8) });
@@ -2097,6 +2179,10 @@
       gridWallItems = wlItems;
     } else {
       // Home ('all')
+      var tgHomeItems = filterByGenre(allMovies, 'telegram').concat(filterByGenre(allSeries, 'telegram'));
+      if (tgHomeItems.length) {
+        shelves.push({ title: 'טלגרם קולנוע VOD — סרטים וסדרות שנמשכו מערוצי הטלגרם', items: tgHomeItems.slice(0, 22) });
+      }
       shelves.push({ title: 'המובילים בישראל היום', items: allMovies.slice(0, 18) });
       var netflixItems = filterByGenre(allMovies, 'netflix').concat(filterByGenre(allSeries, 'netflix'));
       if (netflixItems.length) shelves.push({ title: 'נטפליקס (Netflix Originals & Top)', items: netflixItems.slice(0, 20) });
@@ -2164,6 +2250,11 @@
 
     container.innerHTML = html;
     bindPosterCardEvents(container);
+
+    var openTgBannerBtn = document.getElementById('openTgModalFromBannerBtn');
+    if (openTgBannerBtn) {
+      openTgBannerBtn.addEventListener('click', openTelegramModal);
+    }
 
     var clearActorBtn = document.getElementById('clearActorFilterBtn');
     if (clearActorBtn) {
@@ -2997,13 +3088,28 @@
     var embedContainer = document.getElementById('embedPlayerContainer');
     var playerModal = document.getElementById('playerModal');
     var spinner = document.getElementById('playerLoadingSpinner');
+    var subOverlay = document.getElementById('customSubtitleOverlay');
     if (!embedContainer || !video || !item) return;
 
     state.playingMode = 'embed';
+    state.embedCurrentTime = Number(startOffsetSec) || 0;
+    state.embedPaused = false;
+    if (state.embedSubTimer) {
+      clearInterval(state.embedSubTimer);
+      state.embedSubTimer = null;
+    }
+    state.embedSubTimer = setInterval(function () {
+      if (state.playingMode === 'embed' && !state.embedPaused && state.embedCurrentTime > 0) {
+        state.embedCurrentTime += 0.25;
+        updateActiveSubtitleCue(state.embedCurrentTime);
+      }
+    }, 250);
+
     if (playerModal) playerModal.classList.add('embed-mode-active');
     video.pause();
     video.classList.add('hidden');
     embedContainer.classList.remove('hidden');
+    if (subOverlay) subOverlay.classList.remove('hidden');
 
     var tmdbId = String(item.tmdbId || '').replace(/\D/g, '') || '693134';
     var embedUrl = '';
@@ -3356,8 +3462,10 @@
       var iframe = document.getElementById('streamEmbedIframe');
       if (iframe && iframe.contentWindow) {
         try {
-          iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'seekTo', args: [85, true] }), '*');
-          iframe.contentWindow.postMessage({ api: 'seek', set: 85 }, '*');
+          iframe.contentWindow.postMessage({ action: 'seek', time: 85 }, '*');
+          state.embedCurrentTime = 85;
+          updateActiveSubtitleCue(85);
+          return;
         } catch (e) {}
       }
       playCleanEmbedStream(state.playingItem, state.activeSeason, state.activeEpisode, 85, state.activeSourceTab);
@@ -3380,6 +3488,16 @@
       }
       video.currentTime = next;
       updateActiveSubtitleCue(next);
+    } else if (state.playingMode === 'embed') {
+      var iframe = document.getElementById('streamEmbedIframe');
+      var nextEmbed = Math.max(0, (state.embedCurrentTime || 0) + deltaSeconds);
+      state.embedCurrentTime = nextEmbed;
+      updateActiveSubtitleCue(nextEmbed);
+      if (iframe && iframe.contentWindow) {
+        try {
+          iframe.contentWindow.postMessage({ action: 'seek', time: Math.floor(nextEmbed) }, '*');
+        } catch (e) {}
+      }
     }
   }
   window.seekVideoBy = seekVideoBy;
@@ -3396,6 +3514,12 @@
         updatePlayPauseIcon(true);
       }
     } else if (state.playingMode === 'embed') {
+      var iframe = document.getElementById('streamEmbedIframe');
+      if (iframe && iframe.contentWindow) {
+        try {
+          iframe.contentWindow.postMessage({ action: 'togglePlay' }, '*');
+        } catch (e) {}
+      }
       try {
         if (window.AndroidTvBridge && typeof window.AndroidTvBridge.tapCenterOfScreen === 'function') {
           window.AndroidTvBridge.tapCenterOfScreen();
@@ -3425,6 +3549,10 @@
   window.wakePlayerControls = wakePlayerControls;
 
   function stopCurrentMedia() {
+    if (state.embedSubTimer) {
+      clearInterval(state.embedSubTimer);
+      state.embedSubTimer = null;
+    }
     if (state.hlsInstance) {
       try { state.hlsInstance.destroy(); } catch (e) {}
       state.hlsInstance = null;
@@ -3982,31 +4110,36 @@
     window.addEventListener('message', function (ev) {
       try {
         var d = ev && ev.data;
-        if (d && (d.source === 'vidspark-player' || d.source === 'moviesapi-player') && typeof d.currentTime === 'number') {
-          if (state.playingMode === 'embed' && d.currentTime > 0) {
+        if (d && (d.source === 'vidspark-player' || d.source === 'moviesapi-player')) {
+          if (d.event === 'pause') state.embedPaused = true;
+          else if (d.event === 'play' || d.event === 'timeupdate' || d.event === 'seeked') state.embedPaused = false;
+          if (typeof d.currentTime === 'number' && state.playingMode === 'embed' && d.currentTime >= 0) {
+            state.embedCurrentTime = d.currentTime;
             updateActiveSubtitleCue(d.currentTime);
           }
         }
       } catch (e) {}
     });
 
-    // Subtitles Menu Button & Sync/Style/Background Controls
-    var subsBtn = document.getElementById('playerSubsBtn');
+    // Subtitles Menu Button (Top Bar + Bottom Bar) & Sync/Style/Background Controls
     var subsMenu = document.getElementById('playerSubsMenu');
-    if (subsBtn && subsMenu) {
-      subsBtn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        wakePlayerControls();
-        subsMenu.classList.toggle('hidden');
-        if (!subsMenu.classList.contains('hidden')) {
-          renderSubtitlesMenu();
-          var firstSubBtn = subsMenu.querySelector('button');
-          if (firstSubBtn && typeof window.streamItFocusElement === 'function') {
-            window.streamItFocusElement(firstSubBtn);
-          }
+    var toggleSubsMenuHandler = function (e) {
+      e.stopPropagation();
+      wakePlayerControls();
+      if (!subsMenu) return;
+      subsMenu.classList.toggle('hidden');
+      if (!subsMenu.classList.contains('hidden')) {
+        renderSubtitlesMenu();
+        var firstSubBtn = subsMenu.querySelector('button');
+        if (firstSubBtn && typeof window.streamItFocusElement === 'function') {
+          window.streamItFocusElement(firstSubBtn);
         }
-      });
-    }
+      }
+    };
+    var subsBtn = document.getElementById('playerSubsBtn');
+    var topSubsBtn = document.getElementById('playerTopSubsBtn');
+    if (subsBtn) subsBtn.addEventListener('click', toggleSubsMenuHandler);
+    if (topSubsBtn) topSubsBtn.addEventListener('click', toggleSubsMenuHandler);
 
     var syncMinus = document.getElementById('subSyncMinusBtn');
     var syncReset = document.getElementById('subSyncResetBtn');

@@ -1,9 +1,9 @@
 {
-  "version": "9.4.4",
-  "native_apk_version": "9.4.4",
+  "version": "9.4.5",
+  "native_apk_version": "9.4.5",
   "apk_download_url": "https://is.gd/streamittv_apk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-08T12:15:00Z",
-  "notes": "v9.4.4 — Zero-Account Public Telegram VOD Connector (#telegramModal + /api/telegram-channel) allowing free connection to any Telegram channel without a personal account or phone number."
+  "updated_at": "2026-11-08T13:35:00Z",
+  "notes": "v9.4.5 — Restored Hebrew-Only Subtitles & Settings Panel (#playerTopSubsBtn + #playerSubsMenu + #customSubtitleOverlay) in all player modes, added TMDB movie/series pulling from Telegram channels, and added dedicated טלגרם VOD navigation tab."
 }
