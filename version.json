@@ -1,9 +1,9 @@
 {
-  "version": "9.4.3",
-  "native_apk_version": "9.4.3",
+  "version": "9.4.4",
+  "native_apk_version": "9.4.4",
   "apk_download_url": "https://is.gd/streamittv_apk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-08T11:20:00Z",
-  "notes": "v9.4.3 — Fixed Please Disable Sandbox & removed all popups/ads, moved player sources into compact מקורות dropdown button, and verified TMDB IDs in Hebrew catalog."
+  "updated_at": "2026-11-08T12:15:00Z",
+  "notes": "v9.4.4 — Zero-Account Public Telegram VOD Connector (#telegramModal + /api/telegram-channel) allowing free connection to any Telegram channel without a personal account or phone number."
 }

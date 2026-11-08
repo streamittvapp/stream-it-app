@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&family=Rubik:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
-  <link rel="stylesheet" href="styles.css?v=9.4.3" />
+  <link rel="stylesheet" href="styles.css?v=9.4.4" />
   <script>
     (function () {
       try {
@@ -32,7 +32,7 @@
         }
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
         var otaCss = localStorage.getItem('streamit_ota_css_v9') || '';
-        if (otaVer && otaVer > '9.4.3' && otaCss.length > 500) {
+        if (otaVer && otaVer > '9.4.4' && otaCss.length > 500) {
           var st = document.createElement('style');
           st.id = 'streamit-ota-live-style-v9';
           st.textContent = otaCss;
@@ -65,6 +65,14 @@
       </div>
 
       <div class="header-left">
+        <button type="button" id="openTelegramHubBtn" class="header-icon-btn header-tg-btn tv-focusable" aria-label="חיבור וניהול ערוצי טלגרם VOD">
+          <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+            <path d="M22 2L11 13" />
+            <path d="M22 2L15 22l-4-9-9-4 20-7z" />
+          </svg>
+          <span class="header-btn-text">טלגרם VOD</span>
+        </button>
+
         <button type="button" id="openSearchBtn" class="header-icon-btn tv-focusable" aria-label="חיפוש קטלוג">
           <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
             <circle cx="11" cy="11" r="7" />
@@ -147,6 +155,14 @@
     </div>
 
     <div class="tv-rail-footer">
+      <button type="button" id="tvTelegramRailBtn" class="tv-rail-btn tv-focusable" aria-label="ערוצי טלגרם VOD">
+        <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+          <path d="M22 2L11 13" />
+          <path d="M22 2L15 22l-4-9-9-4 20-7z" />
+        </svg>
+        <span class="tv-rail-label">טלגרם</span>
+      </button>
+
       <button type="button" id="tvAccountRailBtn" class="tv-rail-btn tv-focusable" aria-label="מי צופה עכשיו וחשבון">
         <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -800,10 +816,67 @@
           <span class="auth-logged-label">מחובר כעת בתור:</span>
           <strong id="authUserDisplay" class="auth-user-display" dir="ltr"></strong>
         </div>
+        <button type="button" id="openTelegramFromAuthBtn" class="btn-secondary auth-tg-manage-btn tv-focusable" aria-label="חיבור וניהול ערוצי טלגרם VOD">
+          <span>חיבור וניהול ערוצי טלגרם VOD (חינמי)</span>
+        </button>
         <button type="button" id="logoutBtn" class="btn-secondary auth-logout-btn tv-focusable" aria-label="התנתק מהחשבון">
           <span>התנתק מהחשבון</span>
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- ZERO-ACCOUNT PUBLIC TELEGRAM VOD CONNECTOR MODAL (#telegramModal)     -->
+  <!-- ===================================================================== -->
+  <div id="telegramModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="telegramModalHeading">
+    <div class="auth-modal-card tg-modal-card">
+      <div class="auth-card-header">
+        <div>
+          <h2 id="telegramModalHeading" class="auth-heading">טלגרם קולנוע VOD — חיבור ערוצים חינמי</h2>
+          <p class="tg-modal-sub">ללא חשבון אישי וללא מספר טלפון • שאיבה אוטומטית של סרטים, סדרות ווידאו מערוצי טלגרם ציבוריים</p>
+        </div>
+        <button type="button" id="closeTelegramModalBtn" class="modal-close-btn tv-focusable" aria-label="סגור חלון טלגרם">
+          <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="tg-add-channel-bar">
+        <input
+          type="text"
+          id="tgChannelInput"
+          class="form-input tg-channel-input tv-focusable"
+          dir="ltr"
+          placeholder="@channel_name או https://t.me/BoxOffice..."
+          aria-label="שם ערוץ טלגרם או קישור לערוץ"
+          autocomplete="off"
+        />
+        <button type="button" id="tgAddChannelBtn" class="btn-primary tg-add-btn tv-focusable" aria-label="חבר ערוץ טלגרם">
+          <span>+ חבר ערוץ</span>
+        </button>
+        <button type="button" id="tgSyncAllBtn" class="btn-secondary tg-sync-btn tv-focusable" aria-label="סנכרן את כל הערוצים">
+          <span>סנכרן הכל</span>
+        </button>
+      </div>
+
+      <div id="tgSyncStatusMsg" class="tg-sync-status" aria-live="polite"></div>
+
+      <div class="tg-section-header">
+        <h3 class="sub-users-heading">ערוצי טלגרם מחוברים כעת:</h3>
+        <button type="button" id="tgFilterCatalogBtn" class="btn-secondary tg-filter-cat-btn tv-focusable" aria-label="הצג את כל תכני הטלגרם בקטלוג">
+          <span>הצג בקטלוג הראשי</span>
+        </button>
+      </div>
+
+      <div id="tgConnectedChannelsList" class="tg-channels-grid"></div>
+
+      <div class="tg-section-header">
+        <h3 class="sub-users-heading">תכנים אחרונים שנשאבו מערוצי הטלגרם:</h3>
+      </div>
+
+      <div id="tgRecentPostsGrid" class="tg-recent-posts-grid"></div>
     </div>
   </div>
 
@@ -833,13 +906,13 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Core Application & Smart TV Navigation Scripts -->
-  <script src="tv-navigation.js?v=9.4.3"></script>
-  <script src="app.js?v=9.4.3"></script>
+  <script src="tv-navigation.js?v=9.4.4"></script>
+  <script src="app.js?v=9.4.4"></script>
   <script>
     (function () {
       try {
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (otaVer && otaVer > '9.4.3') {
+        if (otaVer && otaVer > '9.4.4') {
           var navCode = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
           if (navCode.length > 500) {
             var s1 = document.createElement('script');

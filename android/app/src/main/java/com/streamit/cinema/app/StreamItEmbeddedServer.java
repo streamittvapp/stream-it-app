@@ -130,7 +130,7 @@ public class StreamItEmbeddedServer {
             Map<String, String> params = parseQuery(query);
 
             if ("/api/health".equals(path)) {
-                byte[] body = "{\"ok\":true,\"mode\":\"android_embedded_server\",\"version\":\"9.4.3\",\"ota_ver_url\":\"https://is.gd/streamittv_ver\",\"ota_apk_url\":\"https://is.gd/streamittv_apk\"}"
+                byte[] body = "{\"ok\":true,\"mode\":\"android_embedded_server\",\"version\":\"9.4.4\",\"ota_ver_url\":\"https://is.gd/streamittv_ver\",\"ota_apk_url\":\"https://is.gd/streamittv_apk\"}"
                         .getBytes(StandardCharsets.UTF_8);
                 sendResponse(out, 200, "application/json; charset=utf-8", body);
             } else if ("/api/ota".equals(path)) {
@@ -139,6 +139,8 @@ public class StreamItEmbeddedServer {
                 handleDirectStream(out, params);
             } else if ("/api/hls-proxy".equals(path)) {
                 handleHlsProxy(out, params);
+            } else if ("/api/telegram-channel".equals(path)) {
+                handleTelegramChannelProxy(out, params);
             } else {
                 byte[] body = "{\"ok\":false,\"error\":\"Not found\"}".getBytes(StandardCharsets.UTF_8);
                 sendResponse(out, 404, "application/json; charset=utf-8", body);
@@ -467,6 +469,35 @@ public class StreamItEmbeddedServer {
             }
 
             sendResponse(out, 200, "video/mp2t", rawBytes);
+        } catch (Exception e) {
+            byte[] err = ("{\"ok\":false,\"error\":\"" + e.getMessage() + "\"}").getBytes(StandardCharsets.UTF_8);
+            sendResponse(out, 502, "application/json; charset=utf-8", err);
+        }
+    }
+
+    private void handleTelegramChannelProxy(OutputStream out, Map<String, String> params) throws Exception {
+        try {
+            String rawCh = params.get("channel");
+            if (rawCh == null || rawCh.trim().isEmpty()) {
+                byte[] err = "{\"ok\":false,\"error\":\"Missing channel\"}".getBytes(StandardCharsets.UTF_8);
+                sendResponse(out, 400, "application/json; charset=utf-8", err);
+                return;
+            }
+            String cleanCh = rawCh.trim()
+                    .replaceAll("^https?://(www\\.)?(t\\.me|telegram\\.me)/(s/)?", "")
+                    .replaceAll("^@", "")
+                    .replaceAll("[^a-zA-Z0-9_]", "");
+            if (cleanCh.isEmpty()) {
+                byte[] err = "{\"ok\":false,\"error\":\"Invalid channel\"}".getBytes(StandardCharsets.UTF_8);
+                sendResponse(out, 400, "application/json; charset=utf-8", err);
+                return;
+            }
+            String tgUrl = "https://t.me/s/" + cleanCh;
+            Map<String, String> headers = new HashMap<>();
+            headers.put("User-Agent", USER_AGENT);
+            headers.put("Accept-Language", "he-IL,he;q=0.9,en-US;q=0.8,en;q=0.7");
+            byte[] htmlBytes = httpGetBytes(tgUrl, headers, 10000);
+            sendResponse(out, 200, "text/html; charset=utf-8", htmlBytes);
         } catch (Exception e) {
             byte[] err = ("{\"ok\":false,\"error\":\"" + e.getMessage() + "\"}").getBytes(StandardCharsets.UTF_8);
             sendResponse(out, 502, "application/json; charset=utf-8", err);

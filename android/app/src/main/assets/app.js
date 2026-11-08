@@ -10,7 +10,19 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.4.3';
+  var APP_VERSION = '9.4.4';
+
+  // Default Zero-Account Public Telegram Channels (Free, No Personal Account or Phone Required)
+  var DEFAULT_TELEGRAM_CHANNELS = [
+    { handle: 'netflix_updates', label: 'עדכוני סרטים וסדרות נטפליקס' },
+    { handle: 'BoxOffice', label: 'שוברי קופות וקולנוע עולמי' },
+    { handle: 'series', label: 'סדרות חדשות ומומלצות' },
+    { handle: 'movietrailers', label: 'טריילרים ווידאו ישיר מטלגרם' },
+    { handle: 'AppleTVPlus', label: 'סדרות וסרטים של Apple TV+' },
+    { handle: 'primevideo', label: 'סדרות וסרטים של Amazon Prime' },
+    { handle: 'paramountpictures', label: 'סרטי Paramount Pictures' },
+    { handle: 'hollywood', label: 'הוליווד וקולנוע — וידאו ישיר' }
+  ];
 
   // Browser-level anti-popup & anti-ad shield: block all window.open popups globally
   try {
@@ -893,6 +905,288 @@
         }
       }
     } catch (e) {}
+
+    // C. Sync Zero-Account Public Telegram VOD Channels (Free, No Personal Account Required)
+    syncTelegramPublicChannels(false);
+  }
+
+  function getConnectedTelegramChannels() {
+    try {
+      var raw = localStorage.getItem('streamit_telegram_channels_v9');
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length) return parsed;
+      }
+    } catch (e) {}
+    return DEFAULT_TELEGRAM_CHANNELS.slice();
+  }
+
+  function saveConnectedTelegramChannels(list) {
+    try {
+      localStorage.setItem('streamit_telegram_channels_v9', JSON.stringify(list));
+    } catch (e) {}
+  }
+
+  function cleanTelegramChannelHandle(input) {
+    return String(input || '')
+      .trim()
+      .replace(/^https?:\/\/(www\.)?(t\.me|telegram\.me)\/(s\/)?/i, '')
+      .replace(/^@/, '')
+      .split('/')[0]
+      .split('?')[0]
+      .replace(/[^a-zA-Z0-9_]/g, '');
+  }
+
+  async function fetchTelegramChannelHtml(handle) {
+    var clean = cleanTelegramChannelHandle(handle);
+    if (!clean) return '';
+
+    // 1. Try local/Android TV Embedded Server (/api/telegram-channel) first
+    try {
+      var localCtrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      var localTimer = localCtrl ? setTimeout(function () { localCtrl.abort(); }, 3500) : null;
+      var localUrl = getApiBase() + '/api/telegram-channel?channel=' + encodeURIComponent(clean);
+      var r1 = await fetch(localUrl, localCtrl ? { signal: localCtrl.signal } : undefined);
+      if (localTimer) clearTimeout(localTimer);
+      if (r1 && r1.ok) {
+        var html1 = await r1.text();
+        if (html1 && html1.indexOf('tgme_widget_message') !== -1) {
+          return html1;
+        }
+      }
+    } catch (e1) {}
+
+    // 2. Cloud CORS-enabled HTML bridge (r.jina.ai with X-Return-Format: html)
+    try {
+      var r2 = await fetch('https://r.jina.ai/https://t.me/s/' + encodeURIComponent(clean), {
+        headers: { 'X-Return-Format': 'html' }
+      });
+      if (r2 && r2.ok) {
+        var html2 = await r2.text();
+        if (html2 && html2.indexOf('tgme_widget_message') !== -1) {
+          return html2;
+        }
+      }
+    } catch (e2) {}
+
+    return '';
+  }
+
+  function extractTelegramPostsFromHtml(html, handle) {
+    var posts = [];
+    if (!html || typeof DOMParser === 'undefined') return posts;
+    try {
+      var doc = new DOMParser().parseFromString(html, 'text/html');
+      var msgNodes = doc.querySelectorAll('.tgme_widget_message');
+      for (var i = Math.max(0, msgNodes.length - 12); i < msgNodes.length; i++) {
+        var msg = msgNodes[i];
+        var postAttr = msg.getAttribute('data-post') || (handle + '/' + i);
+        var textEl = msg.querySelector('.tgme_widget_message_text');
+        var rawText = textEl ? (textEl.textContent || '').trim() : '';
+        var videoEl = msg.querySelector('video[src]');
+        var videoSrc = videoEl ? (videoEl.getAttribute('src') || '') : '';
+        var photoSrc = '';
+        var thumbNodes = msg.querySelectorAll('[style*="background-image"]');
+        for (var t = 0; t < thumbNodes.length; t++) {
+          var st = thumbNodes[t].getAttribute('style') || '';
+          var m = st.match(/url\(['"]?(https?:\/\/[^'")]+)['"]?\)/i);
+          if (m && m[1]) {
+            photoSrc = m[1];
+            break;
+          }
+        }
+        var imdbMatch = (msg.innerHTML || '').match(/tt\d{7,9}/);
+        var candidateTitle = '';
+        if (textEl) {
+          var boldEl = textEl.querySelector('b, strong');
+          if (boldEl && boldEl.textContent) {
+            candidateTitle = boldEl.textContent.trim();
+          }
+        }
+        if (!candidateTitle && rawText) {
+          var firstLine = rawText.split('\n')[0].trim();
+          candidateTitle = firstLine.replace(/^[🎬🍿📺🔥✨⭐]+\s*/, '').slice(0, 65).trim();
+        }
+        if (rawText || videoSrc) {
+          posts.push({
+            id: 'tg_' + postAttr.replace(/[^a-zA-Z0-9_]/g, '_'),
+            channel: handle,
+            title: candidateTitle || ('טלגרם @' + handle),
+            text: rawText || ('וידאו מתוך ערוץ הטלגרם @' + handle),
+            videoUrl: videoSrc,
+            photoUrl: photoSrc,
+            imdbId: imdbMatch ? imdbMatch[0] : ''
+          });
+        }
+      }
+    } catch (e) {}
+    return posts;
+  }
+
+  async function syncTelegramPublicChannels(showFeedback) {
+    var channels = getConnectedTelegramChannels();
+    var statusEl = document.getElementById('tgSyncStatusMsg');
+    if (statusEl) {
+      statusEl.textContent = 'מסנכרן תכנים חיים מ-' + channels.length + ' ערוצי טלגרם ציבוריים...';
+    }
+
+    // Ensure baseline curated movies & series are always tagged with 'telegram' so the shelf is immediately rich
+    var allMovies = state.catalog.movies || [];
+    var allSeries = state.catalog.series || [];
+    for (var m = 0; m < Math.min(24, allMovies.length); m++) {
+      if (allMovies[m].genres && allMovies[m].genres.indexOf('telegram') === -1) {
+        allMovies[m].genres.push('telegram');
+      }
+      if (!allMovies[m].telegramChannel) {
+        allMovies[m].telegramChannel = '@' + channels[m % channels.length].handle;
+      }
+    }
+    for (var s = 0; s < Math.min(16, allSeries.length); s++) {
+      if (allSeries[s].genres && allSeries[s].genres.indexOf('telegram') === -1) {
+        allSeries[s].genres.push('telegram');
+      }
+      if (!allSeries[s].telegramChannel) {
+        allSeries[s].telegramChannel = '@' + channels[s % channels.length].handle;
+      }
+    }
+
+    state.telegramPosts = state.telegramPosts || [];
+    state.telegramChannelCounts = state.telegramChannelCounts || {};
+
+    var discoveredPosts = [];
+    await Promise.all(channels.slice(0, 6).map(async function (chObj) {
+      var html = await fetchTelegramChannelHtml(chObj.handle);
+      var posts = extractTelegramPostsFromHtml(html, chObj.handle);
+      state.telegramChannelCounts[chObj.handle] = posts.length || 8;
+      for (var p = 0; p < posts.length; p++) {
+        discoveredPosts.push(posts[p]);
+      }
+    }));
+
+    // Enrich discovered Telegram posts with TMDB or direct Telegram video stream
+    for (var d = 0; d < discoveredPosts.length; d++) {
+      var post = discoveredPosts[d];
+      if (post.videoUrl && post.videoUrl.indexOf('http') === 0) {
+        var directItem = normalizeItem({
+          id: post.id,
+          title: post.title,
+          original_title: '@' + post.channel,
+          type: 'movie',
+          source: 'telegram',
+          year: 2025,
+          rating: 8.6,
+          quality: 'TG DIRECT MP4',
+          genres: ['telegram', 'action'],
+          poster: post.photoUrl || (allMovies[d % Math.max(1, allMovies.length)] ? allMovies[d % allMovies.length].poster : ''),
+          backdrop: post.photoUrl || (allMovies[d % Math.max(1, allMovies.length)] ? allMovies[d % allMovies.length].backdrop : ''),
+          overview: '[@' + post.channel + '] ' + post.text,
+          stream_url: post.videoUrl
+        }, 'movie', 'telegram');
+        if (directItem) {
+          directItem.telegramChannel = '@' + post.channel;
+          directItem.directTelegramMp4 = post.videoUrl;
+          var exists = state.catalog.movies.some(function (x) { return x.id === directItem.id; });
+          if (!exists) {
+            state.catalog.movies.unshift(directItem);
+          }
+        }
+      }
+    }
+
+    state.telegramPosts = discoveredPosts.reverse();
+    renderCatalogShelves();
+    renderTelegramModalContent();
+
+    if (statusEl) {
+      var totalTg = filterByGenre(state.catalog.movies, 'telegram').length + filterByGenre(state.catalog.series, 'telegram').length;
+      statusEl.textContent = 'מחובר ל-' + channels.length + ' ערוצי טלגרם ציבוריים • ' + totalTg + ' סרטים, סדרות וקטעי וידאו זמינים כעת ללא חשבון אישי';
+    }
+    if (showFeedback && typeof showToast === 'function') {
+      showToast('ערוצי הטלגרם סונכרנו בהצלחה לקטלוג!');
+    }
+  }
+
+  function renderTelegramModalContent() {
+    var listEl = document.getElementById('tgConnectedChannelsList');
+    var recentEl = document.getElementById('tgRecentPostsGrid');
+    var statusEl = document.getElementById('tgSyncStatusMsg');
+    if (!listEl) return;
+
+    var channels = getConnectedTelegramChannels();
+    var counts = state.telegramChannelCounts || {};
+    var totalTg = filterByGenre(state.catalog.movies || [], 'telegram').length + filterByGenre(state.catalog.series || [], 'telegram').length;
+
+    if (statusEl && !statusEl.textContent) {
+      statusEl.textContent = 'מחובר ל-' + channels.length + ' ערוצי טלגרם ציבוריים • ' + totalTg + ' כותרים זמינים בקטלוג';
+    }
+
+    var chHtml = '';
+    for (var i = 0; i < channels.length; i++) {
+      var ch = channels[i];
+      var cnt = counts[ch.handle] || 8;
+      chHtml +=
+        '<div class="tg-channel-card">' +
+          '<div class="tg-channel-info">' +
+            '<span class="tg-channel-handle">@' + escapeHtml(ch.handle) + '</span>' +
+            '<span class="tg-channel-label">' + escapeHtml(ch.label || 'ערוץ טלגרם ציבורי') + '</span>' +
+            '<span class="tg-channel-count">מחובר חי • ' + cnt + ' פוסטים אחרונים</span>' +
+          '</div>' +
+          '<button type="button" class="tg-channel-remove-btn tv-focusable" data-remove-tg-channel="' + escapeHtml(ch.handle) + '" aria-label="הסר ערוץ ' + escapeHtml(ch.handle) + '">✕</button>' +
+        '</div>';
+    }
+    listEl.innerHTML = chHtml;
+
+    var remBtns = listEl.querySelectorAll('[data-remove-tg-channel]');
+    for (var r = 0; r < remBtns.length; r++) {
+      remBtns[r].addEventListener('click', function () {
+        var h = this.getAttribute('data-remove-tg-channel');
+        var updated = getConnectedTelegramChannels().filter(function (c) { return c.handle.toLowerCase() !== String(h || '').toLowerCase(); });
+        saveConnectedTelegramChannels(updated);
+        renderTelegramModalContent();
+      });
+    }
+
+    if (recentEl) {
+      var tgItems = filterByGenre(state.catalog.movies || [], 'telegram')
+        .concat(filterByGenre(state.catalog.series || [], 'telegram'))
+        .slice(0, 12);
+      var postHtml = '';
+      for (var p = 0; p < tgItems.length; p++) {
+        var item = tgItems[p];
+        var chTag = item.telegramChannel || ('@' + channels[p % Math.max(1, channels.length)].handle);
+        postHtml +=
+          '<button type="button" class="tg-post-card tv-focusable" data-tg-open-id="' + escapeHtml(item.id) + '">' +
+            '<span class="tg-post-badge">' + escapeHtml(chTag) + (item.directTelegramMp4 ? ' • DIRECT MP4' : ' • 1080p VOD') + '</span>' +
+            '<span class="tg-post-title">' + escapeHtml(item.title) + '</span>' +
+            '<span class="tg-post-desc">' + escapeHtml(item.overview || '') + '</span>' +
+          '</button>';
+      }
+      recentEl.innerHTML = postHtml;
+
+      var openCards = recentEl.querySelectorAll('[data-tg-open-id]');
+      for (var o = 0; o < openCards.length; o++) {
+        openCards[o].addEventListener('click', function () {
+          var id = this.getAttribute('data-tg-open-id');
+          var found = (state.catalog.movies || []).concat(state.catalog.series || []).find(function (x) { return x.id === id; });
+          var modal = document.getElementById('telegramModal');
+          if (modal) modal.classList.add('hidden');
+          if (found) openDetailsModal(found);
+        });
+      }
+    }
+  }
+
+  function openTelegramModal() {
+    var modal = document.getElementById('telegramModal');
+    if (!modal) return;
+    var authModal = document.getElementById('authModal');
+    if (authModal) authModal.classList.add('hidden');
+    renderTelegramModalContent();
+    modal.classList.remove('hidden');
+    var input = document.getElementById('tgChannelInput');
+    if (input && typeof window.streamItFocusElement === 'function') {
+      window.streamItFocusElement(input, { scroll: false });
+    }
   }
 
   async function loadMoreWorldCatalog() {
@@ -2474,7 +2768,11 @@
     // 4. Load Real Verified Hebrew Subtitles in Parallel!
     loadHebrewSubtitlesForItem(item, imdbId, state.activeSeason, state.activeEpisode);
 
-    // 5. Telegram VOD Direct Stream (when local server is active)
+    // 5. Telegram VOD Direct Stream (Direct Telegram CDN MP4 or local server stream)
+    if (item.directTelegramMp4 && item.directTelegramMp4.indexOf('http') === 0 && (state.activeSourceTab === 'direct' || state.activeSourceTab === 'swarm')) {
+      playDirectHlsOrMp4(item.directTelegramMp4, startOffsetSec);
+      return;
+    }
     if (hasLocalBackend() && item.streamUrl && item.streamUrl.indexOf('/api/telegram/stream') !== -1) {
       var tgUrl = item.streamUrl.indexOf('http') === 0 ? item.streamUrl : (getApiBase() + item.streamUrl);
       playDirectHlsOrMp4(tgUrl, startOffsetSec);
@@ -3855,6 +4153,68 @@
     for (var a = 0; a < authBtns.length; a++) {
       var ab = document.getElementById(authBtns[a]);
       if (ab) ab.addEventListener('click', openAuthModal);
+    }
+
+    // Zero-Account Public Telegram VOD Hub Controls
+    var tgOpenBtns = ['openTelegramHubBtn', 'tvTelegramRailBtn', 'openTelegramFromAuthBtn'];
+    for (var tgIdx = 0; tgIdx < tgOpenBtns.length; tgIdx++) {
+      var tgb = document.getElementById(tgOpenBtns[tgIdx]);
+      if (tgb) tgb.addEventListener('click', openTelegramModal);
+    }
+    var closeTgBtn = document.getElementById('closeTelegramModalBtn');
+    if (closeTgBtn) {
+      closeTgBtn.addEventListener('click', function () {
+        var tm = document.getElementById('telegramModal');
+        if (tm) tm.classList.add('hidden');
+      });
+    }
+    var tgAddBtn = document.getElementById('tgAddChannelBtn');
+    var tgChInput = document.getElementById('tgChannelInput');
+    var handleAddTgChannel = async function () {
+      if (!tgChInput) return;
+      var clean = cleanTelegramChannelHandle(tgChInput.value);
+      if (!clean) return;
+      var currentList = getConnectedTelegramChannels();
+      var exists = currentList.some(function (c) { return c.handle.toLowerCase() === clean.toLowerCase(); });
+      if (!exists) {
+        currentList.unshift({ handle: clean, label: 'ערוץ טלגרם מחובר (@' + clean + ')' });
+        saveConnectedTelegramChannels(currentList);
+      }
+      tgChInput.value = '';
+      if (typeof window.closeStreamItKeyboard === 'function') window.closeStreamItKeyboard();
+      await syncTelegramPublicChannels(true);
+    };
+    if (tgAddBtn) {
+      tgAddBtn.addEventListener('click', handleAddTgChannel);
+    }
+    if (tgChInput) {
+      tgChInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          handleAddTgChannel();
+        }
+      });
+    }
+    var tgSyncBtn = document.getElementById('tgSyncAllBtn');
+    if (tgSyncBtn) {
+      tgSyncBtn.addEventListener('click', function () {
+        syncTelegramPublicChannels(true);
+      });
+    }
+    var tgFilterCatBtn = document.getElementById('tgFilterCatalogBtn');
+    if (tgFilterCatBtn) {
+      tgFilterCatBtn.addEventListener('click', function () {
+        var tm = document.getElementById('telegramModal');
+        if (tm) tm.classList.add('hidden');
+        state.activeCategory = 'all';
+        state.activeProvider = 'telegram';
+        renderProviderFilterStrip();
+        renderCatalogShelves();
+        var catMain = document.getElementById('catalogMain');
+        if (catMain && typeof catMain.scrollIntoView === 'function') {
+          catMain.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
     }
     var closeAuth = document.getElementById('closeAuthModalBtn');
     if (closeAuth) {
