@@ -72,7 +72,13 @@
     if (auth && !auth.classList.contains('hidden')) return auth;
 
     var details = document.getElementById('detailsModal');
-    if (details && !details.classList.contains('hidden')) return details;
+    if (details && !details.classList.contains('hidden')) {
+      var detailsSourcesPanel = document.getElementById('detailsStreamsDropdownPanel');
+      if (detailsSourcesPanel && !detailsSourcesPanel.classList.contains('hidden')) {
+        return detailsSourcesPanel;
+      }
+      return details;
+    }
 
     var search = document.getElementById('searchModal');
     if (search && !search.classList.contains('hidden')) return search;
@@ -880,6 +886,17 @@
 
     var details = document.getElementById('detailsModal');
     if (details && !details.classList.contains('hidden')) {
+      var detailsSourcesPanel = document.getElementById('detailsStreamsDropdownPanel');
+      if (detailsSourcesPanel && !detailsSourcesPanel.classList.contains('hidden')) {
+        if (typeof window.closeDetailsSourcesDropdown === 'function') {
+          window.closeDetailsSourcesDropdown();
+        } else {
+          detailsSourcesPanel.classList.add('hidden');
+        }
+        var srcBtn = document.getElementById('detailsSourcesDropdownBtn');
+        if (srcBtn && isElementVisible(srcBtn)) setFocus(srcBtn);
+        return true;
+      }
       details.classList.add('hidden');
       if (lastMainFocus && isElementVisible(lastMainFocus)) setFocus(lastMainFocus);
       return true;

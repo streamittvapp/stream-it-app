@@ -2005,9 +2005,18 @@
       wlBtn.innerHTML = (inWl ? getSvgIcon('check') : getSvgIcon('plus')) + '<span>' + (inWl ? 'ברשימה שלי' : 'הרשימה שלי') + '</span>';
     }
 
+    closeDetailsSourcesDropdown();
+
+    var secHeading = document.getElementById('detailsSectionHeading');
+    var seasonSel = document.getElementById('seasonSelector');
+    var epGrid = document.getElementById('episodesGrid');
+
     if (epSection) {
+      epSection.classList.remove('hidden');
       if (item.type === 'series') {
-        epSection.classList.remove('hidden');
+        if (secHeading) secHeading.textContent = 'עונות ופרקים';
+        if (seasonSel) seasonSel.classList.remove('hidden');
+        if (epGrid) epGrid.classList.remove('hidden');
         renderSeasonSelector(item);
         loadSeriesSeasonEpisodes(item, 1);
         // Fetch live exact number of seasons & episodes from TMDB / Cinemeta so every series shows ALL its real seasons!
@@ -2026,7 +2035,13 @@
           }
         });
       } else {
-        epSection.classList.add('hidden');
+        if (secHeading) {
+          secHeading.textContent = item.type === 'channel'
+            ? 'שידור חי ישיר'
+            : (item.type === 'youtube' ? 'הזרמת וידאו מיוטיוב' : 'צפייה ישירה בסרט');
+        }
+        if (seasonSel) seasonSel.classList.add('hidden');
+        if (epGrid) epGrid.classList.add('hidden');
       }
     }
 
@@ -2038,6 +2053,17 @@
       window.streamItFocusElement(playBtn);
     }
   }
+
+  function closeDetailsSourcesDropdown() {
+    var btn = document.getElementById('detailsSourcesDropdownBtn');
+    var panel = document.getElementById('detailsStreamsDropdownPanel');
+    if (panel) panel.classList.add('hidden');
+    if (btn) {
+      btn.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  }
+  window.closeDetailsSourcesDropdown = closeDetailsSourcesDropdown;
 
   async function populateDetailsStreamsList(item, season, episode) {
     var listEl = document.getElementById('detailsStreamsList');
@@ -2071,6 +2097,7 @@
           if (u && u.indexOf('/api/telegram/stream') !== -1) {
             state.detailsItem.streamUrl = getApiBase() + u;
           }
+          closeDetailsSourcesDropdown();
           startPlayback(state.detailsItem, state.activeSeason, state.activeEpisode, 0, m);
         });
       }
@@ -3528,8 +3555,37 @@
     var closeDetails = document.getElementById('closeDetailsBtn');
     if (closeDetails) {
       closeDetails.addEventListener('click', function () {
+        closeDetailsSourcesDropdown();
         var dm = document.getElementById('detailsModal');
         if (dm) dm.classList.add('hidden');
+      });
+    }
+    var detailsSourcesBtn = document.getElementById('detailsSourcesDropdownBtn');
+    var detailsSourcesPanel = document.getElementById('detailsStreamsDropdownPanel');
+    if (detailsSourcesBtn && detailsSourcesPanel) {
+      detailsSourcesBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var isOpen = !detailsSourcesPanel.classList.contains('hidden');
+        if (isOpen) {
+          closeDetailsSourcesDropdown();
+        } else {
+          detailsSourcesPanel.classList.remove('hidden');
+          detailsSourcesBtn.classList.add('open');
+          detailsSourcesBtn.setAttribute('aria-expanded', 'true');
+          var firstSourceCard = detailsSourcesPanel.querySelector('.stream-source-card');
+          if (firstSourceCard && typeof window.streamItFocusElement === 'function') {
+            window.streamItFocusElement(firstSourceCard, { scroll: false });
+          }
+        }
+      });
+    }
+    var detailsModalEl = document.getElementById('detailsModal');
+    if (detailsModalEl) {
+      detailsModalEl.addEventListener('click', function (e) {
+        var wrap = document.getElementById('detailsSourcesDropdownWrap');
+        if (wrap && !wrap.contains(e.target)) {
+          closeDetailsSourcesDropdown();
+        }
       });
     }
     var detailsPlay = document.getElementById('detailsPlayBtn');
@@ -4047,6 +4103,40 @@
           '<button id="subPosUpBtn" class="sub-opt-btn tv-focusable" type="button">למעלה יותר</button>' +
         '</div>';
       subMenuPanel.appendChild(posSec);
+    }
+
+    // Upgrade Details Modal to place "מקורות" dropdown button on the right of "עונות ופרקים"
+    var oldStreamsSec = document.getElementById('detailsStreamsSection');
+    if (oldStreamsSec && oldStreamsSec.parentNode) {
+      oldStreamsSec.parentNode.removeChild(oldStreamsSec);
+    }
+    var epSec = document.getElementById('detailsEpisodesSection');
+    if (epSec && !document.getElementById('detailsSourcesDropdownBtn')) {
+      epSec.classList.remove('hidden');
+      epSec.innerHTML =
+        '<div class="episodes-header">' +
+          '<div class="episodes-header-right">' +
+            '<div id="detailsSourcesDropdownWrap" class="details-sources-dropdown-wrap">' +
+              '<button type="button" id="detailsSourcesDropdownBtn" class="explorer-dropdown-btn details-sources-btn tv-focusable" aria-haspopup="listbox" aria-expanded="false">' +
+                '<svg class="dropdown-icon" viewBox="0 0 24 24" aria-hidden="true">' +
+                  '<polygon points="12 2 2 7 12 12 22 7 12 2" />' +
+                  '<polyline points="2 17 12 22 22 17" />' +
+                  '<polyline points="2 12 12 17 22 12" />' +
+                '</svg>' +
+                '<span>מקורות</span>' +
+                '<svg class="dropdown-chevron" viewBox="0 0 24 24" aria-hidden="true">' +
+                  '<polyline points="6 9 12 15 18 9" />' +
+                '</svg>' +
+              '</button>' +
+              '<div id="detailsStreamsDropdownPanel" class="details-sources-dropdown-panel hidden" role="listbox" aria-label="בחירת מקור שידור">' +
+                '<div id="detailsStreamsList" class="details-streams-list"></div>' +
+              '</div>' +
+            '</div>' +
+            '<h3 id="detailsSectionHeading" class="episodes-section-title">עונות ופרקים</h3>' +
+          '</div>' +
+          '<div id="seasonSelector" class="season-selector" role="tablist" aria-label="בחירת עונה"></div>' +
+        '</div>' +
+        '<div id="episodesGrid" class="episodes-grid"></div>';
     }
   }
 

@@ -479,17 +479,27 @@
           </div>
         </div>
 
-        <!-- Live Swarm Sources Strip: PirateBay, YTS 4K, Torrentio & Telegram Cinema VOD (#detailsStreamsSection) -->
-        <div id="detailsStreamsSection" class="details-streams-section">
-          <div class="streams-section-header">
-            <h3 class="episodes-section-title">מקורות שידור זמינים (Direct 1080p • PirateBay • YTS 4K • טלגרם קולנוע VOD)</h3>
-          </div>
-          <div id="detailsStreamsList" class="details-streams-list"></div>
-        </div>
-
-        <div id="detailsEpisodesSection" class="details-episodes-section hidden">
+        <div id="detailsEpisodesSection" class="details-episodes-section">
           <div class="episodes-header">
-            <h3 class="episodes-section-title">עונות ופרקים</h3>
+            <div class="episodes-header-right">
+              <div id="detailsSourcesDropdownWrap" class="details-sources-dropdown-wrap">
+                <button type="button" id="detailsSourcesDropdownBtn" class="explorer-dropdown-btn details-sources-btn tv-focusable" aria-haspopup="listbox" aria-expanded="false">
+                  <svg class="dropdown-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                    <polyline points="2 17 12 22 22 17" />
+                    <polyline points="2 12 12 17 22 12" />
+                  </svg>
+                  <span>מקורות</span>
+                  <svg class="dropdown-chevron" viewBox="0 0 24 24" aria-hidden="true">
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </button>
+                <div id="detailsStreamsDropdownPanel" class="details-sources-dropdown-panel hidden" role="listbox" aria-label="בחירת מקור שידור">
+                  <div id="detailsStreamsList" class="details-streams-list"></div>
+                </div>
+              </div>
+              <h3 id="detailsSectionHeading" class="episodes-section-title">עונות ופרקים</h3>
+            </div>
             <div id="seasonSelector" class="season-selector" role="tablist" aria-label="בחירת עונה"></div>
           </div>
           <div id="episodesGrid" class="episodes-grid"></div>
