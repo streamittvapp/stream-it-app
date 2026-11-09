@@ -10,12 +10,13 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.6.7';
+  var APP_VERSION = '9.6.8';
   var wasLegacyBooted = Boolean(window.__STREAMIT_V94_BOOTED || window.__STREAMIT_V961_BOOTED);
   window.__STREAMIT_V94_BOOTED = true;
   window.__STREAMIT_V961_BOOTED = true;
   window.__STREAMIT_V966_BOOTED = true;
   window.__STREAMIT_V967_BOOTED = true;
+  window.__STREAMIT_V968_BOOTED = true;
 
   // Preserve direct reference to native fetch and freeze any stale in-flight async loops from legacy bundled v9.6.0 APK scripts
   var nativeFetch = window.fetch ? window.fetch.bind(window) : null;
@@ -323,11 +324,11 @@
         '<circle cx="300" cy="390" r="290" fill="url(#glow)"/>' +
         '<rect x="28" y="28" width="544" height="844" rx="28" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>' +
         '<rect x="190" y="255" width="220" height="220" rx="44" fill="rgba(255,255,255,0.06)" stroke="' + acc + '" stroke-width="3"/>' +
-        '<text x="300" y="382" text-anchor="middle" fill="#FFFFFF" font-family="Heebo, Rubik, Arial, sans-serif" font-weight="900" font-size="' + fontSize + '">' + safeLogo + '</text>' +
+        '<text x="300" y="382" text-anchor="middle" fill="#FFFFFF" font-family="Rubik, Arial, sans-serif" font-weight="900" font-size="' + fontSize + '">' + safeLogo + '</text>' +
         '<rect x="215" y="420" width="170" height="32" rx="16" fill="' + acc + '"/>' +
-        '<text x="300" y="442" text-anchor="middle" fill="#FFFFFF" font-family="Heebo, Rubik, Arial, sans-serif" font-weight="800" font-size="17">אפיק ' + safeNum + ' • LIVE</text>' +
-        '<text x="300" y="555" text-anchor="middle" fill="#FFFFFF" font-family="Heebo, Rubik, Arial, sans-serif" font-weight="800" font-size="31">' + safeSub + '</text>' +
-        '<text x="300" y="600" text-anchor="middle" fill="#94A3B8" font-family="Heebo, Rubik, Arial, sans-serif" font-weight="600" font-size="21">שידור חי רציף • Full HD 1080p</text>' +
+        '<text x="300" y="442" text-anchor="middle" fill="#FFFFFF" font-family="Rubik, Arial, sans-serif" font-weight="800" font-size="17">אפיק ' + safeNum + ' • LIVE</text>' +
+        '<text x="300" y="555" text-anchor="middle" fill="#FFFFFF" font-family="Rubik, Arial, sans-serif" font-weight="800" font-size="31">' + safeSub + '</text>' +
+        '<text x="300" y="600" text-anchor="middle" fill="#94A3B8" font-family="Rubik, Arial, sans-serif" font-weight="600" font-size="21">שידור חי רציף • Full HD 1080p</text>' +
       '</svg>';
     return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
   }
@@ -3384,7 +3385,7 @@
     var initial = String(name || 'A').trim().charAt(0) || 'A';
     var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">' +
       '<rect width="80" height="80" fill="#262626"/>' +
-      '<text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" fill="#ffffff" font-family="Heebo, sans-serif" font-weight="800" font-size="34">' +
+      '<text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" fill="#ffffff" font-family="Rubik, sans-serif" font-weight="800" font-size="34">' +
       escapeHtml(initial) + '</text></svg>';
     return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
   }

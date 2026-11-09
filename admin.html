@@ -7,7 +7,7 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&family=Rubik:wght@600;700;800;900&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
     :root {
       /* Sidebar Palette (Right Sidebar) */
@@ -71,7 +71,7 @@
     body {
       background-color: var(--content-bg);
       color: var(--text-primary);
-      font-family: 'Heebo', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Rubik', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
       direction: rtl;
       text-align: right;
@@ -290,7 +290,7 @@
     }
 
     .sidebar-ver {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'Rubik', sans-serif;
       font-size: 0.72rem;
       font-weight: 700;
       padding: 3px 8px;
@@ -322,7 +322,7 @@
       background: transparent;
       border: 1px solid transparent;
       color: #CBD5E1;
-      font-family: 'Heebo', sans-serif;
+      font-family: 'Rubik', sans-serif;
       font-size: 0.92rem;
       font-weight: 700;
       cursor: pointer;
@@ -352,7 +352,7 @@
     }
 
     .sidebar-nav-badge {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'Rubik', sans-serif;
       font-size: 0.74rem;
       font-weight: 700;
       padding: 2px 8px;
@@ -387,7 +387,7 @@
     }
 
     .sidebar-admin-email {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'Rubik', sans-serif;
       font-size: 0.8rem;
       font-weight: 700;
       color: #38BDF8;
@@ -505,7 +505,7 @@
       height: 40px;
       padding: 0 16px;
       border-radius: var(--radius-md);
-      font-family: 'Heebo', sans-serif;
+      font-family: 'Rubik', sans-serif;
       font-size: 0.86rem;
       font-weight: 700;
       cursor: pointer;
@@ -638,7 +638,7 @@
       border: 1px solid var(--border-medium);
       border-radius: var(--radius-md);
       color: var(--text-primary);
-      font-family: 'Heebo', sans-serif;
+      font-family: 'Rubik', sans-serif;
       font-size: 0.92rem;
       outline: none;
       transition: border-color 0.16s ease, box-shadow 0.16s ease;
@@ -646,7 +646,7 @@
 
     .form-input::placeholder {
       color: #94A3B8;
-      font-family: 'Heebo', sans-serif;
+      font-family: 'Rubik', sans-serif;
     }
 
     .form-input:focus,
@@ -658,14 +658,14 @@
     .ltr-input {
       direction: ltr;
       text-align: left;
-      font-family: 'JetBrains Mono', 'Heebo', monospace;
+      font-family: 'Rubik', sans-serif;
       font-size: 0.88rem;
     }
 
     .ltr-input::placeholder {
       direction: rtl;
       text-align: right;
-      font-family: 'Heebo', sans-serif;
+      font-family: 'Rubik', sans-serif;
     }
 
     /* ============================================================
@@ -838,7 +838,7 @@
       border: none;
       background: transparent;
       color: var(--text-secondary);
-      font-family: 'Heebo', sans-serif;
+      font-family: 'Rubik', sans-serif;
       font-size: 0.82rem;
       font-weight: 700;
       cursor: pointer;
@@ -922,7 +922,7 @@
     .user-cell-email {
       direction: ltr;
       text-align: right;
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'Rubik', sans-serif;
       font-size: 0.85rem;
       font-weight: 700;
       color: var(--text-primary);
@@ -1002,7 +1002,7 @@
       border: 1px solid var(--border-light);
       padding: 4px 10px;
       border-radius: 8px;
-      font-family: 'JetBrains Mono', monospace;
+      font-family: 'Rubik', sans-serif;
       font-size: 0.8rem;
       font-weight: 700;
       color: var(--text-primary);
@@ -2383,7 +2383,7 @@
               '<td>' + statusBadge + '</td>' +
               '<td>' + roleBadge + '</td>' +
               '<td style="color:var(--text-secondary);font-weight:700;">עד ' + Number(u.max_profiles || 5) + ' פרופילים</td>' +
-              '<td style="direction:ltr;text-align:right;color:var(--text-muted);font-family:\'JetBrains Mono\',monospace;font-size:0.78rem;">' + escapeHtml((u.updatedAt || '').slice(0, 16).replace('T', ' ')) + '</td>' +
+              '<td style="direction:ltr;text-align:right;color:var(--text-muted);font-family:\'Rubik\',sans-serif;font-size:0.78rem;">' + escapeHtml((u.updatedAt || '').slice(0, 16).replace('T', ' ')) + '</td>' +
               '<td>' +
                 '<div class="row-actions">' +
                   '<button type="button" class="btn btn-secondary btn-xs" data-action="edit" data-email="' + escapeHtml(u.email) + '">ערוך / סיסמה</button>' +
@@ -2506,7 +2506,7 @@
           return (
             '<div class="info-card">' +
               '<div class="info-card-top">' +
-                '<span class="info-card-title" style="direction:ltr;color:var(--accent-blue);font-family:\'JetBrains Mono\',monospace;">@' + escapeHtml(c.handle) + '</span>' +
+                '<span class="info-card-title" style="direction:ltr;color:var(--accent-blue);font-family:\'Rubik\',sans-serif;">@' + escapeHtml(c.handle) + '</span>' +
                 '<span class="badge badge-approved"><span class="badge-dot"></span><span>מחובר</span></span>' +
               '</div>' +
               '<div style="font-size:0.86rem;color:var(--text-muted);">' + escapeHtml(c.label || 'ערוץ טלגרם VOD') + '</div>' +
