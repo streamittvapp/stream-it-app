@@ -1,9 +1,9 @@
 {
-  "version": "9.6.4",
+  "version": "9.6.5",
   "native_apk_version": "9.6.0",
   "apk_download_url": "https://streamittvapp.github.io/stream-it-app/StreamIt-AndroidTV.apk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-09T00:56:00Z",
-  "notes": "v9.6.4 — Streamer Polish & Smooth Remote Navigation (Desktop untouched): Eliminated all remaining frames/borders/white backgrounds including on the logo; lighter gray focus highlight; live clock to the left of My List in top menu; soft collapsible accordion sections in right side menu; 1-click access to Search + deterministic 6x6 mini-keyboard; live tile reorganization on search; legacy APK background loop freezer + in-place focus preservation."
+  "updated_at": "2026-11-09T19:45:00Z",
+  "notes": "v9.6.5 — SafeWatch AI Parental Control & Automatic Scene-Skipping System: Manage Main User & Sub-Users from User Settings, Profile Manager, TV Settings, or In-Player HUD; per-profile category filtering (Sex/Nudity, Violence/Gore, Profanity, Drugs, Horror); Auto-Skip or Blur+Mute shield; real-time Hebrew/English profanity audio mute & subtitle censoring; optional 4-digit PIN lock."
 }

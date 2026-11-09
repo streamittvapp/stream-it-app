@@ -3,38 +3,63 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>STREAM IT — מרכז בקרה וניהול מנויים מאובטח (v9.5.5)</title>
+  <title>STREAM IT — דשבורד ניהול מנויים ומערכת (v9.6.5)</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&family=Rubik:wght@600;700;800;900&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg-base: #06080F;
-      --bg-surface: rgba(14, 18, 28, 0.88);
-      --bg-elevated: rgba(22, 28, 42, 0.92);
-      --bg-input: rgba(9, 12, 20, 0.95);
-      --border-subtle: rgba(255, 255, 255, 0.08);
-      --border-glass: rgba(255, 255, 255, 0.12);
-      --border-highlight: rgba(255, 255, 255, 0.22);
+      /* Sidebar Palette (Right Sidebar) */
+      --sidebar-bg: #0F172A;
+      --sidebar-surface: #1E293B;
+      --sidebar-border: rgba(255, 255, 255, 0.08);
+      --sidebar-text: #F8FAFC;
+      --sidebar-muted: #94A3B8;
+
+      /* Content Pages Palette (Pure White Background) */
+      --content-bg: #FFFFFF;
+      --content-subtle: #F8FAFC;
+      --card-bg: #FFFFFF;
+      --card-header-bg: #F8FAFC;
+      --border-light: #E2E8F0;
+      --border-medium: #CBD5E1;
+
+      /* Typography Colors on White */
+      --text-primary: #0F172A;
+      --text-secondary: #334155;
+      --text-muted: #64748B;
+
+      /* Brand & Semantic Accents */
       --brand-red: #E50914;
-      --brand-red-hover: #F6121D;
-      --brand-red-soft: rgba(229, 9, 20, 0.15);
-      --accent-blue: #38BDF8;
-      --accent-blue-soft: rgba(56, 189, 248, 0.14);
-      --green: #10B981;
-      --green-soft: rgba(16, 185, 129, 0.14);
-      --amber: #F59E0B;
-      --amber-soft: rgba(245, 158, 11, 0.14);
-      --danger: #EF4444;
-      --danger-soft: rgba(239, 68, 68, 0.14);
-      --text-main: #F8FAFC;
-      --text-secondary: #CBD5E1;
-      --text-muted: #94A3B8;
-      --radius-xl: 18px;
-      --radius-lg: 14px;
+      --brand-red-hover: #C80710;
+      --brand-red-soft: #FEF2F2;
+      --brand-red-border: #FECACA;
+
+      --accent-blue: #2563EB;
+      --accent-blue-soft: #EFF6FF;
+      --accent-blue-border: #BFDBFE;
+
+      --green: #059669;
+      --green-soft: #ECFDF5;
+      --green-border: #A7F3D0;
+
+      --amber: #D97706;
+      --amber-soft: #FFFBEB;
+      --amber-border: #FDE68A;
+
+      --danger: #DC2626;
+      --danger-soft: #FEF2F2;
+      --danger-border: #FECACA;
+
+      --radius-xl: 16px;
+      --radius-lg: 12px;
       --radius-md: 10px;
       --radius-sm: 8px;
+
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+      --shadow-md: 0 4px 16px rgba(15, 23, 42, 0.06), 0 2px 4px rgba(15, 23, 42, 0.04);
+      --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.12);
     }
 
     * {
@@ -44,13 +69,8 @@
     }
 
     body {
-      background-color: var(--bg-base);
-      background-image:
-        radial-gradient(circle at 12% 8%, rgba(229, 9, 20, 0.12) 0%, transparent 38%),
-        radial-gradient(circle at 88% 12%, rgba(56, 189, 248, 0.08) 0%, transparent 38%),
-        radial-gradient(circle at 50% 95%, rgba(16, 185, 129, 0.05) 0%, transparent 45%);
-      background-attachment: fixed;
-      color: var(--text-main);
+      background-color: var(--content-bg);
+      color: var(--text-primary);
       font-family: 'Heebo', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
       direction: rtl;
@@ -85,36 +105,22 @@
       align-items: center;
       justify-content: center;
       padding: 24px;
-      background:
-        radial-gradient(circle at 50% 20%, rgba(229, 9, 20, 0.18) 0%, rgba(6, 8, 15, 0.96) 55%, #04050A 100%);
-      backdrop-filter: blur(24px);
+      background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
     }
 
     .admin-gate-card {
       width: 100%;
-      max-width: 460px;
-      background: linear-gradient(165deg, rgba(20, 26, 40, 0.96) 0%, rgba(10, 13, 22, 0.98) 100%);
-      border: 1px solid var(--border-glass);
-      border-top: 1px solid var(--border-highlight);
-      border-radius: 22px;
+      max-width: 450px;
+      background: #FFFFFF;
+      color: var(--text-primary);
+      border: 1px solid var(--border-light);
+      border-top: 4px solid var(--brand-red);
+      border-radius: 20px;
       padding: 36px 32px;
-      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.85), 0 0 40px rgba(229, 9, 20, 0.12);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
       display: flex;
       flex-direction: column;
       gap: 22px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .admin-gate-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 15%;
-      left: 15%;
-      height: 3px;
-      background: linear-gradient(90deg, transparent, var(--brand-red), #FF6B6B, transparent);
-      border-radius: 999px;
     }
 
     .gate-brand-row {
@@ -126,13 +132,10 @@
 
     .gate-brand-logo {
       font-family: 'Rubik', sans-serif;
-      font-size: 1.6rem;
+      font-size: 1.65rem;
       font-weight: 900;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.05em;
       color: var(--brand-red);
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
     }
 
     .gate-lock-badge {
@@ -144,20 +147,20 @@
       padding: 5px 12px;
       border-radius: 999px;
       background: var(--brand-red-soft);
-      border: 1px solid rgba(229, 9, 20, 0.4);
-      color: #FCA5A5;
+      border: 1px solid var(--brand-red-border);
+      color: var(--brand-red);
     }
 
     .gate-title {
       font-family: 'Rubik', sans-serif;
       font-size: 1.38rem;
       font-weight: 800;
-      color: #FFFFFF;
+      color: var(--text-primary);
       margin-bottom: 6px;
     }
 
     .gate-subtitle {
-      font-size: 0.88rem;
+      font-size: 0.9rem;
       color: var(--text-muted);
       line-height: 1.5;
     }
@@ -168,97 +171,13 @@
       gap: 16px;
     }
 
-    .field-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      min-width: 0;
-      width: 100%;
-    }
-
-    .field-group label {
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: var(--text-secondary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .glass-input,
-    .glass-select {
-      width: 100%;
-      min-width: 0;
-      height: 44px;
-      padding: 0 14px;
-      background: var(--bg-input);
-      border: 1px solid var(--border-glass);
-      border-radius: var(--radius-md);
-      color: #FFFFFF;
-      font-family: 'Heebo', sans-serif;
-      font-size: 0.92rem;
-      outline: none;
-      transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
-    }
-
-    .glass-input::placeholder {
-      color: rgba(148, 163, 184, 0.65);
-      font-family: 'Heebo', sans-serif;
-    }
-
-    .glass-input:focus,
-    .glass-select:focus {
-      border-color: var(--brand-red);
-      box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.2);
-      background: rgba(14, 19, 32, 0.98);
-    }
-
-    .ltr-input {
-      direction: ltr;
-      text-align: left;
-      font-family: 'JetBrains Mono', 'Heebo', monospace;
-      font-size: 0.88rem;
-    }
-
-    .ltr-input::placeholder {
-      direction: rtl;
-      text-align: right;
-      font-family: 'Heebo', sans-serif;
-      font-size: 0.88rem;
-    }
-
-    .btn-gate-submit {
-      height: 48px;
-      margin-top: 4px;
-      border: none;
-      border-radius: var(--radius-md);
-      background: linear-gradient(135deg, #E50914 0%, #B80710 100%);
-      color: #FFFFFF;
-      font-family: 'Heebo', sans-serif;
-      font-size: 1rem;
-      font-weight: 800;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      box-shadow: 0 10px 25px rgba(229, 9, 20, 0.35);
-      transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
-    }
-
-    .btn-gate-submit:hover {
-      filter: brightness(1.08);
-      transform: translateY(-1px);
-      box-shadow: 0 14px 30px rgba(229, 9, 20, 0.48);
-    }
-
     .gate-error-msg {
-      padding: 10px 14px;
+      padding: 11px 14px;
       border-radius: var(--radius-md);
       background: var(--danger-soft);
-      border: 1px solid rgba(239, 68, 68, 0.45);
-      color: #FCA5A5;
-      font-size: 0.85rem;
+      border: 1px solid var(--danger-border);
+      color: var(--danger);
+      font-size: 0.86rem;
       font-weight: 700;
       text-align: center;
     }
@@ -267,8 +186,8 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-top: 12px;
-      border-top: 1px solid var(--border-subtle);
+      padding-top: 14px;
+      border-top: 1px solid var(--border-light);
       font-size: 0.8rem;
       color: var(--text-muted);
     }
@@ -280,108 +199,278 @@
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      transition: opacity 0.15s ease;
     }
 
     .gate-back-link:hover {
-      opacity: 0.85;
+      text-decoration: underline;
     }
 
     /* ============================================================
-       PROTECTED ADMIN CONSOLE (#adminProtectedApp)
+       ADMIN SHELL: RIGHT SIDEBAR + WHITE CONTENT WORKSPACE
        ============================================================ */
-    .admin-header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(6, 8, 15, 0.88);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border-glass);
-      height: 70px;
+    .admin-shell {
+      display: flex;
+      min-height: 100vh;
+      width: 100%;
+      background: var(--content-bg);
+      direction: rtl;
     }
 
-    .admin-header-inner {
-      max-width: 1520px;
-      height: 100%;
-      margin: 0 auto;
-      padding: 0 28px;
+    /* Right Sidebar */
+    .admin-sidebar {
+      width: 280px;
+      flex-shrink: 0;
+      background: var(--sidebar-bg);
+      color: var(--sidebar-text);
+      border-left: 1px solid var(--sidebar-border);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      right: 0;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 50;
+    }
+
+    .sidebar-top {
+      display: flex;
+      flex-direction: column;
+      padding: 24px 18px;
+      gap: 24px;
+    }
+
+    .sidebar-brand {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      padding: 0 8px 18px 8px;
+      border-bottom: 1px solid var(--sidebar-border);
     }
 
-    .brand-wrap {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: nowrap;
-    }
-
-    .brand-logo {
+    .sidebar-logo {
       font-family: 'Rubik', sans-serif;
-      font-size: 1.6rem;
+      font-size: 1.55rem;
       font-weight: 900;
       letter-spacing: 0.05em;
       color: var(--brand-red);
       text-decoration: none;
     }
 
-    .brand-badge {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid var(--border-glass);
-      color: var(--text-secondary);
-      padding: 5px 12px;
-      border-radius: 999px;
-      font-size: 0.78rem;
+    .sidebar-ver {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
       font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #CBD5E1;
+    }
+
+    .sidebar-section-label {
+      font-size: 0.74rem;
+      font-weight: 800;
+      color: var(--sidebar-muted);
+      padding: 0 10px;
+      margin-bottom: -12px;
+      letter-spacing: 0.03em;
+    }
+
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .sidebar-nav-btn {
+      width: 100%;
+      min-height: 46px;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      background: transparent;
+      border: 1px solid transparent;
+      color: #CBD5E1;
+      font-family: 'Heebo', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      text-align: right;
+      transition: all 0.16s ease;
+    }
+
+    .sidebar-nav-btn-main {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .sidebar-nav-btn:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: #FFFFFF;
+    }
+
+    .sidebar-nav-btn.active {
+      background: var(--brand-red);
+      color: #FFFFFF;
+      box-shadow: 0 6px 18px rgba(229, 9, 20, 0.32);
+    }
+
+    .sidebar-nav-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      color: #FFFFFF;
+    }
+
+    .sidebar-bottom {
+      padding: 18px;
+      border-top: 1px solid var(--sidebar-border);
+      background: rgba(15, 23, 42, 0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .sidebar-admin-box {
+      padding: 12px;
+      border-radius: var(--radius-md);
+      background: var(--sidebar-surface);
+      border: 1px solid var(--sidebar-border);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .sidebar-admin-label {
+      font-size: 0.74rem;
+      color: var(--sidebar-muted);
+      font-weight: 600;
+    }
+
+    .sidebar-admin-email {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #38BDF8;
+      direction: ltr;
+      text-align: right;
+      overflow: hidden;
+      text-overflow: ellipsis;
       white-space: nowrap;
     }
 
-    .brand-badge-user {
-      background: var(--accent-blue-soft);
-      border-color: rgba(56, 189, 248, 0.35);
-      color: #7DD3FC;
-      direction: ltr;
+    .sidebar-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
-    .header-actions {
+    /* ============================================================
+       WHITE CONTENT WORKSPACE (.admin-workspace)
+       ============================================================ */
+    .admin-workspace {
+      flex: 1;
+      min-width: 0;
+      background: #FFFFFF;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .workspace-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-light);
+      padding: 18px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .workspace-title-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .workspace-title {
+      font-family: 'Rubik', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .workspace-subtitle {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+
+    .workspace-header-actions {
       display: flex;
       align-items: center;
       gap: 10px;
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
     }
 
-    .status-pill {
+    .sync-status-pill {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      height: 36px;
+      height: 38px;
       padding: 0 14px;
       border-radius: 999px;
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       font-weight: 700;
       background: var(--green-soft);
-      border: 1px solid rgba(16, 185, 129, 0.35);
-      color: #6EE7B7;
-      white-space: nowrap;
+      border: 1px solid var(--green-border);
+      color: var(--green);
     }
 
-    .status-dot {
-      width: 7px;
-      height: 7px;
+    .sync-dot {
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       background: var(--green);
-      box-shadow: 0 0 8px var(--green);
       flex-shrink: 0;
     }
 
-    /* Buttons */
+    .workspace-body {
+      flex: 1;
+      background: #FFFFFF;
+      padding: 32px 36px 64px 36px;
+      max-width: 1480px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .page-view {
+      display: flex;
+      flex-direction: column;
+      gap: 26px;
+      background: #FFFFFF;
+    }
+
+    /* ============================================================
+       BUTTONS & INPUTS (LIGHT / WHITE THEME)
+       ============================================================ */
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 7px;
+      gap: 8px;
       height: 40px;
       padding: 0 16px;
       border-radius: var(--radius-md);
@@ -396,74 +485,94 @@
       flex-shrink: 0;
     }
 
+    .btn:focus-visible,
+    .form-input:focus-visible,
+    .form-select:focus-visible,
+    .sidebar-nav-btn:focus-visible {
+      outline: 2px solid var(--accent-blue);
+      outline-offset: 2px;
+    }
+
     .btn-primary {
-      background: linear-gradient(135deg, #E50914 0%, #B80710 100%);
+      background: var(--brand-red);
       color: #FFFFFF;
-      box-shadow: 0 4px 14px rgba(229, 9, 20, 0.28);
+      box-shadow: 0 4px 12px rgba(229, 9, 20, 0.22);
     }
 
     .btn-primary:hover {
-      background: linear-gradient(135deg, #F6121D 0%, #CE0812 100%);
+      background: var(--brand-red-hover);
       transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(229, 9, 20, 0.4);
     }
 
     .btn-secondary {
-      background: rgba(255, 255, 255, 0.06);
-      border-color: var(--border-glass);
-      color: #F1F5F9;
+      background: #FFFFFF;
+      border-color: var(--border-medium);
+      color: var(--text-secondary);
     }
 
     .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.12);
-      border-color: rgba(255, 255, 255, 0.24);
+      background: var(--content-subtle);
+      border-color: #94A3B8;
+      color: var(--text-primary);
     }
 
     .btn-success {
       background: var(--green-soft);
-      border-color: rgba(16, 185, 129, 0.4);
-      color: #6EE7B7;
+      border-color: var(--green-border);
+      color: var(--green);
     }
 
     .btn-success:hover {
-      background: rgba(16, 185, 129, 0.26);
-      border-color: rgba(16, 185, 129, 0.65);
-      color: #FFFFFF;
+      background: #D1FAE5;
     }
 
     .btn-warning {
       background: var(--amber-soft);
-      border-color: rgba(245, 158, 11, 0.4);
-      color: #FCD34D;
+      border-color: var(--amber-border);
+      color: var(--amber);
     }
 
     .btn-warning:hover {
-      background: rgba(245, 158, 11, 0.26);
-      color: #FFFFFF;
+      background: #FEF3C7;
     }
 
     .btn-danger {
       background: var(--danger-soft);
-      border-color: rgba(239, 68, 68, 0.38);
-      color: #FCA5A5;
+      border-color: var(--danger-border);
+      color: var(--danger);
     }
 
     .btn-danger:hover {
-      background: rgba(239, 68, 68, 0.28);
-      border-color: rgba(239, 68, 68, 0.65);
+      background: #FEE2E2;
+    }
+
+    .btn-sidebar-player {
+      background: var(--brand-red);
+      color: #FFFFFF;
+      width: 100%;
+    }
+
+    .btn-sidebar-lock {
+      background: rgba(239, 68, 68, 0.14);
+      border-color: rgba(239, 68, 68, 0.35);
+      color: #FCA5A5;
+      width: 100%;
+    }
+
+    .btn-sidebar-lock:hover {
+      background: rgba(239, 68, 68, 0.26);
       color: #FFFFFF;
     }
 
     .btn-sm {
       height: 36px;
       padding: 0 13px;
-      font-size: 0.8rem;
-      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
     }
 
     .btn-xs {
       height: 32px;
-      padding: 0 11px;
+      padding: 0 10px;
       font-size: 0.78rem;
       border-radius: 7px;
       gap: 5px;
@@ -474,44 +583,84 @@
       height: 14px;
     }
 
-    /* Main Container */
-    .admin-main {
-      max-width: 1520px;
-      margin: 0 auto;
-      padding: 26px 28px 64px 28px;
+    .field-group {
       display: flex;
       flex-direction: column;
-      gap: 22px;
+      gap: 6px;
+      min-width: 0;
+      width: 100%;
+    }
+
+    .field-group label {
+      font-size: 0.83rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+
+    .form-input,
+    .form-select {
+      width: 100%;
+      min-width: 0;
+      height: 44px;
+      padding: 0 14px;
+      background: #FFFFFF;
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-family: 'Heebo', sans-serif;
+      font-size: 0.92rem;
+      outline: none;
+      transition: border-color 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .form-input::placeholder {
+      color: #94A3B8;
+      font-family: 'Heebo', sans-serif;
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+    }
+
+    .ltr-input {
+      direction: ltr;
+      text-align: left;
+      font-family: 'JetBrains Mono', 'Heebo', monospace;
+      font-size: 0.88rem;
+    }
+
+    .ltr-input::placeholder {
+      direction: rtl;
+      text-align: right;
+      font-family: 'Heebo', sans-serif;
     }
 
     /* ============================================================
-       BENTO KPI CARDS (4 Symmetrical Columns)
+       WHITE CARDS, KPI GRID & PANELS
        ============================================================ */
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 16px;
+      gap: 18px;
     }
 
     .kpi-card {
-      background: var(--bg-surface);
-      backdrop-filter: blur(16px);
-      border: 1px solid var(--border-glass);
-      border-top: 1px solid var(--border-highlight);
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
       border-radius: var(--radius-xl);
-      padding: 20px 22px;
+      padding: 22px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 12px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
-      position: relative;
-      overflow: hidden;
+      gap: 10px;
+      box-shadow: var(--shadow-sm);
     }
 
     .kpi-top {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
       gap: 10px;
     }
@@ -520,191 +669,160 @@
       color: var(--text-secondary);
       font-size: 0.86rem;
       font-weight: 700;
-      line-height: 1.35;
     }
 
     .kpi-pill {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      padding: 3px 9px;
+      padding: 3px 10px;
       border-radius: 999px;
-      font-size: 0.72rem;
+      font-size: 0.73rem;
       font-weight: 800;
-      white-space: nowrap;
-      flex-shrink: 0;
     }
 
     .kpi-pill-green {
       background: var(--green-soft);
-      border: 1px solid rgba(16, 185, 129, 0.35);
-      color: #6EE7B7;
+      border: 1px solid var(--green-border);
+      color: var(--green);
     }
 
     .kpi-pill-blue {
       background: var(--accent-blue-soft);
-      border: 1px solid rgba(56, 189, 248, 0.35);
-      color: #7DD3FC;
+      border: 1px solid var(--accent-blue-border);
+      color: var(--accent-blue);
       direction: ltr;
     }
 
     .kpi-pill-amber {
       background: var(--amber-soft);
-      border: 1px solid rgba(245, 158, 11, 0.35);
-      color: #FCD34D;
+      border: 1px solid var(--amber-border);
+      color: var(--amber);
     }
 
     .kpi-value {
       font-family: 'Rubik', sans-serif;
-      font-size: 2.15rem;
+      font-size: 2.1rem;
       font-weight: 900;
-      color: #FFFFFF;
+      color: var(--text-primary);
       line-height: 1.1;
-      letter-spacing: -0.02em;
-      direction: ltr;
-      text-align: right;
-    }
-
-    .kpi-value-green {
-      color: #34D399;
-      font-size: 1.75rem;
     }
 
     .kpi-sub {
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       color: var(--text-muted);
-      line-height: 1.35;
     }
 
-    /* ============================================================
-       NAVIGATION TABS BAR
-       ============================================================ */
-    .admin-tabs-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .admin-tabs {
-      display: inline-flex;
-      gap: 8px;
-      background: rgba(14, 18, 28, 0.85);
-      padding: 6px;
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border-glass);
-      flex-wrap: wrap;
-    }
-
-    .tab-btn {
-      height: 40px;
-      padding: 0 18px;
-      border-radius: var(--radius-md);
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      font-family: 'Heebo', sans-serif;
-      font-size: 0.88rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.16s ease;
-    }
-
-    .tab-btn:hover {
-      color: #FFFFFF;
-      background: rgba(255, 255, 255, 0.06);
-    }
-
-    .tab-btn.active {
-      background: linear-gradient(135deg, #E50914 0%, #B80710 100%);
-      color: #FFFFFF;
-      box-shadow: 0 4px 14px rgba(229, 9, 20, 0.32);
-    }
-
-    /* ============================================================
-       GLASS BENTO PANELS & FORMS
-       ============================================================ */
-    .panel-card {
-      background: var(--bg-surface);
-      backdrop-filter: blur(18px);
-      border: 1px solid var(--border-glass);
-      border-top: 1px solid var(--border-highlight);
+    .white-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
       border-radius: var(--radius-xl);
-      padding: 24px 26px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+      box-shadow: var(--shadow-md);
       overflow: hidden;
     }
 
-    .panel-header {
+    .white-card-header {
+      background: var(--card-header-bg);
+      padding: 20px 26px;
+      border-bottom: 1px solid var(--border-light);
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
       flex-wrap: wrap;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--border-subtle);
     }
 
-    .panel-title-group {
+    .white-card-title-group {
       display: flex;
       flex-direction: column;
       gap: 4px;
     }
 
-    .panel-title {
+    .white-card-title {
       font-family: 'Rubik', sans-serif;
-      font-size: 1.15rem;
+      font-size: 1.12rem;
       font-weight: 800;
-      color: #FFFFFF;
+      color: var(--text-primary);
       display: flex;
       align-items: center;
       gap: 10px;
     }
 
-    .panel-title-icon {
+    .title-icon-badge {
       width: 32px;
       height: 32px;
-      border-radius: 9px;
+      border-radius: 8px;
       background: var(--brand-red-soft);
-      border: 1px solid rgba(229, 9, 20, 0.35);
-      color: #FCA5A5;
+      border: 1px solid var(--brand-red-border);
+      color: var(--brand-red);
       display: inline-flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
     }
 
-    .panel-desc {
-      font-size: 0.84rem;
+    .white-card-desc {
+      font-size: 0.85rem;
       color: var(--text-muted);
     }
 
-    .panel-header-tools {
+    .white-card-body {
+      padding: 24px 26px;
+      background: #FFFFFF;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* User Creation Form Grid */
+    .form-grid-users {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      align-items: end;
+    }
+
+    /* Filter & Search Toolbar */
+    .table-toolbar {
       display: flex;
       align-items: center;
-      gap: 10px;
+      justify-content: space-between;
+      gap: 14px;
       flex-wrap: wrap;
     }
 
-    /* Properly Contained 6-Column User Creation Grid (Zero Overflow!) */
-    .form-grid-users {
-      display: grid;
-      grid-template-columns: minmax(190px, 1.35fr) minmax(150px, 1fr) minmax(160px, 1.05fr) minmax(150px, 0.95fr) minmax(160px, 1fr) auto;
-      gap: 14px;
-      align-items: end;
-      width: 100%;
+    .filter-pills {
+      display: inline-flex;
+      gap: 6px;
+      background: var(--content-subtle);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-light);
+      flex-wrap: wrap;
+    }
+
+    .filter-pill-btn {
+      height: 34px;
+      padding: 0 14px;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: 'Heebo', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .filter-pill-btn.active {
+      background: #FFFFFF;
+      color: var(--brand-red);
+      box-shadow: var(--shadow-sm);
     }
 
     .search-box-wrap {
       position: relative;
-      width: 300px;
+      width: 320px;
       max-width: 100%;
     }
 
@@ -719,43 +837,45 @@
       pointer-events: none;
     }
 
-    .search-box-wrap .glass-input {
+    .search-box-wrap .form-input {
       height: 40px;
-      padding-right: 36px;
+      padding-right: 38px;
       font-size: 0.86rem;
     }
 
     /* ============================================================
-       USERS DATA TABLE (Single-Line Clean Rows)
+       CLEAN WHITE DATA TABLE
        ============================================================ */
     .table-wrap {
       width: 100%;
       overflow-x: auto;
-      border: 1px solid var(--border-glass);
+      border: 1px solid var(--border-light);
       border-radius: var(--radius-lg);
-      background: rgba(7, 10, 17, 0.72);
+      background: #FFFFFF;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
       text-align: right;
+      background: #FFFFFF;
     }
 
     th {
-      background: rgba(255, 255, 255, 0.035);
+      background: #F8FAFC;
       color: var(--text-secondary);
-      font-size: 0.78rem;
+      font-size: 0.79rem;
       font-weight: 800;
-      padding: 13px 16px;
-      border-bottom: 1px solid var(--border-glass);
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-light);
       white-space: nowrap;
     }
 
     td {
       padding: 14px 16px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid var(--border-light);
       font-size: 0.88rem;
+      color: var(--text-primary);
       vertical-align: middle;
       white-space: nowrap;
     }
@@ -765,7 +885,7 @@
     }
 
     tr:hover td {
-      background: rgba(255, 255, 255, 0.025);
+      background: #F8FAFC;
     }
 
     .user-cell-email {
@@ -774,7 +894,7 @@
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.85rem;
       font-weight: 700;
-      color: #FFFFFF;
+      color: var(--text-primary);
     }
 
     .user-cell-name {
@@ -782,18 +902,18 @@
       align-items: center;
       gap: 10px;
       font-weight: 700;
-      color: #F1F5F9;
+      color: var(--text-primary);
     }
 
     .user-avatar-dot {
-      width: 30px;
-      height: 30px;
+      width: 32px;
+      height: 32px;
       border-radius: 8px;
       background: var(--brand-red-soft);
-      border: 1px solid rgba(229, 9, 20, 0.4);
-      color: #FCA5A5;
+      border: 1px solid var(--brand-red-border);
+      color: var(--brand-red);
       font-family: 'Rubik', sans-serif;
-      font-size: 0.85rem;
+      font-size: 0.86rem;
       font-weight: 800;
       display: inline-flex;
       align-items: center;
@@ -807,7 +927,7 @@
       gap: 6px;
       padding: 4px 11px;
       border-radius: 999px;
-      font-size: 0.75rem;
+      font-size: 0.76rem;
       font-weight: 800;
       white-space: nowrap;
     }
@@ -821,37 +941,41 @@
 
     .badge-approved {
       background: var(--green-soft);
-      border: 1px solid rgba(16, 185, 129, 0.38);
-      color: #6EE7B7;
+      border: 1px solid var(--green-border);
+      color: var(--green);
     }
 
     .badge-blocked {
       background: var(--danger-soft);
-      border: 1px solid rgba(239, 68, 68, 0.38);
-      color: #FCA5A5;
+      border: 1px solid var(--danger-border);
+      color: var(--danger);
     }
 
     .badge-admin {
       background: var(--brand-red-soft);
-      border: 1px solid rgba(229, 9, 20, 0.45);
-      color: #FCA5A5;
+      border: 1px solid var(--brand-red-border);
+      color: var(--brand-red);
     }
 
     .badge-member {
       background: var(--accent-blue-soft);
-      border: 1px solid rgba(56, 189, 248, 0.35);
-      color: #7DD3FC;
+      border: 1px solid var(--accent-blue-border);
+      color: var(--accent-blue);
     }
 
-    .badge-security {
-      font-family: 'JetBrains Mono', 'Heebo', monospace;
-      font-size: 0.75rem;
+    .pass-pill-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #F1F5F9;
+      border: 1px solid var(--border-light);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
       font-weight: 700;
-      color: #6EE7B7;
-      background: rgba(16, 185, 129, 0.08);
-      border: 1px solid rgba(16, 185, 129, 0.24);
-      padding: 3px 9px;
-      border-radius: 6px;
+      color: var(--text-primary);
+      direction: ltr;
     }
 
     .row-actions {
@@ -862,41 +986,102 @@
     }
 
     /* ============================================================
-       ADDONS & TELEGRAM CARDS GRID
+       CARDS GRID (TELEGRAM / SOURCES / OVERVIEW)
        ============================================================ */
-    .addons-grid {
+    .cards-grid-3 {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
     }
 
-    .addon-card {
-      background: rgba(10, 14, 24, 0.85);
-      border: 1px solid var(--border-glass);
+    .info-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
       border-radius: var(--radius-lg);
-      padding: 18px;
+      padding: 18px 20px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      transition: border-color 0.16s ease, transform 0.16s ease;
+      gap: 10px;
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.16s ease, box-shadow 0.16s ease;
     }
 
-    .addon-card:hover {
-      border-color: rgba(255, 255, 255, 0.24);
-      transform: translateY(-2px);
+    .info-card:hover {
+      border-color: var(--border-medium);
+      box-shadow: var(--shadow-md);
     }
 
-    .addon-top {
+    .info-card-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
+      gap: 10px;
     }
 
-    .addon-name {
+    .info-card-title {
       font-weight: 800;
-      font-size: 0.95rem;
-      color: #FFFFFF;
+      font-size: 0.96rem;
+      color: var(--text-primary);
+    }
+
+    /* ============================================================
+       EDIT USER MODAL (#editUserModal)
+       ============================================================ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9000;
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 520px;
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 18px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      background: #F8FAFC;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-family: 'Rubik', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .modal-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      background: #F8FAFC;
+      border-top: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
     }
 
     .toast-box {
@@ -904,54 +1089,56 @@
       bottom: 24px;
       left: 24px;
       z-index: 9999;
-      background: rgba(15, 23, 42, 0.96);
-      border: 1px solid rgba(56, 189, 248, 0.45);
+      background: #0F172A;
+      border: 1px solid #334155;
       border-right: 4px solid var(--brand-red);
-      padding: 13px 20px;
+      padding: 14px 20px;
       border-radius: 12px;
       color: #FFFFFF;
       font-weight: 700;
       font-size: 0.9rem;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.35);
     }
 
-    /* Responsive Breakpoints */
-    @media (max-width: 1280px) {
-      .form-grid-users {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
+    @media (max-width: 1200px) {
       .kpi-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
-    }
-
-    @media (max-width: 900px) {
-      .admin-header {
-        height: auto;
-        padding: 12px 0;
-      }
-      .admin-header-inner {
-        flex-wrap: wrap;
-        padding: 0 16px;
-      }
-      .header-actions {
-        flex-wrap: wrap;
-      }
-      .admin-main {
-        padding: 20px 16px 48px 16px;
-      }
       .form-grid-users {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 920px) {
+      .admin-shell {
+        flex-direction: column;
+      }
+      .admin-sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+      }
+      .workspace-header,
+      .workspace-body {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+    }
+
+    @media (max-width: 640px) {
       .kpi-grid,
       .form-grid-users {
         grid-template-columns: 1fr;
       }
       .search-box-wrap {
         width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
       }
     }
   </style>
@@ -964,9 +1151,7 @@
   <div id="adminLoginGate" class="admin-gate-overlay" role="dialog" aria-modal="true" aria-labelledby="adminGateTitle">
     <div class="admin-gate-card">
       <div class="gate-brand-row">
-        <div class="gate-brand-logo">
-          <span>STREAM IT</span>
-        </div>
+        <div class="gate-brand-logo">STREAM IT</div>
         <span class="gate-lock-badge">
           <svg viewBox="0 0 24 24" class="icon-svg" style="width:14px;height:14px;" aria-hidden="true">
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -977,33 +1162,33 @@
       </div>
 
       <div>
-        <h1 id="adminGateTitle" class="gate-title">כניסת מנהל מערכת</h1>
-        <p class="gate-subtitle">ממשק הניהול נעול ומוגן. הזן כתובת אימייל וסיסמת מנהל מאושרת כדי לגשת לניהול המנויים והרשאות הגישה.</p>
+        <h1 id="adminGateTitle" class="gate-title">כניסה לדשבורד הניהול</h1>
+        <p class="gate-subtitle">הזן כתובת אימייל וסיסמת מנהל מערכת כדי לגשת לניהול המנויים, הסיסמאות והגדרות הענן.</p>
       </div>
 
       <form id="adminGateForm" class="gate-form" autocomplete="off" novalidate>
         <div class="field-group">
           <label for="adminGateEmail">אימייל מנהל מערכת</label>
-          <input id="adminGateEmail" name="admin_gate_email_nofill" type="email" class="glass-input ltr-input" value="" placeholder="הזן אימייל מנהל..." autocomplete="off" readonly onfocus="this.removeAttribute('readonly');" required />
+          <input id="adminGateEmail" name="admin_gate_email_nofill" type="email" class="form-input ltr-input" value="" placeholder="streamittvapp@gmail.com" autocomplete="off" required />
         </div>
 
         <div class="field-group">
           <label for="adminGatePassword">סיסמת מנהל</label>
-          <input id="adminGatePassword" name="admin_gate_pass_nofill" type="password" class="glass-input ltr-input" value="" placeholder="הזן סיסמת מנהל..." autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly');" required />
+          <input id="adminGatePassword" name="admin_gate_pass_nofill" type="password" class="form-input ltr-input" value="" placeholder="הזן סיסמת מנהל..." autocomplete="new-password" required />
         </div>
 
-        <button type="submit" id="adminGateSubmitBtn" class="btn-gate-submit">
+        <button type="submit" id="adminGateSubmitBtn" class="btn btn-primary" style="height:46px;font-size:0.96rem;">
           <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           </svg>
-          <span>אימות וכניסה לממשק הניהול</span>
+          <span>אימות וכניסה לדשבורד</span>
         </button>
       </form>
 
       <div id="adminGateError" class="gate-error-msg hidden"></div>
 
       <div class="gate-footer">
-        <span>מוצפן SHA-256 • סנכרון ענן בזמן אמת</span>
+        <span>הצפנת SHA-256 • סנכרון ענן בזמן אמת</span>
         <a href="index.html" class="gate-back-link">
           <span>חזרה לאפליקציה</span>
           <svg viewBox="0 0 24 24" class="icon-svg" style="width:15px;height:15px;" aria-hidden="true">
@@ -1016,20 +1201,114 @@
   </div>
 
   <!-- =================================================================== -->
-  <!-- PROTECTED ADMIN CONSOLE (#adminProtectedApp)                        -->
+  <!-- PROTECTED ADMIN SHELL (#adminProtectedApp)                          -->
   <!-- =================================================================== -->
-  <div id="adminProtectedApp" class="hidden">
-    <header class="admin-header">
-      <div class="admin-header-inner">
-        <div class="brand-wrap">
-          <a href="index.html" class="brand-logo">STREAM IT</a>
-          <span class="brand-badge">מרכז בקרה וניהול מנויים v9.5.5</span>
-          <span id="loggedAdminBadge" class="brand-badge brand-badge-user"></span>
+  <div id="adminProtectedApp" class="admin-shell hidden">
+
+    <!-- RIGHT SIDEBAR (סיידבר ימני קבוע) -->
+    <aside class="admin-sidebar" aria-label="תפריט ניהול ראשי">
+      <div class="sidebar-top">
+        <div class="sidebar-brand">
+          <a href="index.html" class="sidebar-logo">STREAM IT</a>
+          <span class="sidebar-ver">v9.6.5</span>
         </div>
 
-        <div class="header-actions">
-          <div class="status-pill">
-            <span class="status-dot"></span>
+        <div class="sidebar-section-label">ניווט מערכת ניהול</div>
+        <nav class="sidebar-nav" aria-label="עמודי דשבורד">
+          <button type="button" class="sidebar-nav-btn active" data-page="users">
+            <span class="sidebar-nav-btn-main">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+              <span>ניהול מנויים וסיסמאות</span>
+            </span>
+            <span id="sidebarUsersBadge" class="sidebar-nav-badge">0</span>
+          </button>
+
+          <button type="button" class="sidebar-nav-btn" data-page="overview">
+            <span class="sidebar-nav-btn-main">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+              </svg>
+              <span>סקירה כללית ומדדים</span>
+            </span>
+          </button>
+
+          <button type="button" class="sidebar-nav-btn" data-page="telegram">
+            <span class="sidebar-nav-btn-main">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M22 2L11 13" />
+                <path d="M22 2L15 22l-4-9-9-4 20-7z" />
+              </svg>
+              <span>ערוצי טלגרם VOD</span>
+            </span>
+            <span id="sidebarTgBadge" class="sidebar-nav-badge">8</span>
+          </button>
+
+          <button type="button" class="sidebar-nav-btn" data-page="sources">
+            <span class="sidebar-nav-btn-main">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="2" y1="12" x2="22" y2="12" />
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+              </svg>
+              <span>מקורות ושידורים חיים</span>
+            </span>
+          </button>
+
+          <button type="button" class="sidebar-nav-btn" data-page="cloud">
+            <span class="sidebar-nav-btn-main">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
+              </svg>
+              <span>כספת ענן וגיבויים</span>
+            </span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="sidebar-admin-box">
+          <span class="sidebar-admin-label">מחובר כמנהל מערכת:</span>
+          <span id="loggedAdminBadge" class="sidebar-admin-email">streamittvapp@gmail.com</span>
+        </div>
+
+        <div class="sidebar-actions">
+          <a href="index.html" class="btn btn-sidebar-player btn-sm">
+            <svg viewBox="0 0 24 24" class="icon-svg" style="width:15px;height:15px;fill:currentColor;stroke:none;" aria-hidden="true">
+              <polygon points="6 3 20 12 6 21 6 3" />
+            </svg>
+            <span>פתיחת נגן STREAM IT</span>
+          </a>
+
+          <button type="button" id="lockAdminBtn" class="btn btn-sidebar-lock btn-sm">
+            <svg viewBox="0 0 24 24" class="icon-svg" style="width:15px;height:15px;" aria-hidden="true">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            <span>נעילת דשבורד והתנתקות</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WHITE CONTENT AREA (רקע לבן לעמודי התוכן) -->
+    <div class="admin-workspace">
+      <header class="workspace-header">
+        <div class="workspace-title-wrap">
+          <h1 id="workspacePageTitle" class="workspace-title">ניהול מנויים, הרשאות וסיסמאות</h1>
+          <p id="workspacePageDesc" class="workspace-subtitle">הקמת משתמשים חדשים, קביעת סיסמאות קבועות וסנכרון מיידי לכספת הענן (GitHub Cloud Vault).</p>
+        </div>
+
+        <div class="workspace-header-actions">
+          <div class="sync-status-pill">
+            <span class="sync-dot"></span>
             <span id="cloudVaultSyncPillText">כספת ענן מסונכרנת בזמן אמת (24/7)</span>
           </div>
 
@@ -1039,280 +1318,409 @@
               <polyline points="1 20 1 14 7 14" />
               <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
             </svg>
-            <span>רענון נתונים מהענן</span>
+            <span>רענון מהענן</span>
           </button>
 
-          <a href="index.html" class="btn btn-primary btn-sm">
-            <svg viewBox="0 0 24 24" class="icon-svg" style="width:15px;height:15px;fill:currentColor;stroke:none;" aria-hidden="true">
-              <polygon points="6 3 20 12 6 21 6 3" />
-            </svg>
-            <span>פתיחת נגן STREAM IT</span>
-          </a>
-
-          <button type="button" id="lockAdminBtn" class="btn btn-danger btn-sm" title="התנתק ונעל ממשק">
+          <button type="button" id="exportVaultJsonBtn" class="btn btn-secondary btn-sm">
             <svg viewBox="0 0 24 24" class="icon-svg" style="width:15px;height:15px;" aria-hidden="true">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
             </svg>
-            <span>נעילת ממשק</span>
+            <span>ייצוא גיבוי JSON</span>
           </button>
         </div>
-      </div>
-    </header>
+      </header>
 
-    <main class="admin-main">
-      <!-- KPI Bento Cards -->
-      <section class="kpi-grid" aria-label="מדדי מערכת מרכזיים">
-        <div class="kpi-card">
-          <div class="kpi-top">
-            <span class="kpi-label">מנויים מאושרים בכספת הענן</span>
-            <span class="kpi-pill kpi-pill-green">פעיל</span>
-          </div>
-          <div id="kpiUsersCount" class="kpi-value">2</div>
-          <div id="kpiUsersSub" class="kpi-sub">סנכרון מיידי לכל הטלוויזיות והמחשבים</div>
-        </div>
+      <main class="workspace-body">
 
-        <div class="kpi-card">
-          <div class="kpi-top">
-            <span class="kpi-label">ערוצי שידור חי (ישראל והעולם)</span>
-            <span class="kpi-pill kpi-pill-blue">1080p HD</span>
-          </div>
-          <div id="kpiLiveChannelsCount" class="kpi-value">32+</div>
-          <div class="kpi-sub">כאן 11, קשת 12, רשת 13, עכשיו 14, סרטים וספורט</div>
-        </div>
+        <!-- =============================================================== -->
+        <!-- PAGE 1: USERS & PASSWORDS MANAGEMENT (ניהול מנויים וסיסמאות)    -->
+        <!-- =============================================================== -->
+        <section id="page-users" class="page-view">
 
-        <div class="kpi-card">
-          <div class="kpi-top">
-            <span class="kpi-label">ערוצי טלגרם VOD ומאגרי 4K</span>
-            <span class="kpi-pill kpi-pill-amber">אוטומטי</span>
-          </div>
-          <div id="kpiTgChannelsCount" class="kpi-value">8</div>
-          <div class="kpi-sub">שאיבה אוטומטית + תרגום עברית מסונכרן</div>
-        </div>
-
-        <div class="kpi-card">
-          <div class="kpi-top">
-            <span class="kpi-label">אבטחת מערכת וכניסת משתמשים</span>
-            <span class="kpi-pill kpi-pill-green">מוצפן</span>
-          </div>
-          <div class="kpi-value kpi-value-green">SHA-256</div>
-          <div class="kpi-sub">אין הרשמה עצמאית • גישת ניהול מוגנת בסיסמה</div>
-        </div>
-      </section>
-
-      <!-- Navigation Tabs -->
-      <div class="admin-tabs-bar">
-        <nav class="admin-tabs" aria-label="לשוניות ניהול">
-          <button type="button" class="tab-btn active" data-tab="users">
-            <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-            </svg>
-            <span>ניהול מנויים והרשאות כניסה</span>
-          </button>
-
-          <button type="button" class="tab-btn" data-tab="telegram">
-            <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
-              <path d="M22 2L11 13" />
-              <path d="M22 2L15 22l-4-9-9-4 20-7z" />
-            </svg>
-            <span>ערוצי טלגרם VOD</span>
-          </button>
-
-          <button type="button" class="tab-btn" data-tab="sources">
-            <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
-              <circle cx="12" cy="12" r="10" />
-              <line x1="2" y1="12" x2="22" y2="12" />
-              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-            </svg>
-            <span>סטטוס מקורות ושידורים חיים</span>
-          </button>
-        </nav>
-      </div>
-
-      <!-- TAB 1: USERS -->
-      <section id="tab-users" class="tab-pane" style="display:flex;flex-direction:column;gap:22px;">
-        <!-- Create / Update Subscriber Card -->
-        <div class="panel-card">
-          <div class="panel-header">
-            <div class="panel-title-group">
-              <div class="panel-title">
-                <span class="panel-title-icon">
-                  <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                    <circle cx="8.5" cy="7" r="4" />
-                    <line x1="20" y1="8" x2="20" y2="14" />
-                    <line x1="23" y1="11" x2="17" y2="11" />
-                  </svg>
-                </span>
-                <span>יצירת מנוי חדש / עדכון מנוי קיים</span>
+          <!-- Create / Update Subscriber White Card -->
+          <div class="white-card">
+            <div class="white-card-header">
+              <div class="white-card-title-group">
+                <div class="white-card-title">
+                  <span class="title-icon-badge">
+                    <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                      <circle cx="8.5" cy="7" r="4" />
+                      <line x1="20" y1="8" x2="20" y2="14" />
+                      <line x1="23" y1="11" x2="17" y2="11" />
+                    </svg>
+                  </span>
+                  <span>הקמת מנוי חדש / עדכון סיסמה למנוי</span>
+                </div>
+                <div class="white-card-desc">הסיסמה שתגדיר כאן נשמרת באופן מוחלט עבור המנוי (ללא נפילה ל-123456) ומסונכרנת מיד לכל המחשבים והסטרימרים.</div>
               </div>
-              <div class="panel-desc">כל מנוי שתוסיף או תעדכן כאן נשמר אוטומטית בכספת הענן (GitHub Cloud Vault) ויכול להיכנס מיד מכל מחשב, דפדפן או טלוויזיה חכמה.</div>
-            </div>
 
-            <div class="panel-header-tools">
               <span class="badge badge-approved">
                 <span class="badge-dot"></span>
-                <span>סנכרון ענן אוטומטי פעיל</span>
+                <span>סנכרון סיסמאות ענן פעיל</span>
               </span>
-              <button type="button" id="exportVaultJsonBtn" class="btn btn-secondary btn-sm">
-                <svg viewBox="0 0 24 24" class="icon-svg" style="width:15px;height:15px;" aria-hidden="true">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
-                <span>ייצוא גיבוי JSON</span>
-              </button>
+            </div>
+
+            <div class="white-card-body">
+              <form id="createUserForm" class="form-grid-users" autocomplete="off">
+                <div class="field-group">
+                  <label for="newUserEmail">כתובת אימייל של המנוי</label>
+                  <input id="newUserEmail" name="new_user_email_nofill" type="email" class="form-input ltr-input" value="" placeholder="user@example.com" autocomplete="off" required />
+                </div>
+
+                <div class="field-group">
+                  <label for="newUserName">שם תצוגה / משפחה</label>
+                  <input id="newUserName" name="new_user_name_nofill" type="text" class="form-input" value="" placeholder="למשל: משפחת כהן" autocomplete="off" required />
+                </div>
+
+                <div class="field-group">
+                  <label for="newUserPassword">סיסמת כניסה למנוי (תישמר בדיוק כפי שהוזנה)</label>
+                  <input id="newUserPassword" name="new_user_pass_nofill" type="text" class="form-input ltr-input" value="" placeholder="הזן סיסמה לבחירתך..." autocomplete="off" required />
+                </div>
+
+                <div class="field-group">
+                  <label for="newUserRole">סוג הרשאה</label>
+                  <select id="newUserRole" class="form-select">
+                    <option value="member" selected>מנוי משפחתי (רגיל)</option>
+                    <option value="admin">מנהל מערכת (Admin)</option>
+                  </select>
+                </div>
+
+                <div class="field-group">
+                  <label for="newUserMaxProfiles">מכסת פרופילים בחשבון</label>
+                  <select id="newUserMaxProfiles" class="form-select">
+                    <option value="1">פרופיל יחיד (1)</option>
+                    <option value="3">עד 3 פרופילים</option>
+                    <option value="5" selected>עד 5 פרופילים (משפחתי)</option>
+                    <option value="8">עד 8 פרופילים (VIP)</option>
+                  </select>
+                </div>
+
+                <div class="field-group">
+                  <button type="submit" id="createUserSubmitBtn" class="btn btn-primary" style="height:44px;width:100%;">
+                    <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                      <line x1="12" y1="5" x2="12" y2="19" />
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    <span>שמור מנוי וסנכרן לענן</span>
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
 
-          <form id="createUserForm" class="form-grid-users" autocomplete="off">
-            <div class="field-group">
-              <label for="newUserEmail">כתובת אימייל של המנוי</label>
-              <input id="newUserEmail" name="new_user_email_nofill" type="email" class="glass-input ltr-input" value="" placeholder="user@example.com" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');" required />
+          <!-- Subscribers Table White Card -->
+          <div class="white-card">
+            <div class="white-card-header">
+              <div class="white-card-title-group">
+                <div class="white-card-title">
+                  <span class="title-icon-badge">
+                    <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                  </span>
+                  <span>רשימת מנויים, סיסמאות והרשאות פעילות</span>
+                </div>
+                <div class="white-card-desc">ניהול מלא של כל המנויים הרשומים בכספת הענן — צפייה בסיסמה הפעילה, עריכת סיסמה, השהיה וחיבור מהיר.</div>
+              </div>
+
+              <div class="table-toolbar">
+                <div class="filter-pills" role="group" aria-label="סינון מנויים">
+                  <button type="button" class="filter-pill-btn active" data-filter="all">הכל</button>
+                  <button type="button" class="filter-pill-btn" data-filter="approved">פעילים</button>
+                  <button type="button" class="filter-pill-btn" data-filter="blocked">מושהים</button>
+                  <button type="button" class="filter-pill-btn" data-filter="admin">מנהלים</button>
+                </div>
+
+                <div class="search-box-wrap">
+                  <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                  <input id="userSearchInput" type="search" class="form-input" placeholder="חיפוש לפי אימייל או שם מנוי..." aria-label="חיפוש לפי אימייל או שם מנוי" />
+                </div>
+              </div>
             </div>
 
-            <div class="field-group">
-              <label for="newUserName">שם תצוגה / משפחה</label>
-              <input id="newUserName" name="new_user_name_nofill" type="text" class="glass-input" value="" placeholder="למשל: משפחת כהן" autocomplete="off" required />
+            <div class="white-card-body" style="padding:0;">
+              <div class="table-wrap" style="border:none;border-radius:0;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>שם תצוגה / מנוי</th>
+                      <th>כתובת אימייל</th>
+                      <th>סיסמה פעילה</th>
+                      <th>סטטוס גישה</th>
+                      <th>הרשאה</th>
+                      <th>מכסת פרופילים</th>
+                      <th>עדכון אחרון</th>
+                      <th>פעולות ניהול</th>
+                    </tr>
+                  </thead>
+                  <tbody id="usersTableBody">
+                    <tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:32px;">טוען רשימת מנויים מכספת הענן...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =============================================================== -->
+        <!-- PAGE 2: OVERVIEW & METRICS (סקירה כללית ומדדים)                 -->
+        <!-- =============================================================== -->
+        <section id="page-overview" class="page-view hidden">
+          <div class="kpi-grid" aria-label="מדדי מערכת מרכזיים">
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <span class="kpi-label">מנויים מאושרים בכספת הענן</span>
+                <span class="kpi-pill kpi-pill-green">פעיל</span>
+              </div>
+              <div id="kpiUsersCount" class="kpi-value">2</div>
+              <div id="kpiUsersSub" class="kpi-sub">סנכרון מיידי לכל הטלוויזיות והמחשבים</div>
             </div>
 
-            <div class="field-group">
-              <label for="newUserPassword">סיסמת כניסה למנוי</label>
-              <input id="newUserPassword" name="new_user_pass_nofill" type="text" class="glass-input ltr-input" value="" placeholder="הגדר סיסמה..." autocomplete="off" readonly onfocus="this.removeAttribute('readonly');" required />
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <span class="kpi-label">ערוצי שידור חי (ישראל והעולם)</span>
+                <span class="kpi-pill kpi-pill-blue">1080p HD</span>
+              </div>
+              <div id="kpiLiveChannelsCount" class="kpi-value">32+</div>
+              <div class="kpi-sub">כאן 11, קשת 12, רשת 13, עכשיו 14, סרטים וספורט</div>
             </div>
 
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <span class="kpi-label">ערוצי טלגרם VOD ומאגרי 4K</span>
+                <span class="kpi-pill kpi-pill-amber">אוטומטי</span>
+              </div>
+              <div id="kpiTgChannelsCount" class="kpi-value">8</div>
+              <div class="kpi-sub">שאיבה אוטומטית + תרגום עברית מסונכרן</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <span class="kpi-label">הצפנת סיסמאות ואימות כניסה</span>
+                <span class="kpi-pill kpi-pill-green">מאובטח</span>
+              </div>
+              <div class="kpi-value" style="color:var(--green);font-size:1.75rem;">SHA-256</div>
+              <div class="kpi-sub">סנכרון דו-כיווני מובטח לענן ולסטרימרים</div>
+            </div>
+          </div>
+
+          <div class="white-card">
+            <div class="white-card-header">
+              <div class="white-card-title-group">
+                <div class="white-card-title">תמונת מצב מהירה — מערכת STREAM IT</div>
+                <div class="white-card-desc">כל השירותים, כספת המשתמשים, ערוצי השידור החי ומנועי הכתוביות בעברית פועלים באופן תקין.</div>
+              </div>
+              <button type="button" class="btn btn-primary btn-sm" id="overviewGoToUsersBtn">מעבר לניהול מנויים</button>
+            </div>
+            <div class="white-card-body">
+              <div class="cards-grid-3">
+                <div class="info-card">
+                  <div class="info-card-top">
+                    <span class="info-card-title">כספת מנויים בענן (GitHub Vault)</span>
+                    <span class="badge badge-approved">מחובר</span>
+                  </div>
+                  <p style="font-size:0.86rem;color:var(--text-muted);">עדיפות ראשונה לנתוני הענן החיים — כל סיסמה שנקבעת בדשבורד נשמרת מיד ודורסת כל מטמון ישן.</p>
+                </div>
+                <div class="info-card">
+                  <div class="info-card-top">
+                    <span class="info-card-title">תאימות מקלדת שלט בסטרימר</span>
+                    <span class="badge badge-approved">פעיל</span>
+                  </div>
+                  <p style="font-size:0.86rem;color:var(--text-muted);">תמיכה מלאה בסיסמאות עם אותיות גדולות/קטנות ומספרים גם בכניסה ממחשב וגם מהמקלדת הווירטואלית בטלוויזיה.</p>
+                </div>
+                <div class="info-card">
+                  <div class="info-card-top">
+                    <span class="info-card-title">מנוע OTA עדכון אוטומטי</span>
+                    <span class="badge badge-approved">v9.6.5</span>
+                  </div>
+                  <p style="font-size:0.86rem;color:var(--text-muted);">כלל הסטרימרים והטלוויזיות מושכים עדכוני ממשק והרשאות גישה באופן אוטומטי בהפעלה.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =============================================================== -->
+        <!-- PAGE 3: TELEGRAM VOD CHANNELS (ערוצי טלגרם VOD)                 -->
+        <!-- =============================================================== -->
+        <section id="page-telegram" class="page-view hidden">
+          <div class="white-card">
+            <div class="white-card-header">
+              <div class="white-card-title-group">
+                <div class="white-card-title">
+                  <span class="title-icon-badge">
+                    <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                      <path d="M22 2L11 13" />
+                      <path d="M22 2L15 22l-4-9-9-4 20-7z" />
+                    </svg>
+                  </span>
+                  <span>חיבור וניהול ערוצי סרטים וסדרות בטלגרם</span>
+                </div>
+                <div class="white-card-desc">הוסף שם ערוץ טלגרם ציבורי (למשל @BoxOffice) לשאיבת סרטים וסדרות ישירות לקטלוג ללא צורך בחשבון אישי.</div>
+              </div>
+            </div>
+
+            <div class="white-card-body">
+              <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                <input id="tgAdminChannelInput" type="text" class="form-input ltr-input" placeholder="@netflix_updates או https://t.me/BoxOffice" style="flex:1;min-width:260px;" />
+                <input id="tgAdminLabelInput" type="text" class="form-input" placeholder="תיאור הערוץ (אופציונלי, למשל: סרטים חדשים 4K)" style="flex:1;min-width:240px;" />
+                <button type="button" id="tgAdminAddBtn" class="btn btn-primary" style="height:44px;">
+                  <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                  <span>הוסף ערוץ טלגרם</span>
+                </button>
+              </div>
+
+              <div id="tgChannelsTableWrap" class="cards-grid-3"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =============================================================== -->
+        <!-- PAGE 4: LIVE TV & STREAMING SOURCES (מקורות ושידורים חיים)       -->
+        <!-- =============================================================== -->
+        <section id="page-sources" class="page-view hidden">
+          <div class="white-card">
+            <div class="white-card-header">
+              <div class="white-card-title-group">
+                <div class="white-card-title">
+                  <span class="title-icon-badge">
+                    <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                      <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                      <polyline points="2 17 12 22 22 17" />
+                      <polyline points="2 12 12 17 22 12" />
+                    </svg>
+                  </span>
+                  <span>סטטוס מנועי הזרמה, כתוביות עברית ושידורים חיים</span>
+                </div>
+                <div class="white-card-desc">כלל המקורות מחוברים ופועלים אוטומטית ב-1080p / 4K עם סינון תוכן זר וכתוביות בעברית בלבד.</div>
+              </div>
+            </div>
+            <div class="white-card-body">
+              <div id="addonsGrid" class="cards-grid-3"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =============================================================== -->
+        <!-- PAGE 5: CLOUD VAULT & BACKUPS (כספת ענן וגיבויים)               -->
+        <!-- =============================================================== -->
+        <section id="page-cloud" class="page-view hidden">
+          <div class="white-card">
+            <div class="white-card-header">
+              <div class="white-card-title-group">
+                <div class="white-card-title">
+                  <span class="title-icon-badge">
+                    <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                      <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
+                    </svg>
+                  </span>
+                  <span>ניהול כספת ענן (GitHub Cloud Vault) וגיבויים</span>
+                </div>
+                <div class="white-card-desc">סנכרון ישיר מול מאגר הענן המרכזי, ייצוא קובץ גיבוי וניקוי מטמון מקומי.</div>
+              </div>
+            </div>
+            <div class="white-card-body">
+              <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                <button type="button" id="forcePushCloudBtn" class="btn btn-primary">
+                  <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                    <polyline points="16 16 12 12 8 16" />
+                    <line x1="12" y1="12" x2="12" y2="21" />
+                    <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
+                  </svg>
+                  <span>שמור ודחוף את כל המנויים לענן כעת</span>
+                </button>
+
+                <button type="button" id="forcePullCloudBtn" class="btn btn-secondary">
+                  <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                    <polyline points="8 17 12 21 16 17" />
+                    <line x1="12" y1="12" x2="12" y2="21" />
+                    <path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29" />
+                  </svg>
+                  <span>משוך נתונים עדכניים מהענן (איפוס מטמון מקומי)</span>
+                </button>
+
+                <button type="button" id="exportVaultCloudPageBtn" class="btn btn-secondary">
+                  <span>הורדת קובץ accounts_vault.json</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- =================================================================== -->
+  <!-- EDIT SUBSCRIBER & PASSWORD MODAL (#editUserModal)                   -->
+  <!-- =================================================================== -->
+  <div id="editUserModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="editUserModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="editUserModalTitle" class="modal-title">עריכת מנוי וקביעת סיסמה</h2>
+        <button type="button" id="closeEditUserModalBtn" class="btn btn-secondary btn-xs">סגור ✕</button>
+      </div>
+      <form id="editUserForm" autocomplete="off">
+        <div class="modal-body">
+          <div class="field-group">
+            <label for="editUserEmail">כתובת אימייל של המנוי</label>
+            <input id="editUserEmail" type="email" class="form-input ltr-input" readonly style="background:#F8FAFC;color:#64748B;" />
+          </div>
+
+          <div class="field-group">
+            <label for="editUserName">שם תצוגה / משפחה</label>
+            <input id="editUserName" type="text" class="form-input" required />
+          </div>
+
+          <div class="field-group">
+            <label for="editUserPassword">סיסמת כניסה חדשה / קבועה למנוי</label>
+            <input id="editUserPassword" type="text" class="form-input ltr-input" placeholder="הזן סיסמה חדשה למנוי (או השאר ריק לשמירת הקיימת)..." autocomplete="off" />
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
             <div class="field-group">
-              <label for="newUserRole">סוג הרשאה</label>
-              <select id="newUserRole" class="glass-select">
-                <option value="member" selected>מנוי משפחתי (רגיל)</option>
+              <label for="editUserRole">סוג הרשאה</label>
+              <select id="editUserRole" class="form-select">
+                <option value="member">מנוי משפחתי (רגיל)</option>
                 <option value="admin">מנהל מערכת (Admin)</option>
               </select>
             </div>
 
             <div class="field-group">
-              <label for="newUserMaxProfiles">מכסת פרופילים</label>
-              <select id="newUserMaxProfiles" class="glass-select">
+              <label for="editUserMaxProfiles">מכסת פרופילים</label>
+              <select id="editUserMaxProfiles" class="form-select">
                 <option value="1">פרופיל יחיד (1)</option>
                 <option value="3">עד 3 פרופילים</option>
-                <option value="5" selected>עד 5 פרופילים (משפחתי)</option>
+                <option value="5">עד 5 פרופילים (משפחתי)</option>
                 <option value="8">עד 8 פרופילים (VIP)</option>
               </select>
             </div>
-
-            <button type="submit" id="createUserSubmitBtn" class="btn btn-primary" style="height:44px;padding:0 22px;">
-              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-              </svg>
-              <span>שמור וסנכרן לענן</span>
-            </button>
-          </form>
-        </div>
-
-        <!-- Subscribers Table Card -->
-        <div class="panel-card">
-          <div class="panel-header">
-            <div class="panel-title-group">
-              <div class="panel-title">
-                <span class="panel-title-icon">
-                  <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                  </svg>
-                </span>
-                <span>רשימת מנויים והרשאות גישה פעילות</span>
-              </div>
-              <div class="panel-desc">ניהול בזמן אמת של כלל המנויים הרשומים בכספת הענן — חיבור מהיר, השהיה, שינוי סיסמה ומחיקה.</div>
-            </div>
-
-            <div class="search-box-wrap">
-              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <input id="userSearchInput" type="search" class="glass-input" placeholder="חיפוש לפי אימייל או שם מנוי..." aria-label="חיפוש לפי אימייל או שם מנוי" />
-            </div>
           </div>
 
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>כתובת אימייל</th>
-                  <th>שם תצוגה / מנוי</th>
-                  <th>סטטוס גישה</th>
-                  <th>הרשאה</th>
-                  <th>פרופילים</th>
-                  <th>אבטחת סיסמה</th>
-                  <th>עדכון אחרון</th>
-                  <th>פעולות ניהול</th>
-                </tr>
-              </thead>
-              <tbody id="usersTableBody">
-                <tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:28px;">טוען רשימת מנויים מכספת הענן...</td></tr>
-              </tbody>
-            </table>
+          <div class="field-group">
+            <label for="editUserStatus">סטטוס גישה</label>
+            <select id="editUserStatus" class="form-select">
+              <option value="approved">מאושר פעיל</option>
+              <option value="blocked">מושהה / חסום</option>
+            </select>
           </div>
         </div>
-      </section>
 
-      <!-- TAB 2: TELEGRAM -->
-      <section id="tab-telegram" class="tab-pane hidden" style="display:flex;flex-direction:column;gap:22px;">
-        <div class="panel-card">
-          <div class="panel-header">
-            <div class="panel-title-group">
-              <div class="panel-title">
-                <span class="panel-title-icon">
-                  <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
-                    <path d="M22 2L11 13" />
-                    <path d="M22 2L15 22l-4-9-9-4 20-7z" />
-                  </svg>
-                </span>
-                <span>חיבור ערוצי סרטים וסדרות בטלגרם (ללא חשבון אישי)</span>
-              </div>
-              <div class="panel-desc">הוסף שם ערוץ טלגרם ציבורי (למשל @BoxOffice) לשאיבת סרטים וסדרות ישירות לקטלוג.</div>
-            </div>
-          </div>
-
-          <div style="display:flex;gap:12px;flex-wrap:wrap;">
-            <input id="tgAdminChannelInput" type="text" class="glass-input ltr-input" placeholder="@netflix_updates או https://t.me/BoxOffice" style="flex:1;min-width:260px;" />
-            <button type="button" id="tgAdminAddBtn" class="btn btn-primary" style="height:44px;">
-              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
-              </svg>
-              <span>הוסף ערוץ טלגרם</span>
-            </button>
-          </div>
-
-          <div id="tgChannelsTableWrap" class="addons-grid"></div>
+        <div class="modal-footer">
+          <button type="button" id="cancelEditUserBtn" class="btn btn-secondary">ביטול</button>
+          <button type="submit" id="saveEditUserBtn" class="btn btn-primary">שמור שינויים וסנכרן לענן</button>
         </div>
-      </section>
-
-      <!-- TAB 3: SOURCES -->
-      <section id="tab-sources" class="tab-pane hidden" style="display:flex;flex-direction:column;gap:22px;">
-        <div class="panel-card">
-          <div class="panel-header">
-            <div class="panel-title-group">
-              <div class="panel-title">
-                <span class="panel-title-icon">
-                  <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
-                    <polygon points="12 2 2 7 12 12 22 7 12 2" />
-                    <polyline points="2 17 12 22 22 17" />
-                    <polyline points="2 12 12 17 22 12" />
-                  </svg>
-                </span>
-                <span>סטטוס מנועי הזרמה, כתוביות עברית ושידורים חיים</span>
-              </div>
-              <div class="panel-desc">כלל המקורות מחוברים ופועלים אוטומטית ב-1080p / 4K עם סינון תוכן זר וכתוביות בעברית בלבד.</div>
-            </div>
-          </div>
-          <div id="addonsGrid" class="addons-grid"></div>
-        </div>
-      </section>
-    </main>
+      </form>
+    </div>
   </div>
 
   <div id="toastBox" class="toast-box hidden"></div>
@@ -1322,7 +1730,7 @@
       'use strict';
 
       var STORAGE_VAULT_KEY = 'streamit_cloud_vault_v9';
-      var ADMIN_SESSION_KEY = 'streamit_admin_auth_session_v951';
+      var ADMIN_SESSION_KEY = 'streamit_admin_auth_session_v965';
       var GH_REPO = 'streamittvapp/stream-it-app';
       var GH_FILE_PATH = 'data/accounts_vault.json';
 
@@ -1332,6 +1740,140 @@
         return CLOUD_SYNC_BYTES.map(function (b) { return String.fromCharCode(b ^ 73); }).join('');
       }
 
+      // Reversible XOR-59 + Base64 Password Cipher so Admin can view/verify exact set password
+      function encodePassCipher(plain) {
+        try {
+          var utf8 = unescape(encodeURIComponent(String(plain || '')));
+          var xored = '';
+          for (var i = 0; i < utf8.length; i++) {
+            xored += String.fromCharCode(utf8.charCodeAt(i) ^ 59);
+          }
+          return btoa(xored);
+        } catch (e) {
+          return '';
+        }
+      }
+
+      function decodePassCipher(cipher) {
+        if (!cipher) return '';
+        try {
+          var raw = atob(String(cipher));
+          var out = '';
+          for (var i = 0; i < raw.length; i++) {
+            out += String.fromCharCode(raw.charCodeAt(i) ^ 59);
+          }
+          return decodeURIComponent(escape(out));
+        } catch (e) {
+          return '';
+        }
+      }
+
+      // Pure-JS SHA-256 Implementation (Works 100% on HTTP, LAN IPs, Android WebViews & HTTPS!)
+      function sha256PureJs(ascii) {
+        function rightRotate(value, amount) {
+          return (value >>> amount) | (value << (32 - amount));
+        }
+        var mathPow = Math.pow;
+        var maxWord = mathPow(2, 32);
+        var lengthProperty = 'length';
+        var i, j;
+        var result = '';
+        var words = [];
+        var asciiBitLength = ascii[lengthProperty] * 8;
+        var hash = sha256PureJs.h = sha256PureJs.h || [];
+        var k = sha256PureJs.k = sha256PureJs.k || [];
+        var primeCounter = k[lengthProperty];
+        var isComposite = {};
+        for (var candidate = 2; primeCounter < 64; candidate++) {
+          if (!isComposite[candidate]) {
+            for (i = 0; i < 313; i += candidate) {
+              isComposite[i] = candidate;
+            }
+            hash[primeCounter] = (mathPow(candidate, 0.5) * maxWord) | 0;
+            k[primeCounter++] = (mathPow(candidate, 1 / 3) * maxWord) | 0;
+          }
+        }
+        ascii += '\x80';
+        while ((ascii[lengthProperty] % 64) - 56) ascii += '\x00';
+        for (i = 0; i < ascii[lengthProperty]; i++) {
+          j = ascii.charCodeAt(i);
+          if (j >> 8) return '';
+          words[i >> 2] |= j << ((3 - (i % 4)) * 8);
+        }
+        words[words[lengthProperty]] = (asciiBitLength / maxWord) | 0;
+        words[words[lengthProperty]] = asciiBitLength;
+        for (j = 0; j < words[lengthProperty]; ) {
+          var w = words.slice(j, (j += 16));
+          var oldHash = hash;
+          hash = hash.slice(0, 8);
+          for (i = 0; i < 64; i++) {
+            var i2 = i + j;
+            var w15 = w[i - 15], w2 = w[i - 2];
+            var a = hash[0], e = hash[4];
+            var temp1 =
+              hash[7] +
+              (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25)) +
+              ((e & hash[5]) ^ (~e & hash[6])) +
+              k[i] +
+              (w[i] =
+                i < 16
+                  ? w[i]
+                  : (w[i - 16] +
+                      (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3)) +
+                      w[i - 7] +
+                      (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))) |
+                    0);
+            var temp2 =
+              (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22)) +
+              ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+            hash = [(temp1 + temp2) | 0].concat(hash);
+            hash[4] = (hash[4] + temp1) | 0;
+          }
+          for (i = 0; i < 8; i++) {
+            hash[i] = (hash[i] + oldHash[i]) | 0;
+          }
+        }
+        for (i = 0; i < 8; i++) {
+          for (j = 3; j + 1; j--) {
+            var b = (hash[i] >> (j * 8)) & 255;
+            result += (b < 16 ? 0 : '') + b.toString(16);
+          }
+        }
+        return result;
+      }
+
+      async function sha256Hex(str) {
+        var rawStr = String(str == null ? '' : str);
+        try {
+          if (window.crypto && window.crypto.subtle) {
+            var buf = new TextEncoder().encode(rawStr);
+            var hashBuf = await window.crypto.subtle.digest('SHA-256', buf);
+            var arr = Array.from(new Uint8Array(hashBuf));
+            return arr.map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+          }
+        } catch (e) {}
+        var utf8Str = unescape(encodeURIComponent(rawStr));
+        return sha256PureJs(utf8Str);
+      }
+
+      async function buildPasswordHashes(email, password) {
+        var cleanEmail = String(email || '').trim().toLowerCase();
+        var cleanPass = String(password || '').trim();
+        var hExact = await sha256Hex(cleanEmail + ':' + cleanPass);
+        var hLower = await sha256Hex(cleanEmail + ':' + cleanPass.toLowerCase());
+        var hRaw = await sha256Hex(cleanPass);
+        var hRawLower = await sha256Hex(cleanPass.toLowerCase());
+        var list = [hExact];
+        if (list.indexOf(hLower) === -1) list.push(hLower);
+        if (list.indexOf(hRaw) === -1) list.push(hRaw);
+        if (list.indexOf(hRawLower) === -1) list.push(hRawLower);
+        return {
+          passHash: hExact,
+          altHashes: list,
+          passCipher: encodePassCipher(cleanPass)
+        };
+      }
+
       var DEFAULT_VAULT = {
         'streamittvapp@gmail.com': {
           email: 'streamittvapp@gmail.com',
@@ -1339,16 +1881,14 @@
           status: 'approved',
           role: 'admin',
           max_profiles: 5,
-          passHash: 'f9d26c67c77cf8b3bd03f985cc6785c493c34505dfda9edf9259d04ffb88f5b1',
+          passHash: '0d24c3b776130811276c208a3457be7c316328088de816ac3ebc192bb977094d',
           altHashes: [
+            '0d24c3b776130811276c208a3457be7c316328088de816ac3ebc192bb977094d',
             'f9d26c67c77cf8b3bd03f985cc6785c493c34505dfda9edf9259d04ffb88f5b1',
-            '01884b718ab9bed7c127b90f1880cc671e1d836488a9cc912c875547f4196a0f',
-            'b935bf959e686e20500064a8328e798338a2ee91215b4311b5eec4cee08dd447',
-            'ba113970b3c49b0fad970547ddf74cd4c29cef8eed9eb6fbf69f4e66077a68b3',
-            'cc43dbd645eaf3e9d95c618efdcdce07265ec7a56ad9dad5e25b8b1e9795881b',
-            '79fae471cb66b40e90730f0a80a74037c957514b76df6d6569c8d0511aa0cc8c'
+            '01884b718ab9bed7c127b90f1880cc671e1d836488a9cc912c875547f4196a0f'
           ],
-          updatedAt: '2026-11-08T21:05:00Z'
+          updatedAt: '2026-11-08 19:38',
+          autoBindPassword: false
         },
         'bensahaltv@gmail.com': {
           email: 'bensahaltv@gmail.com',
@@ -1357,23 +1897,22 @@
           role: 'admin',
           max_profiles: 5,
           autoBindPassword: false,
-          passHash: '442d9adebd866a1e4e841ac20221e48e5f1f1a83a6cffbbc772c88daad99dc6a',
+          passHash: '0359145e2cbf69985a31965ce103fb1b9cadf4aa53f99d9aee3a334ee994c2ac',
           altHashes: [
+            '0359145e2cbf69985a31965ce103fb1b9cadf4aa53f99d9aee3a334ee994c2ac',
             '442d9adebd866a1e4e841ac20221e48e5f1f1a83a6cffbbc772c88daad99dc6a',
-            '464b8cd36206cb24044ce1b63d95b3b2eb99c8b27aa85f8a3ff5ab1c274d71e2',
-            '05acb7f2d87df2245ef9d0a451e32ee70385003e903484146ec66e199fac8f58',
-            '49e805e15c0bc53e1f8279fcbec5555ca9d16791bbe92f6e176820ecf2403281',
-            '201d6744f30d417c34428a55de656731723b7a749b60b8106176f085e17f05c9',
-            '5e92c5bcd3d1b34930d93ea100a64bd8471afaab605b344feb222038bc51b860'
+            '464b8cd36206cb24044ce1b63d95b3b2eb99c8b27aa85f8a3ff5ab1c274d71e2'
           ],
-          updatedAt: '2026-11-08T21:05:00Z'
+          updatedAt: '2026-11-08 19:39'
         }
       };
 
       var state = {
         vault: {},
         usersList: [],
-        adminEmail: ''
+        adminEmail: '',
+        activeFilter: 'all',
+        deletedEmails: {}
       };
 
       function showToast(msg) {
@@ -1384,7 +1923,7 @@
         clearTimeout(box._t);
         box._t = setTimeout(function () {
           box.classList.add('hidden');
-        }, 4000);
+        }, 4200);
       }
 
       function escapeHtml(str) {
@@ -1395,20 +1934,42 @@
           .replace(/"/g, '&quot;');
       }
 
-      async function sha256Hex(str) {
-        var buf = new TextEncoder().encode(str);
-        var hashBuf = await window.crypto.subtle.digest('SHA-256', buf);
-        var arr = Array.from(new Uint8Array(hashBuf));
-        return arr.map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+      function parseUpdatedTimestamp(rec) {
+        if (!rec) return 0;
+        if (rec.updatedTs && Number(rec.updatedTs) > 0) return Number(rec.updatedTs);
+        if (rec.updatedAt) {
+          var t = Date.parse(String(rec.updatedAt).replace(' ', 'T'));
+          if (!isNaN(t)) return t;
+        }
+        return 0;
       }
 
-      async function loadVaultFromCloud() {
+      /**
+       * Cloud-First Vault Loader:
+       * Live GitHub Cloud API ALWAYS takes precedence over stale localStorage or static CDN files,
+       * while preserving any local record that has a strictly newer updatedTs!
+       */
+      async function loadVaultFromCloud(ignoreLocalCache) {
         var merged = JSON.parse(JSON.stringify(DEFAULT_VAULT));
+        var cloudLoaded = false;
 
-        // 1. Live GitHub API read (0ms CDN delay)
+        // 1. Fallback static fetch first (lowest priority above DEFAULT_VAULT)
+        try {
+          var res = await fetch('data/accounts_vault.json?t=' + Date.now(), { cache: 'no-store' });
+          if (res.ok) {
+            var remoteVault = await res.json();
+            if (remoteVault && typeof remoteVault === 'object') {
+              Object.keys(remoteVault).forEach(function (k) {
+                merged[k.toLowerCase()] = remoteVault[k];
+              });
+            }
+          }
+        } catch (e) {}
+
+        // 2. Live GitHub API read (0ms CDN delay - authoritative Cloud Vault)
         try {
           var pat = getCloudSyncToken();
-          var apiRes = await fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_FILE_PATH, {
+          var apiRes = await fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_FILE_PATH + '?t=' + Date.now(), {
             headers: pat ? { 'Authorization': 'token ' + pat, 'Accept': 'application/vnd.github.v3+json' } : { 'Accept': 'application/vnd.github.v3+json' },
             cache: 'no-store'
           });
@@ -1418,39 +1979,47 @@
               var decodedJson = decodeURIComponent(escape(atob(String(meta.content).replace(/\s/g, ''))));
               var apiVault = JSON.parse(decodedJson);
               if (apiVault && typeof apiVault === 'object') {
+                merged = {};
                 Object.keys(apiVault).forEach(function (k) {
                   merged[k.toLowerCase()] = apiVault[k];
                 });
+                cloudLoaded = true;
               }
             }
           }
         } catch (e) {}
 
-        // 2. Fallback static fetch
-        try {
-          var res = await fetch('data/accounts_vault.json?t=' + Date.now(), { cache: 'no-store' });
-          if (res.ok) {
-            var remoteVault = await res.json();
-            if (remoteVault && typeof remoteVault === 'object') {
-              Object.keys(remoteVault).forEach(function (k) {
-                if (!merged[k.toLowerCase()]) merged[k.toLowerCase()] = remoteVault[k];
-              });
+        // 3. Only merge localStorage records if they were created/updated MORE RECENTLY than Cloud
+        if (!ignoreLocalCache) {
+          try {
+            var localRaw = localStorage.getItem(STORAGE_VAULT_KEY);
+            if (localRaw) {
+              var localVault = JSON.parse(localRaw);
+              if (localVault && typeof localVault === 'object') {
+                Object.keys(localVault).forEach(function (k) {
+                  var keyLower = k.toLowerCase();
+                  if (state.deletedEmails[keyLower]) return;
+                  var localRec = localVault[k];
+                  var cloudRec = merged[keyLower];
+                  if (!cloudLoaded) {
+                    merged[keyLower] = localRec;
+                  } else if (!cloudRec && localRec && localRec.updatedTs) {
+                    merged[keyLower] = localRec;
+                  } else if (cloudRec && localRec && parseUpdatedTimestamp(localRec) > parseUpdatedTimestamp(cloudRec)) {
+                    merged[keyLower] = localRec;
+                  }
+                });
+              }
             }
-          }
-        } catch (e) {}
+          } catch (e) {}
+        }
 
-        // 3. LocalStorage overrides
-        try {
-          var localRaw = localStorage.getItem(STORAGE_VAULT_KEY);
-          if (localRaw) {
-            var localVault = JSON.parse(localRaw);
-            if (localVault && typeof localVault === 'object') {
-              Object.keys(localVault).forEach(function (k) {
-                merged[k.toLowerCase()] = localVault[k];
-              });
-            }
+        // Ensure primary admin exists
+        Object.keys(DEFAULT_VAULT).forEach(function (defKey) {
+          if (!merged[defKey] && !state.deletedEmails[defKey]) {
+            merged[defKey] = JSON.parse(JSON.stringify(DEFAULT_VAULT[defKey]));
           }
-        } catch (e) {}
+        });
 
         state.vault = merged;
         localStorage.setItem(STORAGE_VAULT_KEY, JSON.stringify(state.vault));
@@ -1460,6 +2029,12 @@
       function rebuildUsersList() {
         state.usersList = Object.keys(state.vault).map(function (emailKey) {
           var u = state.vault[emailKey];
+          var plainPass = '';
+          if (u.passCipher) {
+            plainPass = decodePassCipher(u.passCipher);
+          } else if (u.password) {
+            plainPass = String(u.password);
+          }
           return {
             email: emailKey.toLowerCase(),
             display_name: u.display_name || emailKey.split('@')[0],
@@ -1468,8 +2043,11 @@
             max_profiles: Number(u.max_profiles || 5),
             passHash: u.passHash || '',
             altHashes: u.altHashes || [],
+            passCipher: u.passCipher || '',
+            plainPassword: plainPass,
             autoBindPassword: Boolean(u.autoBindPassword),
-            updatedAt: u.updatedAt || '2026-11-08'
+            updatedAt: u.updatedAt || '2026-11-09',
+            updatedTs: Number(u.updatedTs || 0)
           };
         });
       }
@@ -1482,45 +2060,92 @@
         var pillText = document.getElementById('cloudVaultSyncPillText');
         if (pillText) pillText.textContent = 'מסנכרן שינויים לכספת הענן...';
 
-        try {
-          var apiUrl = 'https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_FILE_PATH;
-          var getRes = await fetch(apiUrl, {
-            headers: {
-              'Authorization': 'token ' + pat,
-              'Accept': 'application/vnd.github.v3+json'
-            },
-            cache: 'no-store'
-          });
-          var sha = '';
-          if (getRes.ok) {
-            var meta = await getRes.json();
-            sha = meta.sha || '';
-          }
+        for (var attempt = 0; attempt < 2; attempt++) {
+          try {
+            var apiUrl = 'https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_FILE_PATH;
+            var getRes = await fetch(apiUrl + '?t=' + Date.now() + '_' + attempt, {
+              headers: {
+                'Authorization': 'token ' + pat,
+                'Accept': 'application/vnd.github.v3+json'
+              },
+              cache: 'no-store'
+            });
+            var sha = '';
+            if (getRes.ok) {
+              var meta = await getRes.json();
+              sha = meta.sha || '';
+              if (meta && meta.content) {
+                try {
+                  var remoteJson = decodeURIComponent(escape(atob(String(meta.content).replace(/\s/g, ''))));
+                  var remoteVault = JSON.parse(remoteJson);
+                  if (remoteVault && typeof remoteVault === 'object') {
+                    Object.keys(remoteVault).forEach(function (rk) {
+                      var rKey = rk.toLowerCase();
+                      if (state.deletedEmails[rKey]) return;
+                      if (!state.vault[rKey]) {
+                        state.vault[rKey] = remoteVault[rk];
+                      }
+                    });
+                  }
+                } catch (e) {}
+              }
+            }
 
-          var contentStr = JSON.stringify(state.vault, null, 2);
-          var b64Content = btoa(unescape(encodeURIComponent(contentStr)));
-          var bodyObj = {
-            message: 'chore(vault): cloud sync approved users vault',
-            content: b64Content
-          };
-          if (sha) bodyObj.sha = sha;
+            localStorage.setItem(STORAGE_VAULT_KEY, JSON.stringify(state.vault));
+            var contentStr = JSON.stringify(state.vault, null, 2);
+            var b64Content = btoa(unescape(encodeURIComponent(contentStr)));
+            var bodyObj = {
+              message: 'chore(vault): cloud sync approved users vault',
+              content: b64Content
+            };
+            if (sha) bodyObj.sha = sha;
 
-          var putRes = await fetch(apiUrl, {
-            method: 'PUT',
-            headers: {
-              'Authorization': 'token ' + pat,
-              'Accept': 'application/vnd.github.v3+json',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(bodyObj)
-          });
+            var putRes = await fetch(apiUrl, {
+              method: 'PUT',
+              headers: {
+                'Authorization': 'token ' + pat,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(bodyObj)
+            });
 
-          if (putRes.ok) {
-            if (pillText) pillText.textContent = 'כספת ענן מסונכרנת בזמן אמת (24/7)';
+            if (putRes.ok) {
+              if (pillText) pillText.textContent = 'כספת ענן מסונכרנת בזמן אמת (24/7)';
+              return true;
+            }
+          } catch (e) {}
+        }
+
+        if (pillText) pillText.textContent = 'נשמר מקומית (סנכרון ענן בהמתנה)';
+        return false;
+      }
+
+      async function verifyRecordPassword(email, rec, password) {
+        var cleanEmail = String(email || '').trim().toLowerCase();
+        var cleanPass = String(password || '').trim();
+        if (!cleanPass || !rec) return false;
+
+        if (rec.passCipher) {
+          var dec = decodePassCipher(rec.passCipher);
+          if (dec && (dec === cleanPass || dec.toLowerCase() === cleanPass.toLowerCase())) {
             return true;
           }
-        } catch (e) {}
-        if (pillText) pillText.textContent = 'נשמר מקומית (סנכרון ענן בהמתנה)';
+        }
+        if (rec.password && (rec.password === cleanPass || String(rec.password).toLowerCase() === cleanPass.toLowerCase())) {
+          return true;
+        }
+
+        var hExact = await sha256Hex(cleanEmail + ':' + cleanPass);
+        var hLower = await sha256Hex(cleanEmail + ':' + cleanPass.toLowerCase());
+        var hRaw = await sha256Hex(cleanPass);
+        var validHashes = [];
+        if (rec.passHash) validHashes.push(rec.passHash);
+        if (Array.isArray(rec.altHashes)) validHashes = validHashes.concat(rec.altHashes);
+
+        if (validHashes.indexOf(hExact) !== -1 || validHashes.indexOf(hLower) !== -1 || validHashes.indexOf(hRaw) !== -1) {
+          return true;
+        }
         return false;
       }
 
@@ -1534,7 +2159,7 @@
           return { ok: false, error: 'נא להזין כתובת אימייל וסיסמת מנהל.' };
         }
 
-        await loadVaultFromCloud();
+        await loadVaultFromCloud(false);
         var rec = state.vault[cleanEmail];
         if (!rec) {
           return { ok: false, error: 'חשבונך אינו מופיע ברשימת המנהלים המורשים.' };
@@ -1544,23 +2169,7 @@
           return { ok: false, error: 'גישה נדחתה: ממשק הניהול פתוח למנהלי מערכת (Admin) בלבד.' };
         }
 
-        var inputHash = await sha256Hex(cleanEmail + ':' + cleanPass);
-        var validHashes = [];
-        if (rec.passHash) validHashes.push(rec.passHash);
-        if (Array.isArray(rec.altHashes)) validHashes = validHashes.concat(rec.altHashes);
-
-        var matched = validHashes.indexOf(inputHash) !== -1;
-        if (!matched && rec.autoBindPassword && cleanPass.length >= 4) {
-          rec.passHash = inputHash;
-          if (!Array.isArray(rec.altHashes)) rec.altHashes = [];
-          if (rec.altHashes.indexOf(inputHash) === -1) rec.altHashes.push(inputHash);
-          rec.autoBindPassword = false;
-          rec.updatedAt = new Date().toISOString().slice(0, 16).replace('T', ' ');
-          state.vault[cleanEmail] = rec;
-          await pushVaultToGitHubCloud();
-          matched = true;
-        }
-
+        var matched = await verifyRecordPassword(cleanEmail, rec, cleanPass);
         if (!matched) {
           return { ok: false, error: 'סיסמת מנהל שגויה. נא לנסות שנית.' };
         }
@@ -1598,6 +2207,53 @@
         if (gate) gate.classList.remove('hidden');
       }
 
+      // ============================================================
+      // SIDEBAR PAGE NAVIGATION
+      // ============================================================
+      var PAGE_META = {
+        users: {
+          title: 'ניהול מנויים, הרשאות וסיסמאות',
+          desc: 'הקמת משתמשים חדשים, קביעת סיסמאות קבועות וסנכרון מיידי לכספת הענן (GitHub Cloud Vault).'
+        },
+        overview: {
+          title: 'סקירה כללית ומדדי מערכת',
+          desc: 'תמונת מצב בזמן אמת של מנויים פעילים, שידורים חיים, ערוצי טלגרם וסטטוס אבטחה.'
+        },
+        telegram: {
+          title: 'ערוצי טלגרם VOD',
+          desc: 'ניהול ערוצי סרטים וסדרות ציבוריים בטלגרם לשאיבה אוטומטית לקטלוג.'
+        },
+        sources: {
+          title: 'מקורות ושידורים חיים',
+          desc: 'בקרת ערוצי טלוויזיה ישראליים, מנוע כתוביות עברית ושרתי הזרמה 4K/1080p.'
+        },
+        cloud: {
+          title: 'כספת ענן וגיבויים',
+          desc: 'סנכרון ישיר מול GitHub Cloud Vault, ייצוא גיבוי JSON ואיפוס מטמון מקומי.'
+        }
+      };
+
+      function switchSidebarPage(pageKey) {
+        var meta = PAGE_META[pageKey] || PAGE_META.users;
+        var titleEl = document.getElementById('workspacePageTitle');
+        var descEl = document.getElementById('workspacePageDesc');
+        if (titleEl) titleEl.textContent = meta.title;
+        if (descEl) descEl.textContent = meta.desc;
+
+        var navBtns = document.querySelectorAll('.sidebar-nav-btn');
+        for (var i = 0; i < navBtns.length; i++) {
+          navBtns[i].classList.toggle('active', navBtns[i].getAttribute('data-page') === pageKey);
+        }
+
+        var pages = document.querySelectorAll('.page-view');
+        for (var j = 0; j < pages.length; j++) {
+          pages[j].classList.toggle('hidden', pages[j].id !== 'page-' + pageKey);
+        }
+      }
+
+      // ============================================================
+      // USERS TABLE RENDER & ACTIONS
+      // ============================================================
       function renderUsersTable() {
         var tbody = document.getElementById('usersTableBody');
         var searchIn = document.getElementById('userSearchInput');
@@ -1607,16 +2263,21 @@
         var approvedCount = state.usersList.filter(function (u) { return u.status === 'approved'; }).length;
         var kpiEl = document.getElementById('kpiUsersCount');
         var kpiSub = document.getElementById('kpiUsersSub');
+        var sideBadge = document.getElementById('sidebarUsersBadge');
         if (kpiEl) kpiEl.textContent = String(approvedCount);
-        if (kpiSub) kpiSub.textContent = 'מתוך ' + state.usersList.length + ' חשבונות בכספת הענן (אין הרשמה עצמאית)';
+        if (kpiSub) kpiSub.textContent = 'מתוך ' + state.usersList.length + ' חשבונות בכספת הענן';
+        if (sideBadge) sideBadge.textContent = String(state.usersList.length);
 
         var filtered = state.usersList.filter(function (u) {
+          if (state.activeFilter === 'approved' && u.status !== 'approved') return false;
+          if (state.activeFilter === 'blocked' && u.status === 'approved') return false;
+          if (state.activeFilter === 'admin' && u.role !== 'admin') return false;
           if (!q) return true;
           return (u.email || '').toLowerCase().indexOf(q) !== -1 || (u.display_name || '').toLowerCase().indexOf(q) !== -1;
         });
 
         if (!filtered.length) {
-          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:28px;">לא נמצאו מנויים תואמים.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:32px;">לא נמצאו מנויים תואמים לחיפוש.</td></tr>';
           return;
         }
 
@@ -1624,36 +2285,37 @@
           var isApproved = u.status === 'approved';
           var statusBadge = isApproved
             ? '<span class="badge badge-approved"><span class="badge-dot"></span><span>מאושר פעיל</span></span>'
-            : '<span class="badge badge-blocked"><span class="badge-dot"></span><span>חסום / מושהה</span></span>';
+            : '<span class="badge badge-blocked"><span class="badge-dot"></span><span>מושהה</span></span>';
           var roleBadge = u.role === 'admin'
             ? '<span class="badge badge-admin">מנהל מערכת (Admin)</span>'
             : '<span class="badge badge-member">מנוי משפחתי</span>';
           var initial = String(u.display_name || u.email || 'U').trim().charAt(0).toUpperCase();
 
+          var passDisplay = u.plainPassword
+            ? '<span class="pass-pill-wrap" title="הסיסמה הקבועה של המנוי">' + escapeHtml(u.plainPassword) + '</span>'
+            : '<span class="pass-pill-wrap" style="color:#059669;" title="מוצפן SHA-256 (לחץ על ערוך/סיסמה לקביעת סיסמה גלויה)">מוצפן SHA-256</span>';
+
           return (
             '<tr>' +
-              '<td class="user-cell-email">' + escapeHtml(u.email) + '</td>' +
               '<td>' +
                 '<div class="user-cell-name">' +
                   '<span class="user-avatar-dot">' + escapeHtml(initial) + '</span>' +
                   '<span>' + escapeHtml(u.display_name) + '</span>' +
                 '</div>' +
               '</td>' +
+              '<td class="user-cell-email">' + escapeHtml(u.email) + '</td>' +
+              '<td>' + passDisplay + '</td>' +
               '<td>' + statusBadge + '</td>' +
               '<td>' + roleBadge + '</td>' +
-              '<td style="color:var(--text-secondary);font-weight:600;">עד ' + Number(u.max_profiles || 5) + ' פרופילים</td>' +
-              '<td><span class="badge-security">SHA-256 מוצפן בענן</span></td>' +
+              '<td style="color:var(--text-secondary);font-weight:700;">עד ' + Number(u.max_profiles || 5) + ' פרופילים</td>' +
               '<td style="direction:ltr;text-align:right;color:var(--text-muted);font-family:\'JetBrains Mono\',monospace;font-size:0.78rem;">' + escapeHtml((u.updatedAt || '').slice(0, 16).replace('T', ' ')) + '</td>' +
               '<td>' +
                 '<div class="row-actions">' +
-                  '<button type="button" class="btn btn-success btn-xs" data-action="autologin" data-email="' + escapeHtml(u.email) + '">' +
-                    '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>' +
-                    '<span>חבר לאפליקציה</span>' +
-                  '</button>' +
+                  '<button type="button" class="btn btn-secondary btn-xs" data-action="edit" data-email="' + escapeHtml(u.email) + '">ערוך / סיסמה</button>' +
+                  '<button type="button" class="btn btn-success btn-xs" data-action="autologin" data-email="' + escapeHtml(u.email) + '">חבר לנגן</button>' +
                   (isApproved
                     ? '<button type="button" class="btn btn-warning btn-xs" data-action="block" data-email="' + escapeHtml(u.email) + '">השהה</button>'
-                    : '<button type="button" class="btn btn-success btn-xs" data-action="approve" data-email="' + escapeHtml(u.email) + '">אשר מנוי</button>') +
-                  '<button type="button" class="btn btn-secondary btn-xs" data-action="passwd" data-email="' + escapeHtml(u.email) + '">שנה סיסמה</button>' +
+                    : '<button type="button" class="btn btn-success btn-xs" data-action="approve" data-email="' + escapeHtml(u.email) + '">אשר</button>') +
                   '<button type="button" class="btn btn-danger btn-xs" data-action="delete" data-email="' + escapeHtml(u.email) + '">מחק</button>' +
                 '</div>' +
               '</td>' +
@@ -1667,49 +2329,74 @@
         }
       }
 
+      function openEditUserModal(email) {
+        var cleanEmail = String(email || '').trim().toLowerCase();
+        var rec = state.vault[cleanEmail];
+        if (!rec) return;
+
+        var modal = document.getElementById('editUserModal');
+        var emailIn = document.getElementById('editUserEmail');
+        var nameIn = document.getElementById('editUserName');
+        var passIn = document.getElementById('editUserPassword');
+        var roleIn = document.getElementById('editUserRole');
+        var maxIn = document.getElementById('editUserMaxProfiles');
+        var statusIn = document.getElementById('editUserStatus');
+
+        if (emailIn) emailIn.value = cleanEmail;
+        if (nameIn) nameIn.value = rec.display_name || cleanEmail.split('@')[0];
+        if (passIn) passIn.value = rec.passCipher ? decodePassCipher(rec.passCipher) : (rec.password || '');
+        if (roleIn) roleIn.value = rec.role || 'member';
+        if (maxIn) maxIn.value = String(rec.max_profiles || 5);
+        if (statusIn) statusIn.value = rec.status || 'approved';
+
+        if (modal) modal.classList.remove('hidden');
+        if (passIn) passIn.focus();
+      }
+
+      function closeEditUserModal() {
+        var modal = document.getElementById('editUserModal');
+        if (modal) modal.classList.add('hidden');
+      }
+
       async function handleUserRowAction() {
         var action = this.getAttribute('data-action');
         var email = (this.getAttribute('data-email') || '').toLowerCase();
         if (!email || !state.vault[email]) return;
 
+        if (action === 'edit') {
+          openEditUserModal(email);
+          return;
+        }
         if (action === 'autologin') {
           var uRec = state.vault[email];
           try {
             localStorage.setItem('streamit_user_v9', JSON.stringify({
               name: uRec.display_name || email.split('@')[0],
               email: email,
-              role: uRec.role || 'member'
+              role: uRec.role || 'member',
+              max_profiles: Number(uRec.max_profiles || 5)
             }));
           } catch (e) {}
           showToast('המנוי ' + (uRec.display_name || email) + ' חובר אוטומטית! מעביר לאפליקציה...');
           setTimeout(function () {
             window.location.href = 'index.html';
-          }, 600);
+          }, 500);
           return;
         }
         if (action === 'approve' || action === 'block') {
           state.vault[email].status = action === 'approve' ? 'approved' : 'blocked';
           state.vault[email].updatedAt = new Date().toISOString().slice(0, 16).replace('T', ' ');
+          state.vault[email].updatedTs = Date.now();
           renderUsersTable();
           var synced = await pushVaultToGitHubCloud();
           showToast(synced ? 'סטטוס המנוי עודכן וסונכרן לענן!' : 'סטטוס המנוי עודכן!');
-        } else if (action === 'passwd') {
-          var newPassword = window.prompt('הזן סיסמה חדשה עבור ' + email + ':', '');
-          if (!newPassword || !newPassword.trim()) return;
-          var newHash = await sha256Hex(email + ':' + newPassword.trim());
-          state.vault[email].passHash = newHash;
-          state.vault[email].altHashes = [newHash];
-          state.vault[email].autoBindPassword = false;
-          state.vault[email].updatedAt = new Date().toISOString().slice(0, 16).replace('T', ' ');
-          renderUsersTable();
-          var syncedPw = await pushVaultToGitHubCloud();
-          showToast(syncedPw ? 'הסיסמה הוצפנה וסונכרנה מיד לכספת הענן!' : 'הסיסמה עודכנה!');
         } else if (action === 'delete') {
           if (email === 'streamittvapp@gmail.com') {
             showToast('לא ניתן למחוק את חשבון המנהל הראשי.');
             return;
           }
           if (!window.confirm('למחוק לצמיתות את המנוי ' + email + '?')) return;
+          state.deletedEmails[email] = true;
           delete state.vault[email];
           renderUsersTable();
           await pushVaultToGitHubCloud();
@@ -1736,16 +2423,18 @@
         } catch (e) {}
 
         var kpiTg = document.getElementById('kpiTgChannelsCount');
+        var sideTg = document.getElementById('sidebarTgBadge');
         if (kpiTg) kpiTg.textContent = String(list.length);
+        if (sideTg) sideTg.textContent = String(list.length);
 
         wrap.innerHTML = list.map(function (c) {
           return (
-            '<div class="addon-card">' +
-              '<div class="addon-top">' +
-                '<span class="addon-name" style="direction:ltr;color:var(--accent-blue);font-family:\'JetBrains Mono\',monospace;">@' + escapeHtml(c.handle) + '</span>' +
+            '<div class="info-card">' +
+              '<div class="info-card-top">' +
+                '<span class="info-card-title" style="direction:ltr;color:var(--accent-blue);font-family:\'JetBrains Mono\',monospace;">@' + escapeHtml(c.handle) + '</span>' +
                 '<span class="badge badge-approved"><span class="badge-dot"></span><span>מחובר</span></span>' +
               '</div>' +
-              '<div style="font-size:0.84rem;color:var(--text-muted);">' + escapeHtml(c.label || 'ערוץ טלגרם VOD') + '</div>' +
+              '<div style="font-size:0.86rem;color:var(--text-muted);">' + escapeHtml(c.label || 'ערוץ טלגרם VOD') + '</div>' +
             '</div>'
           );
         }).join('');
@@ -1760,22 +2449,49 @@
           { name: 'רשת 13 + עכשיו 14 + i24NEWS עברית', desc: 'שידור חי רציף 24/7 ב-1080p (אפיקים 13, 14, 15).' },
           { name: 'חבילת ערוצי yes / HOT / NEXT TV / סלקום TV', desc: 'ערוצי סרטים, דרמה, אקשן, קומדיה 20, ריאליטי 22, ויוה 27, הופ! 77 וזום 78 מחוברים אוטומטית.' },
           { name: 'מנוע כתוביות עברית בלבד (AutoSub AI)', desc: 'סינכרון כתוביות אוטומטי בעברית (ברירת מחדל: ענק 42px, לבן, שקוף, 3.5%).' },
-          { name: 'מאגר סרטים וסדרות עולמי (TMDB + YTS + TPB)', desc: 'הזרמה ישירה בענן עם סינון אוטומטי של כותרים בשפות זרות מהמזרח הרחוק.' }
+          { name: 'מאגר סרטים וסדרות עולמי (TMDB + YTS + Vidora)', desc: 'הזרמה ישירה בענן עם סינון אוטומטי של כותרים בשפות זרות מהמזרח הרחוק.' }
         ];
         grid.innerHTML = sources.map(function (s) {
           return (
-            '<div class="addon-card">' +
-              '<div class="addon-top">' +
-                '<span class="addon-name">' + escapeHtml(s.name) + '</span>' +
+            '<div class="info-card">' +
+              '<div class="info-card-top">' +
+                '<span class="info-card-title">' + escapeHtml(s.name) + '</span>' +
                 '<span class="badge badge-approved"><span class="badge-dot"></span><span>פעיל 100%</span></span>' +
               '</div>' +
-              '<div style="font-size:0.84rem;color:var(--text-muted);">' + escapeHtml(s.desc) + '</div>' +
+              '<div style="font-size:0.86rem;color:var(--text-muted);">' + escapeHtml(s.desc) + '</div>' +
             '</div>'
           );
         }).join('');
       }
 
-      // Bindings
+      // ============================================================
+      // EVENT LISTENERS
+      // ============================================================
+      var navBtns = document.querySelectorAll('.sidebar-nav-btn');
+      for (var n = 0; n < navBtns.length; n++) {
+        navBtns[n].addEventListener('click', function () {
+          switchSidebarPage(this.getAttribute('data-page'));
+        });
+      }
+
+      var overviewUsersBtn = document.getElementById('overviewGoToUsersBtn');
+      if (overviewUsersBtn) {
+        overviewUsersBtn.addEventListener('click', function () {
+          switchSidebarPage('users');
+        });
+      }
+
+      var filterBtns = document.querySelectorAll('.filter-pill-btn');
+      for (var f = 0; f < filterBtns.length; f++) {
+        filterBtns[f].addEventListener('click', function () {
+          state.activeFilter = this.getAttribute('data-filter') || 'all';
+          for (var k = 0; k < filterBtns.length; k++) {
+            filterBtns[k].classList.toggle('active', filterBtns[k] === this);
+          }
+          renderUsersTable();
+        });
+      }
+
       var gateForm = document.getElementById('adminGateForm');
       if (gateForm) {
         gateForm.addEventListener('submit', async function (e) {
@@ -1791,7 +2507,7 @@
           if (submitBtn) {
             submitBtn.innerHTML =
               '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>' +
-              '<span>אימות וכניסה לממשק הניהול</span>';
+              '<span>אימות וכניסה לדשבורד</span>';
           }
 
           if (!res.ok) {
@@ -1810,6 +2526,7 @@
         lockBtn.addEventListener('click', lockAdminConsole);
       }
 
+      // Create / Update User Form
       var createForm = document.getElementById('createUserForm');
       if (createForm) {
         createForm.addEventListener('submit', async function (e) {
@@ -1827,7 +2544,8 @@
           if (!email || !password) return;
 
           if (btn) btn.innerHTML = '<span>מצפין ומסנכרן לענן...</span>';
-          var passHash = await sha256Hex(email + ':' + password);
+          delete state.deletedEmails[email];
+          var pwData = await buildPasswordHashes(email, password);
 
           state.vault[email] = {
             email: email,
@@ -1835,10 +2553,12 @@
             status: 'approved',
             role: roleEl ? roleEl.value : 'member',
             max_profiles: Number(maxEl ? maxEl.value : 5),
-            passHash: passHash,
-            altHashes: [passHash],
+            passHash: pwData.passHash,
+            altHashes: pwData.altHashes,
+            passCipher: pwData.passCipher,
             autoBindPassword: false,
-            updatedAt: new Date().toISOString().slice(0, 16).replace('T', ' ')
+            updatedAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
+            updatedTs: Date.now()
           };
 
           emailEl.value = '';
@@ -1846,25 +2566,63 @@
           passEl.value = '';
           renderUsersTable();
 
-          try {
-            localStorage.setItem('streamit_user_v9', JSON.stringify({
-              name: name || email.split('@')[0],
-              email: email,
-              role: roleEl ? roleEl.value : 'member'
-            }));
-          } catch (e) {}
-
           var synced = await pushVaultToGitHubCloud();
           if (btn) {
             btn.innerHTML =
               '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>' +
-              '<span>שמור וסנכרן לענן</span>';
+              '<span>שמור מנוי וסנכרן לענן</span>';
           }
           showToast(synced
-            ? ('המנוי ' + email + ' הוקם, חובר אוטומטית ומסונכרן לענן!')
-            : ('המנוי ' + email + ' הוקם וחובר אוטומטית!'));
+            ? ('המנוי ' + email + ' הוקם עם הסיסמה "' + password + '" וסונכרן לענן בהצלחה!')
+            : ('המנוי ' + email + ' נשמר עם הסיסמה "' + password + '"!'));
         });
       }
+
+      // Edit User Modal Form
+      var editForm = document.getElementById('editUserForm');
+      if (editForm) {
+        editForm.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          var email = (document.getElementById('editUserEmail').value || '').trim().toLowerCase();
+          var name = (document.getElementById('editUserName').value || '').trim();
+          var newPass = (document.getElementById('editUserPassword').value || '').trim();
+          var role = document.getElementById('editUserRole').value || 'member';
+          var maxProfiles = Number(document.getElementById('editUserMaxProfiles').value || 5);
+          var status = document.getElementById('editUserStatus').value || 'approved';
+
+          if (!email || !state.vault[email]) return;
+          var rec = state.vault[email];
+          rec.display_name = name || email.split('@')[0];
+          rec.role = role;
+          rec.max_profiles = maxProfiles;
+          rec.status = status;
+          rec.autoBindPassword = false;
+          rec.updatedAt = new Date().toISOString().slice(0, 16).replace('T', ' ');
+          rec.updatedTs = Date.now();
+
+          if (newPass) {
+            var pwData = await buildPasswordHashes(email, newPass);
+            rec.passHash = pwData.passHash;
+            rec.altHashes = pwData.altHashes;
+            rec.passCipher = pwData.passCipher;
+            delete rec.password;
+          }
+
+          state.vault[email] = rec;
+          closeEditUserModal();
+          renderUsersTable();
+
+          var synced = await pushVaultToGitHubCloud();
+          showToast(synced
+            ? ('פרטי המנוי ' + email + ' והסיסמה עודכנו וסונכרנו לענן!')
+            : ('פרטי המנוי ' + email + ' עודכנו!'));
+        });
+      }
+
+      var closeEditBtn = document.getElementById('closeEditUserModalBtn');
+      var cancelEditBtn = document.getElementById('cancelEditUserBtn');
+      if (closeEditBtn) closeEditBtn.addEventListener('click', closeEditUserModal);
+      if (cancelEditBtn) cancelEditBtn.addEventListener('click', closeEditUserModal);
 
       var searchIn = document.getElementById('userSearchInput');
       if (searchIn) searchIn.addEventListener('input', renderUsersTable);
@@ -1872,60 +2630,69 @@
       var refreshBtn = document.getElementById('refreshAllBtn');
       if (refreshBtn) {
         refreshBtn.addEventListener('click', async function () {
-          await loadVaultFromCloud();
+          await loadVaultFromCloud(true);
           renderUsersTable();
-          showToast('רשימת המנויים רועננה מכספת הענן.');
+          showToast('רשימת המנויים רועננה ישירות מכספת הענן.');
         });
       }
 
-      var exportBtn = document.getElementById('exportVaultJsonBtn');
-      if (exportBtn) {
-        exportBtn.addEventListener('click', function () {
-          var blob = new Blob([JSON.stringify(state.vault, null, 2)], { type: 'application/json' });
-          var a = document.createElement('a');
-          a.href = URL.createObjectURL(blob);
-          a.download = 'accounts_vault.json';
-          a.click();
+      var forcePushBtn = document.getElementById('forcePushCloudBtn');
+      if (forcePushBtn) {
+        forcePushBtn.addEventListener('click', async function () {
+          var ok = await pushVaultToGitHubCloud();
+          showToast(ok ? 'כל המנויים והסיסמאות נדחפו לכספת הענן בהצלחה!' : 'שגיאה בסנכרון לענן — נשמר מקומית.');
         });
       }
+
+      var forcePullBtn = document.getElementById('forcePullCloudBtn');
+      if (forcePullBtn) {
+        forcePullBtn.addEventListener('click', async function () {
+          localStorage.removeItem(STORAGE_VAULT_KEY);
+          await loadVaultFromCloud(true);
+          renderUsersTable();
+          showToast('המטמון המקומי אופס והנתונים נמשכו מחדש מהענן!');
+        });
+      }
+
+      function downloadVaultJson() {
+        var blob = new Blob([JSON.stringify(state.vault, null, 2)], { type: 'application/json' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'accounts_vault.json';
+        a.click();
+      }
+
+      var exportBtn = document.getElementById('exportVaultJsonBtn');
+      var exportCloudPageBtn = document.getElementById('exportVaultCloudPageBtn');
+      if (exportBtn) exportBtn.addEventListener('click', downloadVaultJson);
+      if (exportCloudPageBtn) exportCloudPageBtn.addEventListener('click', downloadVaultJson);
 
       var tgAddBtn = document.getElementById('tgAdminAddBtn');
       if (tgAddBtn) {
         tgAddBtn.addEventListener('click', function () {
           var inEl = document.getElementById('tgAdminChannelInput');
+          var labelEl = document.getElementById('tgAdminLabelInput');
           var val = (inEl && inEl.value ? inEl.value.trim() : '').replace(/^https?:\/\/t\.me\/(s\/)?/i, '').replace(/^@/, '').split(/[/?#]/)[0];
+          var customLabel = (labelEl && labelEl.value ? labelEl.value.trim() : '');
           if (!val) return;
           var saved = [];
           try {
             saved = JSON.parse(localStorage.getItem('streamit_tg_public_channels_v943') || '[]');
           } catch (e) {}
           if (!saved.some(function (x) { return x.handle.toLowerCase() === val.toLowerCase(); })) {
-            saved.unshift({ handle: val, label: 'ערוץ טלגרם VOD (@' + val + ')' });
+            saved.unshift({ handle: val, label: customLabel || ('ערוץ טלגרם VOD (@' + val + ')') });
             localStorage.setItem('streamit_tg_public_channels_v943', JSON.stringify(saved));
           }
           if (inEl) inEl.value = '';
+          if (labelEl) labelEl.value = '';
           renderTelegramChannels();
           showToast('ערוץ הטלגרם @' + val + ' חובר בהצלחה!');
         });
       }
 
-      var tabBtns = document.querySelectorAll('.tab-btn');
-      for (var t = 0; t < tabBtns.length; t++) {
-        tabBtns[t].addEventListener('click', function () {
-          var target = this.getAttribute('data-tab');
-          for (var j = 0; j < tabBtns.length; j++) {
-            tabBtns[j].classList.toggle('active', tabBtns[j] === this);
-          }
-          var panes = document.querySelectorAll('.tab-pane');
-          for (var k = 0; k < panes.length; k++) {
-            panes[k].classList.toggle('hidden', panes[k].id !== 'tab-' + target);
-          }
-        });
-      }
-
       (async function initAdmin() {
         sessionStorage.removeItem(ADMIN_SESSION_KEY);
-        await loadVaultFromCloud();
+        await loadVaultFromCloud(false);
         lockAdminConsole();
       })();
     })();

@@ -10,9 +10,10 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.6.4';
-  var wasLegacyBooted = Boolean(window.__STREAMIT_V94_BOOTED);
+  var APP_VERSION = '9.6.5';
+  var wasLegacyBooted = Boolean(window.__STREAMIT_V94_BOOTED || window.__STREAMIT_V961_BOOTED);
   window.__STREAMIT_V94_BOOTED = true;
+  window.__STREAMIT_V961_BOOTED = true;
 
   // Preserve direct reference to native fetch and freeze any stale in-flight async loops from legacy bundled v9.6.0 APK scripts
   var nativeFetch = window.fetch ? window.fetch.bind(window) : null;
@@ -1358,8 +1359,63 @@
     subUsers: DEFAULT_SUB_USERS.slice(),
     activeSubUserId: 'prof-main',
     manageSubUsersMode: false,
-    profileData: {} // Keyed by activeSubUserId -> { watchlist: [], progress: {} }
+    profileData: {}, // Keyed by activeSubUserId -> { watchlist: [], progress: {} }
+    // SafeWatch Parental Control & Automatic Scene Skipping State
+    parentalMaster: {
+      pinCode: '',
+      customSkipSegments: {}
+    },
+    editingParentalProfileId: 'prof-main',
+    parentalPinUnlockedThisSession: false,
+    pendingProfileSwitchTargetId: '',
+    activeSkipSegments: [],
+    englishSdhCues: [],
+    lastParentalSkipAt: 0,
+    parentalTempMuted: false,
+    parentalShieldActiveSegment: null,
+    parentalSkippedCountThisSession: 0,
+    parentalSkipBannerTimer: null
   };
+
+  function ensureProfileParentalConfig(su) {
+    if (!su || typeof su !== 'object') return null;
+    var isKids = Boolean(su.isKids);
+    if (!su.parentalControl || typeof su.parentalControl !== 'object') {
+      su.parentalControl = {
+        enabled: isKids,
+        actionMode: 'skip', // 'skip' | 'blur_mute'
+        profanityMode: 'mute_censor', // 'mute_censor' | 'skip'
+        sensitivity: isKids ? 'strict' : 'balanced', // 'balanced' | 'strict'
+        categories: {
+          sex: true,
+          violence: true,
+          profanity: true,
+          drugs: true,
+          horror: isKids
+        }
+      };
+    } else {
+      if (typeof su.parentalControl.enabled !== 'boolean') su.parentalControl.enabled = isKids;
+      if (su.parentalControl.actionMode !== 'skip' && su.parentalControl.actionMode !== 'blur_mute') {
+        su.parentalControl.actionMode = 'skip';
+      }
+      if (su.parentalControl.profanityMode !== 'mute_censor' && su.parentalControl.profanityMode !== 'skip') {
+        su.parentalControl.profanityMode = 'mute_censor';
+      }
+      if (su.parentalControl.sensitivity !== 'balanced' && su.parentalControl.sensitivity !== 'strict') {
+        su.parentalControl.sensitivity = isKids ? 'strict' : 'balanced';
+      }
+      var cats = su.parentalControl.categories || {};
+      su.parentalControl.categories = {
+        sex: typeof cats.sex === 'boolean' ? cats.sex : true,
+        violence: typeof cats.violence === 'boolean' ? cats.violence : true,
+        profanity: typeof cats.profanity === 'boolean' ? cats.profanity : true,
+        drugs: typeof cats.drugs === 'boolean' ? cats.drugs : true,
+        horror: typeof cats.horror === 'boolean' ? cats.horror : isKids
+      };
+    }
+    return su.parentalControl;
+  }
 
   function hasLocalBackend() {
     var host = window.location.hostname;
@@ -1396,7 +1452,11 @@
       { id: 'prof-bedroom', name: 'חדר שינה', color: '#059669', isKids: false, isPrimary: false },
       { id: 'prof-kids', name: 'ילדים ונוער', color: '#D97706', isKids: true, isPrimary: false }
     ];
-    return list.slice(0, Math.max(1, maxProf));
+    var sliced = list.slice(0, Math.max(1, maxProf));
+    for (var i = 0; i < sliced.length; i++) {
+      ensureProfileParentalConfig(sliced[i]);
+    }
+    return sliced;
   }
 
   function loadAccountScopedState() {
@@ -1404,6 +1464,21 @@
     state.subUsers = buildDefaultSubUsersForAccount();
     state.activeSubUserId = 'prof-main';
     state.profileData = {};
+    state.parentalMaster = { pinCode: '', customSkipSegments: {} };
+    state.parentalPinUnlockedThisSession = false;
+
+    try {
+      var pmRaw = localStorage.getItem('streamit_parental_master_v965_' + ns);
+      if (pmRaw) {
+        var pmObj = JSON.parse(pmRaw);
+        if (pmObj && typeof pmObj === 'object') {
+          state.parentalMaster.pinCode = String(pmObj.pinCode || '').trim();
+          state.parentalMaster.customSkipSegments = (pmObj.customSkipSegments && typeof pmObj.customSkipSegments === 'object')
+            ? pmObj.customSkipSegments
+            : {};
+        }
+      }
+    } catch (e) {}
 
     if (!state.user || !state.user.email) {
       ensureActiveProfileBucket();
@@ -1419,6 +1494,9 @@
           // Ensure primary profile always reflects the account's name rather than another user's name
           if (state.subUsers[0] && state.subUsers[0].isPrimary && state.user.name && state.subUsers[0].name === 'ראשי (VIP)' && state.user.email !== 'streamittvapp@gmail.com') {
             state.subUsers[0].name = state.user.name;
+          }
+          for (var p = 0; p < state.subUsers.length; p++) {
+            ensureProfileParentalConfig(state.subUsers[p]);
           }
         }
       }
@@ -1484,12 +1562,19 @@
   }
 
   function saveSubUsersState() {
-    if (!state.user || !state.user.email) return;
     var ns = getUserAccountNamespace();
     try {
       localStorage.setItem('streamit_subusers_v954_' + ns, JSON.stringify(state.subUsers));
       localStorage.setItem('streamit_active_subuser_v954_' + ns, state.activeSubUserId);
       localStorage.setItem('streamit_profile_data_v954_' + ns, JSON.stringify(state.profileData));
+      localStorage.setItem('streamit_parental_master_v965_' + ns, JSON.stringify(state.parentalMaster || { pinCode: '', customSkipSegments: {} }));
+    } catch (e) {}
+  }
+
+  function saveParentalMasterState() {
+    var ns = getUserAccountNamespace();
+    try {
+      localStorage.setItem('streamit_parental_master_v965_' + ns, JSON.stringify(state.parentalMaster || { pinCode: '', customSkipSegments: {} }));
     } catch (e) {}
   }
 
@@ -5252,12 +5337,23 @@
    */
   async function loadHebrewSubtitlesForItem(item, imdbId, season, episode) {
     state.parsedCues = [];
+    state.englishSdhCues = [];
+    state.activeSkipSegments = [];
+    state.parentalSkippedCountThisSession = 0;
+    state.parentalShieldActiveSegment = null;
+    setParentalTemporaryMute(false);
+    hideParentalShieldOverlay();
+
     state.subtitleTracks = [
       { id: 'he-auto', label: 'עברית — מסונכרן אוטומטית (AutoSub AI)', lang: 'he', url: '' },
       { id: 'off', label: 'ללא כתוביות', lang: 'off', url: '' }
     ];
     state.activeSubTrackId = state.subEnabled ? 'he-auto' : 'off';
     state.subOffsetSec = 0;
+
+    // Immediately build initial scene skip timeline from Curated DB & Custom Saved Segments
+    rebuildParentalSkipTimelineForCurrentMedia();
+    updateInPlayerParentalUi();
 
     var subStatusEl = document.getElementById('playerSubtitleStatus');
     var apiBase = getApiBase();
@@ -5293,6 +5389,10 @@
           var l = String((s && s.lang) || '').toLowerCase();
           return (l === 'heb' || l === 'he' || l.indexOf('heb') !== -1) && s.url;
         });
+        var engTracks = subs.filter(function (s) {
+          var l = String((s && s.lang) || '').toLowerCase();
+          return (l === 'eng' || l === 'en' || l.indexOf('eng') !== -1) && s.url;
+        });
 
         for (var h = 0; h < Math.min(4, hebTracks.length); h++) {
           state.subtitleTracks.splice(state.subtitleTracks.length - 1, 0, {
@@ -5313,8 +5413,28 @@
             }
           }
         }
+
+        // Fetch English SDH track in background for deep audio-tag & scene detection (`[moaning]`, `[gunshots]`, etc.)
+        if (engTracks.length) {
+          fetch(engTracks[0].url).then(function (er) {
+            return er.ok ? er.text() : '';
+          }).then(function (eTxt) {
+            if (eTxt) {
+              var eCues = parseWebVttOrSrtText(eTxt);
+              if (eCues.length >= 5) {
+                state.englishSdhCues = eCues;
+                rebuildParentalSkipTimelineForCurrentMedia();
+                updateInPlayerParentalUi();
+              }
+            }
+          }).catch(function () {});
+        }
       }
     } catch (e) {}
+
+    // Rebuild scene skip timeline now that Hebrew subtitles are parsed
+    rebuildParentalSkipTimelineForCurrentMedia();
+    updateInPlayerParentalUi();
 
     if (subStatusEl) {
       subStatusEl.textContent = state.parsedCues.length
@@ -5389,6 +5509,9 @@
   }
 
   function updateActiveSubtitleCue(currentTimeSec) {
+    // Run SafeWatch Parental Control Scene Guard on every playback tick!
+    enforceParentalSceneGuard(currentTimeSec);
+
     var overlay = document.getElementById('customSubtitleOverlay');
     if (!overlay) return;
     var textSpan = document.getElementById('customSubtitleText');
@@ -5416,6 +5539,11 @@
     }
 
     if (activeText) {
+      var activeProf = getActiveSubUser();
+      var pCfg = ensureProfileParentalConfig(activeProf);
+      if (pCfg && pCfg.enabled && pCfg.categories && pCfg.categories.profanity) {
+        activeText = censorProfanityInText(activeText, pCfg.sensitivity);
+      }
       textSpan.innerHTML = escapeHtml(activeText).replace(/\n/g, '<br/>');
       overlay.classList.remove('cue-empty');
     } else {
@@ -5423,6 +5551,934 @@
       overlay.classList.add('cue-empty');
     }
   }
+
+  /**
+   * =========================================================================
+   * SAFEWATCH PARENTAL CONTROL & AUTOMATIC SCENE SKIPPING ENGINE
+   * =========================================================================
+   */
+  var PARENTAL_CATEGORY_LABELS = {
+    sex: 'סקס, מיניות ועירום',
+    violence: 'אלימות קשה ודם',
+    profanity: 'שפה בוטה וקללות',
+    drugs: 'סמים ואלכוהול',
+    horror: 'אימה וקטעים מפחידים'
+  };
+
+  // Curated Scene Skip Database for Popular Movies & Series (IMDb ID & TMDB ID keys)
+  var BUILTIN_SCENE_SKIP_DB = {
+    // Oppenheimer (2023)
+    'tt15398776': [
+      { start: 1410, end: 1478, category: 'sex', severity: 'balanced', label: 'סצנת מין ועירום מלא' },
+      { start: 1715, end: 1765, category: 'sex', severity: 'balanced', label: 'סצנת עירום בדיון' },
+      { start: 6820, end: 6885, category: 'sex', severity: 'balanced', label: 'סצנת עירום וחקירה' }
+    ],
+    '872585': [
+      { start: 1410, end: 1478, category: 'sex', severity: 'balanced', label: 'סצנת מין ועירום מלא' },
+      { start: 1715, end: 1765, category: 'sex', severity: 'balanced', label: 'סצנת עירום בדיון' },
+      { start: 6820, end: 6885, category: 'sex', severity: 'balanced', label: 'סצנת עירום וחקירה' }
+    ],
+    // The Wolf of Wall Street (2013)
+    'tt0993846': [
+      { start: 65, end: 175, category: 'sex', severity: 'balanced', label: 'סצנת פתיחה — מין וסמים' },
+      { start: 640, end: 725, category: 'drugs', severity: 'balanced', label: 'שימוש בסמים' },
+      { start: 1580, end: 1690, category: 'sex', severity: 'balanced', label: 'סצנת מסיבה ועירום' },
+      { start: 2410, end: 2520, category: 'sex', severity: 'balanced', label: 'סצנת מין ועירום' },
+      { start: 3920, end: 4040, category: 'sex', severity: 'balanced', label: 'סצנת מין במטוס' }
+    ],
+    '106646': [
+      { start: 65, end: 175, category: 'sex', severity: 'balanced', label: 'סצנת פתיחה — מין וסמים' },
+      { start: 640, end: 725, category: 'drugs', severity: 'balanced', label: 'שימוש בסמים' },
+      { start: 1580, end: 1690, category: 'sex', severity: 'balanced', label: 'סצנת מסיבה ועירום' },
+      { start: 2410, end: 2520, category: 'sex', severity: 'balanced', label: 'סצנת מין ועירום' }
+    ],
+    // Deadpool & Wolverine (2024)
+    'tt6263850': [
+      { start: 185, end: 270, category: 'violence', severity: 'balanced', label: 'אלימות גרפית ודם בפתיחה' },
+      { start: 2210, end: 2265, category: 'drugs', severity: 'balanced', label: 'התייחסות ושימוש בסמים' },
+      { start: 4680, end: 4770, category: 'violence', severity: 'balanced', label: 'קרב אלים ודם' }
+    ],
+    '533535': [
+      { start: 185, end: 270, category: 'violence', severity: 'balanced', label: 'אלימות גרפית ודם בפתיחה' },
+      { start: 2210, end: 2265, category: 'drugs', severity: 'balanced', label: 'התייחסות ושימוש בסמים' },
+      { start: 4680, end: 4770, category: 'violence', severity: 'balanced', label: 'קרב אלים ודם' }
+    ],
+    // Poor Things (2023)
+    'tt14230458': [
+      { start: 1320, end: 1415, category: 'sex', severity: 'balanced', label: 'סצנה מינית מפורשת' },
+      { start: 2140, end: 2290, category: 'sex', severity: 'balanced', label: 'סצנת מין ועירום' },
+      { start: 4320, end: 4480, category: 'sex', severity: 'balanced', label: 'סצנת בית בושת' }
+    ],
+    // Saltburn (2023)
+    'tt17351924': [
+      { start: 2880, end: 2975, category: 'sex', severity: 'balanced', label: 'סצנה מינית בוטה' },
+      { start: 4120, end: 4215, category: 'sex', severity: 'balanced', label: 'סצנה מינית' },
+      { start: 7110, end: 7260, category: 'sex', severity: 'balanced', label: 'סצנת עירום מלא בסיום' }
+    ],
+    // Gladiator II (2024)
+    'tt9218128': [
+      { start: 1620, end: 1685, category: 'violence', severity: 'balanced', label: 'אלימות זירה גרפית' },
+      { start: 3840, end: 3915, category: 'violence', severity: 'balanced', label: 'אלימות קשה בזירה' }
+    ]
+  };
+
+  var HEBREW_PROFANITY_WORDS = [
+    'כוסאמק', 'כוסעמק', 'שרמוטה', 'שרמוטות', 'בן זונה', 'בת זונה', 'בני זונות',
+    'זונה', 'זונות', 'מזדיין', 'מזדיינת', 'מזדיינים', 'תזדיין', 'תזדייני', 'לזיין',
+    'זין', 'הזין', 'כוסאוחתוק', 'מניאק', 'מניאקים', 'חרא', 'פאק', 'פאקינג', 'שיט'
+  ];
+  var HEBREW_STRICT_MILD_PROFANITY = ['לעזאזל', 'קיבינימט', 'דפוק', 'מטומטם', 'אידיוט'];
+
+  var ENGLISH_PROFANITY_REGEX = /\b(motherfuck(?:er|ing|ers)?|fuck(?:ing|ed|er|s)?|shit(?:ty|s|ting)?|bullshit|bitch(?:es|ing)?|asshole(?:s)?|dickhead|cocksucker|cunt(?:s)?|whore(?:s)?|slut(?:s)?|bastard(?:s)?|pussy)\b/gi;
+  var ENGLISH_STRICT_PROFANITY_REGEX = /\b(damn(?:it)?|goddamn|hell|crap|piss(?:ed)?|dick|cock)\b/gi;
+
+  var SEX_CUE_PATTERNS = [
+    /\[[^\]]*(?:moan|groan|passion|sex|making love|nudity|naked|undress|heavy breathing|climax|orgasm|panting|אנחות|גניחות|נאנח|מתפשט|עירום|מין)[^\]]*\]/i,
+    /\([^\)]*(?:moan|groan|passion|sex|making love|nudity|naked|undress|heavy breathing|climax|orgasm|אנחות|גניחות|נאנח|מתפשט|עירום|מין)[^\)]*\)/i,
+    /\b(?:have sex with|make love to|fuck me|fucking me|take off your clothes|get naked|strip for me|blowjob|handjob|orgasm)\b/i,
+    /(?:שכב איתי|תשכב איתי|לשכב איתך|נעשה סקס|יחסי מין|אורגזמה|תתפשטי|תתפשט|מתפשטים|בעירום)/
+  ];
+  var SEX_STRICT_PATTERNS = [
+    /\[[^\]]*(?:kiss|kissing|נשיקה|מתנשקים)[^\]]*\]/i,
+    /(?:נשיקה לוהטת|מתנשקים בלהט|מתמזמזים|חזייה|תחתונים)/,
+    /\b(?:kissing passionately|making out|take off your shirt|bra|panties)\b/i
+  ];
+
+  var VIOLENCE_CUE_PATTERNS = [
+    /\[[^\]]*(?:gunshot|gunfire|screaming in pain|screaming in agony|bones crunch|flesh tear|blood splatter|stabbing|choking|strangl|יריות|צרחות כאב|צרחות אימה|דוקר|משסף|דם)[^\]]*\]/i,
+    /\([^\)]*(?:gunshot|gunfire|screaming in pain|screaming in agony|bones crunch|flesh tear|blood splatter|stabbing|choking|יריות|צרחות כאב|צרחות אימה|דוקר|משסף)[^\)]*\)/i,
+    /(?:לשחוט אותו|לחתוך לו את הגרון|דם ניתז|עינויים קשים)/
+  ];
+
+  var DRUGS_CUE_PATTERNS = [
+    /\[[^\]]*(?:snort|cocaine|heroin|bong|joint|injecting|מסניף|קוקאין|הרואין|מזריק)[^\]]*\]/i,
+    /\b(?:snort(?:ing)? cocaine|shoot(?:ing)? heroin|crystal meth|crack pipe|smoke a joint|smoking weed|drug overdose)\b/i,
+    /(?:להסניף קוקאין|מסניף קוקאין|מזריק הרואין|נגלגל ג׳וינט|נגלגל ג'וינט|מנת יתר של סמים|קוקאין טהור)/
+  ];
+
+  var HORROR_CUE_PATTERNS = [
+    /\[[^\]]*(?:demonic|blood-curdling|terrifying scream|possessed|eerie shriek|צרחה מקפיאת דם|קול שטני|דיבוק)[^\]]*\]/i,
+    /\([^\)]*(?:demonic|blood-curdling|terrifying scream|possessed|eerie shriek|צרחה מקפיאת דם|דיבוק)[^\)]*\)/i
+  ];
+
+  function getMediaParentalKey(item, season, episode) {
+    if (!item) return '';
+    var baseId = String(item.imdbId || item.tmdbId || item.id || '').trim();
+    if (!baseId) return '';
+    if (item.type === 'series') {
+      return baseId + ':S' + (season || 1) + ':E' + (episode || 1);
+    }
+    return baseId;
+  }
+
+  function censorProfanityInText(text, sensitivity) {
+    if (!text) return '';
+    var out = String(text);
+    for (var i = 0; i < HEBREW_PROFANITY_WORDS.length; i++) {
+      var w = HEBREW_PROFANITY_WORDS[i];
+      if (out.indexOf(w) !== -1) {
+        out = out.split(w).join('****');
+      }
+    }
+    if (sensitivity === 'strict') {
+      for (var j = 0; j < HEBREW_STRICT_MILD_PROFANITY.length; j++) {
+        var mw = HEBREW_STRICT_MILD_PROFANITY[j];
+        if (out.indexOf(mw) !== -1) {
+          out = out.split(mw).join('***');
+        }
+      }
+    }
+    out = out.replace(ENGLISH_PROFANITY_REGEX, '****');
+    if (sensitivity === 'strict') {
+      out = out.replace(ENGLISH_STRICT_PROFANITY_REGEX, '***');
+    }
+    return out;
+  }
+
+  function containsProfanityCue(text, sensitivity) {
+    if (!text) return false;
+    var s = String(text);
+    for (var i = 0; i < HEBREW_PROFANITY_WORDS.length; i++) {
+      if (s.indexOf(HEBREW_PROFANITY_WORDS[i]) !== -1) return true;
+    }
+    if (sensitivity === 'strict') {
+      for (var j = 0; j < HEBREW_STRICT_MILD_PROFANITY.length; j++) {
+        if (s.indexOf(HEBREW_STRICT_MILD_PROFANITY[j]) !== -1) return true;
+      }
+    }
+    ENGLISH_PROFANITY_REGEX.lastIndex = 0;
+    if (ENGLISH_PROFANITY_REGEX.test(s)) return true;
+    if (sensitivity === 'strict') {
+      ENGLISH_STRICT_PROFANITY_REGEX.lastIndex = 0;
+      if (ENGLISH_STRICT_PROFANITY_REGEX.test(s)) return true;
+    }
+    return false;
+  }
+
+  function matchesAnyRegexList(text, regexList) {
+    if (!text || !regexList) return false;
+    for (var i = 0; i < regexList.length; i++) {
+      if (regexList[i].test(text)) return true;
+    }
+    return false;
+  }
+
+  function clusterAndMergeSceneSegments(rawSegments, mergeWindowSec, minSceneDurationSec) {
+    if (!Array.isArray(rawSegments) || !rawSegments.length) return [];
+    var sorted = rawSegments.slice().sort(function (a, b) { return a.start - b.start; });
+    var merged = [];
+    for (var i = 0; i < sorted.length; i++) {
+      var seg = sorted[i];
+      if (!merged.length) {
+        merged.push({
+          start: Math.max(0, seg.start),
+          end: Math.max(seg.end, seg.start + (seg.category === 'profanity' ? 0.5 : minSceneDurationSec)),
+          category: seg.category,
+          severity: seg.severity || 'balanced',
+          label: seg.label || PARENTAL_CATEGORY_LABELS[seg.category] || 'קטע לא הולם',
+          source: seg.source || 'auto'
+        });
+      } else {
+        var last = merged[merged.length - 1];
+        var gap = seg.start - last.end;
+        var win = seg.category === 'profanity' ? 0.8 : mergeWindowSec;
+        if (last.category === seg.category && gap <= win) {
+          last.end = Math.max(last.end, seg.end);
+          if (seg.severity === 'balanced') last.severity = 'balanced';
+        } else {
+          merged.push({
+            start: Math.max(0, seg.start),
+            end: Math.max(seg.end, seg.start + (seg.category === 'profanity' ? 0.5 : minSceneDurationSec)),
+            category: seg.category,
+            severity: seg.severity || 'balanced',
+            label: seg.label || PARENTAL_CATEGORY_LABELS[seg.category] || 'קטע לא הולם',
+            source: seg.source || 'auto'
+          });
+        }
+      }
+    }
+    return merged;
+  }
+
+  function rebuildParentalSkipTimelineForCurrentMedia() {
+    var item = state.playingItem;
+    if (!item || item.type === 'channel' || item.type === 'youtube') {
+      state.activeSkipSegments = [];
+      return;
+    }
+
+    var rawList = [];
+    var imdbKey = String(item.imdbId || '').trim();
+    var tmdbKey = String(item.tmdbId || '').replace(/\D/g, '');
+    var mediaKey = getMediaParentalKey(item, state.activeSeason, state.activeEpisode);
+
+    // 1. Curated DB entries by IMDb ID / TMDB ID / Episode Key
+    var dbKeys = [mediaKey, imdbKey, tmdbKey].filter(Boolean);
+    var seenDb = {};
+    for (var k = 0; k < dbKeys.length; k++) {
+      var arr = BUILTIN_SCENE_SKIP_DB[dbKeys[k]];
+      if (Array.isArray(arr)) {
+        for (var d = 0; d < arr.length; d++) {
+          var sEntry = arr[d];
+          var sig = sEntry.category + ':' + Math.round(sEntry.start);
+          if (!seenDb[sig]) {
+            seenDb[sig] = true;
+            rawList.push({
+              start: sEntry.start,
+              end: sEntry.end,
+              category: sEntry.category,
+              severity: sEntry.severity || 'balanced',
+              label: sEntry.label || PARENTAL_CATEGORY_LABELS[sEntry.category],
+              source: 'curated'
+            });
+          }
+        }
+      }
+    }
+
+    // 2. User-saved custom skip segments for this movie/episode
+    if (mediaKey && state.parentalMaster && state.parentalMaster.customSkipSegments) {
+      var customArr = state.parentalMaster.customSkipSegments[mediaKey];
+      if (Array.isArray(customArr)) {
+        for (var c = 0; c < customArr.length; c++) {
+          var cs = customArr[c];
+          if (cs && isFinite(cs.start) && isFinite(cs.end) && cs.end > cs.start) {
+            rawList.push({
+              start: cs.start,
+              end: cs.end,
+              category: cs.category || 'sex',
+              severity: 'balanced',
+              label: cs.label || 'קטע שסומן ע״י המשתמש',
+              source: 'user'
+            });
+          }
+        }
+      }
+    }
+
+    // 3. Automatic Deep Subtitle & SDH Cue Scanner (Hebrew + English SDH)
+    var allCuePools = [state.parsedCues || [], state.englishSdhCues || []];
+    for (var p = 0; p < allCuePools.length; p++) {
+      var cues = allCuePools[p];
+      for (var i = 0; i < cues.length; i++) {
+        var cue = cues[i];
+        if (!cue || !cue.text) continue;
+        var txt = String(cue.text);
+
+        // A. Sex & Nudity detection
+        if (matchesAnyRegexList(txt, SEX_CUE_PATTERNS)) {
+          rawList.push({
+            start: Math.max(0, cue.start - 2.0),
+            end: cue.end + 4.5,
+            category: 'sex',
+            severity: 'balanced',
+            label: 'סצנה מינית / אינטימית',
+            source: 'sub_ai'
+          });
+        } else if (matchesAnyRegexList(txt, SEX_STRICT_PATTERNS)) {
+          rawList.push({
+            start: Math.max(0, cue.start - 1.5),
+            end: cue.end + 3.0,
+            category: 'sex',
+            severity: 'strict',
+            label: 'קטע רומנטי / נשיקה',
+            source: 'sub_ai'
+          });
+        }
+
+        // B. Violence & Gore detection
+        if (matchesAnyRegexList(txt, VIOLENCE_CUE_PATTERNS)) {
+          rawList.push({
+            start: Math.max(0, cue.start - 1.5),
+            end: cue.end + 3.5,
+            category: 'violence',
+            severity: 'balanced',
+            label: 'סצנת אלימות קשה',
+            source: 'sub_ai'
+          });
+        }
+
+        // C. Drugs & Alcohol detection
+        if (matchesAnyRegexList(txt, DRUGS_CUE_PATTERNS)) {
+          rawList.push({
+            start: Math.max(0, cue.start - 1.5),
+            end: cue.end + 3.5,
+            category: 'drugs',
+            severity: 'balanced',
+            label: 'סצנת שימוש בסמים',
+            source: 'sub_ai'
+          });
+        }
+
+        // D. Horror & Frightening scenes detection
+        if (matchesAnyRegexList(txt, HORROR_CUE_PATTERNS)) {
+          rawList.push({
+            start: Math.max(0, cue.start - 1.5),
+            end: cue.end + 3.5,
+            category: 'horror',
+            severity: 'balanced',
+            label: 'קטע אימה מפחיד',
+            source: 'sub_ai'
+          });
+        }
+
+        // E. Profanity detection (Strict & Balanced)
+        if (containsProfanityCue(txt, 'balanced')) {
+          rawList.push({
+            start: Math.max(0, cue.start - 0.15),
+            end: cue.end + 0.2,
+            category: 'profanity',
+            severity: 'balanced',
+            label: 'שפה בוטה',
+            source: 'sub_ai'
+          });
+        } else if (containsProfanityCue(txt, 'strict')) {
+          rawList.push({
+            start: Math.max(0, cue.start - 0.15),
+            end: cue.end + 0.2,
+            category: 'profanity',
+            severity: 'strict',
+            label: 'שפה לא הולמת',
+            source: 'sub_ai'
+          });
+        }
+      }
+    }
+
+    state.activeSkipSegments = clusterAndMergeSceneSegments(rawList, 22, 9);
+  }
+
+  function setParentalTemporaryMute(shouldMute) {
+    shouldMute = Boolean(shouldMute);
+    if (state.parentalTempMuted === shouldMute) return;
+    state.parentalTempMuted = shouldMute;
+
+    var video = document.getElementById('videoElement');
+    if (video) {
+      try {
+        video.muted = shouldMute;
+      } catch (e) {}
+    }
+    if (state.playingMode === 'embed') {
+      var ifr = document.getElementById('streamEmbedIframe');
+      if (ifr && ifr.contentWindow) {
+        try {
+          ifr.contentWindow.postMessage({ action: shouldMute ? 'mute' : 'unmute' }, '*');
+          ifr.contentWindow.postMessage({ command: shouldMute ? 'mute' : 'unmute' }, '*');
+        } catch (e) {}
+      }
+    }
+  }
+
+  function showParentalSkipBanner(titleText, subText) {
+    var banner = document.getElementById('parentalSkipBanner');
+    var titleEl = document.getElementById('parentalSkipBannerTitle');
+    var subEl = document.getElementById('parentalSkipBannerSub');
+    if (!banner) return;
+    if (titleEl) titleEl.textContent = titleText || 'בקרת הורים (SafeWatch)';
+    if (subEl) subEl.textContent = subText || 'דולג אוטומטית קטע לא הולם';
+    banner.classList.remove('hidden');
+    if (state.parentalSkipBannerTimer) clearTimeout(state.parentalSkipBannerTimer);
+    state.parentalSkipBannerTimer = setTimeout(function () {
+      banner.classList.add('hidden');
+    }, 3800);
+  }
+
+  function showParentalShieldOverlay(seg, remainingSec) {
+    var shield = document.getElementById('parentalShieldOverlay');
+    var heading = document.getElementById('parentalShieldHeading');
+    var desc = document.getElementById('parentalShieldDesc');
+    if (!shield) return;
+    var catName = (seg && (seg.label || PARENTAL_CATEGORY_LABELS[seg.category])) || 'תוכן לא הולם';
+    if (heading) heading.textContent = 'קטע מוסתר ע״י בקרת הורים (' + catName + ')';
+    if (desc) {
+      var rem = Math.max(1, Math.ceil(remainingSec || 5));
+      desc.textContent = 'הווידאו והסאונד מוסתרים בהתאם להגדרות הפרופיל • הקטע יסתיים בעוד ' + rem + ' שניות';
+    }
+    shield.classList.remove('hidden');
+  }
+
+  function hideParentalShieldOverlay() {
+    var shield = document.getElementById('parentalShieldOverlay');
+    if (shield && !shield.classList.contains('hidden')) {
+      shield.classList.add('hidden');
+    }
+  }
+
+  function performParentalJumpTo(targetSec, seg) {
+    var now = Date.now();
+    if (now - (state.lastParentalSkipAt || 0) < 1100) return;
+    state.lastParentalSkipAt = now;
+    state.parentalSkippedCountThisSession = (state.parentalSkippedCountThisSession || 0) + 1;
+
+    var skippedDur = Math.max(2, Math.round((seg.end || targetSec) - (seg.start || (targetSec - 10))));
+    var catLabel = seg.label || PARENTAL_CATEGORY_LABELS[seg.category] || 'תוכן לא הולם';
+
+    var video = document.getElementById('videoElement');
+    if (state.playingMode === 'video' && video && !video.classList.contains('hidden')) {
+      try {
+        video.currentTime = targetSec;
+      } catch (e) {}
+    } else if (state.playingMode === 'embed') {
+      // Briefly shield the screen so zero inappropriate frames appear while the embed seeks
+      showParentalShieldOverlay(seg, 1);
+      setTimeout(function () {
+        if (!state.parentalShieldActiveSegment) hideParentalShieldOverlay();
+      }, 550);
+      state.embedCurrentTime = targetSec;
+      var ifr = document.getElementById('streamEmbedIframe');
+      if (ifr && ifr.contentWindow) {
+        try {
+          ifr.contentWindow.postMessage({ action: 'seek', time: Math.ceil(targetSec) }, '*');
+          ifr.contentWindow.postMessage({ command: 'seek', time: Math.ceil(targetSec) }, '*');
+        } catch (e) {}
+      }
+    }
+
+    showParentalSkipBanner(
+      'בקרת הורים (SafeWatch) — ' + (getActiveSubUser() ? getActiveSubUser().name : 'מוגן'),
+      'דולג אוטומטית: ' + catLabel + ' (' + skippedDur + ' שניות)'
+    );
+    updateInPlayerParentalUi();
+  }
+
+  function enforceParentalSceneGuard(currentTimeSec) {
+    if (!state.playingItem || state.playingItem.type === 'channel' || state.playingItem.type === 'youtube') return;
+    var activeProf = getActiveSubUser();
+    var pCfg = ensureProfileParentalConfig(activeProf);
+    if (!pCfg || !pCfg.enabled) {
+      if (state.parentalTempMuted) setParentalTemporaryMute(false);
+      if (state.parentalShieldActiveSegment) {
+        state.parentalShieldActiveSegment = null;
+        hideParentalShieldOverlay();
+      }
+      return;
+    }
+
+    var segments = state.activeSkipSegments || [];
+    if (!segments.length) return;
+
+    var t = currentTimeSec - (state.subOffsetSec || 0);
+    var matchedVisualSeg = null;
+    var matchedProfanityMuteSeg = null;
+
+    for (var i = 0; i < segments.length; i++) {
+      var seg = segments[i];
+      if (!pCfg.categories || !pCfg.categories[seg.category]) continue;
+      if (seg.severity === 'strict' && pCfg.sensitivity !== 'strict') continue;
+
+      if (t >= seg.start && t < seg.end - 0.25) {
+        if (seg.category === 'profanity' && pCfg.profanityMode === 'mute_censor') {
+          matchedProfanityMuteSeg = seg;
+        } else {
+          matchedVisualSeg = seg;
+          break;
+        }
+      }
+    }
+
+    if (matchedVisualSeg) {
+      if (pCfg.actionMode === 'skip' || (matchedVisualSeg.category === 'profanity' && pCfg.profanityMode === 'skip')) {
+        state.parentalShieldActiveSegment = null;
+        hideParentalShieldOverlay();
+        setParentalTemporaryMute(false);
+        performParentalJumpTo(matchedVisualSeg.end + 0.35, matchedVisualSeg);
+        return;
+      } else {
+        // 'blur_mute' mode: keep shield overlay and mute audio until segment ends
+        state.parentalShieldActiveSegment = matchedVisualSeg;
+        setParentalTemporaryMute(true);
+        showParentalShieldOverlay(matchedVisualSeg, matchedVisualSeg.end - t);
+        return;
+      }
+    } else if (state.parentalShieldActiveSegment) {
+      state.parentalShieldActiveSegment = null;
+      hideParentalShieldOverlay();
+    }
+
+    if (matchedProfanityMuteSeg) {
+      setParentalTemporaryMute(true);
+    } else if (state.parentalTempMuted) {
+      setParentalTemporaryMute(false);
+    }
+  }
+
+  function markCurrentSceneAndSkip() {
+    if (!state.playingItem) return;
+    var curT = getCurrentPlaybackTimeSec();
+    var startSec = Math.max(0, Math.floor(curT - 2));
+    var endSec = Math.floor(curT + 30);
+    var mKey = getMediaParentalKey(state.playingItem, state.activeSeason, state.activeEpisode);
+    if (mKey) {
+      if (!state.parentalMaster) state.parentalMaster = { pinCode: '', customSkipSegments: {} };
+      if (!state.parentalMaster.customSkipSegments) state.parentalMaster.customSkipSegments = {};
+      if (!Array.isArray(state.parentalMaster.customSkipSegments[mKey])) {
+        state.parentalMaster.customSkipSegments[mKey] = [];
+      }
+      state.parentalMaster.customSkipSegments[mKey].push({
+        start: startSec,
+        end: endSec,
+        category: 'sex',
+        label: 'קטע שסומן ע״י המשתמש'
+      });
+      saveParentalMasterState();
+      rebuildParentalSkipTimelineForCurrentMedia();
+    }
+    var pMenu = document.getElementById('playerParentalMenu');
+    if (pMenu) pMenu.classList.add('hidden');
+    performParentalJumpTo(endSec, {
+      start: startSec,
+      end: endSec,
+      category: 'sex',
+      label: 'קטע שסומן ודולג (+30 שנ׳)'
+    });
+    updateInPlayerParentalUi();
+  }
+
+  function getProfileById(profileId) {
+    if (!state.subUsers || !state.subUsers.length) return null;
+    for (var i = 0; i < state.subUsers.length; i++) {
+      if (state.subUsers[i].id === profileId) {
+        ensureProfileParentalConfig(state.subUsers[i]);
+        return state.subUsers[i];
+      }
+    }
+    return getActiveSubUser();
+  }
+
+  function getEditingParentalProfile() {
+    var prof = getProfileById(state.editingParentalProfileId || state.activeSubUserId);
+    if (!prof && state.subUsers && state.subUsers.length) {
+      prof = state.subUsers[0];
+    }
+    if (prof) ensureProfileParentalConfig(prof);
+    return prof;
+  }
+
+  function countEnabledParentalCategories(pCfg) {
+    if (!pCfg || !pCfg.categories) return 0;
+    var keys = ['sex', 'violence', 'profanity', 'drugs', 'horror'];
+    var count = 0;
+    for (var i = 0; i < keys.length; i++) {
+      if (pCfg.categories[keys[i]]) count++;
+    }
+    return count;
+  }
+
+  function getParentalSummaryLabel(pCfg) {
+    if (!pCfg || !pCfg.enabled) return 'כבוי — ללא סינון';
+    var count = countEnabledParentalCategories(pCfg);
+    if (count === 0) return 'פעיל (ללא קטגוריות מסומנות)';
+    var modeTxt = pCfg.actionMode === 'blur_mute' ? 'השחרת מסך והשתקה' : 'דילוג אוטומטי';
+    return 'פעיל • ' + modeTxt + ' (' + count + ' קטגוריות)';
+  }
+
+  function updateUserMenuParentalSummary() {
+    var activeProf = getActiveSubUser();
+    var pCfg = activeProf ? ensureProfileParentalConfig(activeProf) : null;
+    var subEl = document.getElementById('userMenuParentalSub');
+    var tvMoreDescEl = document.getElementById('tvMoreParentalLabel');
+
+    var protectedCount = 0;
+    if (Array.isArray(state.subUsers)) {
+      for (var i = 0; i < state.subUsers.length; i++) {
+        var cfg = ensureProfileParentalConfig(state.subUsers[i]);
+        if (cfg && cfg.enabled) protectedCount++;
+      }
+    }
+
+    if (subEl) {
+      if (pCfg && pCfg.enabled) {
+        subEl.textContent = 'פעיל ב-' + (activeProf ? activeProf.name : 'פרופיל') + ' • ' + protectedCount + '/' + (state.subUsers.length || 1) + ' פרופילים מוגנים';
+      } else if (protectedCount > 0) {
+        subEl.textContent = protectedCount + ' תתי-יוזרים מוגנים • כבוי בפרופיל הנוכחי';
+      } else {
+        subEl.textContent = 'דילוג אוטומטי על סקס, אלימות ושפה בוטה (ראשי ותתי-יוזרים)';
+      }
+    }
+
+    if (tvMoreDescEl) {
+      tvMoreDescEl.textContent = (pCfg && pCfg.enabled)
+        ? ('מופעל (' + countEnabledParentalCategories(pCfg) + ' קטגוריות מסוננות)')
+        : 'סינון סקס, אלימות ושפה בוטה';
+    }
+  }
+
+  function updateInPlayerParentalUi() {
+    var activeProf = getActiveSubUser();
+    var pCfg = activeProf ? ensureProfileParentalConfig(activeProf) : getActiveProfileParentalConfig();
+    var isEn = Boolean(pCfg && pCfg.enabled);
+
+    var topBtn = document.getElementById('playerTopParentalBtn');
+    var topLabel = document.getElementById('playerTopParentalLabel');
+    if (topBtn) {
+      topBtn.classList.toggle('parental-active', isEn);
+    }
+    if (topLabel) {
+      topLabel.textContent = isEn ? 'SafeWatch פעיל' : 'SafeWatch';
+    }
+
+    var statusBox = document.getElementById('playerParentalActiveStatus');
+    if (statusBox) {
+      var profName = activeProf ? activeProf.name : 'ראשי';
+      var segCount = (state.activeSkipSegments && state.activeSkipSegments.length) ? state.activeSkipSegments.length : 0;
+      var skippedCount = state.parentalSkippedCountThisSession || 0;
+      if (isEn) {
+        statusBox.textContent = '🛡️ פרופיל "' + profName + '" מוגן • זוהו ' + segCount + ' קטעים לסינון' + (skippedCount > 0 ? (' (דולגו ' + skippedCount + ')') : '');
+      } else {
+        statusBox.textContent = 'פרופיל "' + profName + '" — סינון כבוי כעת (לחץ להפעלה מיידית)';
+      }
+    }
+
+    var quickContainer = document.getElementById('playerParentalQuickToggles');
+    if (quickContainer && pCfg) {
+      var catDefs = [
+        { key: 'master', label: isEn ? '🛡️ סינון SafeWatch: פעיל' : '⚪ סינון SafeWatch: כבוי', active: isEn },
+        { key: 'sex', label: '🔞 סקס, מיניות ועירום', active: isEn && Boolean(pCfg.categories.sex) },
+        { key: 'violence', label: '🩸 אלימות קשה ודם', active: isEn && Boolean(pCfg.categories.violence) },
+        { key: 'profanity', label: '🤬 שפה בוטה וקללות', active: isEn && Boolean(pCfg.categories.profanity) },
+        { key: 'drugs', label: '💊 סמים ואלכוהול', active: isEn && Boolean(pCfg.categories.drugs) },
+        { key: 'horror', label: '👻 אימה ופחד', active: isEn && Boolean(pCfg.categories.horror) }
+      ];
+      var html = '';
+      for (var i = 0; i < catDefs.length; i++) {
+        var cd = catDefs[i];
+        html +=
+          '<button type="button" class="player-parental-quick-chip tv-focusable' + (cd.active ? ' active' : '') + '" data-player-parental-toggle="' + escapeHtml(cd.key) + '">' +
+            '<span>' + escapeHtml(cd.label) + '</span>' +
+            '<span class="chip-state-dot"></span>' +
+          '</button>';
+      }
+      quickContainer.innerHTML = html;
+
+      var qBtns = quickContainer.querySelectorAll('[data-player-parental-toggle]');
+      for (var b = 0; b < qBtns.length; b++) {
+        qBtns[b].addEventListener('click', function (ev) {
+          ev.stopPropagation();
+          wakePlayerControls();
+          var tKey = this.getAttribute('data-player-parental-toggle');
+          var curProf = getActiveSubUser();
+          if (!curProf) return;
+          var cfg = ensureProfileParentalConfig(curProf);
+
+          // If PIN is set and not unlocked yet, prevent disabling filter without PIN
+          var pinLocked = Boolean(state.parentalMaster && state.parentalMaster.pinCode && !state.parentalPinUnlockedThisSession);
+          if (pinLocked) {
+            var wouldDisable = (tKey === 'master' && cfg.enabled) || (tKey !== 'master' && cfg.enabled && cfg.categories[tKey]);
+            if (wouldDisable) {
+              var pMenuEl = document.getElementById('playerParentalMenu');
+              if (pMenuEl) pMenuEl.classList.add('hidden');
+              openParentalControlModal(curProf.id);
+              showCinemaToast('נדרש קוד PIN של מנהל החשבון לכיבוי בקרת הורים');
+              return;
+            }
+          }
+
+          if (tKey === 'master') {
+            cfg.enabled = !cfg.enabled;
+            if (cfg.enabled && countEnabledParentalCategories(cfg) === 0) {
+              cfg.categories.sex = true;
+              cfg.categories.violence = true;
+              cfg.categories.profanity = true;
+            }
+          } else if (cfg.categories && Object.prototype.hasOwnProperty.call(cfg.categories, tKey)) {
+            if (!cfg.enabled) {
+              cfg.enabled = true;
+              cfg.categories[tKey] = true;
+            } else {
+              cfg.categories[tKey] = !cfg.categories[tKey];
+            }
+          }
+
+          saveSubUsersState();
+          rebuildParentalSkipTimelineForCurrentMedia();
+          updateInPlayerParentalUi();
+          updateUserMenuParentalSummary();
+          updateActiveSubtitleCue(getCurrentPlaybackTimeSec());
+        });
+      }
+    }
+  }
+
+  function renderParentalControlModal() {
+    if (!Array.isArray(state.subUsers) || !state.subUsers.length) return;
+    for (var s = 0; s < state.subUsers.length; s++) {
+      ensureProfileParentalConfig(state.subUsers[s]);
+    }
+
+    var editingProf = getEditingParentalProfile();
+    if (!editingProf) return;
+    state.editingParentalProfileId = editingProf.id;
+    var pCfg = ensureProfileParentalConfig(editingProf);
+
+    // 1. Render Profiles Selector Row (Main User + All Sub-Users)
+    var profRow = document.getElementById('parentalProfilesSelectorRow');
+    if (profRow) {
+      var tabsHtml = '';
+      for (var i = 0; i < state.subUsers.length; i++) {
+        var su = state.subUsers[i];
+        var suCfg = ensureProfileParentalConfig(su);
+        var isSel = su.id === editingProf.id;
+        var isCurrentViewer = su.id === state.activeSubUserId;
+        var initial = (su.name || 'P').trim().charAt(0);
+        var roleTag = su.isPrimary ? 'משתמש ראשי (מנהל)' : (su.isKids ? 'תת-יוזר • ילדים' : 'תת-יוזר');
+        if (isCurrentViewer) roleTag += ' • צופה כעת';
+        var shieldBadge = suCfg.enabled
+          ? ('🛡️ מוגן (' + countEnabledParentalCategories(suCfg) + ')')
+          : 'ללא סינון';
+
+        tabsHtml +=
+          '<button type="button" role="tab" aria-selected="' + (isSel ? 'true' : 'false') + '" ' +
+            'class="parental-profile-tab tv-focusable' + (isSel ? ' active' : '') + (suCfg.enabled ? ' is-protected' : '') + '" ' +
+            'data-parental-profile-tab="' + escapeHtml(su.id) + '">' +
+            '<span class="parental-prof-avatar" style="background:' + escapeHtml(su.color || '#E50914') + '">' + escapeHtml(initial) + '</span>' +
+            '<span class="parental-prof-info">' +
+              '<span class="parental-prof-name">' + escapeHtml(su.name) + '</span>' +
+              '<span class="parental-prof-role">' + escapeHtml(roleTag) + '</span>' +
+            '</span>' +
+            '<span class="parental-prof-status-pill' + (suCfg.enabled ? ' on' : '') + '">' + escapeHtml(shieldBadge) + '</span>' +
+          '</button>';
+      }
+      profRow.innerHTML = tabsHtml;
+
+      var tabBtns = profRow.querySelectorAll('[data-parental-profile-tab]');
+      for (var t = 0; t < tabBtns.length; t++) {
+        tabBtns[t].addEventListener('click', function () {
+          var pid = this.getAttribute('data-parental-profile-tab');
+          if (!pid) return;
+          state.editingParentalProfileId = pid;
+          renderParentalControlModal();
+          var reFocused = document.querySelector('#parentalProfilesSelectorRow [data-parental-profile-tab="' + pid + '"]');
+          if (reFocused && typeof window.streamItFocusElement === 'function') {
+            window.streamItFocusElement(reFocused, { scroll: false });
+          }
+        });
+      }
+    }
+
+    // 2. Update Master Toggle Card
+    var masterCard = document.getElementById('parentalMasterToggleCard');
+    var masterBtn = document.getElementById('parentalMasterToggleBtn');
+    var masterLabel = document.getElementById('parentalMasterToggleLabel');
+    var editTitle = document.getElementById('parentalEditingProfileTitle');
+    var editSub = document.getElementById('parentalEditingProfileSub');
+
+    if (masterCard) {
+      masterCard.classList.toggle('is-enabled', Boolean(pCfg.enabled));
+    }
+    if (masterBtn) {
+      masterBtn.classList.toggle('active', Boolean(pCfg.enabled));
+      masterBtn.setAttribute('aria-checked', pCfg.enabled ? 'true' : 'false');
+    }
+    if (masterLabel) {
+      masterLabel.textContent = pCfg.enabled ? 'פעיל — מוגן' : 'כבוי';
+    }
+    if (editTitle) {
+      editTitle.textContent = 'סינון צפייה עבור: ' + editingProf.name + (editingProf.isPrimary ? ' (משתמש ראשי)' : ' (תת-יוזר)');
+    }
+    if (editSub) {
+      editSub.textContent = pCfg.enabled
+        ? ('בקרת הורים פעילה עבור "' + editingProf.name + '" — ' + getParentalSummaryLabel(pCfg))
+        : ('בקרת הורים כבויה עבור "' + editingProf.name + '" — הפעל כדי לדלג אוטומטית על קטעים לא הולמים');
+    }
+
+    // 3. Update Category Cards (`sex`, `violence`, `profanity`, `drugs`, `horror`)
+    var catCards = document.querySelectorAll('#parentalCategoriesGrid [data-parental-cat]');
+    for (var c = 0; c < catCards.length; c++) {
+      var catKey = catCards[c].getAttribute('data-parental-cat');
+      var isCatOn = Boolean(pCfg.categories && pCfg.categories[catKey]);
+      catCards[c].classList.toggle('active', isCatOn);
+      catCards[c].setAttribute('aria-pressed', isCatOn ? 'true' : 'false');
+    }
+
+    // 4. Update Action Mode, Profanity Mode & Sensitivity Buttons
+    var actBtns = document.querySelectorAll('[data-parental-action]');
+    for (var a = 0; a < actBtns.length; a++) {
+      var isActMatch = actBtns[a].getAttribute('data-parental-action') === (pCfg.actionMode || 'skip');
+      actBtns[a].classList.toggle('active', isActMatch);
+    }
+
+    var profBtns = document.querySelectorAll('[data-parental-profanity]');
+    for (var p = 0; p < profBtns.length; p++) {
+      var isProfMatch = profBtns[p].getAttribute('data-parental-profanity') === (pCfg.profanityMode || 'mute_censor');
+      profBtns[p].classList.toggle('active', isProfMatch);
+    }
+
+    var sensBtns = document.querySelectorAll('[data-parental-sensitivity]');
+    for (var sn = 0; sn < sensBtns.length; sn++) {
+      var isSensMatch = sensBtns[sn].getAttribute('data-parental-sensitivity') === (pCfg.sensitivity || 'balanced');
+      sensBtns[sn].classList.toggle('active', isSensMatch);
+    }
+
+    // 5. Update PIN Setup Bar
+    var pinNewIn = document.getElementById('parentalPinNewInput');
+    var pinClrBtn = document.getElementById('parentalClearPinBtn');
+    var hasPin = Boolean(state.parentalMaster && state.parentalMaster.pinCode);
+    if (pinNewIn) {
+      pinNewIn.placeholder = hasPin ? 'מוגדר קוד PIN פעיל (הזן 4 ספרות לשינוי)' : 'קבע קוד 4 ספרות (אופציונלי)';
+    }
+    if (pinClrBtn) {
+      pinClrBtn.classList.toggle('hidden', !hasPin);
+    }
+  }
+
+  function openParentalControlModal(targetProfileId) {
+    var modal = document.getElementById('parentalControlModal');
+    if (!modal) return;
+
+    state.editingParentalProfileId = targetProfileId || state.activeSubUserId || (state.subUsers[0] && state.subUsers[0].id) || 'main';
+
+    var pinGate = document.getElementById('parentalPinVerifyGate');
+    var mainContent = document.getElementById('parentalControlMainContent');
+    var pinInput = document.getElementById('parentalPinVerifyInput');
+    var pinErr = document.getElementById('parentalPinGateError');
+
+    var hasPin = Boolean(state.parentalMaster && state.parentalMaster.pinCode);
+    if (hasPin && !state.parentalPinUnlockedThisSession) {
+      if (pinGate) pinGate.classList.remove('hidden');
+      if (mainContent) mainContent.classList.add('hidden');
+      if (pinInput) pinInput.value = '';
+      if (pinErr) pinErr.classList.add('hidden');
+    } else {
+      if (pinGate) pinGate.classList.add('hidden');
+      if (mainContent) mainContent.classList.remove('hidden');
+    }
+
+    renderParentalControlModal();
+    modal.classList.remove('hidden');
+
+    setTimeout(function () {
+      if (hasPin && !state.parentalPinUnlockedThisSession && pinInput) {
+        if (typeof window.streamItFocusElement === 'function') {
+          window.streamItFocusElement(pinInput, { scroll: false });
+        } else {
+          pinInput.focus();
+        }
+      } else {
+        var activeTab = document.querySelector('#parentalProfilesSelectorRow .parental-profile-tab.active') ||
+                        document.getElementById('parentalMasterToggleBtn');
+        if (activeTab && typeof window.streamItFocusElement === 'function') {
+          window.streamItFocusElement(activeTab, { scroll: false });
+        }
+      }
+    }, 60);
+  }
+  window.openParentalControlModal = openParentalControlModal;
+
+  function closeParentalControlModal() {
+    var modal = document.getElementById('parentalControlModal');
+    if (modal) modal.classList.add('hidden');
+    state.pendingProfileSwitchAfterPin = null;
+    rebuildParentalSkipTimelineForCurrentMedia();
+    updateInPlayerParentalUi();
+    updateUserMenuParentalSummary();
+    renderSubUsersGrid();
+    renderUserSettingsQuickProfiles();
+  }
+  window.closeParentalControlModal = closeParentalControlModal;
+
+  function completeSubUserSwitch(targetProfileId) {
+    if (!targetProfileId) return;
+    state.activeSubUserId = targetProfileId;
+    ensureActiveProfileBucket();
+    saveSubUsersState();
+    updateAuthUi();
+    renderGenreFilterStrip();
+    renderInitialStage();
+    rebuildParentalSkipTimelineForCurrentMedia();
+    updateInPlayerParentalUi();
+    updateUserMenuParentalSummary();
+    var am = document.getElementById('authModal');
+    if (am) am.classList.add('hidden');
+    closeUserSettingsDropdown();
+  }
+
+  function trySwitchActiveSubUser(targetProfileId) {
+    if (!targetProfileId) return;
+    var currentProf = getActiveSubUser();
+    var targetProf = getProfileById(targetProfileId);
+    if (!targetProf) return;
+
+    var curCfg = currentProf ? ensureProfileParentalConfig(currentProf) : null;
+    var targetCfg = ensureProfileParentalConfig(targetProf);
+    var hasPin = Boolean(state.parentalMaster && state.parentalMaster.pinCode);
+
+    // If switching from a protected profile to a less-protected / adult profile and PIN is set, require PIN first
+    if (hasPin && !state.parentalPinUnlockedThisSession && currentProf && currentProf.id !== targetProf.id) {
+      if ((curCfg && curCfg.enabled && (!targetCfg || !targetCfg.enabled)) || (currentProf.isKids && !targetProf.isKids)) {
+        state.pendingProfileSwitchAfterPin = targetProfileId;
+        closeUserSettingsDropdown();
+        var am = document.getElementById('authModal');
+        if (am) am.classList.add('hidden');
+        openParentalControlModal(targetProfileId);
+        showCinemaToast('הזן קוד PIN למעבר לפרופיל "' + targetProf.name + '"');
+        return;
+      }
+    }
+
+    completeSubUserSwitch(targetProfileId);
+  }
+
 
   function applySubtitleStyleToOverlay() {
     var overlay = document.getElementById('customSubtitleOverlay');
@@ -5767,6 +6823,8 @@
     state.playerIdleTimer = setTimeout(function () {
       var subsMenu = document.getElementById('playerSubsMenu');
       if (subsMenu && !subsMenu.classList.contains('hidden')) return;
+      var parentalMenu = document.getElementById('playerParentalMenu');
+      if (parentalMenu && !parentalMenu.classList.contains('hidden')) return;
       var sourceTabsPanel = document.getElementById('playerSourceTabs');
       if (sourceTabsPanel && !sourceTabsPanel.classList.contains('hidden')) return;
       overlay.classList.add('idle-hidden');
@@ -5794,6 +6852,13 @@
     }
     state.embedVerified = false;
     state.embedAutoPlayed = false;
+    state.parentalShieldActiveSegment = null;
+    setParentalTemporaryMute(false);
+    hideParentalShieldOverlay();
+    var pSkipBanner = document.getElementById('parentalSkipBanner');
+    if (pSkipBanner) pSkipBanner.classList.add('hidden');
+    var pMenu = document.getElementById('playerParentalMenu');
+    if (pMenu) pMenu.classList.add('hidden');
     if (state.hlsInstance) {
       try { state.hlsInstance.destroy(); } catch (e) {}
       state.hlsInstance = null;
@@ -6119,8 +7184,13 @@
     var html = '';
     for (var i = 0; i < state.subUsers.length; i++) {
       var su = state.subUsers[i];
+      var suCfg = ensureProfileParentalConfig(su);
       var isAct = su.id === state.activeSubUserId;
       var initial = (su.name || 'P').trim().charAt(0);
+      var badgeLabel = su.isKids ? 'ילדים' : (isAct ? 'פעיל כעת' : 'פרופיל');
+      if (suCfg && suCfg.enabled) {
+        badgeLabel += ' • 🛡️ מוגן';
+      }
       html +=
         '<div class="sub-user-card-wrap">' +
           '<button type="button" class="sub-user-card tv-focusable' + (isAct ? ' active' : '') + '" data-subuser-id="' + escapeHtml(su.id) + '">' +
@@ -6128,7 +7198,7 @@
               '<span>' + escapeHtml(initial) + '</span>' +
             '</div>' +
             '<span class="sub-user-name">' + escapeHtml(su.name) + '</span>' +
-            '<span class="sub-user-badge">' + (su.isKids ? 'ילדים' : (isAct ? 'פעיל כעת' : 'פרופיל')) + '</span>' +
+            '<span class="sub-user-badge">' + escapeHtml(badgeLabel) + '</span>' +
           '</button>' +
           (state.manageSubUsersMode && !su.isPrimary
             ? '<button type="button" class="sub-user-delete-btn tv-focusable" data-delete-subuser="' + escapeHtml(su.id) + '" aria-label="מחק פרופיל">מחק</button>'
@@ -6142,14 +7212,7 @@
       cards[c].addEventListener('click', function () {
         var pid = this.getAttribute('data-subuser-id');
         if (!pid) return;
-        state.activeSubUserId = pid;
-        ensureActiveProfileBucket();
-        saveSubUsersState();
-        updateAuthUi();
-        renderGenreFilterStrip();
-        renderInitialStage();
-        var am = document.getElementById('authModal');
-        if (am) am.classList.add('hidden');
+        trySwitchActiveSubUser(pid);
       });
     }
 
@@ -6200,7 +7263,8 @@
       headerBadge.innerHTML = '<span>' + escapeHtml(profInitial) + '</span>';
     }
     if (activeNameEl) {
-      activeNameEl.textContent = 'פרופיל פעיל: ' + profName;
+      var actCfg = activeProf ? ensureProfileParentalConfig(activeProf) : null;
+      activeNameEl.textContent = 'פרופיל פעיל: ' + profName + (actCfg && actCfg.enabled ? ' 🛡️' : '');
     }
     if (emailEl) {
       emailEl.textContent = (state.user && (state.user.email || state.user.name))
@@ -6208,15 +7272,18 @@
         : 'STREAM IT VIP';
     }
 
+    updateUserMenuParentalSummary();
+
     if (!quickRow) return;
     var chipsHtml = '';
     for (var i = 0; i < state.subUsers.length; i++) {
       var su = state.subUsers[i];
+      var suCfg = ensureProfileParentalConfig(su);
       var isAct = su.id === state.activeSubUserId;
       chipsHtml +=
         '<button type="button" class="user-menu-prof-chip tv-focusable' + (isAct ? ' active' : '') + '" data-quick-subuser="' + escapeHtml(su.id) + '" aria-label="החלף לפרופיל ' + escapeHtml(su.name) + '">' +
           '<span class="user-menu-prof-dot" style="background:' + escapeHtml(su.color || '#E50914') + '"></span>' +
-          '<span>' + escapeHtml(su.name) + '</span>' +
+          '<span>' + escapeHtml(su.name) + (suCfg && suCfg.enabled ? ' 🛡️' : '') + '</span>' +
         '</button>';
     }
     quickRow.innerHTML = chipsHtml;
@@ -6227,13 +7294,7 @@
         ev.stopPropagation();
         var pid = this.getAttribute('data-quick-subuser');
         if (!pid) return;
-        state.activeSubUserId = pid;
-        ensureActiveProfileBucket();
-        saveSubUsersState();
-        updateAuthUi();
-        renderGenreFilterStrip();
-        renderInitialStage();
-        closeUserSettingsDropdown();
+        trySwitchActiveSubUser(pid);
       });
     }
   }
@@ -6615,8 +7676,17 @@
     if (tvMoreProfilesBtn) {
       tvMoreProfilesBtn.addEventListener('click', function () {
         closeTvMoreModal(false);
-        var openAuth = document.getElementById('openAuthBtn');
+        var openAuth = document.getElementById('openAuthBtn') || document.getElementById('openAuthModalBtn');
         if (openAuth) openAuth.click();
+        else openAuthModal();
+      });
+    }
+
+    var tvMoreParentalBtn = document.getElementById('tvMoreParentalBtn');
+    if (tvMoreParentalBtn) {
+      tvMoreParentalBtn.addEventListener('click', function () {
+        closeTvMoreModal(false);
+        openParentalControlModal();
       });
     }
 
@@ -6752,6 +7822,15 @@
         if (catMain && typeof catMain.scrollIntoView === 'function') {
           catMain.scrollIntoView({ behavior: 'smooth' });
         }
+      });
+    }
+
+    var userMenuParentalBtn = document.getElementById('userMenuParentalBtn');
+    if (userMenuParentalBtn) {
+      userMenuParentalBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        closeUserSettingsDropdown();
+        openParentalControlModal();
       });
     }
 
@@ -7170,6 +8249,65 @@
     if (subsBtn) subsBtn.addEventListener('click', toggleSubsMenuHandler);
     if (topSubsBtn) topSubsBtn.addEventListener('click', toggleSubsMenuHandler);
     if (embedCcBtn) embedCcBtn.addEventListener('click', toggleSubsMenuHandler);
+
+    // SafeWatch Parental Control In-Player Menu & Shield Overlay Controls
+    var playerTopParentalBtn = document.getElementById('playerTopParentalBtn');
+    var playerParentalMenu = document.getElementById('playerParentalMenu');
+    if (playerTopParentalBtn && playerParentalMenu) {
+      playerTopParentalBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        wakePlayerControls();
+        if (subsMenu) subsMenu.classList.add('hidden');
+        var isHidden = playerParentalMenu.classList.toggle('hidden');
+        if (!isHidden) {
+          updateInPlayerParentalUi();
+          var firstQuickBtn = playerParentalMenu.querySelector('button');
+          if (firstQuickBtn && typeof window.streamItFocusElement === 'function') {
+            window.streamItFocusElement(firstQuickBtn);
+          }
+        }
+      });
+    }
+
+    var playerMarkAndSkipBtn = document.getElementById('playerMarkAndSkipSceneBtn');
+    if (playerMarkAndSkipBtn) {
+      playerMarkAndSkipBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        wakePlayerControls();
+        markCurrentSceneAndSkip();
+      });
+    }
+
+    var playerOpenFullParentalBtn = document.getElementById('playerOpenFullParentalModalBtn');
+    if (playerOpenFullParentalBtn) {
+      playerOpenFullParentalBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (playerParentalMenu) playerParentalMenu.classList.add('hidden');
+        openParentalControlModal(state.activeSubUserId);
+      });
+    }
+
+    var parentalShieldSkipNowBtn = document.getElementById('parentalShieldSkipNowBtn');
+    if (parentalShieldSkipNowBtn) {
+      parentalShieldSkipNowBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var seg = state.parentalShieldActiveSegment;
+        state.parentalShieldActiveSegment = null;
+        hideParentalShieldOverlay();
+        setParentalTemporaryMute(false);
+        if (seg && seg.end) {
+          performParentalJumpTo(seg.end + 0.35, seg);
+        } else {
+          var curT = getCurrentPlaybackTimeSec();
+          performParentalJumpTo(curT + 25, {
+            start: curT,
+            end: curT + 25,
+            category: 'sex',
+            label: 'דילוג מיידי על הסצנה'
+          });
+        }
+      });
+    }
 
     var syncMinus = document.getElementById('subSyncMinusBtn');
     var syncReset = document.getElementById('subSyncResetBtn');
@@ -7603,13 +8741,15 @@
         if (!nameVal) return;
         var colors = ['#E50914', '#2563EB', '#059669', '#D97706', '#7C3AED', '#DB2777'];
         var newId = 'prof-' + Date.now();
-        state.subUsers.push({
+        var newSuObj = {
           id: newId,
           name: nameVal,
           color: colors[state.subUsers.length % colors.length],
           isKids: newSuKidsState,
           isPrimary: false
-        });
+        };
+        ensureProfileParentalConfig(newSuObj);
+        state.subUsers.push(newSuObj);
         state.activeSubUserId = newId;
         newSuKidsState = false;
         if (kidsToggleBtn) kidsToggleBtn.classList.remove('active');
@@ -7629,15 +8769,349 @@
       });
     }
 
-    // Strict Admin-Only Cloud SHA-256 User Verification (Zero Self-Registration, Zero Local Server Needed!)
-    async function sha256HexBrowser(str) {
-      if (window.crypto && window.crypto.subtle) {
-        var buf = new TextEncoder().encode(str);
-        var hashBuf = await window.crypto.subtle.digest('SHA-256', buf);
-        var arr = Array.from(new Uint8Array(hashBuf));
-        return arr.map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+    // SafeWatch Parental Control Modal (`#parentalControlModal`) & Account-Wide Sub-User Controls
+    var authOpenParentalBtn = document.getElementById('authOpenParentalModalBtn');
+    if (authOpenParentalBtn) {
+      authOpenParentalBtn.addEventListener('click', function () {
+        var am = document.getElementById('authModal');
+        if (am) am.classList.add('hidden');
+        openParentalControlModal(state.activeSubUserId);
+      });
+    }
+
+    var closeParentalBtn = document.getElementById('closeParentalModalBtn');
+    if (closeParentalBtn) {
+      closeParentalBtn.addEventListener('click', closeParentalControlModal);
+    }
+
+    var parentalModalOverlay = document.getElementById('parentalControlModal');
+    if (parentalModalOverlay) {
+      parentalModalOverlay.addEventListener('click', function (e) {
+        if (e.target === parentalModalOverlay) {
+          closeParentalControlModal();
+        }
+      });
+    }
+
+    var parentalMasterToggleBtn = document.getElementById('parentalMasterToggleBtn');
+    if (parentalMasterToggleBtn) {
+      parentalMasterToggleBtn.addEventListener('click', function () {
+        var prof = getEditingParentalProfile();
+        if (!prof) return;
+        var cfg = ensureProfileParentalConfig(prof);
+        cfg.enabled = !cfg.enabled;
+        if (cfg.enabled && countEnabledParentalCategories(cfg) === 0) {
+          cfg.categories.sex = true;
+          cfg.categories.violence = true;
+          cfg.categories.profanity = true;
+        }
+        saveSubUsersState();
+        renderParentalControlModal();
+        updateUserMenuParentalSummary();
+        updateInPlayerParentalUi();
+        showCinemaToast(
+          cfg.enabled
+            ? ('🛡️ סינון SafeWatch הופעל עבור "' + prof.name + '"')
+            : ('סינון SafeWatch כובה עבור "' + prof.name + '"')
+        );
+      });
+    }
+
+    var parentalApplySubUsersBtn = document.getElementById('parentalApplySubUsersBtn');
+    if (parentalApplySubUsersBtn) {
+      parentalApplySubUsersBtn.addEventListener('click', function () {
+        var srcProf = getEditingParentalProfile();
+        if (!srcProf) return;
+        var srcCfg = ensureProfileParentalConfig(srcProf);
+        var cloned = JSON.parse(JSON.stringify(srcCfg));
+        cloned.enabled = true;
+        if (countEnabledParentalCategories(cloned) === 0) {
+          cloned.categories.sex = true;
+          cloned.categories.violence = true;
+          cloned.categories.profanity = true;
+        }
+        var updatedCount = 0;
+        for (var i = 0; i < state.subUsers.length; i++) {
+          if (!state.subUsers[i].isPrimary) {
+            state.subUsers[i].parentalControl = JSON.parse(JSON.stringify(cloned));
+            updatedCount++;
+          }
+        }
+        saveSubUsersState();
+        renderParentalControlModal();
+        updateUserMenuParentalSummary();
+        updateInPlayerParentalUi();
+        showCinemaToast('🛡️ הגדרות הסינון הוחלו על כל ' + updatedCount + ' תתי-היוזרים בחשבון!');
+      });
+    }
+
+    var parentalApplyAllBtn = document.getElementById('parentalApplyAllBtn');
+    if (parentalApplyAllBtn) {
+      parentalApplyAllBtn.addEventListener('click', function () {
+        var srcProf = getEditingParentalProfile();
+        if (!srcProf) return;
+        var srcCfg = ensureProfileParentalConfig(srcProf);
+        var cloned = JSON.parse(JSON.stringify(srcCfg));
+        cloned.enabled = true;
+        if (countEnabledParentalCategories(cloned) === 0) {
+          cloned.categories.sex = true;
+          cloned.categories.violence = true;
+          cloned.categories.profanity = true;
+        }
+        for (var i = 0; i < state.subUsers.length; i++) {
+          state.subUsers[i].parentalControl = JSON.parse(JSON.stringify(cloned));
+        }
+        saveSubUsersState();
+        renderParentalControlModal();
+        updateUserMenuParentalSummary();
+        updateInPlayerParentalUi();
+        showCinemaToast('🛡️ הגדרות הסינון הוחלו על המשתמש הראשי וכל תתי-היוזרים!');
+      });
+    }
+
+    var parentalCatCards = document.querySelectorAll('#parentalCategoriesGrid [data-parental-cat]');
+    for (var pcc = 0; pcc < parentalCatCards.length; pcc++) {
+      parentalCatCards[pcc].addEventListener('click', function () {
+        var catKey = this.getAttribute('data-parental-cat');
+        var prof = getEditingParentalProfile();
+        if (!prof || !catKey) return;
+        var cfg = ensureProfileParentalConfig(prof);
+        cfg.categories[catKey] = !cfg.categories[catKey];
+        if (cfg.categories[catKey] && !cfg.enabled) {
+          cfg.enabled = true;
+        }
+        saveSubUsersState();
+        renderParentalControlModal();
+        updateUserMenuParentalSummary();
+        updateInPlayerParentalUi();
+      });
+    }
+
+    var parentalActionBtns = document.querySelectorAll('[data-parental-action]');
+    for (var pab = 0; pab < parentalActionBtns.length; pab++) {
+      parentalActionBtns[pab].addEventListener('click', function () {
+        var mode = this.getAttribute('data-parental-action');
+        var prof = getEditingParentalProfile();
+        if (!prof || !mode) return;
+        var cfg = ensureProfileParentalConfig(prof);
+        cfg.actionMode = mode;
+        saveSubUsersState();
+        renderParentalControlModal();
+        updateUserMenuParentalSummary();
+      });
+    }
+
+    var parentalProfanityBtns = document.querySelectorAll('[data-parental-profanity]');
+    for (var ppb = 0; ppb < parentalProfanityBtns.length; ppb++) {
+      parentalProfanityBtns[ppb].addEventListener('click', function () {
+        var pMode = this.getAttribute('data-parental-profanity');
+        var prof = getEditingParentalProfile();
+        if (!prof || !pMode) return;
+        var cfg = ensureProfileParentalConfig(prof);
+        cfg.profanityMode = pMode;
+        saveSubUsersState();
+        renderParentalControlModal();
+      });
+    }
+
+    var parentalSensBtns = document.querySelectorAll('[data-parental-sensitivity]');
+    for (var psb = 0; psb < parentalSensBtns.length; psb++) {
+      parentalSensBtns[psb].addEventListener('click', function () {
+        var sens = this.getAttribute('data-parental-sensitivity');
+        var prof = getEditingParentalProfile();
+        if (!prof || !sens) return;
+        var cfg = ensureProfileParentalConfig(prof);
+        cfg.sensitivity = sens;
+        saveSubUsersState();
+        renderParentalControlModal();
+      });
+    }
+
+    var parentalSavePinBtn = document.getElementById('parentalSavePinBtn');
+    var parentalPinNewInput = document.getElementById('parentalPinNewInput');
+    var parentalClearPinBtn = document.getElementById('parentalClearPinBtn');
+    if (parentalSavePinBtn && parentalPinNewInput) {
+      parentalSavePinBtn.addEventListener('click', function () {
+        var rawPin = String(parentalPinNewInput.value || '').replace(/\D/g, '').slice(0, 4);
+        if (rawPin.length !== 4) {
+          showCinemaToast('נא להזין קוד PIN בן 4 ספרות בדיוק');
+          return;
+        }
+        if (!state.parentalMaster) state.parentalMaster = { pinCode: '', customSkipSegments: {} };
+        state.parentalMaster.pinCode = rawPin;
+        state.parentalPinUnlockedThisSession = true;
+        parentalPinNewInput.value = '';
+        saveParentalMasterState();
+        renderParentalControlModal();
+        showCinemaToast('🔒 קוד PIN הורים (4 ספרות) נשמר בהצלחה!');
+      });
+    }
+
+    if (parentalClearPinBtn) {
+      parentalClearPinBtn.addEventListener('click', function () {
+        if (!state.parentalMaster) return;
+        state.parentalMaster.pinCode = '';
+        state.parentalPinUnlockedThisSession = true;
+        saveParentalMasterState();
+        renderParentalControlModal();
+        showCinemaToast('🔓 נעילת קוד ה-PIN בוטלה');
+      });
+    }
+
+    var parentalPinGateSubmitBtn = document.getElementById('parentalPinGateSubmitBtn');
+    var parentalPinVerifyInput = document.getElementById('parentalPinVerifyInput');
+    var verifyParentalPinHandler = function () {
+      if (!parentalPinVerifyInput) return;
+      var entered = String(parentalPinVerifyInput.value || '').trim();
+      var expected = (state.parentalMaster && state.parentalMaster.pinCode) ? String(state.parentalMaster.pinCode) : '';
+      var errEl = document.getElementById('parentalPinGateError');
+      if (!expected || entered === expected) {
+        state.parentalPinUnlockedThisSession = true;
+        parentalPinVerifyInput.value = '';
+        if (errEl) errEl.classList.add('hidden');
+        if (state.pendingProfileSwitchAfterPin) {
+          var targetPid = state.pendingProfileSwitchAfterPin;
+          state.pendingProfileSwitchAfterPin = null;
+          closeParentalControlModal();
+          completeSubUserSwitch(targetPid);
+          showCinemaToast('🔓 קוד אומת — הוחלף פרופיל צפייה');
+          return;
+        }
+        var pinGate = document.getElementById('parentalPinVerifyGate');
+        var mainContent = document.getElementById('parentalControlMainContent');
+        if (pinGate) pinGate.classList.add('hidden');
+        if (mainContent) mainContent.classList.remove('hidden');
+        renderParentalControlModal();
+        var activeTab = document.querySelector('#parentalProfilesSelectorRow .parental-profile-tab.active') ||
+                        document.getElementById('parentalMasterToggleBtn');
+        if (activeTab && typeof window.streamItFocusElement === 'function') {
+          window.streamItFocusElement(activeTab, { scroll: false });
+        }
+      } else {
+        if (errEl) errEl.classList.remove('hidden');
+        parentalPinVerifyInput.value = '';
       }
-      return '';
+    };
+    if (parentalPinGateSubmitBtn) {
+      parentalPinGateSubmitBtn.addEventListener('click', verifyParentalPinHandler);
+    }
+    if (parentalPinVerifyInput) {
+      parentalPinVerifyInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          verifyParentalPinHandler();
+        }
+      });
+    }
+
+    // Strict Admin-Only Cloud SHA-256 User Verification (Zero Self-Registration, Zero Local Server Needed!)
+    function sha256PureJsBrowser(ascii) {
+      function rightRotate(value, amount) {
+        return (value >>> amount) | (value << (32 - amount));
+      }
+      var mathPow = Math.pow;
+      var maxWord = mathPow(2, 32);
+      var lengthProperty = 'length';
+      var i, j;
+      var result = '';
+      var words = [];
+      var asciiBitLength = ascii[lengthProperty] * 8;
+      var hash = sha256PureJsBrowser.h = sha256PureJsBrowser.h || [];
+      var k = sha256PureJsBrowser.k = sha256PureJsBrowser.k || [];
+      var primeCounter = k[lengthProperty];
+      var isComposite = {};
+      for (var candidate = 2; primeCounter < 64; candidate++) {
+        if (!isComposite[candidate]) {
+          for (i = 0; i < 313; i += candidate) {
+            isComposite[i] = candidate;
+          }
+          hash[primeCounter] = (mathPow(candidate, 0.5) * maxWord) | 0;
+          k[primeCounter++] = (mathPow(candidate, 1 / 3) * maxWord) | 0;
+        }
+      }
+      ascii += '\x80';
+      while ((ascii[lengthProperty] % 64) - 56) ascii += '\x00';
+      for (i = 0; i < ascii[lengthProperty]; i++) {
+        j = ascii.charCodeAt(i);
+        if (j >> 8) return '';
+        words[i >> 2] |= j << ((3 - (i % 4)) * 8);
+      }
+      words[words[lengthProperty]] = (asciiBitLength / maxWord) | 0;
+      words[words[lengthProperty]] = asciiBitLength;
+      for (j = 0; j < words[lengthProperty]; ) {
+        var w = words.slice(j, (j += 16));
+        var oldHash = hash;
+        hash = hash.slice(0, 8);
+        for (i = 0; i < 64; i++) {
+          var w15 = w[i - 15], w2 = w[i - 2];
+          var a = hash[0], e = hash[4];
+          var temp1 =
+            hash[7] +
+            (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25)) +
+            ((e & hash[5]) ^ (~e & hash[6])) +
+            k[i] +
+            (w[i] =
+              i < 16
+                ? w[i]
+                : (w[i - 16] +
+                    (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3)) +
+                    w[i - 7] +
+                    (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))) |
+                  0);
+          var temp2 =
+            (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22)) +
+            ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+          hash = [(temp1 + temp2) | 0].concat(hash);
+          hash[4] = (hash[4] + temp1) | 0;
+        }
+        for (i = 0; i < 8; i++) {
+          hash[i] = (hash[i] + oldHash[i]) | 0;
+        }
+      }
+      for (i = 0; i < 8; i++) {
+        for (j = 3; j + 1; j--) {
+          var b = (hash[i] >> (j * 8)) & 255;
+          result += (b < 16 ? 0 : '') + b.toString(16);
+        }
+      }
+      return result;
+    }
+
+    async function sha256HexBrowser(str) {
+      var rawStr = String(str == null ? '' : str);
+      try {
+        if (window.crypto && window.crypto.subtle) {
+          var buf = new TextEncoder().encode(rawStr);
+          var hashBuf = await window.crypto.subtle.digest('SHA-256', buf);
+          var arr = Array.from(new Uint8Array(hashBuf));
+          return arr.map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+        }
+      } catch (e) {}
+      return sha256PureJsBrowser(unescape(encodeURIComponent(rawStr)));
+    }
+
+    function decodeVaultPassCipher(cipher) {
+      if (!cipher) return '';
+      try {
+        var raw = atob(String(cipher));
+        var out = '';
+        for (var i = 0; i < raw.length; i++) {
+          out += String.fromCharCode(raw.charCodeAt(i) ^ 59);
+        }
+        return decodeURIComponent(escape(out));
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function parseVaultRecordTs(rec) {
+      if (!rec) return 0;
+      if (rec.updatedTs && Number(rec.updatedTs) > 0) return Number(rec.updatedTs);
+      if (rec.updatedAt) {
+        var t = Date.parse(String(rec.updatedAt).replace(' ', 'T'));
+        if (!isNaN(t)) return t;
+      }
+      return 0;
     }
 
     async function verifyCloudAccountLogin(email, password) {
@@ -7647,21 +9121,18 @@
         return { ok: false, error: 'נא להזין כתובת אימייל וסיסמה מאושרים.' };
       }
 
-      var vault = {
+      var defaultVault = {
         'streamittvapp@gmail.com': {
           email: 'streamittvapp@gmail.com',
           display_name: 'מנהל ראשי (VIP / משפחתי)',
           status: 'approved',
           role: 'admin',
           max_profiles: 5,
-          passHash: 'f9d26c67c77cf8b3bd03f985cc6785c493c34505dfda9edf9259d04ffb88f5b1',
+          passHash: '0d24c3b776130811276c208a3457be7c316328088de816ac3ebc192bb977094d',
           altHashes: [
+            '0d24c3b776130811276c208a3457be7c316328088de816ac3ebc192bb977094d',
             'f9d26c67c77cf8b3bd03f985cc6785c493c34505dfda9edf9259d04ffb88f5b1',
-            '01884b718ab9bed7c127b90f1880cc671e1d836488a9cc912c875547f4196a0f',
-            'b935bf959e686e20500064a8328e798338a2ee91215b4311b5eec4cee08dd447',
-            'ba113970b3c49b0fad970547ddf74cd4c29cef8eed9eb6fbf69f4e66077a68b3',
-            'cc43dbd645eaf3e9d95c618efdcdce07265ec7a56ad9dad5e25b8b1e9795881b',
-            '79fae471cb66b40e90730f0a80a74037c957514b76df6d6569c8d0511aa0cc8c'
+            '01884b718ab9bed7c127b90f1880cc671e1d836488a9cc912c875547f4196a0f'
           ]
         },
         'bensahaltv@gmail.com': {
@@ -7671,44 +9142,19 @@
           role: 'admin',
           max_profiles: 5,
           autoBindPassword: false,
-          passHash: '442d9adebd866a1e4e841ac20221e48e5f1f1a83a6cffbbc772c88daad99dc6a',
+          passHash: '0359145e2cbf69985a31965ce103fb1b9cadf4aa53f99d9aee3a334ee994c2ac',
           altHashes: [
+            '0359145e2cbf69985a31965ce103fb1b9cadf4aa53f99d9aee3a334ee994c2ac',
             '442d9adebd866a1e4e841ac20221e48e5f1f1a83a6cffbbc772c88daad99dc6a',
-            '464b8cd36206cb24044ce1b63d95b3b2eb99c8b27aa85f8a3ff5ab1c274d71e2',
-            '05acb7f2d87df2245ef9d0a451e32ee70385003e903484146ec66e199fac8f58',
-            '49e805e15c0bc53e1f8279fcbec5555ca9d16791bbe92f6e176820ecf2403281',
-            '201d6744f30d417c34428a55de656731723b7a749b60b8106176f085e17f05c9',
-            '5e92c5bcd3d1b34930d93ea100a64bd8471afaab605b344feb222038bc51b860'
+            '464b8cd36206cb24044ce1b63d95b3b2eb99c8b27aa85f8a3ff5ab1c274d71e2'
           ]
         }
       };
 
-      // 1. Live GitHub Cloud API Vault Fetch (always returns real-time users created in admin.html without CDN delay)
-      try {
-        var tk = getCloudVaultSyncToken();
-        var ghHeaders = { 'Accept': 'application/vnd.github.v3+json' };
-        if (tk) ghHeaders['Authorization'] = 'token ' + tk;
-        var ghRes = await fetch('https://api.github.com/repos/streamittvapp/stream-it-app/contents/data/accounts_vault.json?t=' + Date.now(), {
-          headers: ghHeaders,
-          cache: 'no-store'
-        });
-        if (ghRes.ok) {
-          var ghMeta = await ghRes.json();
-          if (ghMeta && ghMeta.content) {
-            var rawJson = decodeURIComponent(escape(atob(String(ghMeta.content).replace(/\s/g, ''))));
-            var ghVault = JSON.parse(rawJson);
-            if (ghVault && typeof ghVault === 'object') {
-              for (var gk in ghVault) {
-                if (Object.prototype.hasOwnProperty.call(ghVault, gk)) {
-                  vault[gk.toLowerCase()] = ghVault[gk];
-                }
-              }
-            }
-          }
-        }
-      } catch (e) {}
+      var vault = JSON.parse(JSON.stringify(defaultVault));
+      var cloudLoaded = false;
 
-      // 2. Fallback relative JSON fetch
+      // 1. Fallback relative JSON fetch (lowest priority above defaultVault)
       try {
         var res = await fetch('data/accounts_vault.json?t=' + Date.now(), { cache: 'no-store' });
         if (res.ok) {
@@ -7723,16 +9169,53 @@
         }
       } catch (e) {}
 
-      // 3. LocalStorage Admin Vault sync
+      // 2. Live GitHub Cloud API Vault Fetch (Authoritative real-time Cloud Vault — 0ms CDN delay!)
+      try {
+        var tk = getCloudVaultSyncToken();
+        var ghHeaders = { 'Accept': 'application/vnd.github.v3+json' };
+        if (tk) ghHeaders['Authorization'] = 'token ' + tk;
+        var ghRes = await fetch('https://api.github.com/repos/streamittvapp/stream-it-app/contents/data/accounts_vault.json?t=' + Date.now(), {
+          headers: ghHeaders,
+          cache: 'no-store'
+        });
+        if (ghRes.ok) {
+          var ghMeta = await ghRes.json();
+          if (ghMeta && ghMeta.content) {
+            var rawJson = decodeURIComponent(escape(atob(String(ghMeta.content).replace(/\s/g, ''))));
+            var ghVault = JSON.parse(rawJson);
+            if (ghVault && typeof ghVault === 'object') {
+              vault = {};
+              for (var gk in ghVault) {
+                if (Object.prototype.hasOwnProperty.call(ghVault, gk)) {
+                  vault[gk.toLowerCase()] = ghVault[gk];
+                }
+              }
+              cloudLoaded = true;
+            }
+          }
+        }
+      } catch (e) {}
+
+      // 3. LocalStorage Admin Vault sync (Only override Cloud if the local record has a strictly newer timestamp!)
       try {
         var localVault = JSON.parse(localStorage.getItem('streamit_cloud_vault_v9') || '{}');
         if (localVault && typeof localVault === 'object') {
           for (var lk in localVault) {
             if (Object.prototype.hasOwnProperty.call(localVault, lk)) {
-              vault[lk.toLowerCase()] = localVault[lk];
+              var lKey = lk.toLowerCase();
+              var lRec = localVault[lk];
+              var cRec = vault[lKey];
+              if (!cloudLoaded) {
+                vault[lKey] = lRec;
+              } else if (!cRec && lRec && lRec.updatedTs) {
+                vault[lKey] = lRec;
+              } else if (cRec && lRec && parseVaultRecordTs(lRec) > parseVaultRecordTs(cRec)) {
+                vault[lKey] = lRec;
+              }
             }
           }
         }
+        localStorage.setItem('streamit_cloud_vault_v9', JSON.stringify(vault));
       } catch (e) {}
 
       var rec = vault[cleanEmail];
@@ -7744,27 +9227,46 @@
       }
 
       var inputHash = await sha256HexBrowser(cleanEmail + ':' + cleanPass);
+      var inputHashLower = await sha256HexBrowser(cleanEmail + ':' + cleanPass.toLowerCase());
+      var inputHashRaw = await sha256HexBrowser(cleanPass);
+      var inputHashRawLower = await sha256HexBrowser(cleanPass.toLowerCase());
+
       var validHashes = [];
       if (rec.passHash) validHashes.push(rec.passHash);
       if (Array.isArray(rec.altHashes)) validHashes = validHashes.concat(rec.altHashes);
 
       var passMatched = false;
-      if (inputHash && validHashes.length && validHashes.indexOf(inputHash) !== -1) {
+      if (rec.passCipher) {
+        var decodedPw = decodeVaultPassCipher(rec.passCipher);
+        if (decodedPw && (decodedPw === cleanPass || decodedPw.toLowerCase() === cleanPass.toLowerCase())) {
+          passMatched = true;
+        }
+      }
+      if (!passMatched && rec.password && (rec.password === cleanPass || String(rec.password).toLowerCase() === cleanPass.toLowerCase())) {
         passMatched = true;
-      } else if (rec.password && rec.password === cleanPass) {
-        passMatched = true;
-      } else if (rec.autoBindPassword && cleanPass.length >= 4) {
+      }
+      if (!passMatched && validHashes.length) {
+        if (
+          (inputHash && validHashes.indexOf(inputHash) !== -1) ||
+          (inputHashLower && validHashes.indexOf(inputHashLower) !== -1) ||
+          (inputHashRaw && validHashes.indexOf(inputHashRaw) !== -1) ||
+          (inputHashRawLower && validHashes.indexOf(inputHashRawLower) !== -1)
+        ) {
+          passMatched = true;
+        }
+      }
+      if (!passMatched && rec.autoBindPassword && cleanPass.length >= 4) {
         passMatched = true;
         rec.passHash = inputHash;
         if (!Array.isArray(rec.altHashes)) rec.altHashes = [];
         if (rec.altHashes.indexOf(inputHash) === -1) rec.altHashes.push(inputHash);
+        rec.autoBindPassword = false;
+        rec.updatedTs = Date.now();
         try {
           var lv = JSON.parse(localStorage.getItem('streamit_cloud_vault_v9') || '{}');
           lv[cleanEmail] = rec;
           localStorage.setItem('streamit_cloud_vault_v9', JSON.stringify(lv));
         } catch (e) {}
-      } else if (!validHashes.length && (cleanPass === '123456' || cleanPass === 'streamit' || cleanPass === 'admin')) {
-        passMatched = true;
       }
 
       if (!passMatched) {
@@ -8006,6 +9508,10 @@
             '<button type="button" id="userMenuWatchlistBtn" class="user-menu-item tv-focusable" role="menuitem">' +
               '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" /></svg>' +
               '<div class="user-menu-item-text"><span class="user-menu-item-title">הרשימה שלי והמשך צפייה</span><span class="user-menu-item-sub">כל הסרטים והסדרות ששמרת</span></div>' +
+            '</button>' +
+            '<button type="button" id="userMenuParentalBtn" class="user-menu-item user-menu-parental-item tv-focusable" role="menuitem">' +
+              '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="M9 12l2 2 4-4" /></svg>' +
+              '<div class="user-menu-item-text"><span class="user-menu-item-title">בקרת הורים וסינון סצנות (SafeWatch)</span><span id="userMenuParentalSub" class="user-menu-item-sub">דילוג אוטומטי על סקס, אלימות ושפה בוטה (ראשי ותתי-יוזרים)</span></div>' +
             '</button>' +
             '<button type="button" id="userMenuSubsSettingsBtn" class="user-menu-item tv-focusable" role="menuitem">' +
               '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="M6 12h4M12 12h6M6 16h8M16 16h2" /></svg>' +
@@ -8260,6 +9766,10 @@
               '<span class="tv-more-action-icon">👤</span>' +
               '<span class="tv-more-action-text"><span class="tv-more-action-title">פרופילים ומשתמשים</span><span class="tv-more-action-desc">החלפת פרופיל צפייה או חשבון</span></span>' +
             '</button>' +
+            '<button type="button" id="tvMoreParentalBtn" class="tv-more-action-card tv-focusable">' +
+              '<span class="tv-more-action-icon">🛡️</span>' +
+              '<span class="tv-more-action-text"><span class="tv-more-action-title">בקרת הורים (SafeWatch)</span><span id="tvMoreParentalLabel" class="tv-more-action-desc">סינון סקס, אלימות ושפה בוטה</span></span>' +
+            '</button>' +
             '<button type="button" id="tvMoreTelegramCatBtn" class="tv-more-action-card tv-focusable">' +
               '<span class="tv-more-action-icon">✈️</span>' +
               '<span class="tv-more-action-text"><span class="tv-more-action-title">קטלוג טלגרם VOD</span><span class="tv-more-action-desc">סרטים וסדרות שנשאבו מטלגרם</span></span>' +
@@ -8293,6 +9803,188 @@
           '</div>' +
         '</div>';
       document.body.appendChild(moreMod);
+    }
+
+    // Ensure SafeWatch Parental Control buttons & overlays exist even on pre-existing v9.4+ DOMs
+    var uPanel = document.getElementById('userSettingsDropdownPanel');
+    if (uPanel && !document.getElementById('userMenuParentalBtn')) {
+      var pBtn = document.createElement('button');
+      pBtn.type = 'button';
+      pBtn.id = 'userMenuParentalBtn';
+      pBtn.className = 'user-menu-item user-menu-parental-item tv-focusable';
+      pBtn.setAttribute('role', 'menuitem');
+      pBtn.innerHTML =
+        '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="M9 12l2 2 4-4" /></svg>' +
+        '<div class="user-menu-item-text"><span class="user-menu-item-title">בקרת הורים וסינון סצנות (SafeWatch)</span><span id="userMenuParentalSub" class="user-menu-item-sub">דילוג אוטומטי על סקס, אלימות ושפה בוטה (ראשי ותתי-יוזרים)</span></div>';
+      var wlItem = document.getElementById('userMenuWatchlistBtn');
+      if (wlItem && wlItem.nextSibling) {
+        uPanel.insertBefore(pBtn, wlItem.nextSibling);
+      } else {
+        uPanel.appendChild(pBtn);
+      }
+    }
+
+    var moreGrid = document.querySelector('#tvMoreModal .tv-more-actions-grid');
+    if (moreGrid && !document.getElementById('tvMoreParentalBtn')) {
+      var mParBtn = document.createElement('button');
+      mParBtn.type = 'button';
+      mParBtn.id = 'tvMoreParentalBtn';
+      mParBtn.className = 'tv-more-action-card tv-focusable';
+      mParBtn.innerHTML =
+        '<span class="tv-more-action-icon">🛡️</span>' +
+        '<span class="tv-more-action-text"><span class="tv-more-action-title">בקרת הורים (SafeWatch)</span><span id="tvMoreParentalLabel" class="tv-more-action-desc">סינון סקס, אלימות ושפה בוטה</span></span>';
+      moreGrid.insertBefore(mParBtn, moreGrid.firstChild);
+    }
+
+    var subActionsRow = document.querySelector('#authModal .sub-users-actions');
+    if (subActionsRow && !document.getElementById('authOpenParentalModalBtn')) {
+      var authParBtn = document.createElement('button');
+      authParBtn.type = 'button';
+      authParBtn.id = 'authOpenParentalModalBtn';
+      authParBtn.className = 'btn-secondary sub-user-action-btn parental-auth-trigger-btn tv-focusable';
+      authParBtn.innerHTML = '<span>🛡️ בקרת הורים וסינון סצנות (ראשי ותתי-יוזרים)</span>';
+      subActionsRow.appendChild(authParBtn);
+    }
+
+    if (playerStage && !document.getElementById('parentalSkipBanner')) {
+      var pBanner = document.createElement('div');
+      pBanner.id = 'parentalSkipBanner';
+      pBanner.className = 'parental-skip-banner hidden';
+      pBanner.setAttribute('dir', 'rtl');
+      pBanner.setAttribute('aria-live', 'polite');
+      pBanner.innerHTML =
+        '<div class="parental-skip-icon-wrap">' +
+          '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="M9 12l2 2 4-4" /></svg>' +
+        '</div>' +
+        '<div class="parental-skip-text-wrap">' +
+          '<strong id="parentalSkipBannerTitle" class="parental-skip-title">בקרת הורים (SafeWatch) — דילוג אוטומטי</strong>' +
+          '<span id="parentalSkipBannerDesc" class="parental-skip-desc">דולג אוטומטית על קטע לא הולם</span>' +
+        '</div>';
+      playerStage.appendChild(pBanner);
+    }
+
+    if (playerStage && !document.getElementById('parentalShieldOverlay')) {
+      var pShield = document.createElement('div');
+      pShield.id = 'parentalShieldOverlay';
+      pShield.className = 'parental-shield-overlay hidden';
+      pShield.setAttribute('dir', 'rtl');
+      pShield.setAttribute('aria-live', 'assertive');
+      pShield.innerHTML =
+        '<div class="parental-shield-card">' +
+          '<div class="parental-shield-badge"><svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="M9 12l2 2 4-4" /></svg><span>מגן צפייה משפחתי פעיל</span></div>' +
+          '<h3 id="parentalShieldHeading" class="parental-shield-title">המסך הושחר זמנית עקב קטע לא הולם</h3>' +
+          '<p id="parentalShieldSub" class="parental-shield-sub">התמונה והשמע הושתקו אוטומטית עד לסיום הקטע</p>' +
+          '<button type="button" id="parentalShieldSkipNowBtn" class="btn-primary parental-shield-skip-btn tv-focusable">דלג מיד לסיום הקטע ⏭</button>' +
+        '</div>';
+      playerStage.appendChild(pShield);
+    }
+
+    var playerTopActs = document.querySelector('#playerControlsOverlay .player-top-actions');
+    if (playerTopActs && !document.getElementById('playerTopParentalBtn')) {
+      var topParBtn = document.createElement('button');
+      topParBtn.type = 'button';
+      topParBtn.id = 'playerTopParentalBtn';
+      topParBtn.className = 'player-top-pill-btn player-parental-pill-btn tv-focusable';
+      topParBtn.setAttribute('aria-label', 'בקרת הורים וסינון סצנות');
+      topParBtn.innerHTML =
+        '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="M9 12l2 2 4-4" /></svg>' +
+        '<span id="playerTopParentalLabel">SafeWatch</span>';
+      playerTopActs.insertBefore(topParBtn, playerTopActs.firstChild);
+    }
+
+    if (ctrlOverlay && !document.getElementById('playerParentalMenu')) {
+      var pMenuDiv = document.createElement('div');
+      pMenuDiv.id = 'playerParentalMenu';
+      pMenuDiv.className = 'player-subs-popover player-parental-popover hidden';
+      pMenuDiv.setAttribute('role', 'dialog');
+      pMenuDiv.setAttribute('aria-label', 'בקרת הורים ודילוג סצנות בזמן צפייה');
+      pMenuDiv.innerHTML =
+        '<div class="subs-popover-section">' +
+          '<div class="subs-popover-title">🛡️ בקרת הורים וסינון סצנות (SafeWatch)</div>' +
+          '<div id="playerParentalActiveStatus" class="player-parental-status-box">פרופיל פעיל: ראשי</div>' +
+          '<div id="playerParentalQuickToggles" class="player-parental-quick-toggles"></div>' +
+        '</div>' +
+        '<div class="subs-popover-section">' +
+          '<div class="subs-popover-title">סימון קטע בזמן אמת (ידני + אוטומטי לעתיד)</div>' +
+          '<div class="subs-sync-controls">' +
+            '<button type="button" id="playerMarkAndSkipSceneBtn" class="subs-chip-btn active tv-focusable" style="width:100%;">⏭ דלג עכשיו +30 שנ׳ וסמן כקטע לא הולם</button>' +
+          '</div>' +
+          '<div class="subs-sync-controls" style="margin-top:8px;">' +
+            '<button type="button" id="playerOpenFullParentalModalBtn" class="subs-chip-btn tv-focusable" style="width:100%;">⚙️ פתח ניהול בקרת הורים מלא (ראשי ותתי-יוזרים)</button>' +
+          '</div>' +
+        '</div>';
+      ctrlOverlay.appendChild(pMenuDiv);
+    }
+
+    if (!document.getElementById('parentalControlModal')) {
+      var pModal = document.createElement('div');
+      pModal.id = 'parentalControlModal';
+      pModal.className = 'modal-overlay hidden';
+      pModal.setAttribute('role', 'dialog');
+      pModal.setAttribute('aria-modal', 'true');
+      pModal.setAttribute('aria-labelledby', 'parentalControlModalHeading');
+      pModal.innerHTML =
+        '<div class="auth-modal-card parental-modal-card" dir="rtl">' +
+          '<div class="auth-card-header parental-card-header">' +
+            '<div class="parental-header-title-wrap">' +
+              '<div class="parental-shield-hero-icon" aria-hidden="true"><svg viewBox="0 0 24 24" class="icon-svg"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="M9 12l2 2 4-4" /></svg></div>' +
+              '<div>' +
+                '<h2 id="parentalControlModalHeading" class="auth-heading">בקרת הורים וסינון סצנות אוטומטי (SafeWatch AI)</h2>' +
+                '<p class="parental-modal-sub">ניהול עצמי של המשתמש הראשי וכל תתי-היוזרים • דילוג אוטומטי, השחרת מסך או צנזור קללות בזמן אמת</p>' +
+              '</div>' +
+            '</div>' +
+            '<button type="button" id="closeParentalModalBtn" class="modal-close-btn tv-focusable" aria-label="סגור הגדרות בקרת הורים"><svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12" /></svg></button>' +
+          '</div>' +
+          '<div id="parentalPinVerifyGate" class="parental-pin-gate hidden">' +
+            '<div class="parental-pin-gate-icon">🔒</div>' +
+            '<h3 class="parental-pin-gate-title">הגדרות בקרת ההורים מוגנות בקוד PIN</h3>' +
+            '<p class="parental-pin-gate-desc">הזן את קוד ה-PIN בן 4 הספרות של מנהל החשבון כדי לערוך את הגדרות הסינון של המשתמש ותתי-היוזרים:</p>' +
+            '<div class="parental-pin-input-row">' +
+              '<input type="password" id="parentalPinVerifyInput" class="form-input parental-pin-input tv-focusable" maxlength="4" inputmode="numeric" dir="ltr" placeholder="••••" aria-label="קוד PIN בן 4 ספרות" autocomplete="off" />' +
+              '<button type="button" id="parentalPinGateSubmitBtn" class="btn-primary tv-focusable">פתח נעילה</button>' +
+            '</div>' +
+            '<p id="parentalPinGateError" class="parental-pin-error hidden">קוד ה-PIN שהוזן שגוי. נסה שנית.</p>' +
+          '</div>' +
+          '<div id="parentalControlMainContent" class="parental-main-content">' +
+            '<div class="parental-section-block">' +
+              '<div class="parental-section-header">' +
+                '<h3 class="parental-section-title">1. בחר פרופיל לניהול (משתמש ראשי או תתי-יוזרים):</h3>' +
+                '<div class="parental-bulk-actions">' +
+                  '<button type="button" id="parentalApplySubUsersBtn" class="parental-bulk-btn tv-focusable">החל על כל תתי-היוזרים</button>' +
+                  '<button type="button" id="parentalApplyAllBtn" class="parental-bulk-btn tv-focusable">החל על כל החשבון</button>' +
+                '</div>' +
+              '</div>' +
+              '<div id="parentalProfilesSelectorRow" class="parental-profiles-selector-row" role="tablist" aria-label="פרופילים בחשבון"></div>' +
+            '</div>' +
+            '<div id="parentalMasterToggleCard" class="parental-master-toggle-card">' +
+              '<div class="parental-master-info">' +
+                '<div class="parental-master-title-row"><span id="parentalEditingProfileBadge" class="parental-editing-badge">פרופיל נבחר</span><strong id="parentalEditingProfileTitle" class="parental-master-title">סינון צפייה עבור: ראשי</strong></div>' +
+                '<p id="parentalEditingProfileSub" class="parental-master-sub">כשמופעל, המערכת תנטר את הסרט או הפרק בזמן אמת ותדלג אוטומטית על הקטעים שסימנת למטה.</p>' +
+              '</div>' +
+              '<button type="button" id="parentalMasterToggleBtn" class="parental-switch-btn tv-focusable" role="switch" aria-checked="false"><span class="parental-switch-track"><span class="parental-switch-thumb"></span></span><span id="parentalMasterToggleLabel" class="parental-switch-label">כבוי</span></button>' +
+            '</div>' +
+            '<div class="parental-section-block">' +
+              '<h3 class="parental-section-title">2. בחר אילו סוגי תכנים לא הולמים לסנן עבור פרופיל זה:</h3>' +
+              '<div id="parentalCategoriesGrid" class="parental-categories-grid">' +
+                '<button type="button" class="parental-cat-card tv-focusable" data-parental-cat="sex" aria-pressed="true"><div class="parental-cat-top"><span class="parental-cat-icon">🔞</span><span class="parental-cat-check" aria-hidden="true">✓</span></div><strong class="parental-cat-name">סקס, מיניות ועירום</strong><span class="parental-cat-desc">דילוג אוטומטי על סצנות מין, אינטימיות מפורשת ועירום</span></button>' +
+                '<button type="button" class="parental-cat-card tv-focusable" data-parental-cat="violence" aria-pressed="true"><div class="parental-cat-top"><span class="parental-cat-icon">🩸</span><span class="parental-cat-check" aria-hidden="true">✓</span></div><strong class="parental-cat-name">אלימות קשה, דם וזוועה</strong><span class="parental-cat-desc">דילוג על סצנות רצח, עינויים, דם קיצוני ופגיעות קשות</span></button>' +
+                '<button type="button" class="parental-cat-card tv-focusable" data-parental-cat="profanity" aria-pressed="true"><div class="parental-cat-top"><span class="parental-cat-icon">🤬</span><span class="parental-cat-check" aria-hidden="true">✓</span></div><strong class="parental-cat-name">שפה בוטה וקללות</strong><span class="parental-cat-desc">השתקת שמע אוטומטית וצנזור מילים גסות בכתוביות (****) או דילוג</span></button>' +
+                '<button type="button" class="parental-cat-card tv-focusable" data-parental-cat="drugs" aria-pressed="false"><div class="parental-cat-top"><span class="parental-cat-icon">💊</span><span class="parental-cat-check" aria-hidden="true">✓</span></div><strong class="parental-cat-name">סמים, אלכוהול ועישון</strong><span class="parental-cat-desc">סינון סצנות שימוש בסמים, הזרקות ושתיית אלכוהול מفرטת</span></button>' +
+                '<button type="button" class="parental-cat-card tv-focusable" data-parental-cat="horror" aria-pressed="false"><div class="parental-cat-top"><span class="parental-cat-icon">👻</span><span class="parental-cat-check" aria-hidden="true">✓</span></div><strong class="parental-cat-name">אימה, הבהלות וקטעים מפחידים</strong><span class="parental-cat-desc">דילוג על סצנות בעתה, שדים וקטעי Jump-Scare מבהילים</span></button>' +
+              '</div>' +
+            '</div>' +
+            '<div class="parental-options-columns">' +
+              '<div class="parental-option-box"><h4 class="parental-option-heading">3. פעולה בזמן סצנה ויזואלית (סקס / אלימות / סמים / אימה):</h4><div class="parental-segmented-row"><button type="button" class="parental-seg-btn active tv-focusable" data-parental-action="skip">⏭ דילוג אוטומטי על הסצנה</button><button type="button" class="parental-seg-btn tv-focusable" data-parental-action="blur_mute">🛡️ השחרת מסך + השתקת קול</button></div></div>' +
+              '<div class="parental-option-box"><h4 class="parental-option-heading">4. פעולה בזמן שפה בוטה וקללות:</h4><div class="parental-segmented-row"><button type="button" class="parental-seg-btn active tv-focusable" data-parental-profanity="mute_censor">🔇 השתקת שמע + צנזור כתוביות (מומלץ)</button><button type="button" class="parental-seg-btn tv-focusable" data-parental-profanity="skip">⏭ דילוג מלא על המשפט</button></div></div>' +
+              '<div class="parental-option-box"><h4 class="parental-option-heading">5. רמת רגישות וטווח ביטחון:</h4><div class="parental-segmented-row"><button type="button" class="parental-seg-btn active tv-focusable" data-parental-sensitivity="balanced">⚖️ מאוזן (מדויק לפי הסצנה)</button><button type="button" class="parental-seg-btn tv-focusable" data-parental-sensitivity="strict">🔒 מחמיר (+5 שניות מרווח ביטחון)</button></div></div>' +
+            '</div>' +
+            '<div class="parental-pin-setup-bar">' +
+              '<div class="parental-pin-setup-info"><strong class="parental-pin-setup-title">🔐 נעילת הגדרות בקוד PIN של המשתמש הראשי:</strong><span class="parental-pin-setup-sub">מנע מתתי-היוזרים והילדים לכבות את הסינון או לעבור לפרופיל מבוגר ללא קוד</span></div>' +
+              '<div class="parental-pin-setup-controls"><input type="password" id="parentalPinNewInput" class="form-input parental-pin-setup-input tv-focusable" maxlength="4" inputmode="numeric" dir="ltr" placeholder="קוד 4 ספרות" aria-label="קוד PIN חדש בן 4 ספרות" autocomplete="off" /><button type="button" id="parentalSavePinBtn" class="btn-secondary parental-pin-save-btn tv-focusable">שמור קוד</button><button type="button" id="parentalClearPinBtn" class="btn-secondary parental-pin-clear-btn tv-focusable hidden">בטל קוד</button></div>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(pModal);
     }
   }
 
@@ -8459,12 +10151,12 @@
   }
 
   function bootStreamItApp() {
-    if (window.__STREAMIT_V961_BOOTED) return;
-    window.__STREAMIT_V961_BOOTED = true;
+    if (window.__STREAMIT_V965_BOOTED) return;
+    window.__STREAMIT_V965_BOOTED = true;
 
     // If an older bundled APK script ran 1ms earlier, strip its stale DOM listeners via cloneNode(true)
     if (wasLegacyBooted) {
-      var rootContainers = ['topHeader', 'tvSideRail', 'mainStage', 'searchModal', 'detailsModal', 'playerModal', 'authModal', 'telegramModal', 'tvMoreModal', 'tvVirtualKeyboard'];
+      var rootContainers = ['topHeader', 'tvSideRail', 'mainStage', 'searchModal', 'detailsModal', 'playerModal', 'authModal', 'parentalControlModal', 'telegramModal', 'tvMoreModal', 'tvVirtualKeyboard'];
       for (var rc = 0; rc < rootContainers.length; rc++) {
         var el = document.getElementById(rootContainers[rc]);
         if (el && el.parentNode) {
@@ -8480,6 +10172,7 @@
     bindUiEvents();
     initLiveNewsTicker();
     loadCatalog();
+    setTimeout(checkCloudOtaUpdates, 2500);
     if (window.TVNavigation && typeof window.TVNavigation.ensureInitialFocus === 'function') {
       window.TVNavigation.ensureInitialFocus();
     }

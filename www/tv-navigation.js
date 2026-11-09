@@ -82,6 +82,9 @@
     var vk = document.getElementById('tvVirtualKeyboard');
     if (vk && !vk.classList.contains('hidden')) return vk;
 
+    var parentalModal = document.getElementById('parentalControlModal');
+    if (parentalModal && !parentalModal.classList.contains('hidden')) return parentalModal;
+
     var player = document.getElementById('playerModal');
     if (player && !player.classList.contains('hidden')) return player;
 
@@ -211,7 +214,7 @@
       var sameNetflixRow = Boolean(prevRow && curRow && prevRow === curRow);
       if (!sameNetflixRow) {
         var scrollTarget = curRow || el;
-        var scrollContainer = el.closest('#tvRailListsScroll, #catalogMain, .details-modal-sheet, #searchModal, #tvMoreModal, .explorer-dropdown-panel');
+        var scrollContainer = el.closest('#tvRailListsScroll, #catalogMain, .details-modal-sheet, .parental-modal-card, #parentalControlModal, #searchModal, #tvMoreModal, .explorer-dropdown-panel');
         if (scrollContainer) {
           if (isTv) {
             var cRect = scrollContainer.getBoundingClientRect();
@@ -381,8 +384,14 @@
 
     var controlsOverlay = document.getElementById('playerControlsOverlay');
     var subsMenu = document.getElementById('playerSubsMenu');
+    var parentalMenu = document.getElementById('playerParentalMenu');
     var sourceTabsPanel = document.getElementById('playerSourceTabs');
     var seekSlider = document.getElementById('playerSeekSlider');
+    var shieldSkipBtn = document.getElementById('parentalShieldSkipNowBtn');
+
+    if (shieldSkipBtn && isElementVisible(shieldSkipBtn)) {
+      return setFocus(shieldSkipBtn, { scroll: false });
+    }
 
     // Direct Remote Control when Player Controls are idle-hidden:
     // Up/Down = Subtitle Vertical Position; Right/Left = Instant ±10s Seek + Netflix Scene Thumbnail Preview!
@@ -390,6 +399,7 @@
       controlsOverlay &&
       controlsOverlay.classList.contains('idle-hidden') &&
       (!subsMenu || subsMenu.classList.contains('hidden')) &&
+      (!parentalMenu || parentalMenu.classList.contains('hidden')) &&
       (!sourceTabsPanel || sourceTabsPanel.classList.contains('hidden'))
     ) {
       if (direction === 'down' && typeof window.adjustSubtitleVerticalPosition === 'function') {
@@ -418,6 +428,7 @@
 
     var skipBtn = document.getElementById('skipIntroOverlayBtn');
     var resumeRestartBtn = document.getElementById('resumeRestartFromZeroBtn');
+    var topParentalBtn = document.getElementById('playerTopParentalBtn');
     var topSubsBtn = document.getElementById('playerTopSubsBtn');
     var sourcesDropBtn = document.getElementById('playerSourcesDropdownBtn');
     var topFsBtn = document.getElementById('playerTopFullscreenBtn');
@@ -430,6 +441,28 @@
     var fullscreenBtn = document.getElementById('playerFullscreenBtn');
     var embedCcBtn = document.getElementById('embedCcOverlayBtn');
     var embedFsBtn = document.getElementById('embedFullscreenOverlayBtn');
+
+    // 0. Open SafeWatch Parental Menu (#playerParentalMenu)
+    if (parentalMenu && !parentalMenu.classList.contains('hidden')) {
+      var parItems = Array.prototype.slice.call(parentalMenu.querySelectorAll('button')).filter(isElementVisible);
+      if (!parItems.length) return true;
+      if (!currentFocused || !parentalMenu.contains(currentFocused)) {
+        return setFocus(parItems[0]);
+      }
+      var nearPar = findNearestPhysical(currentFocused, direction, parItems);
+      if (nearPar) return setFocus(nearPar);
+      var pIdx = parItems.indexOf(currentFocused);
+      if (direction === 'down') {
+        if (pIdx < parItems.length - 1) return setFocus(parItems[pIdx + 1]);
+        return setFocus(parItems[parItems.length - 1]);
+      }
+      if (direction === 'up') {
+        if (pIdx > 0) return setFocus(parItems[pIdx - 1]);
+        parentalMenu.classList.add('hidden');
+        return setFocus(topParentalBtn && isElementVisible(topParentalBtn) ? topParentalBtn : closeBtn);
+      }
+      return true;
+    }
 
     // 1. Open Subtitles Menu (#playerSubsMenu)
     if (subsMenu && !subsMenu.classList.contains('hidden')) {
@@ -497,7 +530,7 @@
       return true;
     }
 
-    var topBarBtns = [topSubsBtn, sourcesDropBtn, topFsBtn, closeBtn].filter(isElementVisible);
+    var topBarBtns = [topParentalBtn, topSubsBtn, sourcesDropBtn, topFsBtn, closeBtn].filter(isElementVisible);
     var transportBtns = [playPauseBtn, rewindBtn, forwardBtn, nextEpBtn, subsBtn, fullscreenBtn].filter(isElementVisible);
     var embedOverlayBtns = [embedCcBtn, embedFsBtn].filter(isElementVisible);
     var isEmbedMode = player.classList.contains('embed-mode-active');
@@ -1372,6 +1405,7 @@
   function openVirtualKeyboard(inputEl) {
     if (!inputEl) return;
     if (!document.body || !document.body.classList.contains('tv-mode')) return;
+    inputEl.removeAttribute('readonly');
     activeVkInput = inputEl;
     var vk = document.getElementById('tvVirtualKeyboard');
     if (!vk) return;
@@ -1516,6 +1550,41 @@
     var vk = document.getElementById('tvVirtualKeyboard');
     if (vk && !vk.classList.contains('hidden')) {
       return closeVirtualKeyboard();
+    }
+
+    var parentalModal = document.getElementById('parentalControlModal');
+    if (parentalModal && !parentalModal.classList.contains('hidden')) {
+      if (typeof window.closeParentalControlModal === 'function') {
+        window.closeParentalControlModal();
+      } else {
+        parentalModal.classList.add('hidden');
+      }
+      var playerOpen = document.getElementById('playerModal');
+      if (playerOpen && !playerOpen.classList.contains('hidden')) {
+        var topPar = document.getElementById('playerTopParentalBtn');
+        if (topPar && isElementVisible(topPar)) setFocus(topPar);
+      } else if (lastMainFocus && isElementVisible(lastMainFocus)) {
+        setFocus(lastMainFocus);
+      }
+      return true;
+    }
+
+    var parentalMenu = document.getElementById('playerParentalMenu');
+    if (parentalMenu && !parentalMenu.classList.contains('hidden')) {
+      parentalMenu.classList.add('hidden');
+      if (isTv) {
+        lastPlayerOverlayDismissedAt = now;
+        var controlsOverlayPar = document.getElementById('playerControlsOverlay');
+        if (controlsOverlayPar) controlsOverlayPar.classList.add('idle-hidden');
+        clearPlayerFocus();
+        if (typeof window.resumePlaybackIfPaused === 'function') {
+          window.resumePlaybackIfPaused();
+        }
+        return true;
+      }
+      var topParBtn = document.getElementById('playerTopParentalBtn');
+      if (topParBtn && isElementVisible(topParBtn)) setFocus(topParBtn);
+      return true;
     }
 
     var subsMenu = document.getElementById('playerSubsMenu');
@@ -1716,15 +1785,34 @@
     }
 
     if (directionOrAction === 'select') {
+      var parentalModalOpen = document.getElementById('parentalControlModal');
       var player = document.getElementById('playerModal');
       var isTv = Boolean(document.body && document.body.classList.contains('tv-mode'));
-      if (player && !player.classList.contains('hidden')) {
+      if (player && !player.classList.contains('hidden') && (!parentalModalOpen || parentalModalOpen.classList.contains('hidden'))) {
         if (isTv) {
+          var shieldSkipBtn = document.getElementById('parentalShieldSkipNowBtn');
+          if (shieldSkipBtn && isElementVisible(shieldSkipBtn)) {
+            shieldSkipBtn.click();
+            return true;
+          }
+
+          var parentalMenu = document.getElementById('playerParentalMenu');
           var subsMenu = document.getElementById('playerSubsMenu');
           var sourceTabsPanel = document.getElementById('playerSourceTabs');
           var controlsOverlay = document.getElementById('playerControlsOverlay');
           var playPauseBtn = document.getElementById('playerPlayPauseBtn');
           var seekSlider = document.getElementById('playerSeekSlider');
+
+          if (parentalMenu && !parentalMenu.classList.contains('hidden')) {
+            if (typeof window.wakePlayerControls === 'function') window.wakePlayerControls();
+            if (currentFocused && parentalMenu.contains(currentFocused) && isElementVisible(currentFocused)) {
+              currentFocused.click();
+            } else {
+              var firstPar = parentalMenu.querySelector('button');
+              if (firstPar && isElementVisible(firstPar)) setFocus(firstPar);
+            }
+            return true;
+          }
 
           if (subsMenu && !subsMenu.classList.contains('hidden')) {
             if (typeof window.wakePlayerControls === 'function') window.wakePlayerControls();
@@ -1796,8 +1884,9 @@
       return navigateVirtualKeyboard(directionOrAction);
     }
 
+    var parentalModalNav = document.getElementById('parentalControlModal');
     var playerModal = document.getElementById('playerModal');
-    if (playerModal && !playerModal.classList.contains('hidden')) {
+    if (playerModal && !playerModal.classList.contains('hidden') && (!parentalModalNav || parentalModalNav.classList.contains('hidden'))) {
       return navigatePlayerModal(directionOrAction);
     }
 
