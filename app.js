@@ -10,7 +10,8 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.6.8';
+  var APP_VERSION = '9.6.9';
+  window.__STREAMIT_V969_BOOTED = true;
   var wasLegacyBooted = Boolean(window.__STREAMIT_V94_BOOTED || window.__STREAMIT_V961_BOOTED);
   window.__STREAMIT_V94_BOOTED = true;
   window.__STREAMIT_V961_BOOTED = true;
@@ -324,10 +325,10 @@
         '<circle cx="300" cy="390" r="290" fill="url(#glow)"/>' +
         '<rect x="28" y="28" width="544" height="844" rx="28" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>' +
         '<rect x="190" y="255" width="220" height="220" rx="44" fill="rgba(255,255,255,0.06)" stroke="' + acc + '" stroke-width="3"/>' +
-        '<text x="300" y="382" text-anchor="middle" fill="#FFFFFF" font-family="Rubik, Arial, sans-serif" font-weight="900" font-size="' + fontSize + '">' + safeLogo + '</text>' +
+        '<text x="300" y="382" text-anchor="middle" fill="#FFFFFF" font-family="Rubik, Arial, sans-serif" font-weight="600" font-size="' + fontSize + '">' + safeLogo + '</text>' +
         '<rect x="215" y="420" width="170" height="32" rx="16" fill="' + acc + '"/>' +
-        '<text x="300" y="442" text-anchor="middle" fill="#FFFFFF" font-family="Rubik, Arial, sans-serif" font-weight="800" font-size="17">אפיק ' + safeNum + ' • LIVE</text>' +
-        '<text x="300" y="555" text-anchor="middle" fill="#FFFFFF" font-family="Rubik, Arial, sans-serif" font-weight="800" font-size="31">' + safeSub + '</text>' +
+        '<text x="300" y="442" text-anchor="middle" fill="#FFFFFF" font-family="Rubik, Arial, sans-serif" font-weight="600" font-size="17">אפיק ' + safeNum + ' • LIVE</text>' +
+        '<text x="300" y="555" text-anchor="middle" fill="#FFFFFF" font-family="Rubik, Arial, sans-serif" font-weight="600" font-size="31">' + safeSub + '</text>' +
         '<text x="300" y="600" text-anchor="middle" fill="#94A3B8" font-family="Rubik, Arial, sans-serif" font-weight="600" font-size="21">שידור חי רציף • Full HD 1080p</text>' +
       '</svg>';
     return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
@@ -1497,6 +1498,153 @@
   window.updateBootLoaderProgress = updateBootLoaderProgress;
 
   /**
+   * Master Admin System Configuration (`streamit_system_config_v9`)
+   * Controls Feature Toggles, Streaming Sources/Channels Connect/Disconnect, and Category Visibility
+   */
+  var DEFAULT_SYSTEM_CONFIG = {
+    updatedTs: 0,
+    features: {
+      top10Shelves: true,
+      strictPosterFilter: true,
+      strictSourcesAndSubs: true,
+      autoCollapseTvRail: true,
+      parentalSafeWatch: true,
+      bootLoaderAnim: true,
+      autoResumePlayback: true,
+      crossDeviceCloudSync: true,
+      liveNewsTicker: true,
+      otaAutoUpdate: true
+    },
+    sources: {
+      vidsrc_vip: true,
+      vidlink_mirror: true,
+      tpb_yts_4k: true,
+      telegram_vod: true,
+      israeli_live: true,
+      cinema_live: true,
+      sports_live: true,
+      news_live: true,
+      youtube_hub: true
+    },
+    disabledChannelIds: {},
+    disabledTelegramHandles: {},
+    categories: {
+      top10_most_watched: true,
+      top10_newest: true,
+      top10_series: true,
+      top10_action: true,
+      movies: true,
+      series: true,
+      israeli: true,
+      channels: true,
+      telegram: true,
+      netflix: true,
+      apple_hbo_prime: true,
+      tpb_4k: true,
+      action: true,
+      crime: true,
+      scifi: true,
+      comedy: true,
+      drama: true,
+      horror: true,
+      animation: true,
+      docu: true,
+      youtube: true
+    }
+  };
+
+  function getSystemConfig() {
+    if (!state.systemConfig) {
+      loadSystemConfig();
+    }
+    return state.systemConfig;
+  }
+
+  function loadSystemConfig() {
+    var cfg = JSON.parse(JSON.stringify(DEFAULT_SYSTEM_CONFIG));
+    try {
+      var raw = localStorage.getItem('streamit_system_config_v9');
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') {
+          if (parsed.updatedTs) cfg.updatedTs = Number(parsed.updatedTs) || 0;
+          if (parsed.features && typeof parsed.features === 'object') {
+            Object.keys(parsed.features).forEach(function (k) { cfg.features[k] = Boolean(parsed.features[k]); });
+          }
+          if (parsed.sources && typeof parsed.sources === 'object') {
+            Object.keys(parsed.sources).forEach(function (k) { cfg.sources[k] = Boolean(parsed.sources[k]); });
+          }
+          if (parsed.categories && typeof parsed.categories === 'object') {
+            Object.keys(parsed.categories).forEach(function (k) { cfg.categories[k] = Boolean(parsed.categories[k]); });
+          }
+          if (parsed.disabledChannelIds && typeof parsed.disabledChannelIds === 'object') {
+            cfg.disabledChannelIds = parsed.disabledChannelIds;
+          }
+          if (parsed.disabledTelegramHandles && typeof parsed.disabledTelegramHandles === 'object') {
+            cfg.disabledTelegramHandles = parsed.disabledTelegramHandles;
+          }
+        }
+      }
+    } catch (e) {}
+    state.systemConfig = cfg;
+    if (!state.brokenPosterIds) state.brokenPosterIds = {};
+    applySystemConfigToUi();
+    return cfg;
+  }
+
+  function applySystemConfigToUi() {
+    var cfg = state.systemConfig || DEFAULT_SYSTEM_CONFIG;
+    if (document.body) {
+      if (cfg.features && cfg.features.autoCollapseTvRail === false) {
+        document.body.classList.add('tv-rail-pinned-open');
+      } else {
+        document.body.classList.remove('tv-rail-pinned-open');
+      }
+    }
+    var tickerBar = document.getElementById('liveNewsTickerBar');
+    if (tickerBar && cfg.features) {
+      tickerBar.style.display = (cfg.features.liveNewsTicker === false) ? 'none' : '';
+    }
+    var bootEl = document.getElementById('appBootLoader');
+    if (bootEl && cfg.features && cfg.features.bootLoaderAnim === false) {
+      bootEl.classList.add('boot-complete');
+    }
+    // Sync top header category nav visibility
+    var catNavMap = {
+      movies: 'movies',
+      series: 'series',
+      israeli: 'israeli',
+      channels: 'channels',
+      telegram: 'telegram',
+      youtube: 'youtube'
+    };
+    var navBtns = document.querySelectorAll('#topHeader [data-category]');
+    for (var i = 0; i < navBtns.length; i++) {
+      var cKey = navBtns[i].getAttribute('data-category');
+      if (cKey && catNavMap[cKey]) {
+        var visible = cfg.categories[catNavMap[cKey]] !== false;
+        if (cKey === 'telegram' && cfg.sources.telegram_vod === false) visible = false;
+        if (cKey === 'channels' && cfg.sources.israeli_live === false && cfg.sources.cinema_live === false && cfg.sources.sports_live === false && cfg.sources.news_live === false) visible = false;
+        if (cKey === 'youtube' && cfg.sources.youtube_hub === false) visible = false;
+        navBtns[i].style.display = visible ? '' : 'none';
+      }
+    }
+  }
+
+  window.__streamItHandleBrokenPoster = function (imgEl, itemId) {
+    if (itemId) {
+      if (!state.brokenPosterIds) state.brokenPosterIds = {};
+      state.brokenPosterIds[String(itemId)] = true;
+    }
+    if (imgEl) {
+      var card = imgEl.closest ? imgEl.closest('.poster-card') : null;
+      if (card && card.parentNode) {
+        card.parentNode.removeChild(card);
+      }
+    }
+  };
+
+  /**
    * Per-Account & Per-Sub-User Strictly Isolated State Persistence
    * Every account (`state.user.email`) gets its own completely separate profiles, watch history (`progress`), and watchlist!
    */
@@ -1582,6 +1730,7 @@
   }
 
   function loadLocalStorageState() {
+    loadSystemConfig();
     try {
       var usr = localStorage.getItem('streamit_user_v9');
       if (usr) {
@@ -1835,6 +1984,16 @@
           var rawJson = decodeURIComponent(escape(atob(String(ghMeta.content).replace(/\s/g, ''))));
           var ghVault = JSON.parse(rawJson);
           if (ghVault && typeof ghVault === 'object') {
+            if (ghVault._system_config && typeof ghVault._system_config === 'object') {
+              var localSysTs = (state.systemConfig && state.systemConfig.updatedTs) ? Number(state.systemConfig.updatedTs) : 0;
+              var cloudSysTs = Number(ghVault._system_config.updatedTs || 0);
+              if (cloudSysTs >= localSysTs) {
+                try {
+                  localStorage.setItem('streamit_system_config_v9', JSON.stringify(ghVault._system_config));
+                } catch (e) {}
+                loadSystemConfig();
+              }
+            }
             var rec = ghVault[cleanEmail];
             if (rec) {
               if (rec.display_name && state.user.name !== rec.display_name) {
@@ -1978,7 +2137,20 @@
     if (type === 'channel' && (!poster || poster.indexOf('images.unsplash.com') !== -1)) {
       poster = createChannelBrandedPosterSvg(channelNumber, logoText, subLabel, '#0B132B', '#1C2541', brandAccent);
     }
-    if (!poster) poster = 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&auto=format&fit=crop&q=80';
+    var sysCfgNorm = getSystemConfig();
+    if (type !== 'channel') {
+      var hasBadPoster = !poster ||
+        String(poster).indexOf('1489599849927') !== -1 ||
+        String(poster).indexOf('undefined') !== -1 ||
+        String(poster).indexOf('null') !== -1 ||
+        String(poster).trim().length < 10;
+      if (hasBadPoster && sysCfgNorm.features.strictPosterFilter !== false) {
+        return null;
+      }
+      if (!poster) {
+        return null;
+      }
+    }
 
     var backdrop = raw.backdrop || raw.backdropUrl || raw.background_image_original || raw.background_image || '';
     if (!backdrop && raw.backdrop_path) backdrop = TMDB_IMG_BACKDROP + raw.backdrop_path;
@@ -2055,6 +2227,13 @@
     var videoId = raw.videoId || '';
     var directYtId = raw.direct_yt_id || raw.directYtId || '';
     var trailerYtId = raw.trailer_yt_id || raw.trailerYtId || '';
+
+    if (type !== 'channel' && sysCfgNorm.features.strictSourcesAndSubs !== false) {
+      var hasPlayableId = Boolean(imdbId || tmdbId || streamUrl || videoId || directYtId || (fallbackStreams && fallbackStreams.length));
+      if (!hasPlayableId) {
+        return null;
+      }
+    }
 
     var idKey = String(raw.id || imdbId || (type + '-' + tmdbId));
 
@@ -3385,7 +3564,7 @@
     var initial = String(name || 'A').trim().charAt(0) || 'A';
     var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">' +
       '<rect width="80" height="80" fill="#262626"/>' +
-      '<text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" fill="#ffffff" font-family="Rubik, sans-serif" font-weight="800" font-size="34">' +
+      '<text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" fill="#ffffff" font-family="Rubik, sans-serif" font-weight="600" font-size="34">' +
       escapeHtml(initial) + '</text></svg>';
     return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
   }
@@ -3737,15 +3916,41 @@
 
   function filterKidsItems(list) {
     if (!Array.isArray(list)) return [];
+    var sysCfg = getSystemConfig();
+    var strictPoster = !sysCfg.features || sysCfg.features.strictPosterFilter !== false;
+    var strictSources = !sysCfg.features || sysCfg.features.strictSourcesAndSubs !== false;
+    var parentalFeatureOn = !sysCfg.features || sysCfg.features.parentalSafeWatch !== false;
+
     var activeProfile = getActiveSubUser();
-    if (!activeProfile) return list;
-    var pCfg = ensureProfileParentalConfig(activeProfile);
-    var isKidsMode = Boolean(activeProfile.isKids);
-    var isSafeWatch = Boolean(pCfg && pCfg.enabled);
-    if (!isKidsMode && !isSafeWatch) return list;
+    var pCfg = activeProfile ? ensureProfileParentalConfig(activeProfile) : null;
+    var isKidsMode = Boolean(parentalFeatureOn && activeProfile && activeProfile.isKids);
+    var isSafeWatch = Boolean(parentalFeatureOn && pCfg && pCfg.enabled);
 
     return list.filter(function (item) {
+      if (!item) return false;
+      if (item.type !== 'channel') {
+        if (state.brokenPosterIds && state.brokenPosterIds[String(item.id)]) return false;
+        if (strictPoster) {
+          var p = String(item.poster || '').trim();
+          if (!p || p.indexOf('1489599849927') !== -1 || p.indexOf('undefined') !== -1 || p.indexOf('null') !== -1) {
+            return false;
+          }
+        }
+        if (strictSources) {
+          var hasSrc = Boolean(item.imdbId || item.tmdbId || item.streamUrl || item.videoId || item.directYtId || (item.fallbackStreams && item.fallbackStreams.length));
+          if (!hasSrc) return false;
+        }
+        if (sysCfg.sources && sysCfg.sources.telegram_vod === false && String(item.id || '').indexOf('tg_') === 0) {
+          return false;
+        }
+      }
       var genres = Array.isArray(item.genres) ? item.genres : [];
+      if (sysCfg.categories) {
+        if (sysCfg.categories.israeli === false && item.isIsraeli && item.type !== 'channel') return false;
+        if (sysCfg.categories.horror === false && genres.indexOf('horror') !== -1) return false;
+        if (sysCfg.categories.animation === false && genres.indexOf('animation') !== -1) return false;
+        if (sysCfg.categories.docu === false && genres.indexOf('docu') !== -1) return false;
+      }
       if (isKidsMode) {
         if (genres.indexOf('horror') !== -1 || genres.indexOf('crime') !== -1 || genres.indexOf('thriller') !== -1) return false;
         if (item.ageRating === '18+' || item.ageRating === '16+') return false;
@@ -3753,6 +3958,23 @@
       if (isSafeWatch && pCfg.categories) {
         if (pCfg.categories.horror && genres.indexOf('horror') !== -1) return false;
         if (pCfg.categories.sex && item.ageRating === '18+') return false;
+      }
+      return true;
+    });
+  }
+
+  function getActiveLiveChannelsList() {
+    var sysCfg = getSystemConfig();
+    var rawChannels = Array.isArray(state.catalog.channels) ? state.catalog.channels : [];
+    return rawChannels.filter(function (ch) {
+      if (!ch) return false;
+      if (sysCfg.disabledChannelIds && sysCfg.disabledChannelIds[String(ch.id)]) return false;
+      var grp = ch.liveGroup || 'israeli';
+      if (sysCfg.sources) {
+        if (grp === 'israeli' && sysCfg.sources.israeli_live === false) return false;
+        if (grp === 'cinema' && sysCfg.sources.cinema_live === false) return false;
+        if (grp === 'sports' && sysCfg.sources.sports_live === false) return false;
+        if (grp === 'news' && sysCfg.sources.news_live === false) return false;
       }
       return true;
     });
@@ -3921,7 +4143,7 @@
     }
     var allMovies = filterKidsItems(state.catalog.movies);
     var allSeries = filterKidsItems(state.catalog.series);
-    var allChannels = state.catalog.channels;
+    var allChannels = getActiveLiveChannelsList();
     var allYoutube = state.catalog.youtube || BUILTIN_YOUTUBE_ITEMS;
 
     var cat = state.activeCategory;
@@ -4289,13 +4511,31 @@
     }
     // 6. Category = Movies / Series / Channels / MyList / All (Home)
     else if (cat === 'movies') {
-      shelves.push({ title: 'שוברי קופות וסרטים מובילים', items: allMovies.slice(0, 18) });
+      var sysCfgMov = getSystemConfig();
+      var showTop10Mov = !sysCfgMov.features || sysCfgMov.features.top10Shelves !== false;
+      if (showTop10Mov && (!sysCfgMov.categories || sysCfgMov.categories.top10_most_watched !== false)) {
+        shelves.push({ title: 'הסרטים הנצפים ביותר היום', items: allMovies.slice(0, 10), isTop10: true });
+      }
+      shelves.push({ title: 'שוברי קופות וסרטים מובילים', items: allMovies.slice(10, 28) });
       shelves.push({ title: 'נטפליקס, אפל TV+, אמאזון ו-HBO', items: filterByGenre(allMovies, 'netflix').concat(filterByGenre(allMovies, 'apple'), filterByGenre(allMovies, 'amazon')).slice(0, 20) });
-      shelves.push({ title: 'מאגר PirateBay & YTS 4K', items: filterByGenre(allMovies, 'tpb').slice(0, 20) });
+      if (showTop10Mov && (!sysCfgMov.categories || sysCfgMov.categories.top10_newest !== false)) {
+        var newestMov = allMovies.filter(function (m) { return m.year === '2026' || m.year === '2025'; }).slice(0, 10);
+        if (newestMov.length >= 5) {
+          shelves.push({ title: 'הסרטים החדשים ביותר (2025–2026)', items: newestMov, isTop10: true });
+        }
+      }
+      if (!sysCfgMov.categories || sysCfgMov.categories.tpb_4k !== false) {
+        shelves.push({ title: 'מאגר PirateBay & YTS 4K', items: filterByGenre(allMovies, 'tpb').slice(0, 20) });
+      }
       gridWallTitle = 'כל הסרטים במאגר (' + allMovies.length + ' סרטים)';
       gridWallItems = allMovies;
     } else if (cat === 'series') {
-      shelves.push({ title: 'סדרות מובילות עם תרגום לעברית', items: allSeries.slice(0, 18) });
+      var sysCfgSer = getSystemConfig();
+      var showTop10Ser = !sysCfgSer.features || sysCfgSer.features.top10Shelves !== false;
+      if (showTop10Ser && (!sysCfgSer.categories || sysCfgSer.categories.top10_series !== false)) {
+        shelves.push({ title: 'הסדרות הנצפות ביותר היום', items: allSeries.slice(0, 10), isTop10: true });
+      }
+      shelves.push({ title: 'סדרות מובילות עם תרגום לעברית', items: allSeries.slice(10, 28) });
       shelves.push({ title: 'סדרות נטפליקס, HBO, אפל TV+ ואמאזון', items: filterByGenre(allSeries, 'netflix').concat(filterByGenre(allSeries, 'hbo'), filterByGenre(allSeries, 'apple'), filterByGenre(allSeries, 'amazon')).slice(0, 20) });
       gridWallTitle = 'כל הסדרות במאגר (' + allSeries.length + ' סדרות)';
       gridWallItems = allSeries;
@@ -4328,7 +4568,12 @@
         : 'הרשימה שלך ריקה — הוסף סרטים וסדרות לצפייה מאוחרת';
       gridWallItems = wlItems;
     } else {
-      // Home ('all') — Strictly Movies & Series ONLY (Zero Live Channels on Home Screen!) + Zero Duplication Between Shelves!
+      // Home ('all') — Interleaved Top 10 Ranked Shelves + Category Shelves Controlled by Admin Dashboard!
+      var sysCfgHome = getSystemConfig();
+      var showTop10 = !sysCfgHome.features || sysCfgHome.features.top10Shelves !== false;
+      var catVis = sysCfgHome.categories || {};
+      var srcVis = sysCfgHome.sources || {};
+
       var seenHomeIds = {};
       var takeUniqueHomeItems = function (pool, maxCount) {
         var out = [];
@@ -4344,91 +4589,163 @@
         return out;
       };
 
-      // 1. Leading in Israel Today (Top Blockbusters)
-      var topIsraelItems = takeUniqueHomeItems(allMovies, 16);
-      if (topIsraelItems.length) {
-        shelves.push({ title: 'המובילים בישראל היום', items: topIsraelItems });
+      // TOP 10 #1 (Row 1): הנצפים ביותר היום בישראל
+      if (showTop10 && catVis.top10_most_watched !== false) {
+        var top10MostWatched = takeUniqueHomeItems(allMovies.concat(allSeries), 10);
+        if (top10MostWatched.length) {
+          shelves.push({ title: 'הנצפים ביותר בישראל היום', items: top10MostWatched, isTop10: true });
+        }
       }
 
-      // 2. Telegram Cinema VOD (Strictly unique items from Telegram channels — never duplicates Leading in Israel!)
-      var rawTgPool = filterByGenre(allMovies, 'telegram').concat(filterByGenre(allSeries, 'telegram'));
-      var tgUniqueItems = takeUniqueHomeItems(rawTgPool, 18);
-      if (tgUniqueItems.length) {
-        shelves.push({ title: 'טלגרם קולנוע VOD — סרטים וסדרות שנמשכו מערוצי הטלגרם', items: tgUniqueItems });
+      // Row 2: שוברי קופות וסרטים מובילים
+      if (catVis.movies !== false) {
+        var topIsraelItems = takeUniqueHomeItems(allMovies, 16);
+        if (topIsraelItems.length) {
+          shelves.push({ title: 'שוברי קופות וסרטים מובילים', items: topIsraelItems });
+        }
       }
 
-      // 3. Popular Series
-      var topSeriesHome = takeUniqueHomeItems(allSeries, 16);
-      if (topSeriesHome.length) {
-        shelves.push({ title: 'סדרות פופולריות לצפייה ישירה', items: topSeriesHome });
+      // Row 3: סדרות פופולריות לצפייה ישירה
+      if (catVis.series !== false) {
+        var topSeriesHome = takeUniqueHomeItems(allSeries, 16);
+        if (topSeriesHome.length) {
+          shelves.push({ title: 'סדרות פופולריות לצפייה ישירה', items: topSeriesHome });
+        }
       }
 
-      // 4. Netflix Originals & Top
-      var netflixItems = takeUniqueHomeItems(filterByGenre(allMovies, 'netflix').concat(filterByGenre(allSeries, 'netflix')), 18);
-      if (netflixItems.length) {
-        shelves.push({ title: 'נטפליקס (Netflix Originals & Top)', items: netflixItems });
+      // TOP 10 #2 (Row 4): החדשים ביותר (2025–2026)
+      if (showTop10 && catVis.top10_newest !== false) {
+        var newestPool = allMovies.concat(allSeries).filter(function (it) {
+          return it && (it.year === '2026' || it.year === '2025');
+        });
+        var top10Newest = takeUniqueHomeItems(newestPool, 10);
+        if (top10Newest.length) {
+          shelves.push({ title: 'החדשים ביותר — הבכורות החמות של השנה', items: top10Newest, isTop10: true });
+        }
       }
 
-      // 5. Apple TV+, HBO Max & Amazon Prime
-      var appleHboItems = takeUniqueHomeItems(
-        filterByGenre(allMovies, 'apple').concat(filterByGenre(allSeries, 'apple'), filterByGenre(allSeries, 'hbo'), filterByGenre(allMovies, 'amazon'), filterByGenre(allSeries, 'amazon')),
-        18
-      );
-      if (appleHboItems.length) {
-        shelves.push({ title: 'אפל TV+, HBO Max ואמאזון פריים (Apple / HBO / Prime)', items: appleHboItems });
+      // Row 5: נטפליקס (Netflix Originals & Top)
+      if (catVis.netflix !== false && srcVis.vidsrc_vip !== false) {
+        var netflixItems = takeUniqueHomeItems(filterByGenre(allMovies, 'netflix').concat(filterByGenre(allSeries, 'netflix')), 18);
+        if (netflixItems.length) {
+          shelves.push({ title: 'נטפליקס (Netflix Originals & Top)', items: netflixItems });
+        }
       }
 
-      // 6. PirateBay & YTS 4K Direct
-      var tpbItems = takeUniqueHomeItems(filterByGenre(allMovies, 'tpb'), 18);
-      if (tpbItems.length) {
-        shelves.push({ title: 'מאגר PirateBay & YTS 4K Direct', items: tpbItems });
+      // Row 6: אפל TV+, HBO Max ואמאזון פריים
+      if (catVis.apple_hbo_prime !== false) {
+        var appleHboItems = takeUniqueHomeItems(
+          filterByGenre(allMovies, 'apple').concat(filterByGenre(allSeries, 'apple'), filterByGenre(allSeries, 'hbo'), filterByGenre(allMovies, 'amazon'), filterByGenre(allSeries, 'amazon')),
+          18
+        );
+        if (appleHboItems.length) {
+          shelves.push({ title: 'אפל TV+, HBO Max ואמאזון פריים (Apple / HBO / Prime)', items: appleHboItems });
+        }
       }
 
-      // 7. Action & Blockbusters
-      var actionMovies = takeUniqueHomeItems(filterByGenre(allMovies, 'action'), 18);
-      if (actionMovies.length) {
-        shelves.push({ title: 'אקשן, הרפתקאות ושוברי קופות', items: actionMovies });
+      // TOP 10 #3 (Row 7): טופ 10 — הסדרות המובילות השבוע
+      if (showTop10 && catVis.top10_series !== false && catVis.series !== false) {
+        var top10SeriesItems = takeUniqueHomeItems(allSeries, 10);
+        if (top10SeriesItems.length) {
+          shelves.push({ title: 'הסדרות המובילות השבוע', items: top10SeriesItems, isTop10: true });
+        }
       }
 
-      // 8. Crime, Thriller & Mystery
-      var crimeItems = takeUniqueHomeItems(filterByGenre(allMovies, 'crime').concat(filterByGenre(allMovies, 'thriller'), filterByGenre(allSeries, 'crime')), 18);
-      if (crimeItems.length) {
-        shelves.push({ title: 'מתח, פשע ומסתורין', items: crimeItems });
+      // Row 8: טלגרם קולנוע VOD
+      if (catVis.telegram !== false && srcVis.telegram_vod !== false) {
+        var rawTgPool = filterByGenre(allMovies, 'telegram').concat(filterByGenre(allSeries, 'telegram'));
+        var tgUniqueItems = takeUniqueHomeItems(rawTgPool, 18);
+        if (tgUniqueItems.length) {
+          shelves.push({ title: 'טלגרם קולנוע VOD — סרטים וסדרות שנמשכו מערוצי הטלגרם', items: tgUniqueItems });
+        }
       }
 
-      // 9. Sci-Fi & Fantasy
-      var scifiItems = takeUniqueHomeItems(filterByGenre(allMovies, 'scifi').concat(filterByGenre(allSeries, 'scifi')), 18);
-      if (scifiItems.length) {
-        shelves.push({ title: 'מדע בדיוני ופנטזיה', items: scifiItems });
+      // Row 9: אקשן, הרפתקאות ושוברי קופות
+      if (catVis.action !== false) {
+        var actionMovies = takeUniqueHomeItems(filterByGenre(allMovies, 'action'), 18);
+        if (actionMovies.length) {
+          shelves.push({ title: 'אקשן, הרפתקאות ושוברי קופות', items: actionMovies });
+        }
       }
 
-      // 10. Verified Israeli Cinema & TV
-      var israeliItems = filterByGenre(allMovies, 'israeli').concat(filterByGenre(allSeries, 'israeli'));
-      if (israeliItems.length) {
-        shelves.push({ title: 'יצירה ישראלית וקולנוע ישראלי', items: israeliItems.slice(0, 20) });
+      // TOP 10 #4 (Row 10): טופ 10 — אקשן, מתח ושוברי קופות
+      if (showTop10 && catVis.top10_action !== false && catVis.action !== false) {
+        var top10ActionPool = filterByGenre(allMovies, 'action').concat(filterByGenre(allMovies, 'thriller'), filterByGenre(allSeries, 'action'));
+        var top10ActionItems = takeUniqueHomeItems(top10ActionPool, 10);
+        if (top10ActionItems.length) {
+          shelves.push({ title: 'אקשן, מתח ושוברי קופות', items: top10ActionItems, isTop10: true });
+        }
       }
 
-      // 11. Comedy & Romance
-      var comedyItems = takeUniqueHomeItems(filterByGenre(allMovies, 'comedy').concat(filterByGenre(allMovies, 'romance')), 18);
-      if (comedyItems.length) {
-        shelves.push({ title: 'קומדיות ורומנטיקה', items: comedyItems });
+      // Row 11: מתח, פשע ומסתורין
+      if (catVis.crime !== false) {
+        var crimeItems = takeUniqueHomeItems(filterByGenre(allMovies, 'crime').concat(filterByGenre(allMovies, 'thriller'), filterByGenre(allSeries, 'crime')), 18);
+        if (crimeItems.length) {
+          shelves.push({ title: 'מתח, פשע ומסתורין', items: crimeItems });
+        }
+      }
+
+      // Row 12: מדע בדיוני ופנטזיה
+      if (catVis.scifi !== false) {
+        var scifiItems = takeUniqueHomeItems(filterByGenre(allMovies, 'scifi').concat(filterByGenre(allSeries, 'scifi')), 18);
+        if (scifiItems.length) {
+          shelves.push({ title: 'מדע בדיוני ופנטזיה', items: scifiItems });
+        }
+      }
+
+      // Row 13: יצירה ישראלית וקולנוע ישראלי
+      if (catVis.israeli !== false) {
+        var israeliItems = filterByGenre(allMovies, 'israeli').concat(filterByGenre(allSeries, 'israeli'));
+        if (israeliItems.length) {
+          shelves.push({ title: 'יצירה ישראלית וקולנוע ישראלי', items: israeliItems.slice(0, 20) });
+        }
+      }
+
+      // Row 14: קומדיות ורומנטיקה
+      if (catVis.comedy !== false) {
+        var comedyItems = takeUniqueHomeItems(filterByGenre(allMovies, 'comedy').concat(filterByGenre(allMovies, 'romance')), 18);
+        if (comedyItems.length) {
+          shelves.push({ title: 'קומדיות ורומנטיקה', items: comedyItems });
+        }
+      }
+
+      // Row 15: מאגר PirateBay & YTS 4K Direct
+      if (catVis.tpb_4k !== false && srcVis.tpb_yts_4k !== false) {
+        var tpbItems = takeUniqueHomeItems(filterByGenre(allMovies, 'tpb'), 18);
+        if (tpbItems.length) {
+          shelves.push({ title: 'מאגר PirateBay & YTS 4K Direct', items: tpbItems });
+        }
       }
 
       gridWallTitle = 'קטלוג הסרטים והסדרות המלא (' + (allMovies.length + allSeries.length) + ' כותרים)';
-      gridWallItems = allMovies.concat(allSeries);
+      gridWallItems = (catVis.movies === false ? [] : allMovies).concat(catVis.series === false ? [] : allSeries);
     }
 
     var html = '';
     for (var s = 0; s < shelves.length; s++) {
       var shelf = shelves[s];
       if (!shelf.items || !shelf.items.length) continue;
-      html +=
-        '<section class="netflix-row">' +
-          '<h2 class="row-title">' + escapeHtml(shelf.title) + '</h2>' +
-          '<div class="row-track">' +
-            shelf.items.map(renderPosterCardHtml).join('') +
-          '</div>' +
-        '</section>';
+      var cardsHtml = shelf.items.map(function (it, idx) {
+        return renderPosterCardHtml(it, shelf.isTop10 ? { rankNumber: idx + 1 } : undefined);
+      }).filter(Boolean).join('');
+      if (!cardsHtml) continue;
+      if (shelf.isTop10) {
+        html +=
+          '<section class="netflix-row top10-row">' +
+            '<h2 class="row-title"><span class="top10-row-pill">TOP 10</span><span>' + escapeHtml(shelf.title) + '</span></h2>' +
+            '<div class="row-track">' +
+              cardsHtml +
+            '</div>' +
+          '</section>';
+      } else {
+        html +=
+          '<section class="netflix-row">' +
+            '<h2 class="row-title">' + escapeHtml(shelf.title) + '</h2>' +
+            '<div class="row-track">' +
+              cardsHtml +
+            '</div>' +
+          '</section>';
+      }
     }
 
     // Always render the Multi-Row & Multi-Column Grid Wall (paginated for instant DOM speed!)
@@ -4631,6 +4948,14 @@
         '</div>';
     }
 
+    if (!item || !item.poster || String(item.poster).indexOf('1489599849927') !== -1 || (state.brokenPosterIds && state.brokenPosterIds[String(item.id)])) {
+      return '';
+    }
+    var rankNum = (opts && typeof opts.rankNumber === 'number' && opts.rankNumber >= 1) ? opts.rankNumber : 0;
+    var rankBadgeHtml = rankNum > 0
+      ? '<span class="top10-rank-badge" aria-label="מקום ' + rankNum + '">' + rankNum + '</span>'
+      : '';
+
     var cwControlsHtml = '';
     if (isCwCard) {
       cwControlsHtml =
@@ -4643,10 +4968,11 @@
     }
 
     return (
-      '<article class="poster-card' + (isCwCard ? ' cw-poster-card' : '') + ' tv-focusable" tabindex="0" role="button" ' +
+      '<article class="poster-card' + (isCwCard ? ' cw-poster-card' : '') + (rankNum > 0 ? ' top10-poster-card' : '') + ' tv-focusable" tabindex="0" role="button" ' +
         'data-item-id="' + escapeHtml(item.id) + '" ' +
-        'aria-label="' + escapeHtml(item.title) + '">' +
-        '<img class="poster-img" src="' + escapeHtml(item.poster) + '" alt="' + escapeHtml(item.title) + '" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=\'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&auto=format&fit=crop&q=80\';" />' +
+        'aria-label="' + escapeHtml((rankNum > 0 ? ('מקום ' + rankNum + ': ') : '') + item.title) + '">' +
+        '<img class="poster-img" src="' + escapeHtml(item.poster) + '" alt="' + escapeHtml(item.title) + '" loading="lazy" decoding="async" onerror="window.__streamItHandleBrokenPoster && window.__streamItHandleBrokenPoster(this, \'' + escapeHtml(item.id) + '\');" />' +
+        rankBadgeHtml +
         cwControlsHtml +
         '<div class="poster-hover-overlay">' +
           '<span class="poster-hover-title">' + escapeHtml(item.title) + '</span>' +
@@ -7914,6 +8240,11 @@
    */
   function bindUiEvents() {
     window.addEventListener('storage', function (e) {
+      if (e && e.key === 'streamit_system_config_v9') {
+        loadSystemConfig();
+        renderCatalogShelves();
+        return;
+      }
       if (e && e.key === 'streamit_user_v9') {
         try {
           state.user = e.newValue ? JSON.parse(e.newValue) : null;
@@ -10787,7 +11118,7 @@
 
     // If an older bundled APK script ran 1ms earlier, strip its stale DOM listeners via cloneNode(true)
     if (wasLegacyBooted) {
-      var rootContainers = ['topHeader', 'tvSideRail', 'mainStage', 'searchModal', 'detailsModal', 'playerModal', 'authModal', 'parentalControlModal', 'telegramModal', 'tvMoreModal', 'tvVirtualKeyboard'];
+      var rootContainers = ['topHeader', 'tvSideRail', 'mainStage', 'searchModal', 'detailsModal', 'playerModal', 'authModal', 'parentalControlModal', 'telegramModal', 'tvMoreModal'];
       for (var rc = 0; rc < rootContainers.length; rc++) {
         var el = document.getElementById(rootContainers[rc]);
         if (el && el.parentNode) {
@@ -10797,6 +11128,9 @@
     }
 
     upgradeDomFromV93ToV94IfNeeded();
+    if (window.TVNavigation && typeof window.TVNavigation.rebindAll === 'function') {
+      window.TVNavigation.rebindAll();
+    }
     updateBootLoaderProgress(12, 'מאתחל ליבת STREAM IT ומאמת חשבון ענן...', {
       cloud: 'active'
     });

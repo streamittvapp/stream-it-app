@@ -13,9 +13,9 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
-  <link rel="stylesheet" href="styles.css?v=9.6.8" />
+  <link rel="stylesheet" href="styles.css?v=9.6.9" />
   <script>
     (function () {
       try {
@@ -31,13 +31,13 @@
           });
         }
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (!otaVer || otaVer <= '9.6.8') {
+        if (!otaVer || otaVer <= '9.6.9') {
           localStorage.removeItem('streamit_ota_css_v9');
           localStorage.removeItem('streamit_ota_app_js_v9');
           localStorage.removeItem('streamit_ota_tv_nav_v9');
         }
         var otaCss = localStorage.getItem('streamit_ota_css_v9') || '';
-        if (otaVer && otaVer > '9.6.8' && otaCss.length > 500) {
+        if (otaVer && otaVer > '9.6.9' && otaCss.length > 500) {
           var st = document.createElement('style');
           st.id = 'streamit-ota-live-style-v9';
           st.textContent = otaCss;
@@ -1106,8 +1106,22 @@
       </button>
 
       <form id="authForm" class="auth-form" autocomplete="off" novalidate>
+        <div id="authQuickAccountsBar" class="auth-quick-accounts-bar">
+          <span class="auth-quick-accounts-label">בחירת חשבון מהירה בסטרימר (לחיצה אחת):</span>
+          <div class="auth-quick-accounts-row" dir="ltr">
+            <button type="button" class="auth-quick-account-btn tv-focusable" data-quick-email="bensahaltv@gmail.com">bensahaltv@gmail.com</button>
+            <button type="button" class="auth-quick-account-btn tv-focusable" data-quick-email="streamittvapp@gmail.com">streamittvapp@gmail.com</button>
+          </div>
+        </div>
+
         <div class="form-group">
-          <label for="authEmailInput" class="form-label">כתובת אימייל (מנוי מאושר)</label>
+          <div class="form-label-row">
+            <label for="authEmailInput" class="form-label">כתובת אימייל (מנוי מאושר)</label>
+            <div class="form-field-inline-actions">
+              <button type="button" class="form-inline-btn tv-focusable" data-open-vk="authEmailInput" aria-label="פתח מקלדת לאימייל">מקלדת</button>
+              <button type="button" class="form-inline-btn form-inline-clear-btn tv-focusable" data-clear-field="authEmailInput" aria-label="נקה שדה אימייל">נקה שדה</button>
+            </div>
+          </div>
           <input
             type="email"
             id="authEmailInput"
@@ -1121,7 +1135,14 @@
         </div>
 
         <div class="form-group">
-          <label for="authPasswordInput" class="form-label">סיסמה</label>
+          <div class="form-label-row">
+            <label for="authPasswordInput" class="form-label">סיסמה</label>
+            <div class="form-field-inline-actions">
+              <button type="button" id="toggleAuthPassVisBtn" class="form-inline-btn tv-focusable" data-toggle-pass="authPasswordInput" aria-label="הצג או הסתר סיסמה">הצג סיסמה</button>
+              <button type="button" class="form-inline-btn tv-focusable" data-open-vk="authPasswordInput" aria-label="פתח מקלדת לסיסמה">מקלדת</button>
+              <button type="button" class="form-inline-btn form-inline-clear-btn tv-focusable" data-clear-field="authPasswordInput" aria-label="נקה שדה סיסמה">נקה שדה</button>
+            </div>
+          </div>
           <input
             type="password"
             id="authPasswordInput"
@@ -1564,19 +1585,34 @@
   <!-- ===================================================================== -->
   <div id="tvVirtualKeyboard" class="tv-virtual-keyboard hidden" dir="ltr" role="dialog" aria-label="מקלדת על המסך">
     <div class="vk-container" dir="ltr">
+      <div id="vkQuickBar" class="vk-quick-bar hidden" dir="rtl">
+        <button type="button" id="vkSwitchEmailBtn" class="vk-quick-btn tv-focusable" data-vk-switch-field="authEmailInput">אימייל</button>
+        <button type="button" id="vkSwitchPassBtn" class="vk-quick-btn tv-focusable" data-vk-switch-field="authPasswordInput">סיסמה</button>
+        <button type="button" class="vk-quick-btn vk-quick-account-pill tv-focusable" data-vk-fill-email="bensahaltv@gmail.com" dir="ltr">bensahaltv@gmail.com</button>
+        <button type="button" class="vk-quick-btn vk-quick-account-pill tv-focusable" data-vk-fill-email="streamittvapp@gmail.com" dir="ltr">streamittvapp@gmail.com</button>
+        <button type="button" class="vk-quick-btn vk-quick-domain-pill tv-focusable" data-vk-append="@gmail.com" dir="ltr">@gmail.com</button>
+        <button type="button" id="vkQuickSubmitAuthBtn" class="vk-quick-btn vk-quick-submit-btn tv-focusable" data-vk-action="submit-auth">התחבר עכשיו</button>
+      </div>
+
       <div class="vk-header" dir="ltr">
-        <span class="vk-title">ON-SCREEN KEYBOARD</span>
-        <div id="vkPreviewText" class="vk-preview-text" dir="auto"></div>
+        <span id="vkFieldBadge" class="vk-field-badge" dir="rtl">שדה הקלדה</span>
+        <div id="vkPreviewText" class="vk-preview-text" dir="ltr"></div>
+        <div class="vk-header-actions" dir="rtl">
+          <button type="button" id="vkTopPassBtn" class="vk-top-act-btn tv-focusable hidden" data-vk-action="toggle-pass">הצג/הסתר</button>
+          <button type="button" id="vkTopBackspaceBtn" class="vk-top-act-btn vk-top-del-btn tv-focusable" data-vk-action="backspace">⌫ מחק אות</button>
+          <button type="button" id="vkTopClearBtn" class="vk-top-act-btn vk-top-clear-btn tv-focusable" data-vk-action="clear">נקה הכל</button>
+          <button type="button" id="vkTopCloseBtn" class="vk-top-act-btn vk-top-close-btn tv-focusable" data-vk-action="close">סגור ✕</button>
+        </div>
       </div>
 
       <div id="vkKeysGrid" class="vk-grid ltr-mode" dir="ltr"></div>
 
       <div class="vk-actions-row" dir="ltr">
-        <button type="button" id="vkLangBtn" class="vk-action-btn tv-focusable" aria-label="החלף שפה">EN / אנגלית</button>
-        <button type="button" id="vkSpaceBtn" class="vk-action-btn vk-space-btn tv-focusable" aria-label="רווח">רווח / SPACE</button>
-        <button type="button" id="vkBackspaceBtn" class="vk-action-btn tv-focusable" aria-label="מחק תו אחרון">מחיקה</button>
-        <button type="button" id="vkClearBtn" class="vk-action-btn tv-focusable" aria-label="נקה הכל">נקה</button>
-        <button type="button" id="vkDoneBtn" class="vk-action-btn vk-done-btn tv-focusable" aria-label="סיום והסתרת מקלדת">אישור</button>
+        <button type="button" id="vkLangBtn" class="vk-action-btn tv-focusable" data-vk-action="lang" aria-label="החלף שפה">EN / עברית</button>
+        <button type="button" id="vkSpaceBtn" class="vk-action-btn vk-space-btn tv-focusable" data-vk-action="space" aria-label="רווח">רווח / SPACE</button>
+        <button type="button" id="vkBackspaceBtn" class="vk-action-btn vk-del-action-btn tv-focusable" data-vk-action="backspace" aria-label="מחק תו אחרון">⌫ מחיקה</button>
+        <button type="button" id="vkClearBtn" class="vk-action-btn vk-clear-action-btn tv-focusable" data-vk-action="clear" aria-label="נקה הכל">נקה הכל</button>
+        <button type="button" id="vkDoneBtn" class="vk-action-btn vk-done-btn tv-focusable" data-vk-action="done" aria-label="סיום והמשך">✓ אישור</button>
       </div>
     </div>
   </div>
@@ -1585,13 +1621,13 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Core Application & Smart TV Navigation Scripts -->
-  <script src="tv-navigation.js?v=9.6.8"></script>
-  <script src="app.js?v=9.6.8"></script>
+  <script src="tv-navigation.js?v=9.6.9"></script>
+  <script src="app.js?v=9.6.9"></script>
   <script>
     (function () {
       try {
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (otaVer && otaVer > '9.6.8') {
+        if (otaVer && otaVer > '9.6.9') {
           var navCode = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
           if (navCode.length > 500) {
             var s1 = document.createElement('script');

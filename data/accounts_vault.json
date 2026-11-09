@@ -9,11 +9,10 @@
     "passCipher": "WQsODw8NDg0OCgs=",
     "passHash": "6d3f56d012335b0679ff7c8d4c4c46172b2d48262999bb6189a6eb5bad134d19",
     "altHashes": [
-      "6d3f56d012335b0679ff7c8d4c4c46172b2d48262999bb6189a6eb5bad134d19",
-      "5e0a1913f2de62496ec8b78568f014b87f4705911cdc968af8a96ba646898e4d"
+      "6d3f56d012335b0679ff7c8d4c4c46172b2d48262999bb6189a6eb5bad134d19"
     ],
-    "updatedAt": "2026-11-10 00:08",
-    "updatedTs": 1794262120000
+    "updatedAt": "2026-11-10 00:58",
+    "updatedTs": 1794265080000
   },
   "bensahaltv@gmail.com": {
     "email": "bensahaltv@gmail.com",
@@ -25,11 +24,10 @@
     "passCipher": "CAgJAgsO",
     "passHash": "88047cd74e5b035155e7a09ec61801901db6e4051402a2f213b00a1fa0582de4",
     "altHashes": [
-      "88047cd74e5b035155e7a09ec61801901db6e4051402a2f213b00a1fa0582de4",
-      "b959e25a0e89cd7edda5e82f5949288a8662452171bd11312c6273c6283d392e"
+      "88047cd74e5b035155e7a09ec61801901db6e4051402a2f213b00a1fa0582de4"
     ],
-    "updatedAt": "2026-11-10 00:08",
-    "updatedTs": 1794262120000,
+    "updatedAt": "2026-11-10 00:58",
+    "updatedTs": 1794265080000,
     "accountState": {
       "updatedTs": 1794261966785,
       "activeSubUserId": "prof-main",
@@ -206,5 +204,56 @@
         "bottomPct": 3.5
       }
     }
+  },
+  "_system_config": {
+    "updatedTs": 1794265080000,
+    "features": {
+      "top10Shelves": true,
+      "strictPosterFilter": true,
+      "strictSourcesAndSubs": true,
+      "autoCollapseTvRail": true,
+      "parentalSafeWatch": true,
+      "crossDeviceCloudSync": true,
+      "bootLoaderAnim": true,
+      "autoResumePlayback": true,
+      "liveNewsTicker": true,
+      "otaAutoUpdate": true
+    },
+    "categories": {
+      "top10_most_watched": true,
+      "top10_newest": true,
+      "top10_series": true,
+      "top10_action": true,
+      "live_channels": true,
+      "continue_watching": true,
+      "watchlist": true,
+      "trending_global": true,
+      "new_2025_2026": true,
+      "netflix_originals": true,
+      "apple_hbo_prime": true,
+      "israeli_cinema": true,
+      "israeli_series": true,
+      "action_blockbusters": true,
+      "crime_thriller": true,
+      "scifi_fantasy": true,
+      "comedy_drama": true,
+      "horror_mystery": true,
+      "docu_biopic": true,
+      "kids_family": true,
+      "piratebay_4k": true
+    },
+    "sources": {
+      "vidsrc_pro": true,
+      "vidlink_pro": true,
+      "superembed_multi": true,
+      "autoembed_cc": true,
+      "smashystream": true,
+      "piratebay_yts_torrents": true,
+      "telegram_israel_vod": true,
+      "opensubtitles_wizdom_he": true,
+      "live_hls_israel": true
+    },
+    "disabledLiveChannels": {},
+    "disabledTelegramChannels": {}
   }
 }
