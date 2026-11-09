@@ -6,18 +6,14 @@
     "role": "admin",
     "max_profiles": 5,
     "autoBindPassword": false,
-    "passCipher": "SE9JXlpWUk8=",
-    "passHash": "cc43dbd645eaf3e9d95c618efdcdce07265ec7a56ad9dad5e25b8b1e9795881b",
+    "passCipher": "WQsODw8NDg0OCgs=",
+    "passHash": "6d3f56d012335b0679ff7c8d4c4c46172b2d48262999bb6189a6eb5bad134d19",
     "altHashes": [
-      "cc43dbd645eaf3e9d95c618efdcdce07265ec7a56ad9dad5e25b8b1e9795881b",
-      "0d24c3b776130811276c208a3457be7c316328088de816ac3ebc192bb977094d",
-      "f9d26c67c77cf8b3bd03f985cc6785c493c34505dfda9edf9259d04ffb88f5b1",
-      "01884b718ab9bed7c127b90f1880cc671e1d836488a9cc912c875547f4196a0f",
-      "b935bf959e686e20500064a8328e798338a2ee91215b4311b5eec4cee08dd447",
-      "ba113970b3c49b0fad970547ddf74cd4c29cef8eed9eb6fbf69f4e66077a68b3",
-      "79fae471cb66b40e90730f0a80a74037c957514b76df6d6569c8d0511aa0cc8c"
+      "6d3f56d012335b0679ff7c8d4c4c46172b2d48262999bb6189a6eb5bad134d19",
+      "5e0a1913f2de62496ec8b78568f014b87f4705911cdc968af8a96ba646898e4d"
     ],
-    "updatedAt": "2026-11-09 23:45"
+    "updatedAt": "2026-11-10 00:08",
+    "updatedTs": 1794262120000
   },
   "bensahaltv@gmail.com": {
     "email": "bensahaltv@gmail.com",
@@ -26,17 +22,189 @@
     "role": "admin",
     "max_profiles": 5,
     "autoBindPassword": false,
-    "passCipher": "SE9JXlpWUk8=",
-    "passHash": "201d6744f30d417c34428a55de656731723b7a749b60b8106176f085e17f05c9",
+    "passCipher": "CAgJAgsO",
+    "passHash": "88047cd74e5b035155e7a09ec61801901db6e4051402a2f213b00a1fa0582de4",
     "altHashes": [
-      "201d6744f30d417c34428a55de656731723b7a749b60b8106176f085e17f05c9",
-      "0359145e2cbf69985a31965ce103fb1b9cadf4aa53f99d9aee3a334ee994c2ac",
-      "442d9adebd866a1e4e841ac20221e48e5f1f1a83a6cffbbc772c88daad99dc6a",
-      "464b8cd36206cb24044ce1b63d95b3b2eb99c8b27aa85f8a3ff5ab1c274d71e2",
-      "05acb7f2d87df2245ef9d0a451e32ee70385003e903484146ec66e199fac8f58",
-      "49e805e15c0bc53e1f8279fcbec5555ca9d16791bbe92f6e176820ecf2403281",
-      "5e92c5bcd3d1b34930d93ea100a64bd8471afaab605b344feb222038bc51b860"
+      "88047cd74e5b035155e7a09ec61801901db6e4051402a2f213b00a1fa0582de4",
+      "b959e25a0e89cd7edda5e82f5949288a8662452171bd11312c6273c6283d392e"
     ],
-    "updatedAt": "2026-11-09 23:45"
+    "updatedAt": "2026-11-10 00:08",
+    "updatedTs": 1794262120000,
+    "accountState": {
+      "updatedTs": 1794261966785,
+      "activeSubUserId": "prof-main",
+      "subUsers": [
+        {
+          "id": "prof-main",
+          "name": "BENSAHAL TV",
+          "color": "#b91c1c",
+          "isKids": false,
+          "isPrimary": true,
+          "parentalControl": {
+            "enabled": false,
+            "actionMode": "blur_mute",
+            "profanityMode": "mute_censor",
+            "sensitivity": "balanced",
+            "categories": {
+              "sex": true,
+              "violence": false,
+              "profanity": true,
+              "drugs": true,
+              "horror": false
+            }
+          }
+        },
+        {
+          "id": "prof-1794166536010",
+          "name": "אילן",
+          "color": "#334155",
+          "isKids": false,
+          "isPrimary": false,
+          "parentalControl": {
+            "enabled": false,
+            "actionMode": "skip",
+            "profanityMode": "mute_censor",
+            "sensitivity": "balanced",
+            "categories": {
+              "sex": true,
+              "violence": true,
+              "profanity": true,
+              "drugs": true,
+              "horror": false
+            }
+          }
+        },
+        {
+          "id": "prof-1794166543582",
+          "name": "איה",
+          "color": "#3f3f46",
+          "isKids": false,
+          "isPrimary": false,
+          "parentalControl": {
+            "enabled": false,
+            "actionMode": "skip",
+            "profanityMode": "mute_censor",
+            "sensitivity": "balanced",
+            "categories": {
+              "sex": true,
+              "violence": true,
+              "profanity": true,
+              "drugs": true,
+              "horror": false
+            }
+          }
+        },
+        {
+          "id": "prof-1794166553435",
+          "name": "אלדר",
+          "color": "#475569",
+          "isKids": false,
+          "isPrimary": false,
+          "parentalControl": {
+            "enabled": false,
+            "actionMode": "skip",
+            "profanityMode": "mute_censor",
+            "sensitivity": "balanced",
+            "categories": {
+              "sex": true,
+              "violence": true,
+              "profanity": true,
+              "drugs": true,
+              "horror": false
+            }
+          }
+        },
+        {
+          "id": "prof-1794166559616",
+          "name": "שקד",
+          "color": "#52525b",
+          "isKids": false,
+          "isPrimary": false,
+          "parentalControl": {
+            "enabled": false,
+            "actionMode": "skip",
+            "profanityMode": "mute_censor",
+            "sensitivity": "balanced",
+            "categories": {
+              "sex": true,
+              "violence": true,
+              "profanity": true,
+              "drugs": true,
+              "horror": false
+            }
+          }
+        },
+        {
+          "id": "prof-1794166564722",
+          "name": "שי",
+          "color": "#64748b",
+          "isKids": false,
+          "isPrimary": false,
+          "parentalControl": {
+            "enabled": false,
+            "actionMode": "skip",
+            "profanityMode": "mute_censor",
+            "sensitivity": "balanced",
+            "categories": {
+              "sex": true,
+              "violence": true,
+              "profanity": true,
+              "drugs": true,
+              "horror": false
+            }
+          }
+        }
+      ],
+      "profileData": {
+        "prof-main": {
+          "watchlist": [],
+          "progress": {
+            "tt1745960": {
+              "currentTime": 18,
+              "duration": 7814,
+              "percent": 3,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794203030102
+            }
+          }
+        },
+        "prof-living": {
+          "watchlist": [],
+          "progress": {}
+        },
+        "prof-1794166536010": {
+          "watchlist": [],
+          "progress": {}
+        },
+        "prof-1794166543582": {
+          "watchlist": [],
+          "progress": {}
+        },
+        "prof-1794166553435": {
+          "watchlist": [],
+          "progress": {}
+        },
+        "prof-1794166559616": {
+          "watchlist": [],
+          "progress": {}
+        },
+        "prof-1794166564722": {
+          "watchlist": [],
+          "progress": {}
+        }
+      },
+      "parentalMaster": {
+        "pinCode": "",
+        "customSkipSegments": {}
+      },
+      "subPrefs": {
+        "size": "xlarge",
+        "fontPx": 52,
+        "color": "white",
+        "bg": "none",
+        "bottomPct": 3.5
+      }
+    }
   }
 }
