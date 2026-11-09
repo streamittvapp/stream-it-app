@@ -10,11 +10,12 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.6.6';
+  var APP_VERSION = '9.6.7';
   var wasLegacyBooted = Boolean(window.__STREAMIT_V94_BOOTED || window.__STREAMIT_V961_BOOTED);
   window.__STREAMIT_V94_BOOTED = true;
   window.__STREAMIT_V961_BOOTED = true;
   window.__STREAMIT_V966_BOOTED = true;
+  window.__STREAMIT_V967_BOOTED = true;
 
   // Preserve direct reference to native fetch and freeze any stale in-flight async loops from legacy bundled v9.6.0 APK scripts
   var nativeFetch = window.fetch ? window.fetch.bind(window) : null;
@@ -1355,12 +1356,16 @@
     searchFilter: 'all',
     searchDebounce: null,
     actorSearchDebounce: null,
+    catalogWallLimit: 48,
+    pythonApiConfirmed: false,
     // Account & Sub-Users ("מי צופה עכשיו?")
     user: null,
     subUsers: DEFAULT_SUB_USERS.slice(),
     activeSubUserId: 'prof-main',
     manageSubUsersMode: false,
     profileData: {}, // Keyed by activeSubUserId -> { watchlist: [], progress: {} }
+    accountCloudSyncTimer: null,
+    accountCloudSyncInFlight: false,
     // SafeWatch Parental Control & Automatic Scene Skipping State
     parentalMaster: {
       pinCode: '',
@@ -1375,7 +1380,9 @@
     parentalTempMuted: false,
     parentalShieldActiveSegment: null,
     parentalSkippedCountThisSession: 0,
-    parentalSkipBannerTimer: null
+    parentalSkipBannerTimer: null,
+    parentalEmbedSeekTargetSec: 0,
+    parentalEmbedSeekUntilTs: 0
   };
 
   function ensureProfileParentalConfig(su) {
@@ -1435,11 +1442,8 @@
   }
 
   function hasLocalBackend() {
-    var host = window.location.hostname;
-    var port = window.location.port;
-    if ((host === 'localhost' || host === '127.0.0.1') && port === '8092') return true;
     if (window.AndroidTvBridge && typeof window.AndroidTvBridge.isAndroidTv === 'function') return true;
-    return false;
+    return Boolean(state.pythonApiConfirmed);
   }
 
   function getApiBase() {
@@ -1450,6 +1454,46 @@
     }
     return 'http://127.0.0.1:8092';
   }
+
+  function updateBootLoaderProgress(percent, statusText, stepStates) {
+    var loader = document.getElementById('appBootLoader');
+    if (!loader) return;
+    var pct = Math.max(5, Math.min(100, Math.round(Number(percent) || 10)));
+    var barFill = document.getElementById('bootLoaderBarFill');
+    var pctEl = document.getElementById('bootLoaderPercent');
+    var txtEl = document.getElementById('bootLoaderStatusText');
+    if (barFill) barFill.style.width = pct + '%';
+    if (pctEl) pctEl.textContent = pct + '%';
+    if (txtEl && statusText) txtEl.textContent = statusText;
+
+    if (stepStates && typeof stepStates === 'object') {
+      var stepMap = {
+        cloud: 'bootStepCloud',
+        catalog: 'bootStepCatalog',
+        safewatch: 'bootStepSafeWatch',
+        ready: 'bootStepReady'
+      };
+      for (var k in stepMap) {
+        if (Object.prototype.hasOwnProperty.call(stepMap, k) && stepStates[k]) {
+          var sEl = document.getElementById(stepMap[k]);
+          if (sEl) {
+            sEl.classList.remove('active', 'done');
+            if (stepStates[k] === 'active' || stepStates[k] === 'done') {
+              sEl.classList.add(stepStates[k]);
+            }
+          }
+        }
+      }
+    }
+
+    if (pct >= 100) {
+      setTimeout(function () {
+        var ld = document.getElementById('appBootLoader');
+        if (ld) ld.classList.add('boot-complete');
+      }, 240);
+    }
+  }
+  window.updateBootLoaderProgress = updateBootLoaderProgress;
 
   /**
    * Per-Account & Per-Sub-User Strictly Isolated State Persistence
@@ -1578,21 +1622,29 @@
     return state.subUsers[0] || buildDefaultSubUsersForAccount()[0];
   }
 
-  function saveSubUsersState() {
+  function saveSubUsersState(opts) {
     var ns = getUserAccountNamespace();
+    var nowTs = Date.now();
     try {
       localStorage.setItem('streamit_subusers_v954_' + ns, JSON.stringify(state.subUsers));
       localStorage.setItem('streamit_active_subuser_v954_' + ns, state.activeSubUserId);
       localStorage.setItem('streamit_profile_data_v954_' + ns, JSON.stringify(state.profileData));
       localStorage.setItem('streamit_parental_master_v965_' + ns, JSON.stringify(state.parentalMaster || { pinCode: '', customSkipSegments: {} }));
+      localStorage.setItem('streamit_account_state_ts_' + ns, String(nowTs));
     } catch (e) {}
+    if (!opts || !opts.skipCloud) {
+      var delay = (opts && typeof opts.cloudDelayMs === 'number') ? opts.cloudDelayMs : 1200;
+      scheduleCloudAccountStateSync(delay);
+    }
   }
 
   function saveParentalMasterState() {
     var ns = getUserAccountNamespace();
     try {
       localStorage.setItem('streamit_parental_master_v965_' + ns, JSON.stringify(state.parentalMaster || { pinCode: '', customSkipSegments: {} }));
+      localStorage.setItem('streamit_account_state_ts_' + ns, String(Date.now()));
     } catch (e) {}
+    scheduleCloudAccountStateSync(1200);
   }
 
   function saveSubtitlePrefs() {
@@ -1605,6 +1657,281 @@
         bottomPct: typeof state.subBottomPct === 'number' ? state.subBottomPct : 3.5
       }));
     } catch (e) {}
+    scheduleCloudAccountStateSync(1500);
+  }
+
+  /**
+   * Cross-Device Cloud Sync for Sub-Users, Watch History, Watchlist, Parental Control & Subtitle Settings
+   * Synchronizes `vault[email].accountState` directly with `data/accounts_vault.json` on GitHub Cloud!
+   */
+  function buildCurrentAccountStatePayload() {
+    var ns = getUserAccountNamespace();
+    var localTs = 0;
+    try {
+      localTs = Number(localStorage.getItem('streamit_account_state_ts_' + ns) || 0);
+    } catch (e) {}
+    return {
+      updatedTs: localTs || Date.now(),
+      activeSubUserId: state.activeSubUserId || 'prof-main',
+      subUsers: JSON.parse(JSON.stringify(state.subUsers || [])),
+      profileData: JSON.parse(JSON.stringify(state.profileData || {})),
+      parentalMaster: JSON.parse(JSON.stringify(state.parentalMaster || { pinCode: '', customSkipSegments: {} })),
+      subPrefs: {
+        size: state.subSize || 'xlarge',
+        fontPx: typeof state.subFontPx === 'number' ? state.subFontPx : 42,
+        color: state.subColor || 'white',
+        bg: state.subBg || 'none',
+        bottomPct: typeof state.subBottomPct === 'number' ? state.subBottomPct : 3.5
+      }
+    };
+  }
+
+  function applyCloudAccountStateToLocal(cloudState) {
+    if (!cloudState || typeof cloudState !== 'object' || !state.user || !state.user.email) return false;
+    var ns = getUserAccountNamespace();
+    var localTs = 0;
+    try {
+      localTs = Number(localStorage.getItem('streamit_account_state_ts_' + ns) || 0);
+    } catch (e) {}
+    var cloudTs = Number(cloudState.updatedTs || 0);
+    var cloudIsNewer = (cloudTs >= localTs) || (localTs === 0);
+
+    // 1. Merge / Adopt Sub-Users ("מי צופה עכשיו?")
+    if (Array.isArray(cloudState.subUsers) && cloudState.subUsers.length > 0) {
+      if (cloudIsNewer) {
+        var mergedSu = JSON.parse(JSON.stringify(cloudState.subUsers));
+        for (var i = 0; i < state.subUsers.length; i++) {
+          var lSu = state.subUsers[i];
+          if (lSu && lSu.id && !mergedSu.some(function (c) { return c.id === lSu.id; })) {
+            mergedSu.push(lSu);
+          }
+        }
+        for (var m = 0; m < mergedSu.length; m++) {
+          ensureProfileParentalConfig(mergedSu[m]);
+        }
+        state.subUsers = mergedSu;
+      } else {
+        for (var c = 0; c < cloudState.subUsers.length; c++) {
+          var cSu = cloudState.subUsers[c];
+          if (cSu && cSu.id && !state.subUsers.some(function (l) { return l.id === cSu.id; })) {
+            ensureProfileParentalConfig(cSu);
+            state.subUsers.push(cSu);
+          }
+        }
+      }
+    }
+
+    // 2. Active Sub-User ID
+    if (cloudState.activeSubUserId && cloudIsNewer) {
+      if (state.subUsers.some(function (u) { return u.id === cloudState.activeSubUserId; })) {
+        state.activeSubUserId = cloudState.activeSubUserId;
+      }
+    }
+
+    // 3. Merge Per-Profile Watchlist & Continue Watching (`profileData`)
+    if (cloudState.profileData && typeof cloudState.profileData === 'object') {
+      if (!state.profileData || typeof state.profileData !== 'object') state.profileData = {};
+      var pKeys = Object.keys(cloudState.profileData);
+      for (var k = 0; k < pKeys.length; k++) {
+        var pid = pKeys[k];
+        var cBucket = cloudState.profileData[pid];
+        if (!cBucket || typeof cBucket !== 'object') continue;
+        if (!state.profileData[pid]) {
+          state.profileData[pid] = { watchlist: [], progress: {} };
+        }
+        var lBucket = state.profileData[pid];
+
+        // Watchlist merge
+        if (Array.isArray(cBucket.watchlist)) {
+          if (cloudIsNewer) {
+            var wlSet = cBucket.watchlist.slice();
+            for (var w = 0; w < (lBucket.watchlist || []).length; w++) {
+              if (wlSet.indexOf(lBucket.watchlist[w]) === -1) wlSet.push(lBucket.watchlist[w]);
+            }
+            lBucket.watchlist = wlSet;
+          } else {
+            for (var cw = 0; cw < cBucket.watchlist.length; cw++) {
+              if (lBucket.watchlist.indexOf(cBucket.watchlist[cw]) === -1) {
+                lBucket.watchlist.push(cBucket.watchlist[cw]);
+              }
+            }
+          }
+        }
+
+        // Continue Watching (`progress`) merge by newest `updatedAt` per item
+        if (cBucket.progress && typeof cBucket.progress === 'object') {
+          if (!lBucket.progress || typeof lBucket.progress !== 'object') lBucket.progress = {};
+          var itemIds = Object.keys(cBucket.progress);
+          for (var it = 0; it < itemIds.length; it++) {
+            var itemId = itemIds[it];
+            var cProg = cBucket.progress[itemId];
+            var lProg = lBucket.progress[itemId];
+            if (!cProg) continue;
+            if (!lProg || Number(cProg.updatedAt || 0) >= Number(lProg.updatedAt || 0)) {
+              lBucket.progress[itemId] = cProg;
+            }
+          }
+        }
+      }
+    }
+
+    // 4. Merge Parental Master State (PIN & Custom Skip Segments)
+    if (cloudState.parentalMaster && typeof cloudState.parentalMaster === 'object') {
+      if (!state.parentalMaster) state.parentalMaster = { pinCode: '', customSkipSegments: {} };
+      if (cloudIsNewer && typeof cloudState.parentalMaster.pinCode === 'string') {
+        state.parentalMaster.pinCode = cloudState.parentalMaster.pinCode;
+      } else if (!state.parentalMaster.pinCode && cloudState.parentalMaster.pinCode) {
+        state.parentalMaster.pinCode = cloudState.parentalMaster.pinCode;
+      }
+      if (cloudState.parentalMaster.customSkipSegments && typeof cloudState.parentalMaster.customSkipSegments === 'object') {
+        if (!state.parentalMaster.customSkipSegments) state.parentalMaster.customSkipSegments = {};
+        var segKeys = Object.keys(cloudState.parentalMaster.customSkipSegments);
+        for (var sk = 0; sk < segKeys.length; sk++) {
+          var mKey = segKeys[sk];
+          if (!state.parentalMaster.customSkipSegments[mKey] || cloudIsNewer) {
+            state.parentalMaster.customSkipSegments[mKey] = cloudState.parentalMaster.customSkipSegments[mKey];
+          }
+        }
+      }
+    }
+
+    // 5. Subtitle Preferences
+    if (cloudState.subPrefs && typeof cloudState.subPrefs === 'object' && cloudIsNewer) {
+      if (cloudState.subPrefs.size) state.subSize = cloudState.subPrefs.size;
+      if (typeof cloudState.subPrefs.fontPx === 'number') state.subFontPx = cloudState.subPrefs.fontPx;
+      if (cloudState.subPrefs.color) state.subColor = cloudState.subPrefs.color;
+      if (cloudState.subPrefs.bg) state.subBg = cloudState.subPrefs.bg;
+      if (typeof cloudState.subPrefs.bottomPct === 'number') state.subBottomPct = cloudState.subPrefs.bottomPct;
+      try {
+        localStorage.setItem('streamit_sub_prefs_v947', JSON.stringify(cloudState.subPrefs));
+      } catch (e) {}
+    }
+
+    ensureActiveProfileBucket();
+    saveSubUsersState({ skipCloud: true });
+    if (cloudTs > 0) {
+      try {
+        localStorage.setItem('streamit_account_state_ts_' + ns, String(Math.max(localTs, cloudTs)));
+      } catch (e) {}
+    }
+    return true;
+  }
+
+  async function syncAccountStateFromCloudVault() {
+    if (!state.user || !state.user.email) return false;
+    var cleanEmail = String(state.user.email).trim().toLowerCase();
+    try {
+      var tk = getCloudVaultSyncToken();
+      var ghHeaders = { 'Accept': 'application/vnd.github.v3+json' };
+      if (tk) ghHeaders['Authorization'] = 'token ' + tk;
+      var ghRes = await fetch('https://api.github.com/repos/streamittvapp/stream-it-app/contents/data/accounts_vault.json?t=' + Date.now(), {
+        headers: ghHeaders,
+        cache: 'no-store'
+      });
+      if (ghRes.ok) {
+        var ghMeta = await ghRes.json();
+        if (ghMeta && ghMeta.content) {
+          var rawJson = decodeURIComponent(escape(atob(String(ghMeta.content).replace(/\s/g, ''))));
+          var ghVault = JSON.parse(rawJson);
+          if (ghVault && typeof ghVault === 'object') {
+            var rec = ghVault[cleanEmail];
+            if (rec) {
+              if (rec.display_name && state.user.name !== rec.display_name) {
+                state.user.name = rec.display_name;
+                try { localStorage.setItem('streamit_user_v9', JSON.stringify(state.user)); } catch (e) {}
+              }
+              if (rec.accountState && typeof rec.accountState === 'object') {
+                applyCloudAccountStateToLocal(rec.accountState);
+                updateAuthUi();
+                applySubtitleStyleToOverlay();
+                renderCatalogShelves();
+                return true;
+              } else {
+                // First time this account connects from a device with local state -> push local state to Cloud Vault!
+                scheduleCloudAccountStateSync(800);
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {}
+    return false;
+  }
+
+  function scheduleCloudAccountStateSync(delayMs) {
+    if (!state.user || !state.user.email) return;
+    if (state.accountCloudSyncTimer) {
+      clearTimeout(state.accountCloudSyncTimer);
+    }
+    state.accountCloudSyncTimer = setTimeout(function () {
+      state.accountCloudSyncTimer = null;
+      pushAccountStateToCloudVault();
+    }, typeof delayMs === 'number' ? delayMs : 1200);
+  }
+
+  async function pushAccountStateToCloudVault() {
+    if (!state.user || !state.user.email || state.accountCloudSyncInFlight) return false;
+    var cleanEmail = String(state.user.email).trim().toLowerCase();
+    var tk = getCloudVaultSyncToken();
+    if (!tk) return false;
+
+    state.accountCloudSyncInFlight = true;
+    try {
+      var apiUrl = 'https://api.github.com/repos/streamittvapp/stream-it-app/contents/data/accounts_vault.json';
+      var getRes = await fetch(apiUrl + '?t=' + Date.now(), {
+        headers: {
+          'Authorization': 'token ' + tk,
+          'Accept': 'application/vnd.github.v3+json'
+        },
+        cache: 'no-store'
+      });
+      if (!getRes.ok) {
+        state.accountCloudSyncInFlight = false;
+        return false;
+      }
+      var meta = await getRes.json();
+      var sha = meta.sha || '';
+      var remoteVault = {};
+      if (meta && meta.content) {
+        var remoteJson = decodeURIComponent(escape(atob(String(meta.content).replace(/\s/g, ''))));
+        remoteVault = JSON.parse(remoteJson) || {};
+      }
+      if (!remoteVault[cleanEmail]) {
+        remoteVault[cleanEmail] = {
+          email: cleanEmail,
+          display_name: state.user.name || cleanEmail.split('@')[0],
+          status: 'approved',
+          role: state.user.role || 'member',
+          max_profiles: Number(state.user.max_profiles || 5)
+        };
+      }
+      remoteVault[cleanEmail].accountState = buildCurrentAccountStatePayload();
+
+      try {
+        localStorage.setItem('streamit_cloud_vault_v9', JSON.stringify(remoteVault));
+      } catch (e) {}
+
+      var contentStr = JSON.stringify(remoteVault, null, 2);
+      var b64Content = btoa(unescape(encodeURIComponent(contentStr)));
+      await fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+          'Authorization': 'token ' + tk,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: 'chore(vault): sync cross-device user profiles and watch history',
+          content: b64Content,
+          sha: sha
+        })
+      });
+      state.accountCloudSyncInFlight = false;
+      return true;
+    } catch (e) {
+      state.accountCloudSyncInFlight = false;
+      return false;
+    }
   }
 
   /**
@@ -1963,10 +2290,28 @@
    * Combines `data/hebrew_catalog.json` + `/api/catalog` (Telegram VOD) + Stremio Cinemeta + YTS/PirateBay + 26 Parallel TMDB Streams (Netflix, Apple TV+, HBO, Amazon, Disney+ & All Genres)
    */
   async function loadCatalog() {
+    updateBootLoaderProgress(18, 'טוען קטלוג סרטים, סדרות וערוצי שידור חי...', {
+      cloud: 'done',
+      catalog: 'active'
+    });
     mergeCustomChannelsIntoState();
     state.catalog.youtube = BUILTIN_YOUTUBE_ITEMS.slice();
 
-    // 1. Load bundled `data/hebrew_catalog.json` immediately
+    // 1. Restore cached enriched catalog from localStorage for instant 0ms repeat boot
+    var hadCachedEnriched = false;
+    try {
+      var cachedRaw = localStorage.getItem('streamit_enriched_catalog_cache_v967');
+      if (cachedRaw) {
+        var cachedObj = JSON.parse(cachedRaw);
+        if (cachedObj && Array.isArray(cachedObj.movies) && cachedObj.movies.length > 20) {
+          state.catalog.movies = cachedObj.movies;
+          state.catalog.series = Array.isArray(cachedObj.series) ? cachedObj.series : [];
+          hadCachedEnriched = true;
+        }
+      }
+    } catch (e) {}
+
+    // 2. Load bundled `data/hebrew_catalog.json` immediately
     try {
       var localRes = await fetch('data/hebrew_catalog.json');
       if (localRes.ok) {
@@ -1975,14 +2320,22 @@
       }
     } catch (e) {}
 
-    // 2. Also load `/api/catalog` (includes live Telegram Movies & Series VOD)
-    try {
-      var apiRes = await fetch(getApiBase() + '/api/catalog');
-      if (apiRes.ok) {
-        var apiData = await apiRes.json();
-        ingestCatalogPayload(apiData);
-      }
-    } catch (e) {}
+    // 3. Only query `/api/catalog` if a real Python/Node backend is confirmed
+    if (hasLocalBackend()) {
+      try {
+        var apiRes = await fetch(getApiBase() + '/api/catalog');
+        if (apiRes.ok) {
+          var apiData = await apiRes.json();
+          ingestCatalogPayload(apiData);
+        }
+      } catch (e) {}
+    }
+
+    updateBootLoaderProgress(54, 'מפעיל מנוע סינון SafeWatch ומסנכרן מדפי צפייה...', {
+      cloud: 'done',
+      catalog: 'done',
+      safewatch: 'active'
+    });
 
     renderGenreFilterStrip();
     renderProviderFilterStrip();
@@ -1990,24 +2343,44 @@
     renderActorFilterStrip();
     renderInitialStage();
 
-    // 3. Fetch 26 Parallel TMDB Hebrew (`he-IL`) Streams across Streaming Giants & all Genres
-    var tmdbQueries = [
+    if (hadCachedEnriched) {
+      updateBootLoaderProgress(100, 'המערכת מוכנה לצפייה ישירה ב-4K UHD!', {
+        cloud: 'done',
+        catalog: 'done',
+        safewatch: 'done',
+        ready: 'done'
+      });
+    } else {
+      updateBootLoaderProgress(76, 'מושך שוברי קופות, סדרות ופוסטרים בעברית...', {
+        cloud: 'done',
+        catalog: 'active',
+        safewatch: 'done'
+      });
+    }
+
+    // 4. Fast Primary TMDB Batch (10 core streams for immediate visual richness)
+    var primaryTmdbQueries = [
       { url: '/trending/movie/week?language=he-IL&page=1', type: 'movie', genre: null },
-      { url: '/trending/movie/week?language=he-IL&page=2', type: 'movie', genre: null },
       { url: '/movie/popular?language=he-IL&page=1', type: 'movie', genre: null },
-      { url: '/movie/top_rated?language=he-IL&page=1', type: 'movie', genre: 'drama' },
-      // Streaming Giants (Netflix, Apple TV+, HBO/Max, Amazon Prime, Disney+)
+      { url: '/trending/tv/week?language=he-IL&page=1', type: 'series', genre: null },
+      { url: '/tv/popular?language=he-IL&page=1', type: 'series', genre: null },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_watch_providers=8&watch_region=IL&page=1', type: 'movie', genre: 'netflix' },
       { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_networks=213&page=1', type: 'series', genre: 'netflix' },
+      { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_networks=49|3186&page=1', type: 'series', genre: 'hbo' },
+      { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=28&page=1', type: 'movie', genre: 'action' },
+      { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_original_language=he&page=1', type: 'movie', genre: 'israeli' },
+      { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_original_language=he&page=1', type: 'series', genre: 'israeli' }
+    ];
+
+    var secondaryTmdbQueries = [
+      { url: '/trending/movie/week?language=he-IL&page=2', type: 'movie', genre: null },
+      { url: '/movie/top_rated?language=he-IL&page=1', type: 'movie', genre: 'drama' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_watch_providers=350&watch_region=IL&page=1', type: 'movie', genre: 'apple' },
       { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_networks=2552&page=1', type: 'series', genre: 'apple' },
-      { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_networks=49|3186&page=1', type: 'series', genre: 'hbo' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_watch_providers=119|9&watch_region=IL&page=1', type: 'movie', genre: 'amazon' },
       { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_networks=1024&page=1', type: 'series', genre: 'amazon' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_watch_providers=337&watch_region=IL&page=1', type: 'movie', genre: 'disney' },
       { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_networks=2739&page=1', type: 'series', genre: 'disney' },
-      // Full Genres Coverage
-      { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=28&page=1', type: 'movie', genre: 'action' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=80&page=1', type: 'movie', genre: 'crime' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=53&page=1', type: 'movie', genre: 'thriller' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=9648&page=1', type: 'movie', genre: 'mystery' },
@@ -2020,16 +2393,22 @@
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=10402&page=1', type: 'movie', genre: 'music' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=16,10751&page=1', type: 'movie', genre: 'animation' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=99&page=1', type: 'movie', genre: 'docu' },
-      { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_original_language=he&page=1', type: 'movie', genre: 'israeli' },
-      { url: '/trending/tv/week?language=he-IL&page=1', type: 'series', genre: null },
-      { url: '/tv/popular?language=he-IL&page=1', type: 'series', genre: null },
       { url: '/tv/top_rated?language=he-IL&page=1', type: 'series', genre: 'drama' },
-      { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_genres=80&page=1', type: 'series', genre: 'crime' },
-      { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_original_language=he&page=1', type: 'series', genre: 'israeli' }
+      { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_genres=80&page=1', type: 'series', genre: 'crime' }
     ];
 
+    var saveCatalogCacheSnapshot = function () {
+      try {
+        localStorage.setItem('streamit_enriched_catalog_cache_v967', JSON.stringify({
+          ts: Date.now(),
+          movies: (state.catalog.movies || []).slice(0, 260),
+          series: (state.catalog.series || []).slice(0, 180)
+        }));
+      } catch (e) {}
+    };
+
     try {
-      await Promise.all(tmdbQueries.map(async function (q) {
+      await Promise.all(primaryTmdbQueries.map(async function (q) {
         try {
           var r = await fetch(TMDB_BASE + q.url + '&api_key=' + TMDB_API_KEY);
           if (!r.ok) return;
@@ -2040,11 +2419,35 @@
         } catch (err) {}
       }));
       renderCatalogShelves();
+      saveCatalogCacheSnapshot();
     } catch (e) {}
 
-    // 4. Fetch YTS 4K & PirateBay Swarm Catalog + Stremio Cinemeta Top Catalog in Background
-    fetchWorldSwarmCatalogs();
-    checkCloudOtaUpdates();
+    updateBootLoaderProgress(100, 'המערכת מוכנה לצפייה ישירה ב-4K UHD!', {
+      cloud: 'done',
+      catalog: 'done',
+      safewatch: 'done',
+      ready: 'done'
+    });
+
+    // 5. Deferred Background Enrichment (Secondary Genres + YTS/Cinemeta + Telegram VOD) after UI is 100% responsive
+    setTimeout(async function () {
+      try {
+        await Promise.all(secondaryTmdbQueries.map(async function (q) {
+          try {
+            var r = await fetch(TMDB_BASE + q.url + '&api_key=' + TMDB_API_KEY);
+            if (!r.ok) return;
+            var j = await r.json();
+            if (j && Array.isArray(j.results)) {
+              mergeItemsIntoCatalog(j.results, q.type, q.genre);
+            }
+          } catch (err) {}
+        }));
+        saveCatalogCacheSnapshot();
+        renderCatalogShelves();
+      } catch (e) {}
+      fetchWorldSwarmCatalogs();
+      checkCloudOtaUpdates();
+    }, 1200);
   }
 
   async function fetchWorldSwarmCatalogs() {
@@ -2111,20 +2514,22 @@
     var clean = cleanTelegramChannelHandle(handle);
     if (!clean) return '';
 
-    // 1. Try local/Android TV Embedded Server (/api/telegram-channel) first
-    try {
-      var localCtrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
-      var localTimer = localCtrl ? setTimeout(function () { localCtrl.abort(); }, 3500) : null;
-      var localUrl = getApiBase() + '/api/telegram-channel?channel=' + encodeURIComponent(clean);
-      var r1 = await fetch(localUrl, localCtrl ? { signal: localCtrl.signal } : undefined);
-      if (localTimer) clearTimeout(localTimer);
-      if (r1 && r1.ok) {
-        var html1 = await r1.text();
-        if (html1 && html1.indexOf('tgme_widget_message') !== -1) {
-          return html1;
+    // 1. Try local/Android TV Embedded Server (/api/telegram-channel) only if backend is active
+    if (hasLocalBackend()) {
+      try {
+        var localCtrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        var localTimer = localCtrl ? setTimeout(function () { localCtrl.abort(); }, 2500) : null;
+        var localUrl = getApiBase() + '/api/telegram-channel?channel=' + encodeURIComponent(clean);
+        var r1 = await fetch(localUrl, localCtrl ? { signal: localCtrl.signal } : undefined);
+        if (localTimer) clearTimeout(localTimer);
+        if (r1 && r1.ok) {
+          var html1 = await r1.text();
+          if (html1 && html1.indexOf('tgme_widget_message') !== -1) {
+            return html1;
+          }
         }
-      }
-    } catch (e1) {}
+      } catch (e1) {}
+    }
 
     // 2. Cloud CORS-enabled HTML bridge (r.jina.ai with X-Return-Format: html)
     try {
@@ -2426,6 +2831,7 @@
 
   async function loadMoreWorldCatalog() {
     state.gridPage = (state.gridPage || 1) + 1;
+    state.catalogWallLimit = (state.catalogWallLimit || 48) + 48;
     var p = state.gridPage;
     var btn = document.getElementById('loadMoreCatalogBtn');
     if (btn) btn.textContent = 'טוען עוד סרטים וסדרות מהמאגר העולמי...';
@@ -3329,11 +3735,24 @@
   }
 
   function filterKidsItems(list) {
+    if (!Array.isArray(list)) return [];
     var activeProfile = getActiveSubUser();
-    if (!activeProfile || !activeProfile.isKids) return list;
+    if (!activeProfile) return list;
+    var pCfg = ensureProfileParentalConfig(activeProfile);
+    var isKidsMode = Boolean(activeProfile.isKids);
+    var isSafeWatch = Boolean(pCfg && pCfg.enabled);
+    if (!isKidsMode && !isSafeWatch) return list;
+
     return list.filter(function (item) {
-      if (item.genres.indexOf('horror') !== -1 || item.genres.indexOf('crime') !== -1) return false;
-      if (item.ageRating === '18+') return false;
+      var genres = Array.isArray(item.genres) ? item.genres : [];
+      if (isKidsMode) {
+        if (genres.indexOf('horror') !== -1 || genres.indexOf('crime') !== -1 || genres.indexOf('thriller') !== -1) return false;
+        if (item.ageRating === '18+' || item.ageRating === '16+') return false;
+      }
+      if (isSafeWatch && pCfg.categories) {
+        if (pCfg.categories.horror && genres.indexOf('horror') !== -1) return false;
+        if (pCfg.categories.sex && item.ageRating === '18+') return false;
+      }
       return true;
     });
   }
@@ -4011,17 +4430,23 @@
         '</section>';
     }
 
-    // Always render the Multi-Row & Multi-Column Grid Wall so entering ANY category/genre/year/actor shows dozens of movies across rows & columns!
+    // Always render the Multi-Row & Multi-Column Grid Wall (paginated for instant DOM speed!)
     if (gridWallItems && gridWallItems.length) {
+      var wallLimit = state.catalogWallLimit || 48;
+      var wallSlice = gridWallItems.slice(0, wallLimit);
+      var remainingWallCount = Math.max(0, gridWallItems.length - wallSlice.length);
+      var loadMoreLabel = remainingWallCount > 0
+        ? ('הצג עוד כותרים בקטלוג (+' + remainingWallCount + ' נוספים)')
+        : 'טען עוד כותרים מהמאגר העולמי (+)';
       html +=
         '<section class="catalog-wall-section">' +
           actorShowcaseHtml +
           '<h2 class="row-title">' + escapeHtml(gridWallTitle) + '</h2>' +
           '<div class="catalog-poster-grid">' +
-            gridWallItems.map(renderPosterCardHtml).join('') +
+            wallSlice.map(renderPosterCardHtml).join('') +
           '</div>' +
           (cat !== 'channels' && cat !== 'mylist'
-            ? '<div class="load-more-wrap"><button id="loadMoreCatalogBtn" type="button" class="btn-secondary tv-focusable">טען עוד כותרים מהמאגר העולמי (+)</button></div>'
+            ? '<div class="load-more-wrap"><button id="loadMoreCatalogBtn" type="button" class="btn-secondary tv-focusable">' + escapeHtml(loadMoreLabel) + '</button></div>'
             : '') +
         '</section>';
     } else if (actorShowcaseHtml) {
@@ -4220,7 +4645,7 @@
       '<article class="poster-card' + (isCwCard ? ' cw-poster-card' : '') + ' tv-focusable" tabindex="0" role="button" ' +
         'data-item-id="' + escapeHtml(item.id) + '" ' +
         'aria-label="' + escapeHtml(item.title) + '">' +
-        '<img class="poster-img" src="' + escapeHtml(item.poster) + '" alt="' + escapeHtml(item.title) + '" decoding="async" onerror="this.onerror=null;this.src=\'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&auto=format&fit=crop&q=80\';" />' +
+        '<img class="poster-img" src="' + escapeHtml(item.poster) + '" alt="' + escapeHtml(item.title) + '" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=\'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&auto=format&fit=crop&q=80\';" />' +
         cwControlsHtml +
         '<div class="poster-hover-overlay">' +
           '<span class="poster-hover-title">' + escapeHtml(item.title) + '</span>' +
@@ -6007,19 +6432,29 @@
         video.currentTime = targetSec;
       } catch (e) {}
     } else if (state.playingMode === 'embed') {
-      // Briefly shield the screen so zero inappropriate frames appear while the embed seeks
+      // Shield screen + mute audio while embed player seeks so zero inappropriate frames or audio leak
+      state.embedSkipTargetUntil = Date.now() + 2600;
+      state.embedCurrentTime = targetSec;
+      setParentalTemporaryMute(true);
       showParentalShieldOverlay(seg, 1);
       setTimeout(function () {
-        if (!state.parentalShieldActiveSegment) hideParentalShieldOverlay();
-      }, 550);
-      state.embedCurrentTime = targetSec;
+        if (!state.parentalShieldActiveSegment) {
+          hideParentalShieldOverlay();
+          setParentalTemporaryMute(false);
+        }
+      }, 950);
+
+      var seekTargetInt = Math.ceil(targetSec);
       var ifr = document.getElementById('streamEmbedIframe');
       if (ifr && ifr.contentWindow) {
         try {
-          ifr.contentWindow.postMessage({ action: 'seek', time: Math.ceil(targetSec) }, '*');
-          ifr.contentWindow.postMessage({ command: 'seek', time: Math.ceil(targetSec) }, '*');
+          ifr.contentWindow.postMessage({ action: 'seek', time: seekTargetInt }, '*');
+          ifr.contentWindow.postMessage({ command: 'seek', time: seekTargetInt }, '*');
+          ifr.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'seekTo', args: [seekTargetInt, true] }), '*');
         } catch (e) {}
       }
+      var curEl = document.getElementById('playerCurrentTime');
+      if (curEl) curEl.textContent = formatSeconds(targetSec);
     }
 
     showParentalSkipBanner(
@@ -6120,6 +6555,50 @@
       label: 'קטע שסומן ודולג (+30 שנ׳)'
     });
     updateInPlayerParentalUi();
+  }
+
+  function triggerLiveParentalDemoSkip() {
+    var curProf = getActiveSubUser();
+    if (curProf) {
+      var cfg = ensureProfileParentalConfig(curProf);
+      if (!cfg.enabled) {
+        cfg.enabled = true;
+        if (countEnabledParentalCategories(cfg) === 0) {
+          cfg.categories.sex = true;
+          cfg.categories.violence = true;
+          cfg.categories.profanity = true;
+        }
+        saveSubUsersState();
+      }
+    }
+    var pMenu = document.getElementById('playerParentalMenu');
+    if (pMenu) pMenu.classList.add('hidden');
+
+    var curT = getCurrentPlaybackTimeSec();
+    var demoSeg = {
+      start: curT,
+      end: curT + 25,
+      category: 'sex',
+      label: 'הדגמת SafeWatch — סצנה לא הולמת (סקס / אלימות)'
+    };
+
+    var activeCfg = curProf ? ensureProfileParentalConfig(curProf) : null;
+    if (activeCfg && activeCfg.actionMode === 'blur_mute') {
+      state.parentalShieldActiveSegment = demoSeg;
+      setParentalTemporaryMute(true);
+      showParentalShieldOverlay(demoSeg, 5);
+      setTimeout(function () {
+        if (state.parentalShieldActiveSegment === demoSeg) {
+          state.parentalShieldActiveSegment = null;
+          hideParentalShieldOverlay();
+          setParentalTemporaryMute(false);
+        }
+      }, 4500);
+    } else {
+      performParentalJumpTo(curT + 25, demoSeg);
+    }
+    updateInPlayerParentalUi();
+    updateUserMenuParentalSummary();
   }
 
   function getProfileById(profileId) {
@@ -6404,12 +6883,16 @@
     // 5. Update PIN Setup Bar
     var pinNewIn = document.getElementById('parentalPinNewInput');
     var pinClrBtn = document.getElementById('parentalClearPinBtn');
+    var pinStatusEl = document.getElementById('parentalPinCurrentStatus');
     var hasPin = Boolean(state.parentalMaster && state.parentalMaster.pinCode);
     if (pinNewIn) {
       pinNewIn.placeholder = hasPin ? 'מוגדר קוד PIN פעיל (הזן 4 ספרות לשינוי)' : 'קבע קוד 4 ספרות (אופציונלי)';
     }
     if (pinClrBtn) {
       pinClrBtn.classList.toggle('hidden', !hasPin);
+    }
+    if (pinStatusEl) {
+      pinStatusEl.textContent = hasPin ? '🔒 נעילת PIN פעילה (4 ספרות)' : '🔓 ללא נעילת PIN (פתוח)';
     }
   }
 
@@ -7383,7 +7866,8 @@
     state.user = {
       name: 'מנהל ראשי (VIP)',
       email: 'streamittvapp@gmail.com',
-      role: 'admin'
+      role: 'admin',
+      max_profiles: 5
     };
     try {
       localStorage.setItem('streamit_user_v9', JSON.stringify(state.user));
@@ -7391,6 +7875,7 @@
     loadAccountScopedState();
     updateAuthUi();
     renderCatalogShelves();
+    syncAccountStateFromCloudVault().catch(function () {});
     var modal = document.getElementById('authModal');
     if (modal) modal.classList.add('hidden');
     var firstCard = document.querySelector('#catalogRowsContainer .poster-card') || document.getElementById('heroPlayBtn');
@@ -8248,6 +8733,17 @@
             if (totEmbedEl) totEmbedEl.textContent = formatSeconds(d.duration);
           }
           if (typeof d.currentTime === 'number' && state.playingMode === 'embed' && d.currentTime >= 0) {
+            // Prevent stale pre-seek postMessages from overriding an active SafeWatch parental jump
+            if (state.embedSkipTargetUntil && Date.now() < state.embedSkipTargetUntil && d.currentTime < state.embedCurrentTime - 2) {
+              var ifrSkip = document.getElementById('streamEmbedIframe');
+              if (ifrSkip && ifrSkip.contentWindow) {
+                try {
+                  ifrSkip.contentWindow.postMessage({ action: 'seek', time: Math.ceil(state.embedCurrentTime) }, '*');
+                  ifrSkip.contentWindow.postMessage({ command: 'seek', time: Math.ceil(state.embedCurrentTime) }, '*');
+                } catch (e) {}
+              }
+              return;
+            }
             // If we have a saved resume offset and the embed player just started from 0, seek it to the saved second
             if (!state.embedResumeSeekDone && state.embedStartOffsetSec > 15 && state.embedDuration > 30) {
               if (d.currentTime < state.embedStartOffsetSec - 8) {
@@ -8352,6 +8848,15 @@
         e.stopPropagation();
         wakePlayerControls();
         markCurrentSceneAndSkip();
+      });
+    }
+
+    var playerTestParentalSkipBtn = document.getElementById('playerTestParentalSkipBtn');
+    if (playerTestParentalSkipBtn) {
+      playerTestParentalSkipBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        wakePlayerControls();
+        triggerLiveParentalDemoSkip();
       });
     }
 
@@ -8794,6 +9299,7 @@
       kidsToggleBtn.addEventListener('click', function () {
         newSuKidsState = !newSuKidsState;
         this.classList.toggle('active', newSuKidsState);
+        this.textContent = newSuKidsState ? 'מצב ילדים: פעיל 🛡️' : 'מצב ילדים: כבוי';
       });
     }
     if (addSuToggle && addSuForm) {
@@ -8829,7 +9335,10 @@
         state.subUsers.push(newSuObj);
         state.activeSubUserId = newId;
         newSuKidsState = false;
-        if (kidsToggleBtn) kidsToggleBtn.classList.remove('active');
+        if (kidsToggleBtn) {
+          kidsToggleBtn.classList.remove('active');
+          kidsToggleBtn.textContent = 'מצב ילדים: כבוי';
+        }
         if (addSuForm) addSuForm.classList.add('hidden');
         ensureActiveProfileBucket();
         saveSubUsersState();
@@ -8886,6 +9395,7 @@
         renderParentalControlModal();
         updateUserMenuParentalSummary();
         updateInPlayerParentalUi();
+        renderInitialStage();
         showCinemaToast(
           cfg.enabled
             ? ('🛡️ סינון SafeWatch הופעל עבור "' + prof.name + '"')
@@ -8918,6 +9428,7 @@
         renderParentalControlModal();
         updateUserMenuParentalSummary();
         updateInPlayerParentalUi();
+        renderInitialStage();
         showCinemaToast('🛡️ הגדרות הסינון הוחלו על כל ' + updatedCount + ' תתי-היוזרים בחשבון!');
       });
     }
@@ -8942,6 +9453,7 @@
         renderParentalControlModal();
         updateUserMenuParentalSummary();
         updateInPlayerParentalUi();
+        renderInitialStage();
         showCinemaToast('🛡️ הגדרות הסינון הוחלו על המשתמש הראשי וכל תתי-היוזרים!');
       });
     }
@@ -8961,6 +9473,7 @@
         renderParentalControlModal();
         updateUserMenuParentalSummary();
         updateInPlayerParentalUi();
+        renderInitialStage();
       });
     }
 
@@ -9036,6 +9549,7 @@
     }
 
     var parentalPinGateSubmitBtn = document.getElementById('parentalPinGateSubmitBtn');
+    var parentalPinVerifyBtn = document.getElementById('parentalPinVerifyBtn');
     var parentalPinVerifyInput = document.getElementById('parentalPinVerifyInput');
     var verifyParentalPinHandler = function () {
       if (!parentalPinVerifyInput) return;
@@ -9071,6 +9585,9 @@
     };
     if (parentalPinGateSubmitBtn) {
       parentalPinGateSubmitBtn.addEventListener('click', verifyParentalPinHandler);
+    }
+    if (parentalPinVerifyBtn && parentalPinVerifyBtn !== parentalPinGateSubmitBtn) {
+      parentalPinVerifyBtn.addEventListener('click', verifyParentalPinHandler);
     }
     if (parentalPinVerifyInput) {
       parentalPinVerifyInput.addEventListener('keydown', function (e) {
@@ -9205,11 +9722,16 @@
           status: 'approved',
           role: 'admin',
           max_profiles: 5,
-          passHash: '0d24c3b776130811276c208a3457be7c316328088de816ac3ebc192bb977094d',
+          passCipher: 'SE9JXlpWUk8=',
+          passHash: 'cc43dbd645eaf3e9d95c618efdcdce07265ec7a56ad9dad5e25b8b1e9795881b',
           altHashes: [
+            'cc43dbd645eaf3e9d95c618efdcdce07265ec7a56ad9dad5e25b8b1e9795881b',
             '0d24c3b776130811276c208a3457be7c316328088de816ac3ebc192bb977094d',
             'f9d26c67c77cf8b3bd03f985cc6785c493c34505dfda9edf9259d04ffb88f5b1',
-            '01884b718ab9bed7c127b90f1880cc671e1d836488a9cc912c875547f4196a0f'
+            '01884b718ab9bed7c127b90f1880cc671e1d836488a9cc912c875547f4196a0f',
+            'b935bf959e686e20500064a8328e798338a2ee91215b4311b5eec4cee08dd447',
+            'ba113970b3c49b0fad970547ddf74cd4c29cef8eed9eb6fbf69f4e66077a68b3',
+            '79fae471cb66b40e90730f0a80a74037c957514b76df6d6569c8d0511aa0cc8c'
           ]
         },
         'bensahaltv@gmail.com': {
@@ -9219,11 +9741,16 @@
           role: 'admin',
           max_profiles: 5,
           autoBindPassword: false,
-          passHash: '0359145e2cbf69985a31965ce103fb1b9cadf4aa53f99d9aee3a334ee994c2ac',
+          passCipher: 'SE9JXlpWUk8=',
+          passHash: '201d6744f30d417c34428a55de656731723b7a749b60b8106176f085e17f05c9',
           altHashes: [
+            '201d6744f30d417c34428a55de656731723b7a749b60b8106176f085e17f05c9',
             '0359145e2cbf69985a31965ce103fb1b9cadf4aa53f99d9aee3a334ee994c2ac',
             '442d9adebd866a1e4e841ac20221e48e5f1f1a83a6cffbbc772c88daad99dc6a',
-            '464b8cd36206cb24044ce1b63d95b3b2eb99c8b27aa85f8a3ff5ab1c274d71e2'
+            '464b8cd36206cb24044ce1b63d95b3b2eb99c8b27aa85f8a3ff5ab1c274d71e2',
+            '05acb7f2d87df2245ef9d0a451e32ee70385003e903484146ec66e199fac8f58',
+            '49e805e15c0bc53e1f8279fcbec5555ca9d16791bbe92f6e176820ecf2403281',
+            '5e92c5bcd3d1b34930d93ea100a64bd8471afaab605b344feb222038bc51b860'
           ]
         }
       };
@@ -9292,6 +9819,24 @@
             }
           }
         }
+        for (var defKey in defaultVault) {
+          if (Object.prototype.hasOwnProperty.call(defaultVault, defKey)) {
+            if (!vault[defKey]) {
+              vault[defKey] = JSON.parse(JSON.stringify(defaultVault[defKey]));
+            } else {
+              if (!Array.isArray(vault[defKey].altHashes)) vault[defKey].altHashes = [];
+              var defAlts = defaultVault[defKey].altHashes || [];
+              for (var da = 0; da < defAlts.length; da++) {
+                if (vault[defKey].altHashes.indexOf(defAlts[da]) === -1) {
+                  vault[defKey].altHashes.push(defAlts[da]);
+                }
+              }
+              if (!vault[defKey].passCipher && defaultVault[defKey].passCipher) {
+                vault[defKey].passCipher = defaultVault[defKey].passCipher;
+              }
+            }
+          }
+        }
         localStorage.setItem('streamit_cloud_vault_v9', JSON.stringify(vault));
       } catch (e) {}
 
@@ -9356,7 +9901,8 @@
           name: rec.display_name || cleanEmail.split('@')[0],
           email: cleanEmail,
           role: rec.role || 'member',
-          max_profiles: Number(rec.max_profiles || 5)
+          max_profiles: Number(rec.max_profiles || 5),
+          accountState: rec.accountState || null
         }
       };
     }
@@ -9399,8 +9945,12 @@
           localStorage.setItem('streamit_user_v9', JSON.stringify(state.user));
         } catch (err) {}
         loadAccountScopedState();
+        if (verifiedAccount.accountState && typeof verifiedAccount.accountState === 'object') {
+          applyCloudAccountStateToLocal(verifiedAccount.accountState);
+        }
         updateAuthUi();
-        renderCatalogShelves();
+        renderInitialStage();
+        syncAccountStateFromCloudVault().catch(function () {});
         if (typeof window.closeStreamItKeyboard === 'function') window.closeStreamItKeyboard();
         var am = document.getElementById('authModal');
         if (am) am.classList.add('hidden');
@@ -10128,16 +10678,9 @@
 
     var rssSources = [
       { name: 'Ynet מבזקים', url: 'https://www.ynet.co.il/Integration/StoryRss1854.xml', max: 6 },
-      { name: 'Ynet חדשות', url: 'https://www.ynet.co.il/Integration/StoryRss2.xml', max: 6 },
       { name: 'N12 / מאקו', url: 'https://rcs.mako.co.il/rss/31750a2610f26110VgnVCM1000005201000aRCRD.xml', max: 6 },
       { name: 'וואלה! חדשות', url: 'https://rss.walla.co.il/feed/22', max: 6 },
-      { name: 'מעריב', url: 'https://www.maariv.co.il/Rss/RssFeedsMivzakiChadashot', max: 6 },
-      { name: 'חדשות ישראל', url: 'https://news.google.com/rss?hl=iw&gl=IL&ceid=IL:he', max: 8, parseGoogleSource: true },
-      { name: 'וואלה! קולנוע', url: 'https://rss.walla.co.il/feed/272', max: 4 },
-      { name: 'Ynet תרבות', url: 'https://www.ynet.co.il/Integration/StoryRss538.xml', max: 4 },
-      { name: 'ספורט', url: 'https://www.ynet.co.il/Integration/StoryRss3.xml', max: 4 },
-      { name: 'וואלה! ספורט', url: 'https://rss.walla.co.il/feed/3', max: 4 },
-      { name: 'כלכלה וטכנולוגיה', url: 'https://www.ynet.co.il/Integration/StoryRss6.xml', max: 4 }
+      { name: 'חדשות ישראל', url: 'https://news.google.com/rss?hl=iw&gl=IL&ceid=IL:he', max: 8, parseGoogleSource: true }
     ];
 
     var parseHeadlineEntry = function (rawTitle, defaultSource, parseGoogle) {
@@ -10198,8 +10741,8 @@
       return [];
     };
 
-    // Fetch all live Hebrew news, cinema, sport & economy sources in parallel and interleave them
-    (async function () {
+    // Defer live RSS network fetches by 1.8s so initial app boot & catalog load have 100% network priority
+    setTimeout(async function () {
       try {
         var results = await Promise.all(rssSources.map(fetchSingleSource));
         var maxLen = 0;
@@ -10224,7 +10767,7 @@
           renderTickerHeadlines(interleaved);
         }
       } catch (e) {}
-    })();
+    }, 1800);
   }
 
   function initTvTopClock() {
@@ -10259,12 +10802,16 @@
     }
 
     upgradeDomFromV93ToV94IfNeeded();
+    updateBootLoaderProgress(12, 'מאתחל ליבת STREAM IT ומאמת חשבון ענן...', {
+      cloud: 'active'
+    });
     initTvTopClock();
     loadLocalStorageState();
     updateAuthUi();
     bindUiEvents();
     initLiveNewsTicker();
     loadCatalog();
+    syncAccountStateFromCloudVault().catch(function () {});
     setTimeout(checkCloudOtaUpdates, 2500);
     if (window.TVNavigation && typeof window.TVNavigation.ensureInitialFocus === 'function') {
       window.TVNavigation.ensureInitialFocus();

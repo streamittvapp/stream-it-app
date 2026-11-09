@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&family=Rubik:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
-  <link rel="stylesheet" href="styles.css?v=9.6.6" />
+  <link rel="stylesheet" href="styles.css?v=9.6.7" />
   <script>
     (function () {
       try {
@@ -31,13 +31,13 @@
           });
         }
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (!otaVer || otaVer <= '9.6.6') {
+        if (!otaVer || otaVer <= '9.6.7') {
           localStorage.removeItem('streamit_ota_css_v9');
           localStorage.removeItem('streamit_ota_app_js_v9');
           localStorage.removeItem('streamit_ota_tv_nav_v9');
         }
         var otaCss = localStorage.getItem('streamit_ota_css_v9') || '';
-        if (otaVer && otaVer > '9.6.1' && otaCss.length > 500) {
+        if (otaVer && otaVer > '9.6.7' && otaCss.length > 500) {
           var st = document.createElement('style');
           st.id = 'streamit-ota-live-style-v9';
           st.textContent = otaCss;
@@ -52,12 +52,79 @@
 <body>
 
   <!-- ===================================================================== -->
+  <!-- ARCHITECTURAL STARTUP BOOT LOADER WITH PROGRESS BAR (#appBootLoader)  -->
+  <!-- ===================================================================== -->
+  <div id="appBootLoader" class="app-boot-loader" role="status" aria-live="polite" aria-label="טוען את מערכת STREAM IT">
+    <div class="boot-loader-card">
+      <div class="boot-loader-brand" dir="ltr">
+        <svg viewBox="0 0 128 128" class="boot-loader-emblem" aria-hidden="true">
+          <defs>
+            <linearGradient id="bootBgSlate" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#151C2C" />
+              <stop offset="100%" stop-color="#070A10" />
+            </linearGradient>
+            <linearGradient id="bootCrimson" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#EF4444" />
+              <stop offset="55%" stop-color="#DC2626" />
+              <stop offset="100%" stop-color="#991B1B" />
+            </linearGradient>
+          </defs>
+          <rect width="128" height="128" rx="10" fill="url(#bootBgSlate)" />
+          <rect x="3" y="3" width="122" height="122" rx="8" fill="none" stroke="#1E293B" stroke-width="2" />
+          <rect x="18" y="3" width="92" height="3" fill="url(#bootCrimson)" />
+          <path d="M24 30 H62 L54 44 H36 V57 H58 L50 71 H24 V30 Z" fill="#F8FAFC" />
+          <path d="M24 83 H52 V69 H66 V98 H24 V83 Z" fill="#94A3B8" />
+          <path d="M58 32 L106 64 L58 96 V76 L77 64 L58 52 V32 Z" fill="url(#bootCrimson)" />
+          <polygon points="64,48 88,64 64,80" fill="#FFFFFF" opacity="0.95" />
+        </svg>
+        <div class="boot-loader-wordmark-wrap">
+          <div class="boot-loader-wordmark">
+            <span class="boot-word-stream">STREAM</span>
+            <span class="boot-word-it">IT</span>
+          </div>
+          <span class="boot-loader-tagline" dir="rtl">מערכת קולנוע, סדרות ושידורים חיים ב-4K UHD</span>
+        </div>
+      </div>
+
+      <div class="boot-loader-progress-section">
+        <div class="boot-loader-status-row">
+          <span id="bootLoaderStatusText" class="boot-loader-status-text">מאתחל ליבת מערכת ומאמת חשבון ענן...</span>
+          <span id="bootLoaderPercent" class="boot-loader-percent" dir="ltr">12%</span>
+        </div>
+        <div class="boot-loader-bar-track" dir="ltr">
+          <div id="bootLoaderBarFill" class="boot-loader-bar-fill" style="width: 12%;"></div>
+        </div>
+        <div class="boot-loader-steps">
+          <span id="bootStepCloud" class="boot-step-pill active">סנכרון פרופילים וענן</span>
+          <span id="bootStepCatalog" class="boot-step-pill">קטלוג סרטים וסדרות</span>
+          <span id="bootStepSafeWatch" class="boot-step-pill">מנוע בקרת הורים SafeWatch</span>
+          <span id="bootStepReady" class="boot-step-pill">התייצבות מערכת</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
   <!-- DESKTOP FLOATING TOP HEADER (#topHeader)                              -->
   <!-- ===================================================================== -->
   <header id="topHeader" class="top-header" role="banner">
     <div class="header-inner">
       <div class="header-right">
-        <a href="#home" id="brandLogo" class="brand-logo tv-focusable" data-category="all" aria-label="STREAM IT דף הבית">STREAM IT</a>
+        <a href="#home" id="brandLogo" class="brand-logo tv-focusable" data-category="all" dir="ltr" aria-label="STREAM IT דף הבית">
+          <svg viewBox="0 0 128 128" class="brand-logo-emblem" aria-hidden="true">
+            <rect width="128" height="128" rx="10" fill="#0F1420" />
+            <rect x="4" y="4" width="120" height="120" rx="8" fill="none" stroke="#334155" stroke-width="3" />
+            <rect x="18" y="4" width="92" height="4" fill="#DC2626" />
+            <path d="M24 30 H62 L54 44 H36 V57 H58 L50 71 H24 V30 Z" fill="#F8FAFC" />
+            <path d="M24 83 H52 V69 H66 V98 H24 V83 Z" fill="#94A3B8" />
+            <path d="M58 32 L106 64 L58 96 V76 L77 64 L58 52 V32 Z" fill="#DC2626" />
+            <polygon points="64,48 88,64 64,80" fill="#FFFFFF" />
+          </svg>
+          <span class="brand-logo-wordmark">
+            <span class="brand-word-stream">STREAM</span>
+            <span class="brand-word-it">IT</span>
+          </span>
+        </a>
 
         <nav class="main-nav" aria-label="ניווט ראשי">
           <button type="button" class="nav-link active tv-focusable" data-category="all" aria-label="ראשי">ראשי</button>
@@ -949,6 +1016,9 @@
               <button type="button" id="playerMarkAndSkipSceneBtn" class="subs-chip-btn parental-mark-skip-btn tv-focusable" aria-label="דלג על סצנה לא הולמת כעת ושמור בזיכרון">
                 <span>דלג על קטע זה כעת (+30 שנ׳) ושמור</span>
               </button>
+              <button type="button" id="playerTestParentalSkipBtn" class="subs-chip-btn tv-focusable" aria-label="בדיקת סינון חי והדגמת בקרת הורים">
+                <span>בדיקת סינון חי (הדגמת SafeWatch)</span>
+              </button>
               <button type="button" id="playerOpenFullParentalModalBtn" class="subs-chip-btn tv-focusable" aria-label="פתח ניהול בקרת הורים לכל הפרופילים">
                 <span>ניהול בקרת הורים ופרופילים מלא</span>
               </button>
@@ -1515,13 +1585,13 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Core Application & Smart TV Navigation Scripts -->
-  <script src="tv-navigation.js?v=9.6.6"></script>
-  <script src="app.js?v=9.6.6"></script>
+  <script src="tv-navigation.js?v=9.6.7"></script>
+  <script src="app.js?v=9.6.7"></script>
   <script>
     (function () {
       try {
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (otaVer && otaVer > '9.6.6') {
+        if (otaVer && otaVer > '9.6.7') {
           var navCode = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
           if (navCode.length > 500) {
             var s1 = document.createElement('script');

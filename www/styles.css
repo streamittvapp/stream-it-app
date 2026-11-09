@@ -262,14 +262,48 @@ video {
 }
 
 .brand-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-family: var(--font-display);
-  font-size: 1.65rem;
+  font-size: 1.5rem;
   font-weight: 800;
-  letter-spacing: 0.06em;
-  color: var(--brand-red);
+  letter-spacing: 0.04em;
+  color: #ffffff;
   padding: 4px 8px;
   border-radius: var(--radius-btn);
   border: none;
+  direction: ltr;
+}
+
+.brand-logo-emblem {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+}
+
+.brand-logo-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.brand-word-stream {
+  color: #f8fafc;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+}
+
+.brand-word-it {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 6px;
+  background-color: #dc2626;
+  color: #ffffff;
+  font-size: 1.15rem;
+  font-weight: 900;
+  line-height: 1.2;
 }
 
 .main-nav {
@@ -6161,6 +6195,219 @@ body.tv-mode .channel-tile-card:focus {
   outline: 2px solid #ffffff !important;
   transform: scale(1.03) !important;
 }
+
+/* =========================================================================
+   ARCHITECTURAL STARTUP BOOT LOADER WITH PROGRESS BAR (#appBootLoader)
+   & HARDWARE RENDERING ACCELERATION (v9.6.7)
+   ========================================================================= */
+.app-boot-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  background: radial-gradient(circle at 50% 35%, #111622 0%, #070a10 65%, #020408 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.38s ease;
+}
+
+.app-boot-loader.boot-complete {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.boot-loader-card {
+  width: 100%;
+  max-width: 540px;
+  background: #0d121d;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-top: 3px solid #dc2626 !important;
+  padding: 36px 32px;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.boot-loader-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+.boot-loader-emblem {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 8px 20px rgba(220, 38, 38, 0.25));
+}
+
+.boot-loader-wordmark-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.boot-loader-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 2.35rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+
+.boot-word-stream {
+  color: #f8fafc;
+}
+
+.boot-word-it {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 10px;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 1.85rem;
+}
+
+.boot-loader-tagline {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.boot-loader-progress-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.boot-loader-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.boot-loader-status-text {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.boot-loader-percent {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #ef4444;
+}
+
+.boot-loader-bar-track {
+  width: 100%;
+  height: 8px;
+  background: #1e293b;
+  overflow: hidden;
+  position: relative;
+}
+
+.boot-loader-bar-fill {
+  height: 100%;
+  width: 12%;
+  background: linear-gradient(90deg, #b91c1c 0%, #dc2626 60%, #ef4444 100%);
+  transition: width 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.boot-loader-steps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.boot-step-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #64748b;
+  transition: all 0.2s ease;
+}
+
+.boot-step-pill::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  background: #475569;
+  flex-shrink: 0;
+}
+
+.boot-step-pill.active {
+  color: #f8fafc;
+  background: rgba(220, 38, 38, 0.12);
+  border-color: rgba(220, 38, 38, 0.45) !important;
+}
+
+.boot-step-pill.active::before {
+  background: #ef4444;
+}
+
+.boot-step-pill.done {
+  color: #cbd5e1;
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+.boot-step-pill.done::before {
+  background: #10b981;
+}
+
+/* DOM & Scroll Performance Acceleration */
+.netflix-row {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 310px;
+}
+
+.catalog-load-more-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 24px 0 12px 0;
+}
+
+.catalog-load-more-btn {
+  min-width: 260px;
+  height: 46px;
+  padding: 0 28px;
+  background: #181c26;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: #f8fafc;
+  font-weight: 800;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.catalog-load-more-btn:hover,
+.catalog-load-more-btn.tv-focused,
+.catalog-load-more-btn:focus {
+  background: #dc2626 !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+}
+
 
 
 

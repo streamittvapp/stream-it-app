@@ -52,10 +52,10 @@
       --danger-soft: #FEF2F2;
       --danger-border: #FECACA;
 
-      --radius-xl: 16px;
-      --radius-lg: 12px;
-      --radius-md: 10px;
-      --radius-sm: 8px;
+      --radius-xl: 12px;
+      --radius-lg: 10px;
+      --radius-md: 8px;
+      --radius-sm: 6px;
 
       --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
       --shadow-md: 0 4px 16px rgba(15, 23, 42, 0.06), 0 2px 4px rgba(15, 23, 42, 0.04);
@@ -115,7 +115,7 @@
       color: var(--text-primary);
       border: 1px solid var(--border-light);
       border-top: 4px solid var(--brand-red);
-      border-radius: 20px;
+      border-radius: 12px;
       padding: 36px 32px;
       box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
       display: flex;
@@ -130,12 +130,43 @@
       gap: 12px;
     }
 
-    .gate-brand-logo {
+    .gate-brand-logo,
+    .sidebar-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
       font-family: 'Rubik', sans-serif;
-      font-size: 1.65rem;
+      font-size: 1.45rem;
       font-weight: 900;
-      letter-spacing: 0.05em;
-      color: var(--brand-red);
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      direction: ltr;
+    }
+
+    .admin-logo-emblem {
+      width: 34px;
+      height: 34px;
+      flex-shrink: 0;
+    }
+
+    .admin-word-stream {
+      color: #0F172A;
+    }
+
+    .sidebar-logo .admin-word-stream {
+      color: #F8FAFC;
+    }
+
+    .admin-word-it {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1px 7px;
+      background: #DC2626;
+      color: #FFFFFF;
+      border-radius: 5px;
+      font-size: 1.15rem;
+      line-height: 1.2;
     }
 
     .gate-lock-badge {
@@ -145,7 +176,7 @@
       font-size: 0.76rem;
       font-weight: 700;
       padding: 5px 12px;
-      border-radius: 999px;
+      border-radius: 8px;
       background: var(--brand-red-soft);
       border: 1px solid var(--brand-red-border);
       color: var(--brand-red);
@@ -1151,7 +1182,19 @@
   <div id="adminLoginGate" class="admin-gate-overlay" role="dialog" aria-modal="true" aria-labelledby="adminGateTitle">
     <div class="admin-gate-card">
       <div class="gate-brand-row">
-        <div class="gate-brand-logo">STREAM IT</div>
+        <div class="gate-brand-logo" dir="ltr">
+          <svg viewBox="0 0 128 128" class="admin-logo-emblem" aria-hidden="true">
+            <rect width="128" height="128" rx="10" fill="#0F1420" />
+            <rect x="4" y="4" width="120" height="120" rx="8" fill="none" stroke="#334155" stroke-width="3" />
+            <rect x="18" y="4" width="92" height="4" fill="#DC2626" />
+            <path d="M24 30 H62 L54 44 H36 V57 H58 L50 71 H24 V30 Z" fill="#F8FAFC" />
+            <path d="M24 83 H52 V69 H66 V98 H24 V83 Z" fill="#94A3B8" />
+            <path d="M58 32 L106 64 L58 96 V76 L77 64 L58 52 V32 Z" fill="#DC2626" />
+            <polygon points="64,48 88,64 64,80" fill="#FFFFFF" />
+          </svg>
+          <span class="admin-word-stream">STREAM</span>
+          <span class="admin-word-it">IT</span>
+        </div>
         <span class="gate-lock-badge">
           <svg viewBox="0 0 24 24" class="icon-svg" style="width:14px;height:14px;" aria-hidden="true">
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -1209,8 +1252,20 @@
     <aside class="admin-sidebar" aria-label="תפריט ניהול ראשי">
       <div class="sidebar-top">
         <div class="sidebar-brand">
-          <a href="index.html" class="sidebar-logo">STREAM IT</a>
-          <span class="sidebar-ver">v9.6.5</span>
+          <a href="index.html" class="sidebar-logo" dir="ltr">
+            <svg viewBox="0 0 128 128" class="admin-logo-emblem" aria-hidden="true">
+              <rect width="128" height="128" rx="10" fill="#0A0E17" />
+              <rect x="4" y="4" width="120" height="120" rx="8" fill="none" stroke="#334155" stroke-width="3" />
+              <rect x="18" y="4" width="92" height="4" fill="#DC2626" />
+              <path d="M24 30 H62 L54 44 H36 V57 H58 L50 71 H24 V30 Z" fill="#F8FAFC" />
+              <path d="M24 83 H52 V69 H66 V98 H24 V83 Z" fill="#94A3B8" />
+              <path d="M58 32 L106 64 L58 96 V76 L77 64 L58 52 V32 Z" fill="#DC2626" />
+              <polygon points="64,48 88,64 64,80" fill="#FFFFFF" />
+            </svg>
+            <span class="admin-word-stream">STREAM</span>
+            <span class="admin-word-it">IT</span>
+          </a>
+          <span class="sidebar-ver">v9.6.7</span>
         </div>
 
         <div class="sidebar-section-label">ניווט מערכת ניהול</div>
@@ -1881,13 +1936,18 @@
           status: 'approved',
           role: 'admin',
           max_profiles: 5,
-          passHash: '0d24c3b776130811276c208a3457be7c316328088de816ac3ebc192bb977094d',
+          passCipher: 'SE9JXlpWUk8=',
+          passHash: 'cc43dbd645eaf3e9d95c618efdcdce07265ec7a56ad9dad5e25b8b1e9795881b',
           altHashes: [
+            'cc43dbd645eaf3e9d95c618efdcdce07265ec7a56ad9dad5e25b8b1e9795881b',
             '0d24c3b776130811276c208a3457be7c316328088de816ac3ebc192bb977094d',
             'f9d26c67c77cf8b3bd03f985cc6785c493c34505dfda9edf9259d04ffb88f5b1',
-            '01884b718ab9bed7c127b90f1880cc671e1d836488a9cc912c875547f4196a0f'
+            '01884b718ab9bed7c127b90f1880cc671e1d836488a9cc912c875547f4196a0f',
+            'b935bf959e686e20500064a8328e798338a2ee91215b4311b5eec4cee08dd447',
+            'ba113970b3c49b0fad970547ddf74cd4c29cef8eed9eb6fbf69f4e66077a68b3',
+            '79fae471cb66b40e90730f0a80a74037c957514b76df6d6569c8d0511aa0cc8c'
           ],
-          updatedAt: '2026-11-08 19:38',
+          updatedAt: '2026-11-09 23:45',
           autoBindPassword: false
         },
         'bensahaltv@gmail.com': {
@@ -1897,13 +1957,18 @@
           role: 'admin',
           max_profiles: 5,
           autoBindPassword: false,
-          passHash: '0359145e2cbf69985a31965ce103fb1b9cadf4aa53f99d9aee3a334ee994c2ac',
+          passCipher: 'SE9JXlpWUk8=',
+          passHash: '201d6744f30d417c34428a55de656731723b7a749b60b8106176f085e17f05c9',
           altHashes: [
+            '201d6744f30d417c34428a55de656731723b7a749b60b8106176f085e17f05c9',
             '0359145e2cbf69985a31965ce103fb1b9cadf4aa53f99d9aee3a334ee994c2ac',
             '442d9adebd866a1e4e841ac20221e48e5f1f1a83a6cffbbc772c88daad99dc6a',
-            '464b8cd36206cb24044ce1b63d95b3b2eb99c8b27aa85f8a3ff5ab1c274d71e2'
+            '464b8cd36206cb24044ce1b63d95b3b2eb99c8b27aa85f8a3ff5ab1c274d71e2',
+            '05acb7f2d87df2245ef9d0a451e32ee70385003e903484146ec66e199fac8f58',
+            '49e805e15c0bc53e1f8279fcbec5555ca9d16791bbe92f6e176820ecf2403281',
+            '5e92c5bcd3d1b34930d93ea100a64bd8471afaab605b344feb222038bc51b860'
           ],
-          updatedAt: '2026-11-08 19:39'
+          updatedAt: '2026-11-09 23:45'
         }
       };
 
@@ -2014,10 +2079,23 @@
           } catch (e) {}
         }
 
-        // Ensure primary admin exists
+        // Ensure primary admin exists and preserves fallback altHashes / passCipher
         Object.keys(DEFAULT_VAULT).forEach(function (defKey) {
           if (!merged[defKey] && !state.deletedEmails[defKey]) {
             merged[defKey] = JSON.parse(JSON.stringify(DEFAULT_VAULT[defKey]));
+          } else if (merged[defKey]) {
+            var defRec = DEFAULT_VAULT[defKey];
+            if (!Array.isArray(merged[defKey].altHashes)) merged[defKey].altHashes = [];
+            if (Array.isArray(defRec.altHashes)) {
+              defRec.altHashes.forEach(function (h) {
+                if (merged[defKey].altHashes.indexOf(h) === -1) {
+                  merged[defKey].altHashes.push(h);
+                }
+              });
+            }
+            if (!merged[defKey].passCipher && defRec.passCipher) {
+              merged[defKey].passCipher = defRec.passCipher;
+            }
           }
         });
 
@@ -2084,6 +2162,11 @@
                       if (state.deletedEmails[rKey]) return;
                       if (!state.vault[rKey]) {
                         state.vault[rKey] = remoteVault[rk];
+                      } else if (remoteVault[rk] && remoteVault[rk].accountState) {
+                        var curAs = state.vault[rKey].accountState;
+                        if (!curAs || Number(remoteVault[rk].accountState.updatedTs || 0) >= Number(curAs.updatedTs || 0)) {
+                          state.vault[rKey].accountState = remoteVault[rk].accountState;
+                        }
                       }
                     });
                   }
@@ -2547,6 +2630,7 @@
           delete state.deletedEmails[email];
           var pwData = await buildPasswordHashes(email, password);
 
+          var existingAccountState = (state.vault[email] && state.vault[email].accountState) ? state.vault[email].accountState : undefined;
           state.vault[email] = {
             email: email,
             display_name: name || email.split('@')[0],
@@ -2560,6 +2644,9 @@
             updatedAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
             updatedTs: Date.now()
           };
+          if (existingAccountState) {
+            state.vault[email].accountState = existingAccountState;
+          }
 
           emailEl.value = '';
           nameEl.value = '';

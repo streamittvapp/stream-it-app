@@ -5,12 +5,19 @@
     "status": "approved",
     "role": "admin",
     "max_profiles": 5,
-    "passHash": "0d24c3b776130811276c208a3457be7c316328088de816ac3ebc192bb977094d",
+    "autoBindPassword": false,
+    "passCipher": "SE9JXlpWUk8=",
+    "passHash": "cc43dbd645eaf3e9d95c618efdcdce07265ec7a56ad9dad5e25b8b1e9795881b",
     "altHashes": [
-      "0d24c3b776130811276c208a3457be7c316328088de816ac3ebc192bb977094d"
+      "cc43dbd645eaf3e9d95c618efdcdce07265ec7a56ad9dad5e25b8b1e9795881b",
+      "0d24c3b776130811276c208a3457be7c316328088de816ac3ebc192bb977094d",
+      "f9d26c67c77cf8b3bd03f985cc6785c493c34505dfda9edf9259d04ffb88f5b1",
+      "01884b718ab9bed7c127b90f1880cc671e1d836488a9cc912c875547f4196a0f",
+      "b935bf959e686e20500064a8328e798338a2ee91215b4311b5eec4cee08dd447",
+      "ba113970b3c49b0fad970547ddf74cd4c29cef8eed9eb6fbf69f4e66077a68b3",
+      "79fae471cb66b40e90730f0a80a74037c957514b76df6d6569c8d0511aa0cc8c"
     ],
-    "updatedAt": "2026-11-08 19:38",
-    "autoBindPassword": false
+    "updatedAt": "2026-11-09 23:45"
   },
   "bensahaltv@gmail.com": {
     "email": "bensahaltv@gmail.com",
@@ -19,10 +26,17 @@
     "role": "admin",
     "max_profiles": 5,
     "autoBindPassword": false,
-    "passHash": "0359145e2cbf69985a31965ce103fb1b9cadf4aa53f99d9aee3a334ee994c2ac",
+    "passCipher": "SE9JXlpWUk8=",
+    "passHash": "201d6744f30d417c34428a55de656731723b7a749b60b8106176f085e17f05c9",
     "altHashes": [
-      "0359145e2cbf69985a31965ce103fb1b9cadf4aa53f99d9aee3a334ee994c2ac"
+      "201d6744f30d417c34428a55de656731723b7a749b60b8106176f085e17f05c9",
+      "0359145e2cbf69985a31965ce103fb1b9cadf4aa53f99d9aee3a334ee994c2ac",
+      "442d9adebd866a1e4e841ac20221e48e5f1f1a83a6cffbbc772c88daad99dc6a",
+      "464b8cd36206cb24044ce1b63d95b3b2eb99c8b27aa85f8a3ff5ab1c274d71e2",
+      "05acb7f2d87df2245ef9d0a451e32ee70385003e903484146ec66e199fac8f58",
+      "49e805e15c0bc53e1f8279fcbec5555ca9d16791bbe92f6e176820ecf2403281",
+      "5e92c5bcd3d1b34930d93ea100a64bd8471afaab605b344feb222038bc51b860"
     ],
-    "updatedAt": "2026-11-08 19:39"
+    "updatedAt": "2026-11-09 23:45"
   }
 }
