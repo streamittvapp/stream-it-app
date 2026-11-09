@@ -10,10 +10,11 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.6.5';
+  var APP_VERSION = '9.6.6';
   var wasLegacyBooted = Boolean(window.__STREAMIT_V94_BOOTED || window.__STREAMIT_V961_BOOTED);
   window.__STREAMIT_V94_BOOTED = true;
   window.__STREAMIT_V961_BOOTED = true;
+  window.__STREAMIT_V966_BOOTED = true;
 
   // Preserve direct reference to native fetch and freeze any stale in-flight async loops from legacy bundled v9.6.0 APK scripts
   var nativeFetch = window.fetch ? window.fetch.bind(window) : null;
@@ -260,12 +261,12 @@
     youtube: 'יוטיוב (YouTube)'
   };
 
-  // Default Netflix-style Sub-User Profiles ("מי צופה עכשיו?")
+  // Default Netflix-style Sub-User Profiles ("מי צופה עכשיו?") — Matte Dark Cinema Palette (No Neon)
   var DEFAULT_SUB_USERS = [
-    { id: 'prof-main', name: 'ראשי (VIP)', color: '#E50914', isKids: false, isPrimary: true },
-    { id: 'prof-living', name: 'סלון', color: '#2563EB', isKids: false, isPrimary: false },
-    { id: 'prof-bedroom', name: 'חדר שינה', color: '#059669', isKids: false, isPrimary: false },
-    { id: 'prof-kids', name: 'ילדים ונוער', color: '#D97706', isKids: true, isPrimary: false }
+    { id: 'prof-main', name: 'ראשי (VIP)', color: '#b91c1c', isKids: false, isPrimary: true },
+    { id: 'prof-living', name: 'סלון', color: '#334155', isKids: false, isPrimary: false },
+    { id: 'prof-bedroom', name: 'חדר שינה', color: '#3f3f46', isKids: false, isPrimary: false },
+    { id: 'prof-kids', name: 'ילדים ונוער', color: '#475569', isKids: true, isPrimary: false }
   ];
 
   // Official Israeli Theatrical Marketing Titles Dictionary
@@ -1379,6 +1380,22 @@
 
   function ensureProfileParentalConfig(su) {
     if (!su || typeof su !== 'object') return null;
+    // Normalize any legacy neon/bright avatar colors to matte Dark Cinema slate/crimson
+    var legacyColorMap = {
+      '#e50914': '#b91c1c',
+      '#2563eb': '#334155',
+      '#059669': '#3f3f46',
+      '#10b981': '#3f3f46',
+      '#d97706': '#475569',
+      '#7c3aed': '#52525b',
+      '#db2777': '#64748b'
+    };
+    var curCol = String(su.color || '').trim().toLowerCase();
+    if (legacyColorMap[curCol]) {
+      su.color = legacyColorMap[curCol];
+    } else if (!curCol) {
+      su.color = su.isPrimary ? '#b91c1c' : '#334155';
+    }
     var isKids = Boolean(su.isKids);
     if (!su.parentalControl || typeof su.parentalControl !== 'object') {
       su.parentalControl = {
@@ -1447,10 +1464,10 @@
     var primaryName = (state.user && state.user.name) ? state.user.name : 'פרופיל ראשי';
     var maxProf = (state.user && Number(state.user.max_profiles) > 0) ? Number(state.user.max_profiles) : 5;
     var list = [
-      { id: 'prof-main', name: primaryName, color: '#E50914', isKids: false, isPrimary: true },
-      { id: 'prof-living', name: 'סלון', color: '#2563EB', isKids: false, isPrimary: false },
-      { id: 'prof-bedroom', name: 'חדר שינה', color: '#059669', isKids: false, isPrimary: false },
-      { id: 'prof-kids', name: 'ילדים ונוער', color: '#D97706', isKids: true, isPrimary: false }
+      { id: 'prof-main', name: primaryName, color: '#b91c1c', isKids: false, isPrimary: true },
+      { id: 'prof-living', name: 'סלון', color: '#334155', isKids: false, isPrimary: false },
+      { id: 'prof-bedroom', name: 'חדר שינה', color: '#3f3f46', isKids: false, isPrimary: false },
+      { id: 'prof-kids', name: 'ילדים ונוער', color: '#475569', isKids: true, isPrimary: false }
     ];
     var sliced = list.slice(0, Math.max(1, maxProf));
     for (var i = 0; i < sliced.length; i++) {
@@ -2816,12 +2833,22 @@
 
     var tvPlatList = document.getElementById('tvRailPlatformsList');
     if (tvPlatList) {
+      var shortCardLabels = {
+        all: 'הכל',
+        netflix: 'נטפליקס',
+        apple: 'אפל TV+',
+        hbo: 'HBO Max',
+        amazon: 'פריים',
+        disney: 'דיסני+',
+        tpb: '4K YTS',
+        telegram: 'טלגרם'
+      };
       tvPlatList.innerHTML = PROVIDER_FILTERS.map(function (pf) {
         var isAct = state.activeProvider === pf.id;
-        var cleanLabel = String(pf.label || '').replace(/\s*\([^)]*\)/g, '');
+        var cardText = shortCardLabels[pf.id] || String(pf.label || '').replace(/\s*\([^)]*\)/g, '');
         return (
-          '<button type="button" class="tv-rail-item tv-focusable' + (isAct ? ' active' : '') + '" data-tv-provider="' + pf.id + '">' +
-            '<span>' + escapeHtml(cleanLabel) + '</span>' +
+          '<button type="button" class="tv-rail-item tv-rail-platform-card tv-focusable' + (isAct ? ' active' : '') + '" data-tv-provider="' + pf.id + '">' +
+            '<span>' + escapeHtml(cardText) + '</span>' +
           '</button>'
         );
       }).join('');
@@ -6137,7 +6164,8 @@
     var activeProf = getActiveSubUser();
     var pCfg = activeProf ? ensureProfileParentalConfig(activeProf) : null;
     var subEl = document.getElementById('userMenuParentalSub');
-    var tvMoreDescEl = document.getElementById('tvMoreParentalLabel');
+    var tvMoreDescEl = document.getElementById('tvMoreParentalSubLabel') || document.getElementById('tvMoreParentalDesc');
+    var tvMoreTitleEl = document.getElementById('tvMoreParentalLabel');
 
     var protectedCount = 0;
     if (Array.isArray(state.subUsers)) {
@@ -6157,10 +6185,13 @@
       }
     }
 
+    if (tvMoreTitleEl) {
+      tvMoreTitleEl.textContent = 'בקרת הורים וסינון סצנות (SafeWatch)';
+    }
     if (tvMoreDescEl) {
       tvMoreDescEl.textContent = (pCfg && pCfg.enabled)
-        ? ('מופעל (' + countEnabledParentalCategories(pCfg) + ' קטגוריות מסוננות)')
-        : 'סינון סקס, אלימות ושפה בוטה';
+        ? ('מופעל (' + countEnabledParentalCategories(pCfg) + ' קטגוריות מסוננות) • ניהול ראשי ותתי-יוזרים')
+        : 'דילוג אוטומטי על סקס, אלימות, שפה בוטה וסמים לפי פרופיל';
     }
   }
 
@@ -6184,7 +6215,7 @@
       var segCount = (state.activeSkipSegments && state.activeSkipSegments.length) ? state.activeSkipSegments.length : 0;
       var skippedCount = state.parentalSkippedCountThisSession || 0;
       if (isEn) {
-        statusBox.textContent = '🛡️ פרופיל "' + profName + '" מוגן • זוהו ' + segCount + ' קטעים לסינון' + (skippedCount > 0 ? (' (דולגו ' + skippedCount + ')') : '');
+        statusBox.textContent = 'פרופיל "' + profName + '" מוגן • זוהו ' + segCount + ' קטעים לסינון' + (skippedCount > 0 ? (' (דולגו ' + skippedCount + ')') : '');
       } else {
         statusBox.textContent = 'פרופיל "' + profName + '" — סינון כבוי כעת (לחץ להפעלה מיידית)';
       }
@@ -6193,12 +6224,12 @@
     var quickContainer = document.getElementById('playerParentalQuickToggles');
     if (quickContainer && pCfg) {
       var catDefs = [
-        { key: 'master', label: isEn ? '🛡️ סינון SafeWatch: פעיל' : '⚪ סינון SafeWatch: כבוי', active: isEn },
-        { key: 'sex', label: '🔞 סקס, מיניות ועירום', active: isEn && Boolean(pCfg.categories.sex) },
-        { key: 'violence', label: '🩸 אלימות קשה ודם', active: isEn && Boolean(pCfg.categories.violence) },
-        { key: 'profanity', label: '🤬 שפה בוטה וקללות', active: isEn && Boolean(pCfg.categories.profanity) },
-        { key: 'drugs', label: '💊 סמים ואלכוהול', active: isEn && Boolean(pCfg.categories.drugs) },
-        { key: 'horror', label: '👻 אימה ופחד', active: isEn && Boolean(pCfg.categories.horror) }
+        { key: 'master', label: isEn ? 'סינון SafeWatch: פעיל' : 'סינון SafeWatch: כבוי', active: isEn },
+        { key: 'sex', label: 'סקס, מיניות ועירום', active: isEn && Boolean(pCfg.categories.sex) },
+        { key: 'violence', label: 'אלימות קשה ודם', active: isEn && Boolean(pCfg.categories.violence) },
+        { key: 'profanity', label: 'שפה בוטה וקללות', active: isEn && Boolean(pCfg.categories.profanity) },
+        { key: 'drugs', label: 'סמים ואלכוהול', active: isEn && Boolean(pCfg.categories.drugs) },
+        { key: 'horror', label: 'אימה ופחד', active: isEn && Boolean(pCfg.categories.horror) }
       ];
       var html = '';
       for (var i = 0; i < catDefs.length; i++) {
@@ -6284,14 +6315,14 @@
         var roleTag = su.isPrimary ? 'משתמש ראשי (מנהל)' : (su.isKids ? 'תת-יוזר • ילדים' : 'תת-יוזר');
         if (isCurrentViewer) roleTag += ' • צופה כעת';
         var shieldBadge = suCfg.enabled
-          ? ('🛡️ מוגן (' + countEnabledParentalCategories(suCfg) + ')')
+          ? ('פעיל (' + countEnabledParentalCategories(suCfg) + ')')
           : 'ללא סינון';
 
         tabsHtml +=
           '<button type="button" role="tab" aria-selected="' + (isSel ? 'true' : 'false') + '" ' +
             'class="parental-profile-tab tv-focusable' + (isSel ? ' active' : '') + (suCfg.enabled ? ' is-protected' : '') + '" ' +
             'data-parental-profile-tab="' + escapeHtml(su.id) + '">' +
-            '<span class="parental-prof-avatar" style="background:' + escapeHtml(su.color || '#E50914') + '">' + escapeHtml(initial) + '</span>' +
+            '<span class="parental-prof-avatar" style="background:' + escapeHtml(su.color || '#334155') + '">' + escapeHtml(initial) + '</span>' +
             '<span class="parental-prof-info">' +
               '<span class="parental-prof-name">' + escapeHtml(su.name) + '</span>' +
               '<span class="parental-prof-role">' + escapeHtml(roleTag) + '</span>' +
@@ -7595,10 +7626,10 @@
     }
 
     var secTogglePairs = [
-      { btn: 'tvRailSecCategoriesBtn', list: 'tvRailCategoriesList' },
-      { btn: 'tvRailSecPlatformsBtn', list: 'tvRailPlatformsList' },
-      { btn: 'tvRailSecYearsBtn', list: 'tvRailYearsList' },
-      { btn: 'tvRailSecActorsBtn', list: 'tvRailActorsList' }
+      { btn: 'tvRailSecCategoriesBtn', list: 'tvRailCategoriesList', isAccordion: true },
+      { btn: 'tvRailSecYearsBtn', list: 'tvRailYearsList', isAccordion: true },
+      { btn: 'tvRailSecActorsBtn', list: 'tvRailActorsList', isAccordion: true },
+      { btn: 'tvRailSecPlatformsBtn', list: 'tvRailPlatformsList', isAccordion: false }
     ];
     secTogglePairs.forEach(function (pair) {
       var bEl = document.getElementById(pair.btn);
@@ -7607,20 +7638,30 @@
         bEl.addEventListener('click', function (e) {
           e.stopPropagation();
           var willOpen = !lEl.classList.contains('open');
-          // Soft Accordion: close all other sections smoothly when opening one
-          secTogglePairs.forEach(function (other) {
-            var ob = document.getElementById(other.btn);
-            var ol = document.getElementById(other.list);
-            if (ob && ol) {
-              var openNow = (other.btn === pair.btn) ? willOpen : false;
-              ol.classList.toggle('open', openNow);
-              ol.classList.remove('hidden');
-              ob.classList.toggle('open', openNow);
-              ob.setAttribute('aria-expanded', openNow ? 'true' : 'false');
-              var arr = ob.querySelector('.tv-rail-sec-arrow');
-              if (arr) arr.textContent = openNow ? '▾' : '◂';
-            }
-          });
+          if (pair.isAccordion) {
+            // Soft Accordion for top sections (Categories, Years, Actors), while keeping Platforms 2-column grid open below
+            secTogglePairs.forEach(function (other) {
+              if (!other.isAccordion) return;
+              var ob = document.getElementById(other.btn);
+              var ol = document.getElementById(other.list);
+              if (ob && ol) {
+                var openNow = (other.btn === pair.btn) ? willOpen : false;
+                ol.classList.toggle('open', openNow);
+                ol.classList.remove('hidden');
+                ob.classList.toggle('open', openNow);
+                ob.setAttribute('aria-expanded', openNow ? 'true' : 'false');
+                var arr = ob.querySelector('.tv-rail-sec-arrow');
+                if (arr) arr.textContent = openNow ? '▾' : '◂';
+              }
+            });
+          } else {
+            lEl.classList.toggle('open', willOpen);
+            lEl.classList.remove('hidden');
+            bEl.classList.toggle('open', willOpen);
+            bEl.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+            var arrP = bEl.querySelector('.tv-rail-sec-arrow');
+            if (arrP) arrP.textContent = willOpen ? '▾' : '◂';
+          }
         });
       }
     });
@@ -7643,6 +7684,40 @@
     var tvRailSettingsBtn = document.getElementById('tvRailSettingsBtn');
     var tvMoreModal = document.getElementById('tvMoreModal');
     var closeTvMoreModalBtn = document.getElementById('closeTvMoreModalBtn');
+    var switchTvMoreTab = function (tabName) {
+      var targetTab = tabName === 'actors' ? 'actors' : 'settings';
+      var settingsBtn = document.getElementById('tvMoreTabSettingsBtn');
+      var actorsBtn = document.getElementById('tvMoreTabActorsBtn');
+      var settingsPanel = document.getElementById('tvMoreTabSettingsPanel');
+      var actorsPanel = document.getElementById('tvMoreTabActorsPanel');
+      if (settingsBtn) {
+        settingsBtn.classList.toggle('active', targetTab === 'settings');
+        settingsBtn.setAttribute('aria-selected', targetTab === 'settings' ? 'true' : 'false');
+      }
+      if (actorsBtn) {
+        actorsBtn.classList.toggle('active', targetTab === 'actors');
+        actorsBtn.setAttribute('aria-selected', targetTab === 'actors' ? 'true' : 'false');
+      }
+      if (settingsPanel) {
+        settingsPanel.classList.toggle('hidden', targetTab !== 'settings');
+      }
+      if (actorsPanel) {
+        actorsPanel.classList.toggle('hidden', targetTab !== 'actors');
+      }
+      if (targetTab === 'actors') {
+        renderActorFilterStrip();
+      }
+    };
+    window.switchTvMoreTab = switchTvMoreTab;
+
+    var moreTabBtns = document.querySelectorAll('#tvMoreModal [data-more-tab]');
+    for (var mt = 0; mt < moreTabBtns.length; mt++) {
+      moreTabBtns[mt].addEventListener('click', function () {
+        var tName = this.getAttribute('data-more-tab') || 'settings';
+        switchTvMoreTab(tName);
+      });
+    }
+
     var closeTvMoreModal = function (restoreFocusToRail) {
       if (tvMoreModal) tvMoreModal.classList.add('hidden');
       var targetBtn = tvRailSettingsBtn || tvMoreRailBtn;
@@ -7653,9 +7728,11 @@
     var openTvSettingsDrawer = function (e) {
       if (e) e.stopPropagation();
       if (!tvMoreModal) return;
+      switchTvMoreTab('settings');
       renderActorFilterStrip();
+      updateUserMenuParentalSummary();
       tvMoreModal.classList.remove('hidden');
-      var firstMoreAction = tvMoreModal.querySelector('.tv-more-action-card');
+      var firstMoreAction = document.getElementById('tvMoreProfilesBtn') || tvMoreModal.querySelector('.tv-more-action-card');
       if (firstMoreAction && typeof window.streamItFocusElement === 'function') {
         window.streamItFocusElement(firstMoreAction, { scroll: false });
       }
@@ -7743,9 +7820,9 @@
           subOverlay.classList.remove('sub-size-normal', 'sub-size-large', 'sub-size-xlarge');
           subOverlay.classList.add('sub-size-' + state.subtitleSize);
         }
-        var subsDesc = document.getElementById('tvMoreSubsDesc');
+        var subsDesc = document.getElementById('tvMoreSubsLabel') || document.getElementById('tvMoreSubsDesc');
         if (subsDesc) {
-          subsDesc.textContent = 'עברית (' + (labels[state.subtitleSize] || 'ענק') + ')';
+          subsDesc.textContent = 'כתוביות: עברית (' + (labels[state.subtitleSize] || 'ענק') + ')';
         }
         showCinemaToast('גודל כתוביות עודכן ל: עברית (' + (labels[state.subtitleSize] || 'ענק') + ')');
       });
@@ -8739,7 +8816,7 @@
         var nameIn = document.getElementById('newSubUserNameInput');
         var nameVal = nameIn && nameIn.value ? nameIn.value.trim() : '';
         if (!nameVal) return;
-        var colors = ['#E50914', '#2563EB', '#059669', '#D97706', '#7C3AED', '#DB2777'];
+        var colors = ['#b91c1c', '#334155', '#3f3f46', '#475569', '#52525b', '#1e293b'];
         var newId = 'prof-' + Date.now();
         var newSuObj = {
           id: newId,
@@ -9699,7 +9776,7 @@
       mainNavEl.appendChild(clockSpan);
     }
 
-    // Ensure #tvSideRail has the 2.5x Expanded Streamer Right Menu with Soft Accordion (collapsed by default)
+    // Ensure #tvSideRail has the Streamer Right Menu with Soft Accordion + Open 2-Column Platforms Grid at bottom
     var tvSideRailEl = document.getElementById('tvSideRail');
     if (tvSideRailEl) {
       tvSideRailEl.innerHTML =
@@ -9718,10 +9795,6 @@
             '<button type="button" id="tvRailSecCategoriesBtn" class="tv-rail-sec-header tv-focusable" aria-expanded="false"><span>קטגוריות</span><span class="tv-rail-sec-arrow">◂</span></button>' +
             '<div id="tvRailCategoriesList" class="tv-rail-sec-list"></div>' +
           '</div>' +
-          '<div class="tv-rail-section" data-rail-section="platforms">' +
-            '<button type="button" id="tvRailSecPlatformsBtn" class="tv-rail-sec-header tv-focusable" aria-expanded="false"><span>פלטפורמות</span><span class="tv-rail-sec-arrow">◂</span></button>' +
-            '<div id="tvRailPlatformsList" class="tv-rail-sec-list"></div>' +
-          '</div>' +
           '<div class="tv-rail-section" data-rail-section="years">' +
             '<button type="button" id="tvRailSecYearsBtn" class="tv-rail-sec-header tv-focusable" aria-expanded="false"><span>לפי שנה</span><span class="tv-rail-sec-arrow">◂</span></button>' +
             '<div id="tvRailYearsList" class="tv-rail-sec-list"></div>' +
@@ -9730,6 +9803,10 @@
             '<button type="button" id="tvRailSecActorsBtn" class="tv-rail-sec-header tv-focusable" aria-expanded="false"><span>שחקנים</span><span class="tv-rail-sec-arrow">◂</span></button>' +
             '<div id="tvRailActorsList" class="tv-rail-sec-list"></div>' +
           '</div>' +
+          '<div class="tv-rail-section tv-rail-platforms-section" data-rail-section="platforms">' +
+            '<button type="button" id="tvRailSecPlatformsBtn" class="tv-rail-sec-header open tv-focusable" aria-expanded="true"><span>פלטפורמות</span><span class="tv-rail-sec-arrow">▾</span></button>' +
+            '<div id="tvRailPlatformsList" class="tv-rail-sec-list tv-rail-platforms-grid open"></div>' +
+          '</div>' +
         '</div>' +
         '<div id="tvRailBottomBar" class="tv-rail-bottom-bar">' +
           '<button type="button" id="tvRailProfileBtn" class="tv-rail-bottom-btn tv-rail-profile-btn tv-focusable" aria-label="פרופיל משתמש">' +
@@ -9737,72 +9814,88 @@
             '<span id="tvRailProfileName" class="tv-rail-profile-name">ראשי</span>' +
           '</button>' +
           '<button type="button" id="tvRailSettingsBtn" class="tv-rail-bottom-btn tv-rail-settings-btn tv-focusable" aria-label="הגדרות">' +
-            '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>' +
+            '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>' +
           '</button>' +
         '</div>';
     }
 
-    // Ensure #tvMoreModal exists in document.body on older APK DOMs
-    if (!document.getElementById('tvMoreModal')) {
-      var moreMod = document.createElement('div');
+    // Ensure #tvMoreModal exists and uses the v9.6.6 Tabbed Settings & Actors Center layout
+    if (!document.getElementById('tvMoreModal') || !document.getElementById('tvMoreTabSettingsBtn')) {
+      var moreMod = document.getElementById('tvMoreModal') || document.createElement('div');
       moreMod.id = 'tvMoreModal';
       moreMod.className = 'modal-overlay hidden';
       moreMod.setAttribute('role', 'dialog');
       moreMod.setAttribute('aria-modal', 'true');
       moreMod.setAttribute('aria-labelledby', 'tvMoreModalHeading');
       moreMod.innerHTML =
-        '<div class="tv-more-modal-card">' +
-          '<div class="tv-more-header">' +
+        '<div class="auth-modal-card tv-more-modal-card">' +
+          '<div class="auth-card-header">' +
             '<div>' +
-              '<h2 id="tvMoreModalHeading" class="tv-more-title">עוד אפשרויות וסינון מתקדם</h2>' +
-              '<p class="tv-more-sub">חיפוש וגלריית שחקנים, ערוצי טלגרם VOD, YouTube, פרופילים והגדרות</p>' +
+              '<h2 id="tvMoreModalHeading" class="auth-heading">מרכז הגדרות, פרופילים וניהול מערכת</h2>' +
+              '<p class="tg-modal-sub">ניהול משתמשים, בקרת הורים (SafeWatch), ערוצי טלגרם VOD, כתוביות וחיפוש שחקנים</p>' +
             '</div>' +
-            '<button type="button" id="closeTvMoreModalBtn" class="modal-close-btn tv-focusable" aria-label="סגור תפריט עוד">' +
+            '<button type="button" id="closeTvMoreModalBtn" class="modal-close-btn tv-focusable" aria-label="סגור חלון הגדרות">' +
               '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12" /></svg>' +
             '</button>' +
           '</div>' +
-          '<div class="tv-more-actions-grid">' +
-            '<button type="button" id="tvMoreProfilesBtn" class="tv-more-action-card tv-focusable">' +
-              '<span class="tv-more-action-icon">👤</span>' +
-              '<span class="tv-more-action-text"><span class="tv-more-action-title">פרופילים ומשתמשים</span><span class="tv-more-action-desc">החלפת פרופיל צפייה או חשבון</span></span>' +
+          '<div class="tv-more-tabs-bar" role="tablist" aria-label="כרטיסיות מרכז הגדרות">' +
+            '<button type="button" id="tvMoreTabSettingsBtn" class="tv-more-tab-btn active tv-focusable" data-more-tab="settings" role="tab" aria-selected="true">' +
+              '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>' +
+              '<span>הגדרות, פרופילים וניהול</span>' +
             '</button>' +
-            '<button type="button" id="tvMoreParentalBtn" class="tv-more-action-card tv-focusable">' +
-              '<span class="tv-more-action-icon">🛡️</span>' +
-              '<span class="tv-more-action-text"><span class="tv-more-action-title">בקרת הורים (SafeWatch)</span><span id="tvMoreParentalLabel" class="tv-more-action-desc">סינון סקס, אלימות ושפה בוטה</span></span>' +
-            '</button>' +
-            '<button type="button" id="tvMoreTelegramCatBtn" class="tv-more-action-card tv-focusable">' +
-              '<span class="tv-more-action-icon">✈️</span>' +
-              '<span class="tv-more-action-text"><span class="tv-more-action-title">קטלוג טלגרם VOD</span><span class="tv-more-action-desc">סרטים וסדרות שנשאבו מטלגרם</span></span>' +
-            '</button>' +
-            '<button type="button" id="tvMoreTelegramHubBtn" class="tv-more-action-card tv-focusable">' +
-              '<span class="tv-more-action-icon">➕</span>' +
-              '<span class="tv-more-action-text"><span class="tv-more-action-title">ניהול ערוצי טלגרם</span><span class="tv-more-action-desc">הוספה וחיבור ערוצים חדשים</span></span>' +
-            '</button>' +
-            '<button type="button" id="tvMoreYoutubeBtn" class="tv-more-action-card tv-focusable">' +
-              '<span class="tv-more-action-icon">▶️</span>' +
-              '<span class="tv-more-action-text"><span class="tv-more-action-title">מרכז YouTube</span><span class="tv-more-action-desc">הופעות, טריילרים ומוזיקה</span></span>' +
-            '</button>' +
-            '<button type="button" id="tvMoreSubsBtn" class="tv-more-action-card tv-focusable">' +
-              '<span class="tv-more-action-icon">💬</span>' +
-              '<span class="tv-more-action-text"><span class="tv-more-action-title">גודל כתוביות</span><span id="tvMoreSubsDesc" class="tv-more-action-desc">עברית (ענק)</span></span>' +
-            '</button>' +
-            '<button type="button" id="tvMoreRefreshBtn" class="tv-more-action-card tv-focusable">' +
-              '<span class="tv-more-action-icon">🔄</span>' +
-              '<span class="tv-more-action-text"><span class="tv-more-action-title">רענון קטלוג וענן</span><span class="tv-more-action-desc">סנכרון מיידי של כל המקורות</span></span>' +
+            '<button type="button" id="tvMoreTabActorsBtn" class="tv-more-tab-btn tv-focusable" data-more-tab="actors" role="tab" aria-selected="false">' +
+              '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>' +
+              '<span>חיפוש וגלריית שחקנים</span>' +
             '</button>' +
           '</div>' +
-          '<div class="tv-more-actors-section">' +
-            '<div class="tv-more-actors-header">' +
-              '<h3 class="tv-more-section-title">שחקנים וכוכבי קולנוע</h3>' +
-              '<div class="tv-more-actor-search">' +
-                '<input type="text" id="tvMoreActorSearchInput" class="tv-more-actor-input tv-focusable" placeholder="חפש שחקן (למשל: ברוס ויליס, גל גדות)..." aria-label="חפש שחקן או שחקנית" autocomplete="off" />' +
-                '<button type="button" id="tvMoreActorSearchBtn" class="tv-more-actor-btn tv-focusable">חפש</button>' +
-              '</div>' +
+          '<div id="tvMoreTabSettingsPanel" class="tv-more-tab-panel">' +
+            '<div class="tv-more-actions-grid">' +
+              '<button type="button" id="tvMoreProfilesBtn" class="tv-more-action-card tv-focusable">' +
+                '<span class="tv-more-icon"><svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg></span>' +
+                '<div class="tv-more-text"><strong>מי צופה עכשיו? (פרופילים ויוזרים)</strong><span>החלפת פרופיל פעיל, הוספת תת-יוזר וניהול מנויים</span></div>' +
+              '</button>' +
+              '<button type="button" id="tvMoreParentalBtn" class="tv-more-action-card tv-more-parental-card tv-focusable">' +
+                '<span class="tv-more-icon"><svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="M9 12l2 2 4-4" /></svg></span>' +
+                '<div class="tv-more-text"><strong id="tvMoreParentalLabel">בקרת הורים וסינון סצנות (SafeWatch)</strong><span id="tvMoreParentalSubLabel">דילוג אוטומטי על סקס, אלימות, שפה בוטה וסמים לפי פרופיל</span></div>' +
+              '</button>' +
+              '<button type="button" id="tvMoreTelegramCatBtn" class="tv-more-action-card tv-focusable">' +
+                '<span class="tv-more-icon"><svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M22 2L11 13" /><path d="M22 2L15 22l-4-9-9-4 20-7z" /></svg></span>' +
+                '<div class="tv-more-text"><strong>קטלוג טלגרם VOD</strong><span>הצג את כל הסרטים והסדרות שנשאבו מערוצי הטלגרם</span></div>' +
+              '</button>' +
+              '<button type="button" id="tvMoreTelegramHubBtn" class="tv-more-action-card tv-focusable">' +
+                '<span class="tv-more-icon"><svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg></span>' +
+                '<div class="tv-more-text"><strong>חיבור וניהול ערוצי טלגרם</strong><span>הוספת ערוצים ציבוריים חדשים וסנכרון תוכן מיידי</span></div>' +
+              '</button>' +
+              '<button type="button" id="tvMoreSubsBtn" class="tv-more-action-card tv-focusable">' +
+                '<span class="tv-more-icon"><svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="0" /><path d="M6 12h4M12 12h6M6 16h8M16 16h2" /></svg></span>' +
+                '<div class="tv-more-text"><strong id="tvMoreSubsLabel">כתוביות: עברית (ענק)</strong><span>החלף שפת כתוביות ברירת מחדל (עברית / אנגלית / כבוי)</span></div>' +
+              '</button>' +
+              '<button type="button" id="tvMoreYoutubeBtn" class="tv-more-action-card tv-focusable">' +
+                '<span class="tv-more-icon"><svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="0" /><path d="M10 9l5 3-5 3V9z" /></svg></span>' +
+                '<div class="tv-more-text"><strong>יוטיוב וטריילרים</strong><span>עבור למסך הטריילרים ותכני הווידאו מיוטיוב</span></div>' +
+              '</button>' +
+              '<button type="button" id="tvMoreRefreshBtn" class="tv-more-action-card tv-focusable">' +
+                '<span class="tv-more-icon"><svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M23 4v6h-6M1 20v-6h6" /><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" /></svg></span>' +
+                '<div class="tv-more-text"><strong>סנכרון ורענון קטלוג</strong><span>משיכת תכנים חדשים, עדכון פוסטרים ובדיקת גרסה</span></div>' +
+              '</button>' +
             '</div>' +
-            '<div id="tvMoreActorsGrid" class="tv-more-actors-grid"></div>' +
+          '</div>' +
+          '<div id="tvMoreTabActorsPanel" class="tv-more-tab-panel hidden">' +
+            '<div class="tv-more-actors-section">' +
+              '<div class="tv-more-actors-header">' +
+                '<h3 class="sub-users-heading">שחקנים ופילמוגרפיה (בחר שחקן מהרשימה או חפש לפי שם)</h3>' +
+                '<div class="tv-more-actor-search-bar">' +
+                  '<input type="text" id="tvMoreActorSearchInput" class="form-input tv-more-actor-input tv-focusable" dir="rtl" placeholder="חפש שחקן (למשל: ברוס ויליס, גל גדות)..." aria-label="חפש שחקן או שחקנית" autocomplete="off" />' +
+                  '<button type="button" id="tvMoreActorSearchBtn" class="btn-primary tv-more-actor-btn tv-focusable">חפש שחקן</button>' +
+                '</div>' +
+              '</div>' +
+              '<div id="tvMoreActorsGrid" class="actor-photo-grid tv-more-actors-grid"></div>' +
+            '</div>' +
           '</div>' +
         '</div>';
-      document.body.appendChild(moreMod);
+      if (!moreMod.parentNode) {
+        document.body.appendChild(moreMod);
+      }
     }
 
     // Ensure SafeWatch Parental Control buttons & overlays exist even on pre-existing v9.4+ DOMs

@@ -1,9 +1,9 @@
 {
-  "version": "9.6.5",
+  "version": "9.6.6",
   "native_apk_version": "9.6.0",
   "apk_download_url": "https://streamittvapp.github.io/stream-it-app/StreamIt-AndroidTV.apk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-09T19:45:00Z",
-  "notes": "v9.6.5 — SafeWatch AI Parental Control & Automatic Scene-Skipping System: Manage Main User & Sub-Users from User Settings, Profile Manager, TV Settings, or In-Player HUD; per-profile category filtering (Sex/Nudity, Violence/Gore, Profanity, Drugs, Horror); Auto-Skip or Blur+Mute shield; real-time Hebrew/English profanity audio mute & subtitle censoring; optional 4-digit PIN lock."
+  "updated_at": "2026-11-09T20:40:00Z",
+  "notes": "v9.6.6 — Matte Dark Cinema UI Overhaul: Sharp-edged Tabbed Settings & Actor Hub, redesigned SafeWatch Parental Control & Profile Cards (zero rounded corners, zero neon colors), larger global & keyboard typography, 2-column open Platforms cards in Side Rail, 6-column movie/series grid, and prominent animated tile focus."
 }

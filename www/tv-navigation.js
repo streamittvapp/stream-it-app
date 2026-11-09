@@ -1032,6 +1032,14 @@
           return true;
         }
         if (direction === 'up') {
+          var openPlatList = document.getElementById('tvRailPlatformsList');
+          if (openPlatList && openPlatList.classList.contains('open')) {
+            var pCardsUp = Array.prototype.slice.call(openPlatList.querySelectorAll('.tv-rail-platform-card')).filter(isElementVisible);
+            if (pCardsUp.length >= 2) {
+              var targetCard = (currentFocused === railSettingsBtn) ? pCardsUp[pCardsUp.length - 1] : pCardsUp[pCardsUp.length - 2];
+              return setFocus(targetCard);
+            }
+          }
           if (railListItems.length) return setFocus(railListItems[railListItems.length - 1]);
           if (railSearchBtn && isElementVisible(railSearchBtn)) return setFocus(railSearchBtn, { scroll: false });
           return true;
@@ -1039,7 +1047,51 @@
         return true;
       }
 
-      // A4. Scrollable Accordion Headers & Open Section Items (#tvRailListsScroll)
+      // A4. Scrollable Accordion Headers & Open Section Items (#tvRailListsScroll + 2-Column Platforms Grid)
+      var platGridEl = document.getElementById('tvRailPlatformsList');
+      if (platGridEl && platGridEl.classList.contains('open') && platGridEl.contains(currentFocused)) {
+        var platCards = Array.prototype.slice.call(platGridEl.querySelectorAll('.tv-rail-platform-card')).filter(isElementVisible);
+        var pIdx = platCards.indexOf(currentFocused);
+        if (pIdx !== -1) {
+          var isRightCol = (pIdx % 2 === 0);
+          if (direction === 'left') {
+            if (isRightCol && pIdx + 1 < platCards.length) {
+              return setFocus(platCards[pIdx + 1], { scroll: false });
+            }
+            return focusMainStageFromRail();
+          }
+          if (direction === 'right') {
+            if (!isRightCol && pIdx - 1 >= 0) {
+              return setFocus(platCards[pIdx - 1], { scroll: false });
+            }
+            return true;
+          }
+          if (direction === 'down') {
+            if (pIdx + 2 < platCards.length) {
+              return setFocus(platCards[pIdx + 2]);
+            }
+            if (!isRightCol && railSettingsBtn && isElementVisible(railSettingsBtn)) {
+              return setFocus(railSettingsBtn, { scroll: false });
+            }
+            if (railProfileBtn && isElementVisible(railProfileBtn)) {
+              return setFocus(railProfileBtn, { scroll: false });
+            }
+            return true;
+          }
+          if (direction === 'up') {
+            if (pIdx - 2 >= 0) {
+              return setFocus(platCards[pIdx - 2]);
+            }
+            var platHeaderBtn = document.getElementById('tvRailSecPlatformsBtn');
+            if (platHeaderBtn && isElementVisible(platHeaderBtn)) {
+              return setFocus(platHeaderBtn);
+            }
+            return true;
+          }
+          return true;
+        }
+      }
+
       var lIdx = railListItems.indexOf(currentFocused);
       if (lIdx !== -1) {
         if (direction === 'down') {
