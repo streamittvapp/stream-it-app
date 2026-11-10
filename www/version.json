@@ -1,9 +1,9 @@
 {
-  "version": "9.7.0",
+  "version": "9.7.1",
   "native_apk_version": "9.6.0",
   "apk_download_url": "https://streamittvapp.github.io/stream-it-app/StreamIt-AndroidTV.apk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-10T08:05:00Z",
-  "notes": "v9.7.0 — Clean Login Form (No Quick-Access Buttons), Full Desktop Keyboard & Mouse Typing Support, Deterministic Remote D-Pad Down Navigation to Submit Button, Instant Cloud Account Verification, and Legacy APK v9.6.0 Dual-Boot Guard."
+  "updated_at": "2026-11-10T12:10:00Z",
+  "notes": "v9.7.1 — Exact Account Password Mapping (bensahaltv@gmail.com -> b0544656510, streamittvapp@gmail.com -> 332905), Zero Placeholders & Zero Quick Buttons on Login Forms, and Phone QR Code Quick-Login Pairing."
 }

@@ -1713,6 +1713,8 @@
     if (emailIn) {
       emailIn.removeAttribute('readonly');
       emailIn.removeAttribute('disabled');
+      emailIn.removeAttribute('placeholder');
+      emailIn.placeholder = '';
       emailIn.classList.add('tv-focusable');
     }
 
@@ -1720,6 +1722,8 @@
     if (passIn) {
       passIn.removeAttribute('readonly');
       passIn.removeAttribute('disabled');
+      passIn.removeAttribute('placeholder');
+      passIn.placeholder = '';
       passIn.classList.add('tv-focusable');
     }
 
@@ -1727,6 +1731,32 @@
     if (subBtn) {
       subBtn.removeAttribute('disabled');
       subBtn.classList.add('tv-focusable');
+    }
+
+    var authForm = document.getElementById('authForm');
+    if (authForm && !document.getElementById('qrMobileApproveBanner')) {
+      var banner = document.createElement('div');
+      banner.id = 'qrMobileApproveBanner';
+      banner.className = 'qr-mobile-approve-banner hidden';
+      banner.innerHTML =
+        '<div class="qr-mobile-approve-badge">📱 חיבור מהיר של מסך באמצעות QR</div>' +
+        '<p id="qrMobileApproveDesc" class="qr-mobile-approve-desc">הזן את פרטי המנוי שלך בטלפון ולחץ על <strong>"התחבר לחשבון"</strong> כדי לחבר את המסך שסרקת באופן אוטומטי.</p>';
+      authForm.insertBefore(banner, authForm.firstChild);
+    }
+    if (authForm && !document.getElementById('authQrPairBox')) {
+      var qrBox = document.createElement('div');
+      qrBox.id = 'authQrPairBox';
+      qrBox.className = 'auth-qr-pair-box';
+      qrBox.innerHTML =
+        '<div class="auth-qr-img-wrap">' +
+          '<img id="authQrCodeImg" class="auth-qr-img" src="" alt="קוד QR להתחברות מהירה מהטלפון" />' +
+        '</div>' +
+        '<div class="auth-qr-info">' +
+          '<div class="auth-qr-title">התחברות מהירה באמצעות QR מהטלפון</div>' +
+          '<p class="auth-qr-sub">סרוק את קוד ה-QR עם מצלמת הטלפון והתחבר מהנייד — המסך יתחבר אוטומטית תוך שניות.</p>' +
+          '<div class="auth-qr-code-pill">קוד צימוד מסך: <strong id="authQrPairCodeLabel" dir="ltr">----</strong></div>' +
+        '</div>';
+      authForm.appendChild(qrBox);
     }
   }
 

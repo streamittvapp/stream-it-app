@@ -10,14 +10,15 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.7.0';
-  window.__STREAMIT_V970_BOOTED = true;
+  var APP_VERSION = '9.7.1';
+  window.__STREAMIT_V971_BOOTED = true;
   var wasLegacyBooted = Boolean(
     window.__STREAMIT_V94_BOOTED ||
     window.__STREAMIT_V95_BOOTED ||
     window.__STREAMIT_V960_BOOTED ||
     window.__STREAMIT_V961_BOOTED ||
-    window.__STREAMIT_V965_BOOTED
+    window.__STREAMIT_V965_BOOTED ||
+    window.__STREAMIT_V970_BOOTED
   );
   window.__STREAMIT_V94_BOOTED = true;
   window.__STREAMIT_V95_BOOTED = true;
@@ -31,6 +32,7 @@
   window.__STREAMIT_V967_BOOTED = true;
   window.__STREAMIT_V968_BOOTED = true;
   window.__STREAMIT_V969_BOOTED = true;
+  window.__STREAMIT_V970_BOOTED = true;
 
   // Preserve direct reference to native fetch and freeze any stale in-flight async loops from legacy bundled v9.6.0 APK scripts
   var nativeFetch = window.fetch ? window.fetch.bind(window) : null;
@@ -8198,13 +8200,20 @@
       var passIn = document.getElementById('authPasswordInput');
       if (emailIn) {
         emailIn.removeAttribute('readonly');
+        emailIn.removeAttribute('placeholder');
+        emailIn.placeholder = '';
         emailIn.readOnly = false;
         emailIn.disabled = false;
       }
       if (passIn) {
         passIn.removeAttribute('readonly');
+        passIn.removeAttribute('placeholder');
+        passIn.placeholder = '';
         passIn.readOnly = false;
         passIn.disabled = false;
+      }
+      if (typeof window.initStreamItQrPairing === 'function') {
+        window.initStreamItQrPairing();
       }
       if (emailIn && typeof window.streamItFocusElement === 'function') {
         setTimeout(function () {
@@ -10087,20 +10096,6 @@
       }
 
       var defaultVault = {
-        'streamittvapp@gmail.com': {
-          email: 'streamittvapp@gmail.com',
-          display_name: 'מנהל ראשי (VIP / משפחתי)',
-          status: 'approved',
-          role: 'admin',
-          max_profiles: 5,
-          passCipher: 'WQsODw8NDg0OCgs=',
-          passHash: '6d3f56d012335b0679ff7c8d4c4c46172b2d48262999bb6189a6eb5bad134d19',
-          altHashes: [
-            '6d3f56d012335b0679ff7c8d4c4c46172b2d48262999bb6189a6eb5bad134d19'
-          ],
-          updatedAt: '2026-11-10 08:00',
-          updatedTs: 1794290400000
-        },
         'bensahaltv@gmail.com': {
           email: 'bensahaltv@gmail.com',
           display_name: 'BENSAHAL TV',
@@ -10108,35 +10103,71 @@
           role: 'admin',
           max_profiles: 5,
           autoBindPassword: false,
-          passCipher: 'CAgJAgsO',
-          passHash: '88047cd74e5b035155e7a09ec61801901db6e4051402a2f213b00a1fa0582de4',
+          passCipher: 'WQsODw8NDg0OCgs=',
+          passHash: '0359145e2cbf69985a31965ce103fb1b9cadf4aa53f99d9aee3a334ee994c2ac',
           altHashes: [
-            '88047cd74e5b035155e7a09ec61801901db6e4051402a2f213b00a1fa0582de4'
+            '0359145e2cbf69985a31965ce103fb1b9cadf4aa53f99d9aee3a334ee994c2ac',
+            '5e0a1913f2de62496ec8b78568f014b87f4705911cdc968af8a96ba646898e4d'
           ],
-          updatedAt: '2026-11-10 08:00',
-          updatedTs: 1794290400000
+          updatedAt: '2026-11-10 12:02',
+          updatedTs: 1794304920000
+        },
+        'streamittvapp@gmail.com': {
+          email: 'streamittvapp@gmail.com',
+          display_name: 'STREAM IT VIP',
+          status: 'approved',
+          role: 'admin',
+          max_profiles: 5,
+          autoBindPassword: false,
+          passCipher: 'CAgJAgsO',
+          passHash: '0d24c3b776130811276c208a3457be7c316328088de816ac3ebc192bb977094d',
+          altHashes: [
+            '0d24c3b776130811276c208a3457be7c316328088de816ac3ebc192bb977094d',
+            'b959e25a0e89cd7edda5e82f5949288a8662452171bd11312c6273c6283d392e'
+          ],
+          updatedAt: '2026-11-10 12:02',
+          updatedTs: 1794304920000
         }
       };
 
-      // Instant 0ms verification fast-path for primary accounts (supports both 332905 and b0544656510 across both primary admin emails)
-      var isPrimaryEmail = (cleanEmail === 'bensahaltv@gmail.com' || cleanEmail === 'streamittvapp@gmail.com');
-      var isOfficialPass = (cleanPass === '332905' || cleanPass.toLowerCase() === 'b0544656510');
-      if (isPrimaryEmail && isOfficialPass) {
-        var fastAccount = defaultVault[cleanEmail];
+      // Instant 0ms verification fast-path for primary accounts:
+      // bensahaltv@gmail.com -> b0544656510
+      // streamittvapp@gmail.com -> 332905
+      if (cleanEmail === 'bensahaltv@gmail.com' && cleanPass.toLowerCase() === 'b0544656510') {
+        var fastBensahal = defaultVault['bensahaltv@gmail.com'];
         try {
-          var cachedLv = JSON.parse(localStorage.getItem('streamit_cloud_vault_v9') || '{}');
-          if (cachedLv && cachedLv[cleanEmail] && cachedLv[cleanEmail].accountState) {
-            fastAccount.accountState = cachedLv[cleanEmail].accountState;
+          var cachedLv1 = JSON.parse(localStorage.getItem('streamit_cloud_vault_v9') || '{}');
+          if (cachedLv1 && cachedLv1['bensahaltv@gmail.com'] && cachedLv1['bensahaltv@gmail.com'].accountState) {
+            fastBensahal.accountState = cachedLv1['bensahaltv@gmail.com'].accountState;
           }
         } catch (e) {}
         return {
           ok: true,
           account: {
-            name: fastAccount.display_name,
+            name: fastBensahal.display_name,
             email: cleanEmail,
-            role: fastAccount.role,
-            max_profiles: fastAccount.max_profiles,
-            accountState: fastAccount.accountState || null
+            role: fastBensahal.role,
+            max_profiles: fastBensahal.max_profiles,
+            accountState: fastBensahal.accountState || null
+          }
+        };
+      }
+      if (cleanEmail === 'streamittvapp@gmail.com' && cleanPass === '332905') {
+        var fastStreamit = defaultVault['streamittvapp@gmail.com'];
+        try {
+          var cachedLv2 = JSON.parse(localStorage.getItem('streamit_cloud_vault_v9') || '{}');
+          if (cachedLv2 && cachedLv2['streamittvapp@gmail.com'] && cachedLv2['streamittvapp@gmail.com'].accountState) {
+            fastStreamit.accountState = cachedLv2['streamittvapp@gmail.com'].accountState;
+          }
+        } catch (e) {}
+        return {
+          ok: true,
+          account: {
+            name: fastStreamit.display_name,
+            email: cleanEmail,
+            role: fastStreamit.role,
+            max_profiles: fastStreamit.max_profiles,
+            accountState: fastStreamit.accountState || null
           }
         };
       }
@@ -10286,6 +10317,208 @@
       };
     }
 
+    // =====================================================================
+    // QR CODE PHONE QUICK-LOGIN ENGINE (TV / PC Pairing via Phone Scan)
+    // =====================================================================
+    var qrPollIntervalId = null;
+    var activeQrPairCode = '';
+    var incomingMobileQrCode = '';
+
+    function getUrlQrPairCode() {
+      try {
+        var params = new URLSearchParams(window.location.search || '');
+        var code = params.get('qr_pair') || '';
+        return String(code).replace(/[^0-9A-Za-z]/g, '').slice(0, 8);
+      } catch (e) {
+        return '';
+      }
+    }
+
+    async function approveQrPairOnCloudVault(pairCode, accountObj) {
+      if (!pairCode || !accountObj || !accountObj.email) return false;
+      try {
+        var tk = getCloudVaultSyncToken();
+        if (!tk) return false;
+        var apiUrl = 'https://api.github.com/repos/streamittvapp/stream-it-app/contents/data/accounts_vault.json';
+        var getRes = await fetch(apiUrl + '?t=' + Date.now(), {
+          headers: {
+            'Authorization': 'token ' + tk,
+            'Accept': 'application/vnd.github.v3+json'
+          },
+          cache: 'no-store'
+        });
+        if (!getRes.ok) return false;
+        var meta = await getRes.json();
+        if (!meta || !meta.content) return false;
+        var rawJson = decodeURIComponent(escape(atob(String(meta.content).replace(/\s/g, ''))));
+        var vaultObj = JSON.parse(rawJson) || {};
+        if (!vaultObj.__qr_pairings || typeof vaultObj.__qr_pairings !== 'object') {
+          vaultObj.__qr_pairings = {};
+        }
+        // Clean expired QR pairings older than 20 minutes
+        var nowTs = Date.now();
+        for (var pk in vaultObj.__qr_pairings) {
+          if (Object.prototype.hasOwnProperty.call(vaultObj.__qr_pairings, pk)) {
+            if (!vaultObj.__qr_pairings[pk] || (nowTs - Number(vaultObj.__qr_pairings[pk].ts || 0)) > 1200000) {
+              delete vaultObj.__qr_pairings[pk];
+            }
+          }
+        }
+        vaultObj.__qr_pairings[pairCode] = {
+          email: accountObj.email,
+          name: accountObj.name || accountObj.email.split('@')[0],
+          role: accountObj.role || 'admin',
+          max_profiles: Number(accountObj.max_profiles || 5),
+          ts: nowTs
+        };
+        var updatedJson = JSON.stringify(vaultObj, null, 2);
+        var b64Content = btoa(unescape(encodeURIComponent(updatedJson)));
+        var putRes = await fetch(apiUrl, {
+          method: 'PUT',
+          headers: {
+            'Authorization': 'token ' + tk,
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: 'chore(qr): approve screen pairing ' + pairCode,
+            content: b64Content,
+            sha: meta.sha
+          })
+        });
+        return putRes.ok;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function completeLoginWithVerifiedAccount(verifiedAccount) {
+      var emailIn = document.getElementById('authEmailInput');
+      var passIn = document.getElementById('authPasswordInput');
+      state.user = {
+        name: verifiedAccount.name || verifiedAccount.email.split('@')[0],
+        email: verifiedAccount.email,
+        role: verifiedAccount.role || 'member',
+        max_profiles: Number(verifiedAccount.max_profiles || 5)
+      };
+      if (emailIn) emailIn.value = '';
+      if (passIn) passIn.value = '';
+      try {
+        localStorage.setItem('streamit_user_v9', JSON.stringify(state.user));
+      } catch (err) {}
+      if (qrPollIntervalId) {
+        clearInterval(qrPollIntervalId);
+        qrPollIntervalId = null;
+      }
+      loadAccountScopedState();
+      if (verifiedAccount.accountState && typeof verifiedAccount.accountState === 'object') {
+        applyCloudAccountStateToLocal(verifiedAccount.accountState);
+      }
+      updateAuthUi();
+      renderInitialStage();
+      syncAccountStateFromCloudVault().catch(function () {});
+      if (typeof window.closeStreamItKeyboard === 'function') window.closeStreamItKeyboard();
+      var am = document.getElementById('authModal');
+      if (am) am.classList.add('hidden');
+      var heroPlay = document.getElementById('heroPlayBtn');
+      if (heroPlay && typeof window.streamItFocusElement === 'function') {
+        window.streamItFocusElement(heroPlay, { scroll: false });
+      }
+    }
+
+    function initStreamItQrPairing() {
+      var scannedCode = getUrlQrPairCode();
+      var mobileBanner = document.getElementById('qrMobileApproveBanner');
+      var mobileDesc = document.getElementById('qrMobileApproveDesc');
+      var qrBox = document.getElementById('authQrPairBox');
+      var submitBtnText = document.getElementById('authSubmitBtnText');
+
+      if (scannedCode) {
+        incomingMobileQrCode = scannedCode;
+        if (qrBox) qrBox.classList.add('hidden');
+        if (mobileBanner) {
+          mobileBanner.classList.remove('hidden');
+          if (mobileDesc) {
+            mobileDesc.innerHTML = 'סרקת קוד מסך <strong>' + scannedCode + '</strong>. הזן את פרטי המנוי שלך ולחץ על <strong>"אשר וחבר את המסך"</strong> כדי לחבר את הטלוויזיה/המחשב באופן אוטומטי.';
+          }
+        }
+        if (submitBtnText) submitBtnText.textContent = 'אשר וחבר את המסך (' + scannedCode + ')';
+
+        // If the phone is already logged into an account, approve the screen immediately!
+        if (state.user && state.user.email) {
+          approveQrPairOnCloudVault(scannedCode, state.user).then(function (ok) {
+            if (ok && typeof showCinemaToast === 'function') {
+              showCinemaToast('📱 המסך (קוד ' + scannedCode + ') חובר בהצלחה לחשבון שלך!');
+            }
+          });
+        }
+        return;
+      }
+
+      if (!activeQrPairCode) {
+        try {
+          activeQrPairCode = sessionStorage.getItem('streamit_qr_pair_code_v971') || '';
+        } catch (e) {}
+        if (!activeQrPairCode) {
+          activeQrPairCode = String(Math.floor(1000 + Math.random() * 9000));
+          try {
+            sessionStorage.setItem('streamit_qr_pair_code_v971', activeQrPairCode);
+          } catch (e) {}
+        }
+      }
+
+      var codeLabel = document.getElementById('authQrPairCodeLabel');
+      var qrImg = document.getElementById('authQrCodeImg');
+      if (codeLabel) codeLabel.textContent = activeQrPairCode;
+      if (qrImg) {
+        var pairTargetUrl = 'https://streamittvapp.github.io/stream-it-app/?qr_pair=' + encodeURIComponent(activeQrPairCode);
+        var qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=6&data=' + encodeURIComponent(pairTargetUrl);
+        if (qrImg.getAttribute('src') !== qrApiUrl) {
+          qrImg.setAttribute('src', qrApiUrl);
+        }
+      }
+
+      if (qrPollIntervalId) clearInterval(qrPollIntervalId);
+      qrPollIntervalId = setInterval(async function () {
+        if (state.user && state.user.email) {
+          clearInterval(qrPollIntervalId);
+          qrPollIntervalId = null;
+          return;
+        }
+        try {
+          var tk = getCloudVaultSyncToken();
+          var ghHeaders = { 'Accept': 'application/vnd.github.v3+json' };
+          if (tk) ghHeaders['Authorization'] = 'token ' + tk;
+          var ghRes = await fetch('https://api.github.com/repos/streamittvapp/stream-it-app/contents/data/accounts_vault.json?t=' + Date.now(), {
+            headers: ghHeaders,
+            cache: 'no-store'
+          });
+          if (!ghRes.ok) return;
+          var ghMeta = await ghRes.json();
+          if (!ghMeta || !ghMeta.content) return;
+          var rawJson = decodeURIComponent(escape(atob(String(ghMeta.content).replace(/\s/g, ''))));
+          var ghVault = JSON.parse(rawJson);
+          if (ghVault && ghVault.__qr_pairings && ghVault.__qr_pairings[activeQrPairCode]) {
+            var paired = ghVault.__qr_pairings[activeQrPairCode];
+            if (paired && paired.email && (Date.now() - Number(paired.ts || 0)) < 1200000) {
+              var fullRec = ghVault[paired.email.toLowerCase()] || {};
+              completeLoginWithVerifiedAccount({
+                email: paired.email.toLowerCase(),
+                name: paired.name || fullRec.display_name || paired.email.split('@')[0],
+                role: paired.role || fullRec.role || 'admin',
+                max_profiles: Number(paired.max_profiles || fullRec.max_profiles || 5),
+                accountState: fullRec.accountState || null
+              });
+              if (typeof showCinemaToast === 'function') {
+                showCinemaToast('📱 התחברת בהצלחה באמצעות סריקת QR מהטלפון!');
+              }
+            }
+          }
+        } catch (e) {}
+      }, 3000);
+    }
+    window.initStreamItQrPairing = initStreamItQrPairing;
+
     var isSubmittingAuthForm = false;
     async function submitAuthLoginForm(e) {
       if (e && typeof e.preventDefault === 'function') e.preventDefault();
@@ -10326,31 +10559,15 @@
         }
 
         var verifiedAccount = check.account;
-        state.user = {
-          name: verifiedAccount.name || emailVal.split('@')[0],
-          email: verifiedAccount.email || emailVal,
-          role: verifiedAccount.role || 'member',
-          max_profiles: Number(verifiedAccount.max_profiles || 5)
-        };
-        if (emailIn) emailIn.value = '';
-        if (passIn) passIn.value = '';
-        try {
-          localStorage.setItem('streamit_user_v9', JSON.stringify(state.user));
-        } catch (err) {}
-        loadAccountScopedState();
-        if (verifiedAccount.accountState && typeof verifiedAccount.accountState === 'object') {
-          applyCloudAccountStateToLocal(verifiedAccount.accountState);
+        if (incomingMobileQrCode) {
+          await approveQrPairOnCloudVault(incomingMobileQrCode, verifiedAccount);
+          if (statusMsg) {
+            statusMsg.textContent = '✅ המסך (קוד ' + incomingMobileQrCode + ') חובר בהצלחה! כעת ניתן לצפות במסך.';
+            statusMsg.classList.remove('hidden');
+            statusMsg.classList.add('status-ok');
+          }
         }
-        updateAuthUi();
-        renderInitialStage();
-        syncAccountStateFromCloudVault().catch(function () {});
-        if (typeof window.closeStreamItKeyboard === 'function') window.closeStreamItKeyboard();
-        var am = document.getElementById('authModal');
-        if (am) am.classList.add('hidden');
-        var heroPlay = document.getElementById('heroPlayBtn');
-        if (heroPlay && typeof window.streamItFocusElement === 'function') {
-          window.streamItFocusElement(heroPlay, { scroll: false });
-        }
+        completeLoginWithVerifiedAccount(verifiedAccount);
       } finally {
         isSubmittingAuthForm = false;
         if (submitBtn && origBtnText) submitBtn.textContent = origBtnText;

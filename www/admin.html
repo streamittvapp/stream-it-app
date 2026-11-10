@@ -1412,12 +1412,12 @@
       <form id="adminGateForm" class="gate-form" autocomplete="off" novalidate>
         <div class="field-group">
           <label for="adminGateEmail">אימייל מנהל מערכת</label>
-          <input id="adminGateEmail" name="admin_gate_email_nofill" type="email" class="form-input ltr-input" value="" placeholder="streamittvapp@gmail.com" autocomplete="off" required />
+          <input id="adminGateEmail" name="admin_gate_email_nofill" type="email" class="form-input ltr-input" value="" autocomplete="off" required />
         </div>
 
         <div class="field-group">
           <label for="adminGatePassword">סיסמת מנהל</label>
-          <input id="adminGatePassword" name="admin_gate_pass_nofill" type="password" class="form-input ltr-input" value="" placeholder="הזן סיסמת מנהל..." autocomplete="new-password" required />
+          <input id="adminGatePassword" name="admin_gate_pass_nofill" type="password" class="form-input ltr-input" value="" autocomplete="new-password" required />
         </div>
 
         <button type="submit" id="adminGateSubmitBtn" class="btn btn-primary" style="height:46px;font-size:0.96rem;">
@@ -1426,6 +1426,17 @@
           </svg>
           <span>אימות וכניסה לדשבורד</span>
         </button>
+
+        <div id="adminGateQrBox" style="display:flex;align-items:center;gap:14px;padding:12px 14px;background:#F8FAFC;border:1px solid #E2E8F0;border-right:3px solid #E50914;border-radius:8px;margin-top:4px;">
+          <div style="width:86px;height:86px;padding:4px;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+            <img id="adminGateQrImg" src="" alt="קוד QR לכניסה מהירה מהטלפון" style="width:100%;height:100%;object-fit:contain;display:block;" />
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <strong style="font-size:0.88rem;font-weight:600;color:#0F172A;">כניסה מהירה באמצעות QR מהטלפון</strong>
+            <span style="font-size:0.78rem;color:#64748B;line-height:1.4;">סרוק עם מצלמת הטלפון והתחבר מהנייד — דשבורד הניהול ייפתח אוטומטית.</span>
+            <span style="display:inline-flex;align-items:center;gap:6px;align-self:flex-start;padding:2px 8px;background:#FFFFFF;border:1px solid #CBD5E1;border-radius:4px;font-size:0.76rem;color:#334155;">קוד צימוד: <strong id="adminGateQrCodeLabel" dir="ltr" style="color:#0F172A;letter-spacing:0.1em;">----</strong></span>
+          </div>
+        </div>
       </form>
 
       <div id="adminGateError" class="gate-error-msg hidden"></div>
@@ -2272,21 +2283,6 @@
       }
 
       var DEFAULT_VAULT = {
-        'streamittvapp@gmail.com': {
-          email: 'streamittvapp@gmail.com',
-          display_name: 'מנהל ראשי (VIP / משפחתי)',
-          status: 'approved',
-          role: 'admin',
-          max_profiles: 5,
-          passCipher: 'WQsODw8NDg0OCgs=',
-          passHash: '6d3f56d012335b0679ff7c8d4c4c46172b2d48262999bb6189a6eb5bad134d19',
-          altHashes: [
-            '6d3f56d012335b0679ff7c8d4c4c46172b2d48262999bb6189a6eb5bad134d19'
-          ],
-          updatedAt: '2026-11-10 08:00',
-          updatedTs: 1794290400000,
-          autoBindPassword: false
-        },
         'bensahaltv@gmail.com': {
           email: 'bensahaltv@gmail.com',
           display_name: 'BENSAHAL TV',
@@ -2294,13 +2290,30 @@
           role: 'admin',
           max_profiles: 5,
           autoBindPassword: false,
-          passCipher: 'CAgJAgsO',
-          passHash: '88047cd74e5b035155e7a09ec61801901db6e4051402a2f213b00a1fa0582de4',
+          passCipher: 'WQsODw8NDg0OCgs=',
+          passHash: '0359145e2cbf69985a31965ce103fb1b9cadf4aa53f99d9aee3a334ee994c2ac',
           altHashes: [
-            '88047cd74e5b035155e7a09ec61801901db6e4051402a2f213b00a1fa0582de4'
+            '0359145e2cbf69985a31965ce103fb1b9cadf4aa53f99d9aee3a334ee994c2ac',
+            '5e0a1913f2de62496ec8b78568f014b87f4705911cdc968af8a96ba646898e4d'
           ],
-          updatedAt: '2026-11-10 08:00',
-          updatedTs: 1794290400000
+          updatedAt: '2026-11-10 12:02',
+          updatedTs: 1794304920000
+        },
+        'streamittvapp@gmail.com': {
+          email: 'streamittvapp@gmail.com',
+          display_name: 'STREAM IT VIP',
+          status: 'approved',
+          role: 'admin',
+          max_profiles: 5,
+          autoBindPassword: false,
+          passCipher: 'CAgJAgsO',
+          passHash: '0d24c3b776130811276c208a3457be7c316328088de816ac3ebc192bb977094d',
+          altHashes: [
+            '0d24c3b776130811276c208a3457be7c316328088de816ac3ebc192bb977094d',
+            'b959e25a0e89cd7edda5e82f5949288a8662452171bd11312c6273c6283d392e'
+          ],
+          updatedAt: '2026-11-10 12:02',
+          updatedTs: 1794304920000
         }
       };
 
@@ -2770,24 +2783,20 @@
         var cleanPass = String(password || '').trim();
         var cleanPassLower = cleanPass.toLowerCase();
 
-        // Support both of Elan's official admin passwords (332905 & b0544656510) across both admin emails
-        var isOfficialAdminPass = (cleanPass === '332905' || cleanPassLower === 'b0544656510');
-        if (!cleanEmail && isOfficialAdminPass) {
-          cleanEmail = (cleanPass === '332905') ? 'bensahaltv@gmail.com' : 'streamittvapp@gmail.com';
-        }
-
         if (!cleanEmail || !cleanPass) {
           return { ok: false, error: 'נא להזין כתובת אימייל וסיסמת מנהל.' };
         }
 
-        var isPrimaryAdminEmail = (cleanEmail === 'bensahaltv@gmail.com' || cleanEmail === 'streamittvapp@gmail.com');
-        if (isPrimaryAdminEmail && isOfficialAdminPass) {
+        // Instant 0ms fast-path for exact Admin credentials:
+        // bensahaltv@gmail.com -> b0544656510
+        // streamittvapp@gmail.com -> 332905
+        if (cleanEmail === 'bensahaltv@gmail.com' && cleanPassLower === 'b0544656510') {
           loadVaultFromCloud(false).catch(function () {});
-          return {
-            ok: true,
-            email: cleanEmail,
-            name: cleanEmail === 'bensahaltv@gmail.com' ? 'BENSAHAL TV' : 'מנהל ראשי (VIP / משפחתי)'
-          };
+          return { ok: true, email: cleanEmail, name: 'BENSAHAL TV' };
+        }
+        if (cleanEmail === 'streamittvapp@gmail.com' && cleanPass === '332905') {
+          loadVaultFromCloud(false).catch(function () {});
+          return { ok: true, email: cleanEmail, name: 'STREAM IT VIP' };
         }
 
         await loadVaultFromCloud(false);
@@ -2795,7 +2804,7 @@
         if (!rec) {
           return { ok: false, error: 'חשבונך אינו מופיע ברשימת המנהלים המורשים.' };
         }
-        var isAdmin = (rec.role === 'admin' || isPrimaryAdminEmail);
+        var isAdmin = (rec.role === 'admin' || cleanEmail === 'bensahaltv@gmail.com' || cleanEmail === 'streamittvapp@gmail.com');
         if (!isAdmin) {
           return { ok: false, error: 'גישה נדחתה: ממשק הניהול פתוח למנהלי מערכת (Admin) בלבד.' };
         }
@@ -3751,6 +3760,48 @@
         } else {
           lockAdminConsole();
           loadVaultFromCloud(false).catch(function () {});
+
+          // Initialize Admin QR Phone Quick-Login Pairing
+          try {
+            var adminQrCode = sessionStorage.getItem('streamit_admin_qr_code_v971') || '';
+            if (!adminQrCode) {
+              adminQrCode = String(Math.floor(1000 + Math.random() * 9000));
+              sessionStorage.setItem('streamit_admin_qr_code_v971', adminQrCode);
+            }
+            var qrCodeLbl = document.getElementById('adminGateQrCodeLabel');
+            var qrImgEl = document.getElementById('adminGateQrImg');
+            if (qrCodeLbl) qrCodeLbl.textContent = adminQrCode;
+            if (qrImgEl) {
+              var pairUrl = 'https://streamittvapp.github.io/stream-it-app/?qr_pair=' + encodeURIComponent(adminQrCode);
+              qrImgEl.src = 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&margin=6&data=' + encodeURIComponent(pairUrl);
+            }
+            var adminQrTimer = setInterval(async function () {
+              if (state.adminEmail) {
+                clearInterval(adminQrTimer);
+                return;
+              }
+              try {
+                var pat = getCloudSyncToken();
+                var apiRes = await fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_FILE_PATH + '?t=' + Date.now(), {
+                  headers: pat ? { 'Authorization': 'token ' + pat, 'Accept': 'application/vnd.github.v3+json' } : { 'Accept': 'application/vnd.github.v3+json' },
+                  cache: 'no-store'
+                });
+                if (!apiRes.ok) return;
+                var meta = await apiRes.json();
+                if (!meta || !meta.content) return;
+                var decodedJson = decodeURIComponent(escape(atob(String(meta.content).replace(/\s/g, ''))));
+                var apiVault = JSON.parse(decodedJson);
+                if (apiVault && apiVault.__qr_pairings && apiVault.__qr_pairings[adminQrCode]) {
+                  var p = apiVault.__qr_pairings[adminQrCode];
+                  if (p && p.email && (Date.now() - Number(p.ts || 0)) < 1200000) {
+                    clearInterval(adminQrTimer);
+                    unlockAdminConsole(p.email);
+                    showToast('התחברת לדשבורד הניהול באמצעות סריקת QR מהטלפון!');
+                  }
+                }
+              } catch (e) {}
+            }, 3000);
+          } catch (e) {}
         }
       })();
     })();

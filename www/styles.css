@@ -3458,6 +3458,101 @@ body.tv-mode #detailsModal .ep-desc {
   color: #090a0f !important;
 }
 
+.auth-qr-pair-box {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 8px;
+  padding: 12px 14px;
+  background-color: #0d1017;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-right: 3px solid #e50914;
+}
+
+.auth-qr-img-wrap {
+  width: 96px;
+  height: 96px;
+  padding: 6px;
+  background-color: #ffffff;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-qr-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.auth-qr-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: right;
+}
+
+.auth-qr-title {
+  font-size: 0.94rem;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.auth-qr-sub {
+  font-size: 0.8rem;
+  font-weight: 300;
+  color: #a1a1aa;
+  line-height: 1.4;
+}
+
+.auth-qr-code-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  margin-top: 2px;
+  padding: 3px 10px;
+  background-color: #161b26;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  font-size: 0.8rem;
+  color: #e4e4e7;
+}
+
+.auth-qr-code-pill strong {
+  color: #ffffff;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+}
+
+.qr-mobile-approve-banner {
+  padding: 12px 14px;
+  background-color: #131824;
+  border: 1px solid rgba(229, 9, 20, 0.45);
+  border-right: 3px solid #e50914;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.qr-mobile-approve-badge {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.qr-mobile-approve-desc {
+  font-size: 0.82rem;
+  font-weight: 300;
+  color: #d4d4d8;
+  line-height: 1.45;
+}
+
+body.vk-open .auth-qr-pair-box {
+  display: none !important;
+}
+
 .auth-logout-btn {
   width: 100%;
   margin-top: 4px;

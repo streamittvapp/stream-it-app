@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
-  <link rel="stylesheet" href="styles.css?v=9.7.0" />
+  <link rel="stylesheet" href="styles.css?v=9.7.1" />
   <script>
     (function () {
       try {
@@ -34,13 +34,13 @@
           });
         }
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (!otaVer || otaVer <= '9.7.0') {
+        if (!otaVer || otaVer <= '9.7.1') {
           localStorage.removeItem('streamit_ota_css_v9');
           localStorage.removeItem('streamit_ota_app_js_v9');
           localStorage.removeItem('streamit_ota_tv_nav_v9');
         }
         var otaCss = localStorage.getItem('streamit_ota_css_v9') || '';
-        if (otaVer && otaVer > '9.7.0' && otaCss.length > 500) {
+        if (otaVer && otaVer > '9.7.1' && otaCss.length > 500) {
           var st = document.createElement('style');
           st.id = 'streamit-ota-live-style-v9';
           st.textContent = otaCss;
@@ -1101,6 +1101,11 @@
       </div>
 
       <form id="authForm" class="auth-form" autocomplete="off" novalidate>
+        <div id="qrMobileApproveBanner" class="qr-mobile-approve-banner hidden">
+          <div class="qr-mobile-approve-badge">📱 חיבור מהיר של מסך באמצעות QR</div>
+          <p id="qrMobileApproveDesc" class="qr-mobile-approve-desc">הזן את פרטי המנוי שלך בטלפון ולחץ על <strong>"התחבר לחשבון"</strong> כדי לחבר את המסך שסרקת באופן אוטומטי.</p>
+        </div>
+
         <div class="form-group">
           <label for="authEmailInput" class="form-label">כתובת אימייל</label>
           <input
@@ -1110,7 +1115,6 @@
             class="form-input tv-focusable"
             dir="ltr"
             value=""
-            placeholder="name@gmail.com"
             autocomplete="username"
           />
         </div>
@@ -1124,14 +1128,24 @@
             class="form-input tv-focusable"
             dir="ltr"
             value=""
-            placeholder="הזן סיסמה..."
             autocomplete="current-password"
           />
         </div>
 
         <button type="submit" id="authSubmitBtn" class="btn-primary auth-submit-btn tv-focusable" aria-label="התחבר לחשבון">
-          <span>התחבר לחשבון</span>
+          <span id="authSubmitBtnText">התחבר לחשבון</span>
         </button>
+
+        <div id="authQrPairBox" class="auth-qr-pair-box">
+          <div class="auth-qr-img-wrap">
+            <img id="authQrCodeImg" class="auth-qr-img" src="" alt="קוד QR להתחברות מהירה מהטלפון" />
+          </div>
+          <div class="auth-qr-info">
+            <div class="auth-qr-title">התחברות מהירה באמצעות QR מהטלפון</div>
+            <p class="auth-qr-sub">סרוק את קוד ה-QR עם מצלמת הטלפון והתחבר מהנייד — המסך יתחבר אוטומטית תוך שניות.</p>
+            <div class="auth-qr-code-pill">קוד צימוד מסך: <strong id="authQrPairCodeLabel" dir="ltr">----</strong></div>
+          </div>
+        </div>
       </form>
 
       <div id="authStatusMsg" class="auth-status-msg" aria-live="polite"></div>
@@ -1586,13 +1600,13 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Core Application & Smart TV Navigation Scripts -->
-  <script src="tv-navigation.js?v=9.7.0"></script>
-  <script src="app.js?v=9.7.0"></script>
+  <script src="tv-navigation.js?v=9.7.1"></script>
+  <script src="app.js?v=9.7.1"></script>
   <script>
     (function () {
       try {
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (otaVer && otaVer > '9.7.0') {
+        if (otaVer && otaVer > '9.7.1') {
           var navCode = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
           if (navCode.length > 500) {
             var s1 = document.createElement('script');
