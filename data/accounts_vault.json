@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794323576970,
+      "updatedTs": 1794323577519,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -276,7 +276,7 @@
               "percent": 18,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794323576970
+              "updatedAt": 1794323577519
             }
           }
         },
