@@ -313,7 +313,7 @@
         "size": "xlarge",
         "fontPx": 48,
         "color": "yellow",
-        "bg": "none",
+        "bg": "dark",
         "bottomPct": 8
       }
     }
