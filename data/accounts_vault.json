@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794332610292,
+      "updatedTs": 1794332625681,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -253,26 +253,6 @@
               "violence": false,
               "profanity": false,
               "drugs": false,
-              "horror": false
-            }
-          }
-        },
-        {
-          "id": "prof-living",
-          "name": "סלון",
-          "color": "#334155",
-          "isKids": false,
-          "isPrimary": false,
-          "parentalControl": {
-            "enabled": false,
-            "actionMode": "skip",
-            "profanityMode": "mute_censor",
-            "sensitivity": "balanced",
-            "categories": {
-              "sex": true,
-              "violence": true,
-              "profanity": true,
-              "drugs": true,
               "horror": false
             }
           }
