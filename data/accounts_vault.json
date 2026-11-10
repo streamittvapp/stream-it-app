@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794323562532,
+      "updatedTs": 1794323566954,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -271,12 +271,12 @@
               "updatedAt": 1794203030102
             },
             "tt6263850": {
-              "currentTime": 1345,
+              "currentTime": 1350,
               "duration": 7753,
               "percent": 17,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794323562532
+              "updatedAt": 1794323566954
             }
           }
         },
@@ -314,7 +314,7 @@
         "fontPx": 48,
         "color": "white",
         "bg": "none",
-        "bottomPct": 5
+        "bottomPct": 8
       }
     }
   },
