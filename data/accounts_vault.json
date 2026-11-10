@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794332513075,
+      "updatedTs": 1794332610292,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -261,26 +261,6 @@
           "id": "prof-living",
           "name": "סלון",
           "color": "#334155",
-          "isKids": false,
-          "isPrimary": false,
-          "parentalControl": {
-            "enabled": false,
-            "actionMode": "skip",
-            "profanityMode": "mute_censor",
-            "sensitivity": "balanced",
-            "categories": {
-              "sex": true,
-              "violence": true,
-              "profanity": true,
-              "drugs": true,
-              "horror": false
-            }
-          }
-        },
-        {
-          "id": "prof-bedroom",
-          "name": "חדר שינה",
-          "color": "#3f3f46",
           "isKids": false,
           "isPrimary": false,
           "parentalControl": {
