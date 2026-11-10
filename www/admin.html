@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>STREAM IT — דשבורד ניהול מנויים, פיצ'רים וקטלוג (v9.6.9)</title>
+  <title>STREAM IT — דשבורד ניהול מנויים, פיצ'רים וקטלוג (v9.7.0)</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1411,13 +1411,6 @@
 
       <form id="adminGateForm" class="gate-form" autocomplete="off" novalidate>
         <div class="field-group">
-          <label>כניסה מהירה למנהל מערכת (לחיצה אחת):</label>
-          <div class="gate-quick-fill-row">
-            <button type="button" class="btn btn-secondary btn-sm" data-quick-admin="bensahaltv@gmail.com" data-quick-pass="332905">BENSAHAL TV</button>
-            <button type="button" class="btn btn-secondary btn-sm" data-quick-admin="streamittvapp@gmail.com" data-quick-pass="b0544656510">STREAM IT VIP</button>
-          </div>
-        </div>
-        <div class="field-group">
           <label for="adminGateEmail">אימייל מנהל מערכת</label>
           <input id="adminGateEmail" name="admin_gate_email_nofill" type="email" class="form-input ltr-input" value="" placeholder="streamittvapp@gmail.com" autocomplete="off" required />
         </div>
@@ -2288,11 +2281,10 @@
           passCipher: 'WQsODw8NDg0OCgs=',
           passHash: '6d3f56d012335b0679ff7c8d4c4c46172b2d48262999bb6189a6eb5bad134d19',
           altHashes: [
-            '6d3f56d012335b0679ff7c8d4c4c46172b2d48262999bb6189a6eb5bad134d19',
-            '5e0a1913f2de62496ec8b78568f014b87f4705911cdc968af8a96ba646898e4d'
+            '6d3f56d012335b0679ff7c8d4c4c46172b2d48262999bb6189a6eb5bad134d19'
           ],
-          updatedAt: '2026-11-10 00:06',
-          updatedTs: 1794262080000,
+          updatedAt: '2026-11-10 08:00',
+          updatedTs: 1794290400000,
           autoBindPassword: false
         },
         'bensahaltv@gmail.com': {
@@ -2305,11 +2297,10 @@
           passCipher: 'CAgJAgsO',
           passHash: '88047cd74e5b035155e7a09ec61801901db6e4051402a2f213b00a1fa0582de4',
           altHashes: [
-            '88047cd74e5b035155e7a09ec61801901db6e4051402a2f213b00a1fa0582de4',
-            'b959e25a0e89cd7edda5e82f5949288a8662452171bd11312c6273c6283d392e'
+            '88047cd74e5b035155e7a09ec61801901db6e4051402a2f213b00a1fa0582de4'
           ],
-          updatedAt: '2026-11-10 00:06',
-          updatedTs: 1794262080000
+          updatedAt: '2026-11-10 08:00',
+          updatedTs: 1794290400000
         }
       };
 
@@ -3422,20 +3413,6 @@
       for (var gp = 0; gp < gotoPageBtns.length; gp++) {
         gotoPageBtns[gp].addEventListener('click', function () {
           switchSidebarPage(this.getAttribute('data-goto-page'));
-        });
-      }
-
-      var quickAdminBtns = document.querySelectorAll('[data-quick-admin]');
-      for (var qa = 0; qa < quickAdminBtns.length; qa++) {
-        quickAdminBtns[qa].addEventListener('click', function () {
-          var em = this.getAttribute('data-quick-admin') || '';
-          var pw = this.getAttribute('data-quick-pass') || '';
-          var emailIn = document.getElementById('adminGateEmail');
-          var passIn = document.getElementById('adminGatePassword');
-          var gateFormEl = document.getElementById('adminGateForm');
-          if (emailIn) emailIn.value = em;
-          if (passIn) passIn.value = pw;
-          if (gateFormEl) gateFormEl.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
         });
       }
 
