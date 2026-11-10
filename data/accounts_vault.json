@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794332252090,
+      "updatedTs": 1794332258299,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -330,12 +330,12 @@
           ],
           "progress": {
             "1339713": {
-              "currentTime": 15,
+              "currentTime": 50,
               "duration": 6533,
               "percent": 3,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794332252089
+              "updatedAt": 1794332258299
             }
           }
         },
