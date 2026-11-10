@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794331959416,
+      "updatedTs": 1794332078406,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -323,7 +323,8 @@
           "watchlist": [
             "791523",
             "1283515",
-            "288673"
+            "288673",
+            "58841"
           ],
           "progress": {}
         },
