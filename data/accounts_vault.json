@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794332193322,
+      "updatedTs": 1794332224045,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -325,7 +325,8 @@
             "1283515",
             "288673",
             "58841",
-            "1236045"
+            "1236045",
+            "1339713"
           ],
           "progress": {}
         },
