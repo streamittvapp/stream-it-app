@@ -385,8 +385,8 @@
         "customSkipSegments": {}
       },
       "subPrefs": {
-        "size": "xlarge",
-        "fontPx": 48,
+        "size": "large",
+        "fontPx": 32,
         "color": "white",
         "bg": "none",
         "bottomPct": 6.5
