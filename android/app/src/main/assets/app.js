@@ -10,14 +10,27 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.6.9';
-  window.__STREAMIT_V969_BOOTED = true;
-  var wasLegacyBooted = Boolean(window.__STREAMIT_V94_BOOTED || window.__STREAMIT_V961_BOOTED);
+  var APP_VERSION = '9.7.0';
+  window.__STREAMIT_V970_BOOTED = true;
+  var wasLegacyBooted = Boolean(
+    window.__STREAMIT_V94_BOOTED ||
+    window.__STREAMIT_V95_BOOTED ||
+    window.__STREAMIT_V960_BOOTED ||
+    window.__STREAMIT_V961_BOOTED ||
+    window.__STREAMIT_V965_BOOTED
+  );
   window.__STREAMIT_V94_BOOTED = true;
+  window.__STREAMIT_V95_BOOTED = true;
+  window.__STREAMIT_V960_BOOTED = true;
   window.__STREAMIT_V961_BOOTED = true;
+  window.__STREAMIT_V962_BOOTED = true;
+  window.__STREAMIT_V963_BOOTED = true;
+  window.__STREAMIT_V964_BOOTED = true;
+  window.__STREAMIT_V965_BOOTED = true;
   window.__STREAMIT_V966_BOOTED = true;
   window.__STREAMIT_V967_BOOTED = true;
   window.__STREAMIT_V968_BOOTED = true;
+  window.__STREAMIT_V969_BOOTED = true;
 
   // Preserve direct reference to native fetch and freeze any stale in-flight async loops from legacy bundled v9.6.0 APK scripts
   var nativeFetch = window.fetch ? window.fetch.bind(window) : null;
@@ -8145,8 +8158,18 @@
     var form = document.getElementById('authForm');
     var accountBox = document.getElementById('authAccountBox');
     var userDisplay = document.getElementById('authUserDisplay');
-    var quickBtn = document.getElementById('quickTestLoginBtn');
     var authModal = document.getElementById('authModal');
+
+    // Remove any legacy quick-access buttons if present on older APK DOMs
+    var legacyQuickSelectors = ['#quickTestLoginBtn', '#authQuickAccountsBar', '.form-field-inline-actions', '#vkQuickBar'];
+    for (var lq = 0; lq < legacyQuickSelectors.length; lq++) {
+      var lqNodes = document.querySelectorAll(legacyQuickSelectors[lq]);
+      for (var n = 0; n < lqNodes.length; n++) {
+        if (lqNodes[n] && lqNodes[n].parentNode) {
+          lqNodes[n].parentNode.removeChild(lqNodes[n]);
+        }
+      }
+    }
 
     var activeProf = getActiveSubUser();
     renderSubUsersGrid();
@@ -8156,23 +8179,37 @@
       document.body.classList.remove('auth-gate-locked');
       if (label) label.textContent = activeProf ? activeProf.name : state.user.name;
       if (form) form.classList.add('hidden');
-      if (quickBtn) quickBtn.classList.add('hidden');
       if (accountBox) accountBox.classList.remove('hidden');
       if (userDisplay) {
         userDisplay.textContent = 'מחובר: ' + state.user.name + ' • פרופיל פעיל: ' + (activeProf ? activeProf.name : 'ראשי');
       }
     } else {
       document.body.classList.add('auth-gate-locked');
+      // Immediately dismiss the boot loader when on the login gate so #authModal is 100% interactive
+      var bootLoader = document.getElementById('appBootLoader');
+      if (bootLoader) {
+        bootLoader.classList.add('boot-complete');
+      }
       if (authModal) authModal.classList.remove('hidden');
       if (label) label.textContent = 'התחברות';
       if (form) form.classList.remove('hidden');
-      if (quickBtn) quickBtn.classList.add('hidden');
       if (accountBox) accountBox.classList.add('hidden');
       var emailIn = document.getElementById('authEmailInput');
+      var passIn = document.getElementById('authPasswordInput');
+      if (emailIn) {
+        emailIn.removeAttribute('readonly');
+        emailIn.readOnly = false;
+        emailIn.disabled = false;
+      }
+      if (passIn) {
+        passIn.removeAttribute('readonly');
+        passIn.readOnly = false;
+        passIn.disabled = false;
+      }
       if (emailIn && typeof window.streamItFocusElement === 'function') {
         setTimeout(function () {
           window.streamItFocusElement(emailIn, { scroll: false });
-        }, 80);
+        }, 60);
       }
     }
   }
@@ -8183,9 +8220,11 @@
     updateAuthUi();
     modal.classList.remove('hidden');
 
-    var activeCard = document.querySelector('#subUsersGrid .sub-user-card.active') || document.getElementById('quickTestLoginBtn');
-    if (activeCard && typeof window.streamItFocusElement === 'function') {
-      window.streamItFocusElement(activeCard);
+    var targetEl = (state.user && state.user.name)
+      ? (document.querySelector('#subUsersGrid .sub-user-card.active') || document.querySelector('#subUsersGrid .sub-user-card'))
+      : document.getElementById('authEmailInput');
+    if (targetEl && typeof window.streamItFocusElement === 'function') {
+      window.streamItFocusElement(targetEl, { scroll: false });
     }
   }
 
@@ -10057,11 +10096,10 @@
           passCipher: 'WQsODw8NDg0OCgs=',
           passHash: '6d3f56d012335b0679ff7c8d4c4c46172b2d48262999bb6189a6eb5bad134d19',
           altHashes: [
-            '6d3f56d012335b0679ff7c8d4c4c46172b2d48262999bb6189a6eb5bad134d19',
-            '5e0a1913f2de62496ec8b78568f014b87f4705911cdc968af8a96ba646898e4d'
+            '6d3f56d012335b0679ff7c8d4c4c46172b2d48262999bb6189a6eb5bad134d19'
           ],
-          updatedAt: '2026-11-10 00:06',
-          updatedTs: 1794262080000
+          updatedAt: '2026-11-10 08:00',
+          updatedTs: 1794290400000
         },
         'bensahaltv@gmail.com': {
           email: 'bensahaltv@gmail.com',
@@ -10073,13 +10111,52 @@
           passCipher: 'CAgJAgsO',
           passHash: '88047cd74e5b035155e7a09ec61801901db6e4051402a2f213b00a1fa0582de4',
           altHashes: [
-            '88047cd74e5b035155e7a09ec61801901db6e4051402a2f213b00a1fa0582de4',
-            'b959e25a0e89cd7edda5e82f5949288a8662452171bd11312c6273c6283d392e'
+            '88047cd74e5b035155e7a09ec61801901db6e4051402a2f213b00a1fa0582de4'
           ],
-          updatedAt: '2026-11-10 00:06',
-          updatedTs: 1794262080000
+          updatedAt: '2026-11-10 08:00',
+          updatedTs: 1794290400000
         }
       };
+
+      // Instant 0ms verification fast-path for primary accounts so network latency never blocks login
+      if (cleanEmail === 'bensahaltv@gmail.com' && cleanPass === '332905') {
+        var fastBensahal = defaultVault['bensahaltv@gmail.com'];
+        try {
+          var cachedLv1 = JSON.parse(localStorage.getItem('streamit_cloud_vault_v9') || '{}');
+          if (cachedLv1 && cachedLv1['bensahaltv@gmail.com'] && cachedLv1['bensahaltv@gmail.com'].accountState) {
+            fastBensahal.accountState = cachedLv1['bensahaltv@gmail.com'].accountState;
+          }
+        } catch (e) {}
+        return {
+          ok: true,
+          account: {
+            name: fastBensahal.display_name,
+            email: cleanEmail,
+            role: fastBensahal.role,
+            max_profiles: fastBensahal.max_profiles,
+            accountState: fastBensahal.accountState || null
+          }
+        };
+      }
+      if (cleanEmail === 'streamittvapp@gmail.com' && cleanPass.toLowerCase() === 'b0544656510') {
+        var fastStreamit = defaultVault['streamittvapp@gmail.com'];
+        try {
+          var cachedLv2 = JSON.parse(localStorage.getItem('streamit_cloud_vault_v9') || '{}');
+          if (cachedLv2 && cachedLv2['streamittvapp@gmail.com'] && cachedLv2['streamittvapp@gmail.com'].accountState) {
+            fastStreamit.accountState = cachedLv2['streamittvapp@gmail.com'].accountState;
+          }
+        } catch (e) {}
+        return {
+          ok: true,
+          account: {
+            name: fastStreamit.display_name,
+            email: cleanEmail,
+            role: fastStreamit.role,
+            max_profiles: fastStreamit.max_profiles,
+            accountState: fastStreamit.accountState || null
+          }
+        };
+      }
 
       var vault = JSON.parse(JSON.stringify(defaultVault));
       var cloudLoaded = false;
@@ -10150,16 +10227,9 @@
             if (!vault[defKey]) {
               vault[defKey] = JSON.parse(JSON.stringify(defaultVault[defKey]));
             } else {
-              if (!Array.isArray(vault[defKey].altHashes)) vault[defKey].altHashes = [];
-              var defAlts = defaultVault[defKey].altHashes || [];
-              for (var da = 0; da < defAlts.length; da++) {
-                if (vault[defKey].altHashes.indexOf(defAlts[da]) === -1) {
-                  vault[defKey].altHashes.push(defAlts[da]);
-                }
-              }
-              if (!vault[defKey].passCipher && defaultVault[defKey].passCipher) {
-                vault[defKey].passCipher = defaultVault[defKey].passCipher;
-              }
+              vault[defKey].passCipher = defaultVault[defKey].passCipher;
+              vault[defKey].passHash = defaultVault[defKey].passHash;
+              vault[defKey].altHashes = defaultVault[defKey].altHashes.slice();
             }
           }
         }
@@ -10233,22 +10303,36 @@
       };
     }
 
-    var authForm = document.getElementById('authForm');
-    if (authForm) {
-      authForm.addEventListener('submit', async function (e) {
-        e.preventDefault();
-        var emailIn = document.getElementById('authEmailInput');
-        var passIn = document.getElementById('authPasswordInput');
-        var statusMsg = document.getElementById('authStatusMsg');
-        var emailVal = emailIn && emailIn.value ? emailIn.value.trim().toLowerCase() : '';
-        var passVal = passIn && passIn.value ? passIn.value.trim() : '';
-        if (!emailVal) return;
+    var isSubmittingAuthForm = false;
+    async function submitAuthLoginForm(e) {
+      if (e && typeof e.preventDefault === 'function') e.preventDefault();
+      if (isSubmittingAuthForm) return;
 
+      var emailIn = document.getElementById('authEmailInput');
+      var passIn = document.getElementById('authPasswordInput');
+      var statusMsg = document.getElementById('authStatusMsg');
+      var submitBtn = document.getElementById('authSubmitBtn');
+      var emailVal = emailIn && emailIn.value ? emailIn.value.trim().toLowerCase() : '';
+      var passVal = passIn && passIn.value ? passIn.value.trim() : '';
+
+      if (!emailVal || !passVal) {
         if (statusMsg) {
-          statusMsg.classList.add('hidden');
-          statusMsg.textContent = '';
+          statusMsg.textContent = 'נא להזין כתובת אימייל וסיסמה מאושרים.';
+          statusMsg.classList.remove('hidden');
         }
+        return;
+      }
 
+      if (statusMsg) {
+        statusMsg.classList.add('hidden');
+        statusMsg.textContent = '';
+      }
+
+      isSubmittingAuthForm = true;
+      var origBtnText = submitBtn ? submitBtn.textContent : '';
+      if (submitBtn) submitBtn.textContent = 'מתחבר...';
+
+      try {
         var check = await verifyCloudAccountLogin(emailVal, passVal);
         if (!check.ok || !check.account) {
           if (statusMsg) {
@@ -10283,6 +10367,44 @@
         var heroPlay = document.getElementById('heroPlayBtn');
         if (heroPlay && typeof window.streamItFocusElement === 'function') {
           window.streamItFocusElement(heroPlay, { scroll: false });
+        }
+      } finally {
+        isSubmittingAuthForm = false;
+        if (submitBtn && origBtnText) submitBtn.textContent = origBtnText;
+      }
+    }
+    window.submitAuthLoginForm = submitAuthLoginForm;
+
+    var authForm = document.getElementById('authForm');
+    if (authForm) {
+      authForm.addEventListener('submit', submitAuthLoginForm);
+    }
+    var authSubmitBtn = document.getElementById('authSubmitBtn');
+    if (authSubmitBtn) {
+      authSubmitBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        submitAuthLoginForm(e);
+      });
+    }
+    var authEmailIn = document.getElementById('authEmailInput');
+    var authPassIn = document.getElementById('authPasswordInput');
+    if (authEmailIn) {
+      authEmailIn.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !document.body.classList.contains('tv-mode')) {
+          e.preventDefault();
+          if (authPassIn && !authPassIn.value) {
+            authPassIn.focus();
+          } else {
+            submitAuthLoginForm(e);
+          }
+        }
+      });
+    }
+    if (authPassIn) {
+      authPassIn.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !document.body.classList.contains('tv-mode')) {
+          e.preventDefault();
+          submitAuthLoginForm(e);
         }
       });
     }
@@ -11113,8 +11235,8 @@
   }
 
   function bootStreamItApp() {
-    if (window.__STREAMIT_V965_BOOTED) return;
-    window.__STREAMIT_V965_BOOTED = true;
+    if (window.__STREAMIT_V970_BOOT_DONE) return;
+    window.__STREAMIT_V970_BOOT_DONE = true;
 
     // If an older bundled APK script ran 1ms earlier, strip its stale DOM listeners via cloneNode(true)
     if (wasLegacyBooted) {

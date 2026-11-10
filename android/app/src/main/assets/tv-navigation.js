@@ -333,11 +333,6 @@
 
   function getVirtualKeyboardRows(vk) {
     var rows = [];
-    var quickBar = document.getElementById('vkQuickBar');
-    if (quickBar && !quickBar.classList.contains('hidden')) {
-      var qBtns = Array.prototype.slice.call(quickBar.querySelectorAll('.vk-quick-btn')).filter(isElementVisible);
-      if (qBtns.length) rows.push(sortRowByPhysicalLeft(qBtns));
-    }
     var topActs = Array.prototype.slice.call(vk.querySelectorAll('.vk-header-actions .vk-top-act-btn')).filter(isElementVisible);
     if (topActs.length) {
       rows.push(sortRowByPhysicalLeft(topActs));
@@ -349,7 +344,7 @@
     }
     var actionBtns = Array.prototype.slice.call(vk.querySelectorAll('.vk-actions-row .vk-action-btn')).filter(isElementVisible);
     if (actionBtns.length) {
-      rows.push(sortRowByPhysicalLeft(actionBtns));
+      rows.push(actionBtns);
     }
     return rows;
   }
@@ -398,24 +393,14 @@
       return true;
     }
 
-    var curRect = currentFocused.getBoundingClientRect();
-    var curCx = curRect.left + curRect.width / 2;
-
     if (direction === 'up') {
       if (curRow > 0) {
         var targetRowUp = rows[curRow - 1];
-        var bestUp = targetRowUp[0];
-        var bestDistUp = Infinity;
-        for (var u = 0; u < targetRowUp.length; u++) {
-          var ur = targetRowUp[u].getBoundingClientRect();
-          var ucx = ur.left + ur.width / 2;
-          var dUp = Math.abs(ucx - curCx);
-          if (dUp < bestDistUp) {
-            bestDistUp = dUp;
-            bestUp = targetRowUp[u];
-          }
-        }
-        if (bestUp) return setFocus(bestUp, { scroll: false });
+        var nextColUp = Math.min(
+          targetRowUp.length - 1,
+          Math.floor((curCol / Math.max(1, rows[curRow].length)) * targetRowUp.length)
+        );
+        return setFocus(targetRowUp[Math.max(0, nextColUp)], { scroll: false });
       }
       closeVirtualKeyboard();
       return true;
@@ -424,18 +409,146 @@
     if (direction === 'down') {
       if (curRow < rows.length - 1) {
         var targetRowDown = rows[curRow + 1];
-        var bestDown = targetRowDown[0];
-        var bestDistDown = Infinity;
-        for (var d = 0; d < targetRowDown.length; d++) {
-          var dr = targetRowDown[d].getBoundingClientRect();
-          var dcx = dr.left + dr.width / 2;
-          var dDown = Math.abs(dcx - curCx);
-          if (dDown < bestDistDown) {
-            bestDistDown = dDown;
-            bestDown = targetRowDown[d];
-          }
-        }
-        if (bestDown) return setFocus(bestDown, { scroll: false });
+        var nextColDown = Math.min(
+          targetRowDown.length - 1,
+          Math.floor((curCol / Math.max(1, rows[curRow].length)) * targetRowDown.length)
+        );
+        return setFocus(targetRowDown[Math.max(0, nextColDown)], { scroll: false });
+      }
+      // Pressing Down on the bottom row of the keyboard closes it and moves down to the next field/submit button!
+      var prevInput = getActiveVkInput();
+      closeVirtualKeyboard();
+      if (prevInput && prevInput.id === 'authEmailInput') {
+        var passField = document.getElementById('authPasswordInput');
+        if (passField && isElementVisible(passField)) return setFocus(passField);
+      } else if (prevInput && prevInput.id === 'authPasswordInput') {
+        var subBtn = document.getElementById('authSubmitBtn');
+        if (subBtn && isElementVisible(subBtn)) return setFocus(subBtn);
+      }
+      return true;
+    }
+
+    return true;
+  }
+
+  /**
+   * Deterministic Vertical & Horizontal Navigation inside Login & Profiles Modal (#authModal)
+   * Guarantees Remote D-Pad Down/Up moves smoothly all the way to #authSubmitBtn ("התחבר לחשבון") without stopping!
+   */
+  function getAuthModalNavigationRows() {
+    var authModal = document.getElementById('authModal');
+    if (!authModal || authModal.classList.contains('hidden')) return [];
+
+    var rows = [];
+    var closeBtn = document.getElementById('closeAuthModalBtn');
+    if (closeBtn && isElementVisible(closeBtn)) {
+      rows.push([closeBtn]);
+    }
+
+    var subUsersSec = document.getElementById('subUsersSection');
+    if (subUsersSec && isElementVisible(subUsersSec)) {
+      var profCards = Array.prototype.slice.call(subUsersSec.querySelectorAll('#subUsersGrid .sub-user-card')).filter(isElementVisible);
+      if (profCards.length) rows.push(profCards);
+
+      var delBtns = Array.prototype.slice.call(subUsersSec.querySelectorAll('#subUsersGrid .sub-user-delete-btn')).filter(isElementVisible);
+      if (delBtns.length) rows.push(delBtns);
+
+      var actBtns = Array.prototype.slice.call(subUsersSec.querySelectorAll('.sub-users-actions button')).filter(isElementVisible);
+      if (actBtns.length) rows.push(actBtns);
+
+      var addForm = document.getElementById('addSubUserForm');
+      if (addForm && isElementVisible(addForm)) {
+        var nameIn = document.getElementById('newSubUserNameInput');
+        var kidsBtn = document.getElementById('newSubUserKidsBtn');
+        var saveBtn = document.getElementById('saveNewSubUserBtn');
+        var cancelBtn = document.getElementById('cancelNewSubUserBtn');
+        if (nameIn && isElementVisible(nameIn)) rows.push([nameIn]);
+        if (kidsBtn && isElementVisible(kidsBtn)) rows.push([kidsBtn]);
+        var formBtns = [saveBtn, cancelBtn].filter(isElementVisible);
+        if (formBtns.length) rows.push(formBtns);
+      }
+    }
+
+    var authForm = document.getElementById('authForm');
+    if (authForm && isElementVisible(authForm)) {
+      var emailIn = document.getElementById('authEmailInput');
+      var passIn = document.getElementById('authPasswordInput');
+      var submitBtn = document.getElementById('authSubmitBtn');
+      if (emailIn && isElementVisible(emailIn)) rows.push([emailIn]);
+      if (passIn && isElementVisible(passIn)) rows.push([passIn]);
+      if (submitBtn && isElementVisible(submitBtn)) rows.push([submitBtn]);
+    }
+
+    var accountBox = document.getElementById('authAccountBox');
+    if (accountBox && isElementVisible(accountBox)) {
+      var tgAuthBtn = document.getElementById('openTelegramFromAuthBtn');
+      var logoutBtn = document.getElementById('logoutBtn');
+      if (tgAuthBtn && isElementVisible(tgAuthBtn)) rows.push([tgAuthBtn]);
+      if (logoutBtn && isElementVisible(logoutBtn)) rows.push([logoutBtn]);
+    }
+
+    return rows;
+  }
+
+  function navigateAuthModal(direction) {
+    var authModal = document.getElementById('authModal');
+    if (!authModal || authModal.classList.contains('hidden')) return false;
+
+    var rows = getAuthModalNavigationRows();
+    if (!rows.length) return false;
+
+    var activeEl = currentFocused;
+    if ((!activeEl || !authModal.contains(activeEl) || !isElementVisible(activeEl)) && document.activeElement && authModal.contains(document.activeElement)) {
+      activeEl = document.activeElement;
+    }
+
+    var curRow = -1;
+    var curCol = -1;
+    for (var r = 0; r < rows.length; r++) {
+      var cIdx = rows[r].indexOf(activeEl);
+      if (cIdx !== -1) {
+        curRow = r;
+        curCol = cIdx;
+        break;
+      }
+    }
+
+    if (curRow === -1) {
+      var emailField = document.getElementById('authEmailInput');
+      if (emailField && isElementVisible(emailField)) {
+        return setFocus(emailField);
+      }
+      return setFocus(rows[0][0]);
+    }
+
+    if (direction === 'down') {
+      if (curRow < rows.length - 1) {
+        var nextRowD = rows[curRow + 1];
+        var nextColD = Math.min(curCol, nextRowD.length - 1);
+        return setFocus(nextRowD[Math.max(0, nextColD)]);
+      }
+      return setFocus(rows[rows.length - 1][Math.min(curCol, rows[rows.length - 1].length - 1)]);
+    }
+
+    if (direction === 'up') {
+      if (curRow > 0) {
+        var nextRowU = rows[curRow - 1];
+        var nextColU = Math.min(curCol, nextRowU.length - 1);
+        return setFocus(nextRowU[Math.max(0, nextColU)]);
+      }
+      return setFocus(rows[0][Math.min(curCol, rows[0].length - 1)]);
+    }
+
+    if (direction === 'left') {
+      if (curCol < rows[curRow].length - 1) {
+        return setFocus(rows[curRow][curCol + 1]);
+      }
+      return true;
+    }
+
+    if (direction === 'right') {
+      if (curCol > 0) {
+        return setFocus(rows[curRow][curCol - 1]);
       }
       return true;
     }
@@ -1583,52 +1696,37 @@
   }
 
   function ensureAuthFormDomUpgraded() {
-    var authForm = document.getElementById('authForm');
-    if (!authForm) return;
-    if (!document.getElementById('authQuickAccountsBar')) {
-      var quickBar = document.createElement('div');
-      quickBar.id = 'authQuickAccountsBar';
-      quickBar.className = 'auth-quick-accounts-bar';
-      quickBar.innerHTML =
-        '<span class="auth-quick-accounts-label">בחירת חשבון מהירה בסטרימר (לחיצה אחת):</span>' +
-        '<div class="auth-quick-accounts-row" dir="ltr">' +
-          '<button type="button" class="auth-quick-account-btn tv-focusable" data-quick-email="bensahaltv@gmail.com">bensahaltv@gmail.com</button>' +
-          '<button type="button" class="auth-quick-account-btn tv-focusable" data-quick-email="streamittvapp@gmail.com">streamittvapp@gmail.com</button>' +
-        '</div>';
-      authForm.insertBefore(quickBar, authForm.firstChild);
+    var authModal = document.getElementById('authModal');
+    if (!authModal) return;
+
+    // Remove any quick-access / inline helper buttons so the login form stays 100% clean
+    var toRemove = authModal.querySelectorAll(
+      '#authQuickAccountsBar, #quickTestLoginBtn, .form-field-inline-actions, .form-inline-btn, .auth-quick-accounts-bar'
+    );
+    for (var i = 0; i < toRemove.length; i++) {
+      if (toRemove[i] && toRemove[i].parentNode) {
+        toRemove[i].parentNode.removeChild(toRemove[i]);
+      }
     }
 
     var emailIn = document.getElementById('authEmailInput');
-    if (emailIn && emailIn.parentNode && !emailIn.parentNode.querySelector('.form-label-row')) {
-      var emailGroup = emailIn.parentNode;
-      var oldEmailLabel = emailGroup.querySelector('label');
-      var rowE = document.createElement('div');
-      rowE.className = 'form-label-row';
-      rowE.innerHTML =
-        '<label for="authEmailInput" class="form-label">כתובת אימייל (מנוי מאושר)</label>' +
-        '<div class="form-field-inline-actions">' +
-          '<button type="button" class="form-inline-btn tv-focusable" data-open-vk="authEmailInput">מקלדת</button>' +
-          '<button type="button" class="form-inline-btn form-inline-clear-btn tv-focusable" data-clear-field="authEmailInput">נקה שדה</button>' +
-        '</div>';
-      if (oldEmailLabel) emailGroup.replaceChild(rowE, oldEmailLabel);
-      else emailGroup.insertBefore(rowE, emailIn);
+    if (emailIn) {
+      emailIn.removeAttribute('readonly');
+      emailIn.removeAttribute('disabled');
+      emailIn.classList.add('tv-focusable');
     }
 
     var passIn = document.getElementById('authPasswordInput');
-    if (passIn && passIn.parentNode && !passIn.parentNode.querySelector('.form-label-row')) {
-      var passGroup = passIn.parentNode;
-      var oldPassLabel = passGroup.querySelector('label');
-      var rowP = document.createElement('div');
-      rowP.className = 'form-label-row';
-      rowP.innerHTML =
-        '<label for="authPasswordInput" class="form-label">סיסמה</label>' +
-        '<div class="form-field-inline-actions">' +
-          '<button type="button" id="toggleAuthPassVisBtn" class="form-inline-btn tv-focusable" data-toggle-pass="authPasswordInput">הצג סיסמה</button>' +
-          '<button type="button" class="form-inline-btn tv-focusable" data-open-vk="authPasswordInput">מקלדת</button>' +
-          '<button type="button" class="form-inline-btn form-inline-clear-btn tv-focusable" data-clear-field="authPasswordInput">נקה שדה</button>' +
-        '</div>';
-      if (oldPassLabel) passGroup.replaceChild(rowP, oldPassLabel);
-      else passGroup.insertBefore(rowP, passIn);
+    if (passIn) {
+      passIn.removeAttribute('readonly');
+      passIn.removeAttribute('disabled');
+      passIn.classList.add('tv-focusable');
+    }
+
+    var subBtn = document.getElementById('authSubmitBtn');
+    if (subBtn) {
+      subBtn.removeAttribute('disabled');
+      subBtn.classList.add('tv-focusable');
     }
   }
 
@@ -1638,17 +1736,13 @@
     ensureAuthFormDomUpgraded();
     var vk = document.getElementById('tvVirtualKeyboard');
     if (!vk) return null;
-    if (!document.getElementById('vkQuickBar') || !document.getElementById('vkTopBackspaceBtn')) {
+    var oldQuickBar = document.getElementById('vkQuickBar');
+    if (oldQuickBar && oldQuickBar.parentNode) {
+      oldQuickBar.parentNode.removeChild(oldQuickBar);
+    }
+    if (!document.getElementById('vkTopBackspaceBtn')) {
       vk.innerHTML =
         '<div class="vk-container" dir="ltr">' +
-          '<div id="vkQuickBar" class="vk-quick-bar hidden" dir="rtl">' +
-            '<button type="button" id="vkSwitchEmailBtn" class="vk-quick-btn tv-focusable" data-vk-switch-field="authEmailInput">אימייל</button>' +
-            '<button type="button" id="vkSwitchPassBtn" class="vk-quick-btn tv-focusable" data-vk-switch-field="authPasswordInput">סיסמה</button>' +
-            '<button type="button" class="vk-quick-btn vk-quick-account-pill tv-focusable" data-vk-fill-email="bensahaltv@gmail.com" dir="ltr">bensahaltv@gmail.com</button>' +
-            '<button type="button" class="vk-quick-btn vk-quick-account-pill tv-focusable" data-vk-fill-email="streamittvapp@gmail.com" dir="ltr">streamittvapp@gmail.com</button>' +
-            '<button type="button" class="vk-quick-btn vk-quick-domain-pill tv-focusable" data-vk-append="@gmail.com" dir="ltr">@gmail.com</button>' +
-            '<button type="button" id="vkQuickSubmitAuthBtn" class="vk-quick-btn vk-quick-submit-btn tv-focusable" data-vk-action="submit-auth">התחבר עכשיו</button>' +
-          '</div>' +
           '<div class="vk-header" dir="ltr">' +
             '<span id="vkFieldBadge" class="vk-field-badge" dir="rtl">שדה הקלדה</span>' +
             '<div id="vkPreviewText" class="vk-preview-text" dir="ltr"></div>' +
@@ -1702,8 +1796,8 @@
       var liveEl = document.getElementById(inputEl.id);
       if (liveEl) inputEl = liveEl;
     }
+    // Never add tv-mode on Desktop browsers — only mark vk-open while keyboard is displayed
     if (document.body) {
-      document.body.classList.add('tv-mode');
       document.body.classList.add('vk-open');
     }
     try {
@@ -1757,19 +1851,6 @@
     var inputEl = getActiveVkInput();
     if (!inputEl) return;
     var id = inputEl.id || '';
-    var inAuth = Boolean(inputEl.closest('#authModal'));
-    var quickBar = document.getElementById('vkQuickBar');
-    if (quickBar) {
-      quickBar.classList.toggle('hidden', !inAuth);
-      var swEmail = document.getElementById('vkSwitchEmailBtn');
-      var swPass = document.getElementById('vkSwitchPassBtn');
-      if (swEmail) swEmail.classList.toggle('active-field', id === 'authEmailInput');
-      if (swPass) swPass.classList.toggle('active-field', id === 'authPasswordInput');
-      var acctPills = quickBar.querySelectorAll('.vk-quick-account-pill, .vk-quick-domain-pill');
-      for (var i = 0; i < acctPills.length; i++) {
-        acctPills[i].classList.toggle('hidden', id !== 'authEmailInput');
-      }
-    }
 
     var badge = document.getElementById('vkFieldBadge');
     if (badge) {
@@ -1791,7 +1872,7 @@
       if (id === 'authEmailInput') {
         doneBtn.textContent = 'הבא: לסיסמה ↵';
       } else if (id === 'authPasswordInput') {
-        doneBtn.textContent = '✓ התחבר עכשיו';
+        doneBtn.textContent = '✓ התחבר לחשבון';
       } else {
         doneBtn.textContent = '✓ אישור וסיום';
       }
@@ -1852,65 +1933,9 @@
   function handleVkInteractiveElement(el) {
     if (!el) return false;
     var now = Date.now();
-    if (now - lastVkActionAt < 65) return true;
+    if (now - lastVkActionAt < 55) return true;
 
-    // 1. Form Quick Account Fill Buttons (inside #authForm)
-    var quickEmail = el.getAttribute('data-quick-email');
-    if (quickEmail) {
-      lastVkActionAt = now;
-      var emailField = document.getElementById('authEmailInput');
-      var passField = document.getElementById('authPasswordInput');
-      if (emailField) {
-        emailField.value = quickEmail;
-        dispatchInputUpdate(emailField);
-      }
-      if (passField) {
-        openVirtualKeyboard(passField);
-      }
-      return true;
-    }
-
-    // 2. Form Inline Clear Field Button
-    var clearFieldId = el.getAttribute('data-clear-field');
-    if (clearFieldId) {
-      lastVkActionAt = now;
-      var targetClear = document.getElementById(clearFieldId);
-      if (targetClear) {
-        targetClear.value = '';
-        dispatchInputUpdate(targetClear);
-      }
-      return true;
-    }
-
-    // 3. Form Inline Open Keyboard Button
-    var openVkId = el.getAttribute('data-open-vk');
-    if (openVkId) {
-      lastVkActionAt = now;
-      var targetVkIn = document.getElementById(openVkId);
-      if (targetVkIn) {
-        openVirtualKeyboard(targetVkIn);
-      }
-      return true;
-    }
-
-    // 4. Form Inline Toggle Password Visibility Button
-    var togglePassId = el.getAttribute('data-toggle-pass');
-    if (togglePassId) {
-      lastVkActionAt = now;
-      var passEl = document.getElementById(togglePassId);
-      if (passEl) {
-        var curType = (passEl.getAttribute('type') || 'password').toLowerCase();
-        var nextType = curType === 'password' ? 'text' : 'password';
-        passEl.setAttribute('type', nextType);
-        vkRevealPass = nextType === 'text';
-        el.textContent = nextType === 'text' ? 'הסתר סיסמה' : 'הצג סיסמה';
-        updateVkContextUi();
-        updateVkPreview();
-      }
-      return true;
-    }
-
-    // 5. Inside #tvVirtualKeyboard: Character Key (.vk-key[data-char])
+    // 1. Inside #tvVirtualKeyboard: Character Key (.vk-key[data-char])
     if (el.hasAttribute('data-char')) {
       lastVkActionAt = now;
       var inputCharEl = getActiveVkInput();
@@ -1926,50 +1951,7 @@
       return true;
     }
 
-    // 6. Inside #tvVirtualKeyboard: Switch Active Field (אימייל <-> סיסמה)
-    var switchFieldId = el.getAttribute('data-vk-switch-field');
-    if (switchFieldId) {
-      lastVkActionAt = now;
-      var nextInput = document.getElementById(switchFieldId);
-      if (nextInput) {
-        openVirtualKeyboard(nextInput);
-      }
-      return true;
-    }
-
-    // 7. Inside #tvVirtualKeyboard: 1-Click Account Email Pill -> Fills Email & Jumps to Password
-    var fillEmailVal = el.getAttribute('data-vk-fill-email');
-    if (fillEmailVal) {
-      lastVkActionAt = now;
-      var eIn = document.getElementById('authEmailInput') || getActiveVkInput();
-      if (eIn) {
-        eIn.value = fillEmailVal;
-        dispatchInputUpdate(eIn);
-      }
-      var pIn = document.getElementById('authPasswordInput');
-      if (pIn) {
-        openVirtualKeyboard(pIn);
-      }
-      return true;
-    }
-
-    // 8. Inside #tvVirtualKeyboard: Domain Append Pill (@gmail.com)
-    var appendStr = el.getAttribute('data-vk-append');
-    if (appendStr) {
-      lastVkActionAt = now;
-      var appIn = getActiveVkInput();
-      if (appIn) {
-        var vCur = appIn.value || '';
-        if (appendStr.indexOf('@') === 0 && vCur.indexOf('@') !== -1) {
-          vCur = vCur.split('@')[0];
-        }
-        appIn.value = vCur + appendStr;
-        dispatchInputUpdate(appIn);
-      }
-      return true;
-    }
-
-    // 9. Inside #tvVirtualKeyboard: Action Buttons (backspace, clear, space, lang, toggle-pass, submit-auth, close, done)
+    // 2. Inside #tvVirtualKeyboard: Action Buttons (backspace, clear, space, lang, toggle-pass, close, done)
     var vkAction = el.getAttribute('data-vk-action') || '';
     if (!vkAction) {
       if (el.id === 'vkBackspaceBtn' || el.id === 'vkTopBackspaceBtn') vkAction = 'backspace';
@@ -2035,25 +2017,29 @@
         return true;
       }
 
-      if (vkAction === 'submit-auth') {
-        closeVirtualKeyboard();
-        var subBtn = document.getElementById('authSubmitBtn');
-        if (subBtn) subBtn.click();
-        return true;
-      }
-
       if (vkAction === 'done') {
         if (targetIn && targetIn.id === 'authEmailInput') {
+          closeVirtualKeyboard();
           var nextPass = document.getElementById('authPasswordInput');
           if (nextPass && isElementVisible(nextPass)) {
-            openVirtualKeyboard(nextPass);
-            return true;
+            setFocus(nextPass);
+            if (document.body && document.body.classList.contains('tv-mode') && !nextPass.value) {
+              openVirtualKeyboard(nextPass);
+            }
           }
+          return true;
         }
         if (targetIn && targetIn.id === 'authPasswordInput') {
           closeVirtualKeyboard();
           var authSub = document.getElementById('authSubmitBtn');
-          if (authSub) authSub.click();
+          if (authSub && isElementVisible(authSub)) {
+            setFocus(authSub);
+            if (typeof window.submitAuthLoginForm === 'function') {
+              window.submitAuthLoginForm();
+            } else {
+              authSub.click();
+            }
+          }
           return true;
         }
         closeVirtualKeyboard();
@@ -2076,7 +2062,7 @@
       if (!target || typeof target.closest !== 'function') return;
 
       var actionBtn = target.closest(
-        '[data-vk-action], [data-char], [data-vk-switch-field], [data-vk-fill-email], [data-vk-append], [data-quick-email], [data-clear-field], [data-open-vk], [data-toggle-pass], #vkLangBtn, #vkSpaceBtn, #vkBackspaceBtn, #vkClearBtn, #vkDoneBtn'
+        '[data-vk-action], [data-char], #vkLangBtn, #vkSpaceBtn, #vkBackspaceBtn, #vkClearBtn, #vkDoneBtn'
       );
       if (actionBtn) {
         if (handleVkInteractiveElement(actionBtn)) {
@@ -2090,15 +2076,42 @@
       if (clickedInput) {
         var inType = (clickedInput.getAttribute('type') || 'text').toLowerCase();
         if (inType !== 'range' && inType !== 'checkbox' && inType !== 'submit') {
+          clickedInput.removeAttribute('readonly');
           var isTvNow = Boolean(document.body && document.body.classList.contains('tv-mode'));
-          if (isTvNow || clickedInput.closest('#authModal')) {
+          if (isTvNow) {
             e.preventDefault();
             openVirtualKeyboard(clickedInput);
+          } else {
+            // Desktop / Mobile Browser: let native input focus & typing work normally!
+            if (currentFocused && currentFocused !== clickedInput) {
+              currentFocused.classList.remove('tv-focused');
+            }
+            currentFocused = clickedInput;
+            clickedInput.classList.add('tv-focused');
           }
         }
       }
     };
     document.addEventListener('click', window.__streamItVkDocClickHandler, true);
+
+    if (window.__streamItDocFocusInHandler) {
+      try {
+        document.removeEventListener('focusin', window.__streamItDocFocusInHandler, true);
+      } catch (e) {}
+    }
+    window.__streamItDocFocusInHandler = function (e) {
+      var isTvNow = Boolean(document.body && document.body.classList.contains('tv-mode'));
+      if (isTvNow) return;
+      var el = e.target;
+      if (el && (el.tagName === 'INPUT' || el.tagName === 'BUTTON' || (el.classList && el.classList.contains('tv-focusable')))) {
+        if (currentFocused && currentFocused !== el) {
+          currentFocused.classList.remove('tv-focused');
+        }
+        currentFocused = el;
+        el.classList.add('tv-focused');
+      }
+    };
+    document.addEventListener('focusin', window.__streamItDocFocusInHandler, true);
   }
 
   /**
@@ -2437,7 +2450,18 @@
       var tag = (currentFocused.tagName || '').toUpperCase();
       var type = (currentFocused.getAttribute('type') || '').toLowerCase();
       if (tag === 'INPUT' && type !== 'range' && type !== 'checkbox' && type !== 'submit') {
-        openVirtualKeyboard(currentFocused);
+        if (isTv) {
+          openVirtualKeyboard(currentFocused);
+        } else {
+          try {
+            currentFocused.focus();
+          } catch (e) {}
+        }
+        return true;
+      }
+
+      if (currentFocused.id === 'authSubmitBtn' && typeof window.submitAuthLoginForm === 'function') {
+        window.submitAuthLoginForm();
         return true;
       }
 
@@ -2462,6 +2486,9 @@
     }
 
     var activeScope = getActiveScope();
+    if (activeScope && activeScope.id === 'authModal') {
+      return navigateAuthModal(directionOrAction);
+    }
     if (activeScope === document.body || (activeScope && activeScope.classList && activeScope.classList.contains('explorer-dropdown-panel'))) {
       if (navigateHomeStage(directionOrAction)) return true;
     }
@@ -2481,6 +2508,20 @@
   }
 
   function ensureInitialTvFocus() {
+    var authModal = document.getElementById('authModal');
+    if (authModal && !authModal.classList.contains('hidden')) {
+      if (currentFocused && authModal.contains(currentFocused) && isElementVisible(currentFocused)) {
+        return true;
+      }
+      var emailIn = document.getElementById('authEmailInput');
+      if (emailIn && isElementVisible(emailIn)) {
+        return setFocus(emailIn, { scroll: false });
+      }
+      var authList = getFocusableElements(authModal);
+      if (authList.length) {
+        return setFocus(authList[0], { scroll: false });
+      }
+    }
     if (currentFocused && isElementVisible(currentFocused)) return true;
     var firstCard = document.querySelector('#catalogRowsContainer .poster-card') ||
       document.querySelector('#continueWatchingRow .poster-card') ||

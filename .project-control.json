@@ -1,0 +1,625 @@
+{
+  "schema_version": 2,
+  "project_name": "STREAM IT",
+  "updated_at": "2026-11-09T08:46:56",
+  "health_score": 90,
+  "last_audit": {
+    "project_name": "STREAM IT",
+    "ran_at": "2026-11-09T08:46:56",
+    "deep_browser_ran": false,
+    "health_score": 90,
+    "summary": {
+      "pass": 10,
+      "warn": 3,
+      "fail": 0,
+      "na": 1
+    },
+    "categories": [
+      {
+        "id": "runtime",
+        "title": "1. חיבורים ושרת חי",
+        "icon": "🔌",
+        "checks": [
+          {
+            "key": "runtime:folder_exists",
+            "title": "נגישות תיקייה וקובצי בסיס",
+            "task_title": "בדיקת קובצי הגדרות בסיס בפרויקט",
+            "status": "pass",
+            "details": "הפרויקט תקין ונגיש (C:\\Users\\bensa\\Documents\\Antigravity\\BENSAHAL\\STREAM IT).",
+            "recommendation": "",
+            "create_task_on_warn": true
+          },
+          {
+            "key": "runtime:dev_server_http",
+            "title": "מצב שרת מקומי (:8092)",
+            "task_title": "הפעלה ובדיקת שרת חי בפורט 8092",
+            "status": "warn",
+            "details": "השרת כבוי כרגע (פקודת הרצה: python server.py 8092). הרץ 'סריקה מלאה + דפדפן' כדי להרים ולבדוק אותו אוטומטית.",
+            "recommendation": "",
+            "create_task_on_warn": false
+          }
+        ],
+        "status": "warn"
+      },
+      {
+        "id": "ui_browser",
+        "title": "2. ממשק, כפתורים ושגיאות דפדפן",
+        "icon": "🖥️",
+        "checks": [
+          {
+            "key": "ui_browser:live_scan_skipped",
+            "title": "סריקת דפדפן חי (Headless Chrome)",
+            "task_title": "",
+            "status": "na",
+            "details": "השרת המקומי כבוי כרגע — לחץ על '🔍 סריקה עמוקה (כולל דפדפן)' כדי להפעיל ולבדוק כפתורים ו-Console בלייב.",
+            "recommendation": "",
+            "create_task_on_warn": false
+          }
+        ],
+        "status": "na"
+      },
+      {
+        "id": "rtl_mobile",
+        "title": "3. תאימות עברית (RTL) ומובייל",
+        "icon": "📱",
+        "checks": [
+          {
+            "key": "rtl_mobile:viewport_rtl",
+            "title": "הגדרת Viewport למובייל ב-index.html",
+            "task_title": "הוספת meta viewport לקובץ index.html",
+            "status": "pass",
+            "details": "תגית viewport קיימת ב-index.html.",
+            "recommendation": "",
+            "create_task_on_warn": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "id": "security",
+        "title": "4. אבטחה, הרשאות וסודות",
+        "icon": "🛡️",
+        "checks": [
+          {
+            "key": "security:secrets_leak",
+            "title": "סריקת מפתחות וסודות חשופים בקוד",
+            "task_title": "",
+            "status": "pass",
+            "details": "לא נמצאו מפתחות פרטיים או טוקנים חשופים בקוד המקור.",
+            "recommendation": "",
+            "create_task_on_warn": false
+          },
+          {
+            "key": "security:env_gitignore",
+            "title": "הגנת קובצי .env וסודות ב-Git",
+            "task_title": "",
+            "status": "pass",
+            "details": "קובצי .env מוגנים כראוי ואינם חשופים ב-Git.",
+            "recommendation": "",
+            "create_task_on_warn": false
+          },
+          {
+            "key": "security:rules_and_xss",
+            "title": "חוקי הרשאות (Firebase Rules) והגנת XSS",
+            "task_title": "",
+            "status": "pass",
+            "details": "לא זוהו חוקי Firebase פרוצים או קריאות eval מסוכנות.",
+            "recommendation": "",
+            "create_task_on_warn": false
+          },
+          {
+            "key": "security:encryption_and_tls",
+            "title": "הצפנת תקשורת (HTTPS/TLS) והצפנת מידע רגיש",
+            "task_title": "העברת תקשורת ל-HTTPS והצפנת נתונים רגישים באחסון מקומי",
+            "status": "warn",
+            "details": "כתובות HTTP חיצוניות ללא הצפנת TLS/HTTPS: app.js, www/app.js",
+            "recommendation": "השתמש ב-HTTPS/WSS לכל קריאה חיצונית ואל תשמור סיסמאות גלויות ב-localStorage.",
+            "create_task_on_warn": false
+          }
+        ],
+        "status": "warn"
+      },
+      {
+        "id": "build_code",
+        "title": "5. קומפילציה, תלויות ואיכות קוד",
+        "icon": "⚙️",
+        "checks": [
+          {
+            "key": "build_code:dependencies",
+            "title": "תקינות חבילות ותלויות (node_modules)",
+            "task_title": "",
+            "status": "pass",
+            "details": "כל החבילות הראשיות (2) מותקנות ב-node_modules.",
+            "recommendation": "",
+            "create_task_on_warn": false
+          },
+          {
+            "key": "build_code:hardcoded_localhost",
+            "title": "מוכנות לפרודקשן (כתובות Localhost קשיחות)",
+            "task_title": "החלפת כתובות localhost קשיחות במשתנה סביבה / נתיב יחסי",
+            "status": "warn",
+            "details": "נמצאו כתובות localhost מקודדות קשיח בקוד הלקוח שעלולות להישבר בפרודקשן/טאבלט: app.js:1378, www/app.js:1378",
+            "recommendation": "השתמש ב-import.meta.env / נתיב יחסי עם fallback ללוקאלהוסט רק בסביבת פיתוח.",
+            "create_task_on_warn": true
+          }
+        ],
+        "status": "warn"
+      },
+      {
+        "id": "mobile_cap",
+        "title": "6. סנכרון מובייל ו-Capacitor",
+        "icon": "📦",
+        "checks": [
+          {
+            "key": "mobile_cap:cap_sync",
+            "title": "סנכרון קוד Web לאפליקציית Android (cap sync)",
+            "task_title": "",
+            "status": "pass",
+            "details": "תיקיית Android מסונכרנת עם קוד ה-Web העדכני.",
+            "recommendation": "",
+            "create_task_on_warn": false
+          },
+          {
+            "key": "mobile_cap:android_manifest",
+            "title": "תקינות הרשאות AndroidManifest.xml",
+            "task_title": "הוספת הרשאת INTERNET לקובץ AndroidManifest.xml",
+            "status": "pass",
+            "details": "AndroidManifest.xml תקין וכולל הרשאת INTERNET.",
+            "recommendation": "",
+            "create_task_on_warn": true
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "id": "git_env",
+        "title": "7. בקרת גרסאות ומשתני סביבה",
+        "icon": "🌿",
+        "checks": [
+          {
+            "key": "git_env:git_status",
+            "title": "סנכרון וגיבוי קוד ב-Git",
+            "task_title": "",
+            "status": "pass",
+            "details": "קיימים שינויי פיתוח מקומיים (1 changed file(s)).",
+            "recommendation": "לאחר סיום ואישור המשימות, מומלץ לגבות ב-Git Sync.",
+            "create_task_on_warn": false
+          }
+        ],
+        "status": "pass"
+      },
+      {
+        "id": "resilience",
+        "title": "8. עמידות, יציבות ומשאבים",
+        "icon": "⚡",
+        "checks": [
+          {
+            "key": "resilience:error_handling",
+            "title": "טיפול בשגיאות רשת (try/catch סביב קריאות API)",
+            "task_title": "",
+            "status": "pass",
+            "details": "קריאות הרשת בקוד מטופלות בבלוקי הגנת שגיאות.",
+            "recommendation": "",
+            "create_task_on_warn": false
+          }
+        ],
+        "status": "pass"
+      }
+    ]
+  },
+  "tasks": [
+    {
+      "id": "tsk_8dba85f27c",
+      "title": "החלפת כתובות localhost קשיחות במשתנה סביבה / נתיב יחסי",
+      "description": "נמצאו כתובות localhost מקודדות קשיח בקוד הלקוח שעלולות להישבר בפרודקשן/טאבלט: app.js:1378, www/app.js:1378\nהמלצה לתיקון: השתמש ב-import.meta.env / נתיב יחסי עם fallback ללוקאלהוסט רק בסביבת פיתוח.",
+      "category": "build_code",
+      "severity": "medium",
+      "source": "audit",
+      "check_key": "build_code:hardcoded_localhost",
+      "code_path": "",
+      "auto_fix_hint": "",
+      "agent_done": false,
+      "agent_summary": "",
+      "agent_completed_at": "",
+      "owner_verified": false,
+      "owner_verified_at": "",
+      "owner_notes": "",
+      "created_at": "2026-11-09T08:00:53",
+      "updated_at": "2026-11-09T08:46:56"
+    }
+  ],
+  "qa_platforms": [
+    "web",
+    "android"
+  ],
+  "qa_testers": [
+    "איגור",
+    "קובי",
+    "דודו",
+    "אילן"
+  ],
+  "qa_features": [
+    {
+      "id": "html_admin_html",
+      "category": "1. מסכים, עמודים וניווט ראשי",
+      "title": "מסך STREAM IT — מרכז בקרה וניהול מנויים מאובטח (v9.5.5) (admin.html)",
+      "description": "פתיחת admin.html, בדיקת פריסת העמוד, תקינות פונטים וצבעים, כפתורים וטפסים ללא שגיאות קונסול.",
+      "codePath": "admin.html"
+    },
+    {
+      "id": "html_index_html",
+      "category": "1. מסכים, עמודים וניווט ראשי",
+      "title": "מסך STREAM IT — קולנוע, סדרות ושידורים חיים (index.html)",
+      "description": "פתיחת index.html, בדיקת פריסת העמוד, תקינות פונטים וצבעים, כפתורים וטפסים ללא שגיאות קונסול.",
+      "codePath": "index.html"
+    },
+    {
+      "id": "html_sec_admin_html_adminlogingate",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "רכיב / אזור ממשק Adminlogingate (#adminLoginGate)",
+      "description": "בדיקת תצוגה, כפתורים ואינטראקציה של האזור #adminLoginGate בתוך admin.html.",
+      "codePath": "admin.html"
+    },
+    {
+      "id": "html_sec_admin_html_admingateerror",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "רכיב / אזור ממשק Admingateerror (#adminGateError)",
+      "description": "בדיקת תצוגה, כפתורים ואינטראקציה של האזור #adminGateError בתוך admin.html.",
+      "codePath": "admin.html"
+    },
+    {
+      "id": "html_sec_admin_html_adminprotectedapp",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "רכיב / אזור ממשק Adminprotectedapp (#adminProtectedApp)",
+      "description": "בדיקת תצוגה, כפתורים ואינטראקציה של האזור #adminProtectedApp בתוך admin.html.",
+      "codePath": "admin.html"
+    },
+    {
+      "id": "html_sec_admin_html_kpiuserscount",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "רכיב / אזור ממשק Kpiuserscount (#kpiUsersCount)",
+      "description": "בדיקת תצוגה, כפתורים ואינטראקציה של האזור #kpiUsersCount בתוך admin.html.",
+      "codePath": "admin.html"
+    },
+    {
+      "id": "html_sec_admin_html_kpiuserssub",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "רכיב / אזור ממשק Kpiuserssub (#kpiUsersSub)",
+      "description": "בדיקת תצוגה, כפתורים ואינטראקציה של האזור #kpiUsersSub בתוך admin.html.",
+      "codePath": "admin.html"
+    },
+    {
+      "id": "html_sec_admin_html_kpilivechannelscount",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "רכיב / אזור ממשק Kpilivechannelscount (#kpiLiveChannelsCount)",
+      "description": "בדיקת תצוגה, כפתורים ואינטראקציה של האזור #kpiLiveChannelsCount בתוך admin.html.",
+      "codePath": "admin.html"
+    },
+    {
+      "id": "html_sec_admin_html_kpitgchannelscount",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "רכיב / אזור ממשק Kpitgchannelscount (#kpiTgChannelsCount)",
+      "description": "בדיקת תצוגה, כפתורים ואינטראקציה של האזור #kpiTgChannelsCount בתוך admin.html.",
+      "codePath": "admin.html"
+    },
+    {
+      "id": "html_sec_admin_html_tab_users",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "רכיב / אזור ממשק Tab Users (#tab-users)",
+      "description": "בדיקת תצוגה, כפתורים ואינטראקציה של האזור #tab-users בתוך admin.html.",
+      "codePath": "admin.html"
+    },
+    {
+      "id": "html_sec_admin_html_tab_telegram",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "רכיב / אזור ממשק Tab Telegram (#tab-telegram)",
+      "description": "בדיקת תצוגה, כפתורים ואינטראקציה של האזור #tab-telegram בתוך admin.html.",
+      "codePath": "admin.html"
+    },
+    {
+      "id": "html_sec_admin_html_tgchannelstablewrap",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "רכיב / אזור ממשק Tgchannelstablewrap (#tgChannelsTableWrap)",
+      "description": "בדיקת תצוגה, כפתורים ואינטראקציה של האזור #tgChannelsTableWrap בתוך admin.html.",
+      "codePath": "admin.html"
+    },
+    {
+      "id": "html_sec_admin_html_tab_sources",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "רכיב / אזור ממשק Tab Sources (#tab-sources)",
+      "description": "בדיקת תצוגה, כפתורים ואינטראקציה של האזור #tab-sources בתוך admin.html.",
+      "codePath": "admin.html"
+    },
+    {
+      "id": "html_sec_admin_html_addonsgrid",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "רכיב / אזור ממשק Addonsgrid (#addonsGrid)",
+      "description": "בדיקת תצוגה, כפתורים ואינטראקציה של האזור #addonsGrid בתוך admin.html.",
+      "codePath": "admin.html"
+    },
+    {
+      "id": "html_fn_admin_html_getcloudsynctoken",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "פעולת מערכת: Get Cloud Sync Token (getCloudSyncToken)",
+      "description": "בדיקת הפעלת הפונקציה getCloudSyncToken() מתוך הממשק ב-admin.html ווידוא השלמת הפעולה ללא שגיאות.",
+      "codePath": "admin.html"
+    },
+    {
+      "id": "html_fn_admin_html_showtoast",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "פעולת מערכת: Show Toast (showToast)",
+      "description": "בדיקת הפעלת הפונקציה showToast() מתוך הממשק ב-admin.html ווידוא השלמת הפעולה ללא שגיאות.",
+      "codePath": "admin.html"
+    },
+    {
+      "id": "html_fn_admin_html_escapehtml",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "פעולת מערכת: Escape Html (escapeHtml)",
+      "description": "בדיקת הפעלת הפונקציה escapeHtml() מתוך הממשק ב-admin.html ווידוא השלמת הפעולה ללא שגיאות.",
+      "codePath": "admin.html"
+    },
+    {
+      "id": "html_fn_admin_html_sha256hex",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "פעולת מערכת: Sha256Hex (sha256Hex)",
+      "description": "בדיקת הפעלת הפונקציה sha256Hex() מתוך הממשק ב-admin.html ווידוא השלמת הפעולה ללא שגיאות.",
+      "codePath": "admin.html"
+    },
+    {
+      "id": "html_fn_admin_html_loadvaultfromcloud",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "פעולת מערכת: Load Vault From Cloud (loadVaultFromCloud)",
+      "description": "בדיקת הפעלת הפונקציה loadVaultFromCloud() מתוך הממשק ב-admin.html ווידוא השלמת הפעולה ללא שגיאות.",
+      "codePath": "admin.html"
+    },
+    {
+      "id": "html_fn_admin_html_rebuilduserslist",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "פעולת מערכת: Rebuild Users List (rebuildUsersList)",
+      "description": "בדיקת הפעלת הפונקציה rebuildUsersList() מתוך הממשק ב-admin.html ווידוא השלמת הפעולה ללא שגיאות.",
+      "codePath": "admin.html"
+    },
+    {
+      "id": "html_fn_admin_html_pushvaulttogithubcloud",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "פעולת מערכת: Push Vault To Git Hub Cloud (pushVaultToGitHubCloud)",
+      "description": "בדיקת הפעלת הפונקציה pushVaultToGitHubCloud() מתוך הממשק ב-admin.html ווידוא השלמת הפעולה ללא שגיאות.",
+      "codePath": "admin.html"
+    },
+    {
+      "id": "html_fn_admin_html_verifyadmingatecredentials",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "פעולת מערכת: Verify Admin Gate Credentials (verifyAdminGateCredentials)",
+      "description": "בדיקת הפעלת הפונקציה verifyAdminGateCredentials() מתוך הממשק ב-admin.html ווידוא השלמת הפעולה ללא שגיאות.",
+      "codePath": "admin.html"
+    },
+    {
+      "id": "html_fn_admin_html_unlockadminconsole",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "פעולת מערכת: Unlock Admin Console (unlockAdminConsole)",
+      "description": "בדיקת הפעלת הפונקציה unlockAdminConsole() מתוך הממשק ב-admin.html ווידוא השלמת הפעולה ללא שגיאות.",
+      "codePath": "admin.html"
+    },
+    {
+      "id": "html_fn_admin_html_lockadminconsole",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "פעולת מערכת: Lock Admin Console (lockAdminConsole)",
+      "description": "בדיקת הפעלת הפונקציה lockAdminConsole() מתוך הממשק ב-admin.html ווידוא השלמת הפעולה ללא שגיאות.",
+      "codePath": "admin.html"
+    },
+    {
+      "id": "html_sec_index_html_topheader",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "רכיב / אזור ממשק Topheader (#topHeader)",
+      "description": "בדיקת תצוגה, כפתורים ואינטראקציה של האזור #topHeader בתוך index.html.",
+      "codePath": "index.html"
+    },
+    {
+      "id": "html_sec_index_html_headersearchbox",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "רכיב / אזור ממשק Headersearchbox (#headerSearchBox)",
+      "description": "בדיקת תצוגה, כפתורים ואינטראקציה של האזור #headerSearchBox בתוך index.html.",
+      "codePath": "index.html"
+    },
+    {
+      "id": "html_sec_index_html_usersettingsdropdownwrap",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "רכיב / אזור ממשק Usersettingsdropdownwrap (#userSettingsDropdownWrap)",
+      "description": "בדיקת תצוגה, כפתורים ואינטראקציה של האזור #userSettingsDropdownWrap בתוך index.html.",
+      "codePath": "index.html"
+    },
+    {
+      "id": "html_sec_index_html_usersettingsdropdownpanel",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "רכיב / אזור ממשק Usersettingsdropdownpanel (#userSettingsDropdownPanel)",
+      "description": "בדיקת תצוגה, כפתורים ואינטראקציה של האזור #userSettingsDropdownPanel בתוך index.html.",
+      "codePath": "index.html"
+    },
+    {
+      "id": "html_sec_index_html_usermenuavatarcircle",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "רכיב / אזור ממשק Usermenuavatarcircle (#userMenuAvatarCircle)",
+      "description": "בדיקת תצוגה, כפתורים ואינטראקציה של האזור #userMenuAvatarCircle בתוך index.html.",
+      "codePath": "index.html"
+    },
+    {
+      "id": "html_sec_index_html_usermenuprofilesquickrow",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "רכיב / אזור ממשק Usermenuprofilesquickrow (#userMenuProfilesQuickRow)",
+      "description": "בדיקת תצוגה, כפתורים ואינטראקציה של האזור #userMenuProfilesQuickRow בתוך index.html.",
+      "codePath": "index.html"
+    },
+    {
+      "id": "html_sec_index_html_tvsiderail",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "רכיב / אזור ממשק Tvsiderail (#tvSideRail)",
+      "description": "בדיקת תצוגה, כפתורים ואינטראקציה של האזור #tvSideRail בתוך index.html.",
+      "codePath": "index.html"
+    },
+    {
+      "id": "html_sec_index_html_tvrailsearchsection",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "רכיב / אזור ממשק Tvrailsearchsection (#tvRailSearchSection)",
+      "description": "בדיקת תצוגה, כפתורים ואינטראקציה של האזור #tvRailSearchSection בתוך index.html.",
+      "codePath": "index.html"
+    },
+    {
+      "id": "html_sec_index_html_tvrailminikeyboard",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "רכיב / אזור ממשק Tvrailminikeyboard (#tvRailMiniKeyboard)",
+      "description": "בדיקת תצוגה, כפתורים ואינטראקציה של האזור #tvRailMiniKeyboard בתוך index.html.",
+      "codePath": "index.html"
+    },
+    {
+      "id": "html_sec_index_html_tvraillistsscroll",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "רכיב / אזור ממשק Tvraillistsscroll (#tvRailListsScroll)",
+      "description": "בדיקת תצוגה, כפתורים ואינטראקציה של האזור #tvRailListsScroll בתוך index.html.",
+      "codePath": "index.html"
+    },
+    {
+      "id": "html_sec_index_html_tvrailcategorieslist",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "רכיב / אזור ממשק Tvrailcategorieslist (#tvRailCategoriesList)",
+      "description": "בדיקת תצוגה, כפתורים ואינטראקציה של האזור #tvRailCategoriesList בתוך index.html.",
+      "codePath": "index.html"
+    },
+    {
+      "id": "html_sec_index_html_tvrailplatformslist",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "רכיב / אזור ממשק Tvrailplatformslist (#tvRailPlatformsList)",
+      "description": "בדיקת תצוגה, כפתורים ואינטראקציה של האזור #tvRailPlatformsList בתוך index.html.",
+      "codePath": "index.html"
+    },
+    {
+      "id": "mod_app_js",
+      "category": "2. רכיבי ממשק, לשוניות ואינטראקציה (UI & Modals)",
+      "title": "מודול לוגיקה ואינטראקציה (app.js)",
+      "description": "בדיקת טעינה ופעולה תקינה של הפונקציות והאינטראקציות בקובץ app.js.",
+      "codePath": "app.js"
+    },
+    {
+      "id": "srv_app_js",
+      "category": "3. שרת, נקודות קצה ו-API (Backend & Services)",
+      "title": "שירות / מודול מערכת: app.js",
+      "description": "בדיקת הרצה, לוגיקה ותקינות פעולת המודול app.js ללא שגיאות זמן ריצה.",
+      "codePath": "app.js"
+    },
+    {
+      "id": "pyfn_build_www_py_build_www",
+      "category": "3. שרת, נקודות קצה ו-API (Backend & Services)",
+      "title": "פונקציית שרת / מנוע: Build Www (build_www)",
+      "description": "בדיקת הרצת הפונקציה build_www() במודול build_www.py ווידוא פלט תקין.",
+      "codePath": "build_www.py"
+    },
+    {
+      "id": "srv_build_www_py",
+      "category": "3. שרת, נקודות קצה ו-API (Backend & Services)",
+      "title": "שירות / מודול מערכת: build_www.py",
+      "description": "בדיקת הרצה, לוגיקה ותקינות פעולת המודול build_www.py ללא שגיאות זמן ריצה.",
+      "codePath": "build_www.py"
+    },
+    {
+      "id": "srv_sw_js",
+      "category": "3. שרת, נקודות קצה ו-API (Backend & Services)",
+      "title": "שירות / מודול מערכת: sw.js",
+      "description": "בדיקת הרצה, לוגיקה ותקינות פעולת המודול sw.js ללא שגיאות זמן ריצה.",
+      "codePath": "sw.js"
+    },
+    {
+      "id": "srv_tv_navigation_js",
+      "category": "3. שרת, נקודות קצה ו-API (Backend & Services)",
+      "title": "שירות / מודול מערכת: tv-navigation.js",
+      "description": "בדיקת הרצה, לוגיקה ותקינות פעולת המודול tv-navigation.js ללא שגיאות זמן ריצה.",
+      "codePath": "tv-navigation.js"
+    },
+    {
+      "id": "sec_tls_https_wss",
+      "category": "4. אבטחת מידע, הצפנה והגנת נתונים (Security & Encryption)",
+      "title": "הצפנת תעבורת רשת וחיבורים מאובטחים (HTTPS / TLS / WSS)",
+      "description": "וידוא שכל קריאות ה-API, ה-WebSockets והעברת הנתונים ב-STREAM IT מתבצעות בפרוטוקול מוצפן (HTTPS/WSS) ללא תוכן מעורב (Mixed Content) או שליחת מידע רגיש בטקסט גלוי.",
+      "codePath": "capacitor.config.json"
+    },
+    {
+      "id": "sec_api_keys_and_secrets",
+      "category": "4. אבטחת מידע, הצפנה והגנת נתונים (Security & Encryption)",
+      "title": "הגנת מפתחות API, טוקנים וסודות מערכת (Zero Exposed Secrets)",
+      "description": "בדיקה שמפתחות פרטיים (API Keys, Tokens, DB Credentials) שמורים בקבצי סביבה מוגנים בשרת בלבד, מוחרגים ב-.gitignore, ואינם חשופים בקוד הלקוח (Bundle / Source).",
+      "codePath": ".gitignore"
+    },
+    {
+      "id": "sec_data_encryption_at_rest",
+      "category": "4. אבטחת מידע, הצפנה והגנת נתונים (Security & Encryption)",
+      "title": "הצפנת מידע רגיש, סיסמאות ואחסון מקומי (Encryption at Rest / Hashing / DPAPI)",
+      "description": "וידוא שסיסמאות, טוקנים ונתונים רגישים מוצפנים (AES-GCM / DPAPI / bcrypt / SHA-256) ואינם נשמרים בטקסט גלוי (Plaintext) ב-localStorage, בקבצי קונפיגורציה או במסד הנתונים.",
+      "codePath": "app.js"
+    },
+    {
+      "id": "sec_auth_and_session_tokens",
+      "category": "4. אבטחת מידע, הצפנה והגנת נתונים (Security & Encryption)",
+      "title": "אימות משתמשים, תוקף טוקנים (JWT / Session) ונעילת גישה לא מורשית (IDOR)",
+      "description": "בדיקה שנתיבים מוגנים ופעולות ניהול דורשים אימות תקף, שטוקנים פגי תוקף נדחים כראוי, ושאין אפשרות לעקוף מסך התחברות או לגשת לנתוני משתמש אחר.",
+      "codePath": "app.js"
+    },
+    {
+      "id": "sec_db_rules_and_rbac",
+      "category": "4. אבטחת מידע, הצפנה והגנת נתונים (Security & Encryption)",
+      "title": "הרשאות גישה למסד נתונים ובקרת תפקידים (DB Security Rules & RBAC)",
+      "description": "בדיקה שחוקי הגישה למסד הנתונים (Firestore Rules / SQL / API Middleware) אוכפים הפרדת הרשאות מלאה ומונעים קריאה או כתיבה ללא הרשאה מתאימה.",
+      "codePath": ".gitignore"
+    },
+    {
+      "id": "sec_input_sanitization_xss_injection",
+      "category": "4. אבטחת מידע, הצפנה והגנת נתונים (Security & Encryption)",
+      "title": "סינון קלט והגנה מפני הזרקות קוד (XSS / SQLi / Command Injection / Path Traversal)",
+      "description": "הזנת תווים מיוחדים ותגיות סקריפט בשדות חיפוש וטפסים ווידוא שכל קלט עובר סינון ואימות (Sanitization & Validation) בצד לקוח ובצד שרת.",
+      "codePath": "app.js"
+    },
+    {
+      "id": "sec_cors_headers_and_uploads",
+      "category": "4. אבטחת מידע, הצפנה והגנת נתונים (Security & Encryption)",
+      "title": "מדיניות CORS, כותרות אבטחה (CSP / HSTS) ובדיקת קבצים מועלים",
+      "description": "וידוא שהשרת אינו פתוח ל-CORS פרוץ, שכותרות האבטחה מוגדרות כראוי, ושכל העלאת קובץ בודקת סוג וגודל קובץ מותרים.",
+      "codePath": "capacitor.config.json"
+    },
+    {
+      "id": "sec_privacy_and_error_leakage",
+      "category": "4. אבטחת מידע, הצפנה והגנת נתונים (Security & Encryption)",
+      "title": "הגנת פרטיות ואי-חשיפת מידע טכני בהודעות שגיאה (Safe Error Handling)",
+      "description": "וידוא שהודעות שגיאה למשתמש אינן חושפות Stack Trace או נתיבי שרת פנימיים, ושמנגנוני נעילה והגנת פרטיות פועלים כראוי.",
+      "codePath": "app.js"
+    },
+    {
+      "id": "qa_rtl_and_ui_layout",
+      "category": "5. נתונים, ביצועים ותאימות מערכת",
+      "title": "תקינות תצוגה, יישור לימין (RTL), פונטים ומצב כהה / בהיר",
+      "description": "בדיקה ויזואלית מלאה של STREAM IT: היעדר גלישה אופקית, ניגודיות צבעים ברורה ויישור תקין של כל הטבלאות והכפתורים.",
+      "codePath": "package.json"
+    },
+    {
+      "id": "qa_buttons_and_forms_e2e",
+      "category": "5. נתונים, ביצועים ותאימות מערכת",
+      "title": "בדיקת כל הכפתורים, הטפסים וחיוויי השגיאה / הצלחה (End-to-End)",
+      "description": "מעבר על הכפתורים והטפסים המרכזיים במערכת ווידוא שכל לחיצה מבצעת את הפעולה הצפויה ומציגה חיווי ברור למשתמש.",
+      "codePath": "package.json"
+    },
+    {
+      "id": "qa_console_and_network_clean",
+      "category": "5. נתונים, ביצועים ותאימות מערכת",
+      "title": "היעדר שגיאות קונסול (Console Errors) ובקשות רשת כושלות (4xx/5xx)",
+      "description": "פתיחת DevTools (F12) בזמן שימוש במערכת ווידוא שאין שגיאות JavaScript, חריגות Unhandled Promise או קריאות API שנכשלות.",
+      "codePath": "package.json"
+    },
+    {
+      "id": "infra_android_capacitor",
+      "category": "6. נתונים, אבטחה, ביצועים ותאימות",
+      "title": "בדיקת תאימות ובילד באנדרואיד (Android / Capacitor)",
+      "description": "פתיחת האפליקציה במכשיר/אמולטור אנדרואיד, בדיקת הרשאות מערכת, פריסת מסך מובייל וכפתור חזור.",
+      "codePath": "capacitor.config.json"
+    }
+  ],
+  "qa_matrix": {
+    "web": {},
+    "android": {}
+  }
+}

@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
-  <link rel="stylesheet" href="styles.css?v=9.6.9" />
+  <link rel="stylesheet" href="styles.css?v=9.7.0" />
   <script>
     (function () {
       try {
@@ -31,13 +31,13 @@
           });
         }
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (!otaVer || otaVer <= '9.6.9') {
+        if (!otaVer || otaVer <= '9.7.0') {
           localStorage.removeItem('streamit_ota_css_v9');
           localStorage.removeItem('streamit_ota_app_js_v9');
           localStorage.removeItem('streamit_ota_tv_nav_v9');
         }
         var otaCss = localStorage.getItem('streamit_ota_css_v9') || '';
-        if (otaVer && otaVer > '9.6.9' && otaCss.length > 500) {
+        if (otaVer && otaVer > '9.7.0' && otaCss.length > 500) {
           var st = document.createElement('style');
           st.id = 'streamit-ota-live-style-v9';
           st.textContent = otaCss;
@@ -1094,64 +1094,35 @@
       </section>
 
       <div class="auth-divider">
-        <span>כניסת מנויים מאושרים (ללא הרשמה עצמאית)</span>
+        <span>כניסת מנויים מאושרים</span>
       </div>
 
-      <!-- 1-Click Prominent Quick Test Login Button -->
-      <button type="button" id="quickTestLoginBtn" class="btn-quick-login tv-focusable" aria-label="כניסה מהירה לבדיקות בקליק אחד">
-        <svg viewBox="0 0 24 24" class="icon-svg icon-fill" aria-hidden="true">
-          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-        </svg>
-        <span>כניסה מהירה (בדיקות)</span>
-      </button>
-
       <form id="authForm" class="auth-form" autocomplete="off" novalidate>
-        <div id="authQuickAccountsBar" class="auth-quick-accounts-bar">
-          <span class="auth-quick-accounts-label">בחירת חשבון מהירה בסטרימר (לחיצה אחת):</span>
-          <div class="auth-quick-accounts-row" dir="ltr">
-            <button type="button" class="auth-quick-account-btn tv-focusable" data-quick-email="bensahaltv@gmail.com">bensahaltv@gmail.com</button>
-            <button type="button" class="auth-quick-account-btn tv-focusable" data-quick-email="streamittvapp@gmail.com">streamittvapp@gmail.com</button>
-          </div>
-        </div>
-
         <div class="form-group">
-          <div class="form-label-row">
-            <label for="authEmailInput" class="form-label">כתובת אימייל (מנוי מאושר)</label>
-            <div class="form-field-inline-actions">
-              <button type="button" class="form-inline-btn tv-focusable" data-open-vk="authEmailInput" aria-label="פתח מקלדת לאימייל">מקלדת</button>
-              <button type="button" class="form-inline-btn form-inline-clear-btn tv-focusable" data-clear-field="authEmailInput" aria-label="נקה שדה אימייל">נקה שדה</button>
-            </div>
-          </div>
+          <label for="authEmailInput" class="form-label">כתובת אימייל</label>
           <input
             type="email"
             id="authEmailInput"
-            name="streamit_login_email_nofill"
+            name="streamit_login_email"
             class="form-input tv-focusable"
             dir="ltr"
             value=""
-            placeholder="הזן כתובת אימייל..."
-            autocomplete="off"
+            placeholder="name@gmail.com"
+            autocomplete="username"
           />
         </div>
 
         <div class="form-group">
-          <div class="form-label-row">
-            <label for="authPasswordInput" class="form-label">סיסמה</label>
-            <div class="form-field-inline-actions">
-              <button type="button" id="toggleAuthPassVisBtn" class="form-inline-btn tv-focusable" data-toggle-pass="authPasswordInput" aria-label="הצג או הסתר סיסמה">הצג סיסמה</button>
-              <button type="button" class="form-inline-btn tv-focusable" data-open-vk="authPasswordInput" aria-label="פתח מקלדת לסיסמה">מקלדת</button>
-              <button type="button" class="form-inline-btn form-inline-clear-btn tv-focusable" data-clear-field="authPasswordInput" aria-label="נקה שדה סיסמה">נקה שדה</button>
-            </div>
-          </div>
+          <label for="authPasswordInput" class="form-label">סיסמה</label>
           <input
             type="password"
             id="authPasswordInput"
-            name="streamit_login_pass_nofill"
+            name="streamit_login_pass"
             class="form-input tv-focusable"
             dir="ltr"
             value=""
             placeholder="הזן סיסמה..."
-            autocomplete="new-password"
+            autocomplete="current-password"
           />
         </div>
 
@@ -1585,15 +1556,6 @@
   <!-- ===================================================================== -->
   <div id="tvVirtualKeyboard" class="tv-virtual-keyboard hidden" dir="ltr" role="dialog" aria-label="מקלדת על המסך">
     <div class="vk-container" dir="ltr">
-      <div id="vkQuickBar" class="vk-quick-bar hidden" dir="rtl">
-        <button type="button" id="vkSwitchEmailBtn" class="vk-quick-btn tv-focusable" data-vk-switch-field="authEmailInput">אימייל</button>
-        <button type="button" id="vkSwitchPassBtn" class="vk-quick-btn tv-focusable" data-vk-switch-field="authPasswordInput">סיסמה</button>
-        <button type="button" class="vk-quick-btn vk-quick-account-pill tv-focusable" data-vk-fill-email="bensahaltv@gmail.com" dir="ltr">bensahaltv@gmail.com</button>
-        <button type="button" class="vk-quick-btn vk-quick-account-pill tv-focusable" data-vk-fill-email="streamittvapp@gmail.com" dir="ltr">streamittvapp@gmail.com</button>
-        <button type="button" class="vk-quick-btn vk-quick-domain-pill tv-focusable" data-vk-append="@gmail.com" dir="ltr">@gmail.com</button>
-        <button type="button" id="vkQuickSubmitAuthBtn" class="vk-quick-btn vk-quick-submit-btn tv-focusable" data-vk-action="submit-auth">התחבר עכשיו</button>
-      </div>
-
       <div class="vk-header" dir="ltr">
         <span id="vkFieldBadge" class="vk-field-badge" dir="rtl">שדה הקלדה</span>
         <div id="vkPreviewText" class="vk-preview-text" dir="ltr"></div>
@@ -1621,13 +1583,13 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Core Application & Smart TV Navigation Scripts -->
-  <script src="tv-navigation.js?v=9.6.9"></script>
-  <script src="app.js?v=9.6.9"></script>
+  <script src="tv-navigation.js?v=9.7.0"></script>
+  <script src="app.js?v=9.7.0"></script>
   <script>
     (function () {
       try {
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (otaVer && otaVer > '9.6.9') {
+        if (otaVer && otaVer > '9.7.0') {
           var navCode = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
           if (navCode.length > 500) {
             var s1 = document.createElement('script');

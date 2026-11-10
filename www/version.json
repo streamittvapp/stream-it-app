@@ -1,9 +1,9 @@
 {
-  "version": "9.6.9",
+  "version": "9.7.0",
   "native_apk_version": "9.6.0",
   "apk_download_url": "https://streamittvapp.github.io/stream-it-app/StreamIt-AndroidTV.apk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-10T01:00:00Z",
-  "notes": "v9.6.9 — Streamer Keyboard Overhaul (Delete, Clear, Field Switcher & Quick Account Login), Lighter Rubik Typography, Auto-Collapsing Right Side Menu with Remote Tab Handle, Refined Streamer Poster Tiles, Interleaved Top 10 Ranked Shelves, Strict Poster & Source/Hebrew Subtitles Quality Gate, and Admin Dashboard Feature/Category/Source Toggles & Statistics."
+  "updated_at": "2026-11-10T08:05:00Z",
+  "notes": "v9.7.0 — Clean Login Form (No Quick-Access Buttons), Full Desktop Keyboard & Mouse Typing Support, Deterministic Remote D-Pad Down Navigation to Submit Button, Instant Cloud Account Verification, and Legacy APK v9.6.0 Dual-Boot Guard."
 }

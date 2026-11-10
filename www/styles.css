@@ -3407,6 +3407,13 @@ body.tv-mode #detailsModal .ep-desc {
   border-color: #e50914 !important;
 }
 
+#quickTestLoginBtn,
+#authQuickAccountsBar,
+.form-field-inline-actions,
+#vkQuickBar {
+  display: none !important;
+}
+
 .form-input {
   height: 46px;
   padding: 0 14px;
@@ -3418,7 +3425,10 @@ body.tv-mode #detailsModal .ep-desc {
   border: 1px solid rgba(255, 255, 255, 0.22);
   direction: ltr;
   text-align: left;
-  cursor: pointer;
+  cursor: text;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  pointer-events: auto !important;
   transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
@@ -3514,7 +3524,8 @@ body.vk-open #authModal {
 }
 
 body.vk-open .auth-modal-card {
-  max-height: 50vh !important;
+  max-height: 54vh !important;
+  overflow-y: auto !important;
   padding: 14px 20px !important;
   gap: 8px !important;
 }
