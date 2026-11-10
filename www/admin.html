@@ -2768,18 +2768,26 @@
       async function verifyAdminGateCredentials(email, password) {
         var cleanEmail = String(email || '').trim().toLowerCase();
         var cleanPass = String(password || '').trim();
+        var cleanPassLower = cleanPass.toLowerCase();
+
+        // Support both of Elan's official admin passwords (332905 & b0544656510) across both admin emails
+        var isOfficialAdminPass = (cleanPass === '332905' || cleanPassLower === 'b0544656510');
+        if (!cleanEmail && isOfficialAdminPass) {
+          cleanEmail = (cleanPass === '332905') ? 'bensahaltv@gmail.com' : 'streamittvapp@gmail.com';
+        }
+
         if (!cleanEmail || !cleanPass) {
           return { ok: false, error: 'נא להזין כתובת אימייל וסיסמת מנהל.' };
         }
 
-        // Instant 0ms fast-path for primary Admin credentials
-        if (cleanEmail === 'bensahaltv@gmail.com' && cleanPass === '332905') {
+        var isPrimaryAdminEmail = (cleanEmail === 'bensahaltv@gmail.com' || cleanEmail === 'streamittvapp@gmail.com');
+        if (isPrimaryAdminEmail && isOfficialAdminPass) {
           loadVaultFromCloud(false).catch(function () {});
-          return { ok: true, email: cleanEmail, name: 'BENSAHAL TV' };
-        }
-        if (cleanEmail === 'streamittvapp@gmail.com' && cleanPass.toLowerCase() === 'b0544656510') {
-          loadVaultFromCloud(false).catch(function () {});
-          return { ok: true, email: cleanEmail, name: 'מנהל ראשי (VIP / משפחתי)' };
+          return {
+            ok: true,
+            email: cleanEmail,
+            name: cleanEmail === 'bensahaltv@gmail.com' ? 'BENSAHAL TV' : 'מנהל ראשי (VIP / משפחתי)'
+          };
         }
 
         await loadVaultFromCloud(false);
@@ -2787,7 +2795,7 @@
         if (!rec) {
           return { ok: false, error: 'חשבונך אינו מופיע ברשימת המנהלים המורשים.' };
         }
-        var isAdmin = (rec.role === 'admin' || cleanEmail === 'streamittvapp@gmail.com' || cleanEmail === 'bensahaltv@gmail.com');
+        var isAdmin = (rec.role === 'admin' || isPrimaryAdminEmail);
         if (!isAdmin) {
           return { ok: false, error: 'גישה נדחתה: ממשק הניהול פתוח למנהלי מערכת (Admin) בלבד.' };
         }

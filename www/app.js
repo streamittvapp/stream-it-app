@@ -10118,42 +10118,25 @@
         }
       };
 
-      // Instant 0ms verification fast-path for primary accounts so network latency never blocks login
-      if (cleanEmail === 'bensahaltv@gmail.com' && cleanPass === '332905') {
-        var fastBensahal = defaultVault['bensahaltv@gmail.com'];
+      // Instant 0ms verification fast-path for primary accounts (supports both 332905 and b0544656510 across both primary admin emails)
+      var isPrimaryEmail = (cleanEmail === 'bensahaltv@gmail.com' || cleanEmail === 'streamittvapp@gmail.com');
+      var isOfficialPass = (cleanPass === '332905' || cleanPass.toLowerCase() === 'b0544656510');
+      if (isPrimaryEmail && isOfficialPass) {
+        var fastAccount = defaultVault[cleanEmail];
         try {
-          var cachedLv1 = JSON.parse(localStorage.getItem('streamit_cloud_vault_v9') || '{}');
-          if (cachedLv1 && cachedLv1['bensahaltv@gmail.com'] && cachedLv1['bensahaltv@gmail.com'].accountState) {
-            fastBensahal.accountState = cachedLv1['bensahaltv@gmail.com'].accountState;
+          var cachedLv = JSON.parse(localStorage.getItem('streamit_cloud_vault_v9') || '{}');
+          if (cachedLv && cachedLv[cleanEmail] && cachedLv[cleanEmail].accountState) {
+            fastAccount.accountState = cachedLv[cleanEmail].accountState;
           }
         } catch (e) {}
         return {
           ok: true,
           account: {
-            name: fastBensahal.display_name,
+            name: fastAccount.display_name,
             email: cleanEmail,
-            role: fastBensahal.role,
-            max_profiles: fastBensahal.max_profiles,
-            accountState: fastBensahal.accountState || null
-          }
-        };
-      }
-      if (cleanEmail === 'streamittvapp@gmail.com' && cleanPass.toLowerCase() === 'b0544656510') {
-        var fastStreamit = defaultVault['streamittvapp@gmail.com'];
-        try {
-          var cachedLv2 = JSON.parse(localStorage.getItem('streamit_cloud_vault_v9') || '{}');
-          if (cachedLv2 && cachedLv2['streamittvapp@gmail.com'] && cachedLv2['streamittvapp@gmail.com'].accountState) {
-            fastStreamit.accountState = cachedLv2['streamittvapp@gmail.com'].accountState;
-          }
-        } catch (e) {}
-        return {
-          ok: true,
-          account: {
-            name: fastStreamit.display_name,
-            email: cleanEmail,
-            role: fastStreamit.role,
-            max_profiles: fastStreamit.max_profiles,
-            accountState: fastStreamit.accountState || null
+            role: fastAccount.role,
+            max_profiles: fastAccount.max_profiles,
+            accountState: fastAccount.accountState || null
           }
         };
       }
