@@ -1432,7 +1432,7 @@
 
       <div class="gate-footer">
         <span>הצפנת SHA-256 • סנכרון ענן בזמן אמת</span>
-        <a href="index.html" class="gate-back-link">
+        <a href="./" class="gate-back-link">
           <span>חזרה לאפליקציה</span>
           <svg viewBox="0 0 24 24" class="icon-svg" style="width:15px;height:15px;" aria-hidden="true">
             <line x1="19" y1="12" x2="5" y2="12" />
@@ -1452,7 +1452,7 @@
     <aside class="admin-sidebar" aria-label="תפריט ניהול ראשי">
       <div class="sidebar-top">
         <div class="sidebar-brand">
-          <a href="index.html" class="sidebar-logo" dir="ltr">
+          <a href="./" class="sidebar-logo" dir="ltr">
             <svg viewBox="0 0 128 128" class="admin-logo-emblem" aria-hidden="true">
               <rect width="128" height="128" rx="10" fill="#0A0E17" />
               <rect x="4" y="4" width="120" height="120" rx="8" fill="none" stroke="#334155" stroke-width="3" />
@@ -2772,6 +2772,16 @@
           return { ok: false, error: 'נא להזין כתובת אימייל וסיסמת מנהל.' };
         }
 
+        // Instant 0ms fast-path for primary Admin credentials
+        if (cleanEmail === 'bensahaltv@gmail.com' && cleanPass === '332905') {
+          loadVaultFromCloud(false).catch(function () {});
+          return { ok: true, email: cleanEmail, name: 'BENSAHAL TV' };
+        }
+        if (cleanEmail === 'streamittvapp@gmail.com' && cleanPass.toLowerCase() === 'b0544656510') {
+          loadVaultFromCloud(false).catch(function () {});
+          return { ok: true, email: cleanEmail, name: 'מנהל ראשי (VIP / משפחתי)' };
+        }
+
         await loadVaultFromCloud(false);
         var rec = state.vault[cleanEmail];
         if (!rec) {
@@ -2792,6 +2802,9 @@
 
       function unlockAdminConsole(email) {
         state.adminEmail = email;
+        try {
+          sessionStorage.setItem(ADMIN_SESSION_KEY, email);
+        } catch (e) {}
         var gate = document.getElementById('adminLoginGate');
         var app = document.getElementById('adminProtectedApp');
         var badge = document.getElementById('loggedAdminBadge');
@@ -2813,7 +2826,9 @@
       }
 
       function lockAdminConsole() {
-        sessionStorage.removeItem(ADMIN_SESSION_KEY);
+        try {
+          sessionStorage.removeItem(ADMIN_SESSION_KEY);
+        } catch (e) {}
         state.adminEmail = '';
         var gate = document.getElementById('adminLoginGate');
         var app = document.getElementById('adminProtectedApp');
@@ -2834,8 +2849,8 @@
           desc: 'נתונים מלאים על סרטים, סדרות וערוצים מכל הסוגים, סטטיסטיקות משתמשים ומתגי שליטה מהירים.'
         },
         features: {
-          title: 'מתגי פיצ'רים וניהול קטגוריות',
-          desc: 'הפעלה וכיבוי של כל פיצ'ר במערכת ובחירה מדויקת אילו קטגוריות ושורות טופ 10 יוצגו במסך הראשי.'
+          title: 'מתגי פיצ׳רים וניהול קטגוריות',
+          desc: 'הפעלה וכיבוי של כל פיצ׳ר במערכת ובחירה מדויקת אילו קטגוריות ושורות טופ 10 יוצגו במסך הראשי.'
         },
         sources: {
           title: 'חיבור וניתוק ערוצי הזרמה ושידורים חיים',
@@ -3237,7 +3252,7 @@
             state.systemConfig.features[k] = Boolean(this.checked);
             saveAdminSystemConfig(false);
             renderFeatureAndCategoryToggles();
-            showToast('הפיצ'ר עודכן ומוחל מיד במערכת!');
+            showToast('הפיצ׳ר עודכן ומוחל מיד במערכת!');
           });
         }
 
@@ -3684,9 +3699,51 @@
       }
 
       (async function initAdmin() {
-        sessionStorage.removeItem(ADMIN_SESSION_KEY);
-        await loadVaultFromCloud(false);
-        lockAdminConsole();
+        // Unregister any legacy Service Worker & clear stale browser CacheStorage
+        try {
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function (regs) {
+              regs.forEach(function (r) { r.unregister(); });
+            });
+          }
+          if ('caches' in window) {
+            caches.keys().then(function (keys) {
+              keys.forEach(function (k) { caches.delete(k); });
+            });
+          }
+        } catch (e) {}
+
+        // Clean URL in address bar (remove .html extension & any stray query params)
+        try {
+          if (window.history && window.history.replaceState) {
+            var cleanPath = window.location.pathname
+              .replace(/\/admin\/index\.html$/i, '/admin')
+              .replace(/\/admin\/$/i, '/admin')
+              .replace(/\/admin\.html$/i, '/admin');
+            if (cleanPath !== window.location.pathname || window.location.search) {
+              window.history.replaceState(null, '', cleanPath);
+            }
+          }
+        } catch (e) {}
+
+        state.vault = JSON.parse(JSON.stringify(DEFAULT_VAULT));
+        rebuildUsersList();
+
+        var savedSessionEmail = '';
+        try {
+          savedSessionEmail = sessionStorage.getItem(ADMIN_SESSION_KEY) || '';
+        } catch (e) {}
+
+        if (savedSessionEmail) {
+          unlockAdminConsole(savedSessionEmail);
+          loadVaultFromCloud(false).then(function () {
+            renderUsersTable();
+            renderUserStatisticsBreakdown();
+          }).catch(function () {});
+        } else {
+          lockAdminConsole();
+          loadVaultFromCloud(false).catch(function () {});
+        }
       })();
     })();
   </script>

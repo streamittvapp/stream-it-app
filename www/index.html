@@ -20,6 +20,9 @@
     (function () {
       try {
         try { window.open = function () { return null; }; } catch (e) {}
+        if (window.history && window.history.replaceState && /\/index\.html$/i.test(window.location.pathname)) {
+          window.history.replaceState(null, '', window.location.pathname.replace(/\/index\.html$/i, '/') + window.location.search + window.location.hash);
+        }
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.getRegistrations().then(function (regs) {
             regs.forEach(function (r) { r.unregister(); });

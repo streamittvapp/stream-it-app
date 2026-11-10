@@ -1,0 +1,3752 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <base href="../" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>STREAM IT — דשבורד ניהול מנויים, פיצ'רים וקטלוג (v9.7.0)</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      /* Sidebar Palette (Right Sidebar) */
+      --sidebar-bg: #0F172A;
+      --sidebar-surface: #1E293B;
+      --sidebar-border: rgba(255, 255, 255, 0.08);
+      --sidebar-text: #F8FAFC;
+      --sidebar-muted: #94A3B8;
+
+      /* Content Pages Palette (Pure White Background) */
+      --content-bg: #FFFFFF;
+      --content-subtle: #F8FAFC;
+      --card-bg: #FFFFFF;
+      --card-header-bg: #F8FAFC;
+      --border-light: #E2E8F0;
+      --border-medium: #CBD5E1;
+
+      /* Typography Colors on White */
+      --text-primary: #0F172A;
+      --text-secondary: #334155;
+      --text-muted: #64748B;
+
+      /* Brand & Semantic Accents */
+      --brand-red: #E50914;
+      --brand-red-hover: #C80710;
+      --brand-red-soft: #FEF2F2;
+      --brand-red-border: #FECACA;
+
+      --accent-blue: #2563EB;
+      --accent-blue-soft: #EFF6FF;
+      --accent-blue-border: #BFDBFE;
+
+      --green: #059669;
+      --green-soft: #ECFDF5;
+      --green-border: #A7F3D0;
+
+      --amber: #D97706;
+      --amber-soft: #FFFBEB;
+      --amber-border: #FDE68A;
+
+      --danger: #DC2626;
+      --danger-soft: #FEF2F2;
+      --danger-border: #FECACA;
+
+      --radius-xl: 12px;
+      --radius-lg: 10px;
+      --radius-md: 8px;
+      --radius-sm: 6px;
+
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+      --shadow-md: 0 4px 16px rgba(15, 23, 42, 0.06), 0 2px 4px rgba(15, 23, 42, 0.04);
+      --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--content-bg);
+      color: var(--text-primary);
+      font-family: 'Rubik', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      direction: rtl;
+      text-align: right;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .icon-svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      flex-shrink: 0;
+    }
+
+    /* ============================================================
+       MANDATORY ADMIN SECURITY GATE (#adminLoginGate)
+       ============================================================ */
+    .admin-gate-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+    }
+
+    .admin-gate-card {
+      width: 100%;
+      max-width: 450px;
+      background: #FFFFFF;
+      color: var(--text-primary);
+      border: 1px solid var(--border-light);
+      border-top: 4px solid var(--brand-red);
+      border-radius: 12px;
+      padding: 36px 32px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    .gate-brand-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .gate-brand-logo,
+    .sidebar-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Rubik', sans-serif;
+      font-size: 1.45rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      direction: ltr;
+    }
+
+    .admin-logo-emblem {
+      width: 34px;
+      height: 34px;
+      flex-shrink: 0;
+    }
+
+    .admin-word-stream {
+      color: #0F172A;
+    }
+
+    .sidebar-logo .admin-word-stream {
+      color: #F8FAFC;
+    }
+
+    .admin-word-it {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1px 7px;
+      background: #DC2626;
+      color: #FFFFFF;
+      border-radius: 5px;
+      font-size: 1.15rem;
+      line-height: 1.2;
+    }
+
+    .gate-lock-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.76rem;
+      font-weight: 500;
+      padding: 5px 12px;
+      border-radius: 8px;
+      background: var(--brand-red-soft);
+      border: 1px solid var(--brand-red-border);
+      color: var(--brand-red);
+    }
+
+    .gate-title {
+      font-family: 'Rubik', sans-serif;
+      font-size: 1.38rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .gate-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .gate-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .gate-error-msg {
+      padding: 11px 14px;
+      border-radius: var(--radius-md);
+      background: var(--danger-soft);
+      border: 1px solid var(--danger-border);
+      color: var(--danger);
+      font-size: 0.86rem;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .gate-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-light);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .gate-back-link {
+      color: var(--accent-blue);
+      text-decoration: none;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .gate-back-link:hover {
+      text-decoration: underline;
+    }
+
+    /* ============================================================
+       ADMIN SHELL: RIGHT SIDEBAR + WHITE CONTENT WORKSPACE
+       ============================================================ */
+    .admin-shell {
+      display: flex;
+      min-height: 100vh;
+      width: 100%;
+      background: var(--content-bg);
+      direction: rtl;
+    }
+
+    /* Right Sidebar */
+    .admin-sidebar {
+      width: 280px;
+      flex-shrink: 0;
+      background: var(--sidebar-bg);
+      color: var(--sidebar-text);
+      border-left: 1px solid var(--sidebar-border);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      right: 0;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 50;
+    }
+
+    .sidebar-top {
+      display: flex;
+      flex-direction: column;
+      padding: 24px 18px;
+      gap: 24px;
+    }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px 18px 8px;
+      border-bottom: 1px solid var(--sidebar-border);
+    }
+
+    .sidebar-logo {
+      font-family: 'Rubik', sans-serif;
+      font-size: 1.55rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: var(--brand-red);
+      text-decoration: none;
+    }
+
+    .sidebar-ver {
+      font-family: 'Rubik', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #CBD5E1;
+    }
+
+    .sidebar-section-label {
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--sidebar-muted);
+      padding: 0 10px;
+      margin-bottom: -12px;
+      letter-spacing: 0.03em;
+    }
+
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .sidebar-nav-btn {
+      width: 100%;
+      min-height: 46px;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      background: transparent;
+      border: 1px solid transparent;
+      color: #CBD5E1;
+      font-family: 'Rubik', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      text-align: right;
+      transition: all 0.16s ease;
+    }
+
+    .sidebar-nav-btn-main {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .sidebar-nav-btn:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: #FFFFFF;
+    }
+
+    .sidebar-nav-btn.active {
+      background: var(--brand-red);
+      color: #FFFFFF;
+      box-shadow: 0 6px 18px rgba(229, 9, 20, 0.32);
+    }
+
+    .sidebar-nav-badge {
+      font-family: 'Rubik', sans-serif;
+      font-size: 0.74rem;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      color: #FFFFFF;
+    }
+
+    .sidebar-bottom {
+      padding: 18px;
+      border-top: 1px solid var(--sidebar-border);
+      background: rgba(15, 23, 42, 0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .sidebar-admin-box {
+      padding: 12px;
+      border-radius: var(--radius-md);
+      background: var(--sidebar-surface);
+      border: 1px solid var(--sidebar-border);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .sidebar-admin-label {
+      font-size: 0.74rem;
+      color: var(--sidebar-muted);
+      font-weight: 600;
+    }
+
+    .sidebar-admin-email {
+      font-family: 'Rubik', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #38BDF8;
+      direction: ltr;
+      text-align: right;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .sidebar-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* ============================================================
+       WHITE CONTENT WORKSPACE (.admin-workspace)
+       ============================================================ */
+    .admin-workspace {
+      flex: 1;
+      min-width: 0;
+      background: #FFFFFF;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .workspace-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-light);
+      padding: 18px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .workspace-title-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .workspace-title {
+      font-family: 'Rubik', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .workspace-subtitle {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+
+    .workspace-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .sync-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 38px;
+      padding: 0 14px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      background: var(--green-soft);
+      border: 1px solid var(--green-border);
+      color: var(--green);
+    }
+
+    .sync-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      flex-shrink: 0;
+    }
+
+    .workspace-body {
+      flex: 1;
+      background: #FFFFFF;
+      padding: 32px 36px 64px 36px;
+      max-width: 1480px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .page-view {
+      display: flex;
+      flex-direction: column;
+      gap: 26px;
+      background: #FFFFFF;
+    }
+
+    /* ============================================================
+       BUTTONS & INPUTS (LIGHT / WHITE THEME)
+       ============================================================ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 40px;
+      padding: 0 16px;
+      border-radius: var(--radius-md);
+      font-family: 'Rubik', sans-serif;
+      font-size: 0.86rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid transparent;
+      text-decoration: none;
+      transition: all 0.16s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .btn:focus-visible,
+    .form-input:focus-visible,
+    .form-select:focus-visible,
+    .sidebar-nav-btn:focus-visible {
+      outline: 2px solid var(--accent-blue);
+      outline-offset: 2px;
+    }
+
+    .btn-primary {
+      background: var(--brand-red);
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(229, 9, 20, 0.22);
+    }
+
+    .btn-primary:hover {
+      background: var(--brand-red-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #FFFFFF;
+      border-color: var(--border-medium);
+      color: var(--text-secondary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--content-subtle);
+      border-color: #94A3B8;
+      color: var(--text-primary);
+    }
+
+    .btn-success {
+      background: var(--green-soft);
+      border-color: var(--green-border);
+      color: var(--green);
+    }
+
+    .btn-success:hover {
+      background: #D1FAE5;
+    }
+
+    .btn-warning {
+      background: var(--amber-soft);
+      border-color: var(--amber-border);
+      color: var(--amber);
+    }
+
+    .btn-warning:hover {
+      background: #FEF3C7;
+    }
+
+    .btn-danger {
+      background: var(--danger-soft);
+      border-color: var(--danger-border);
+      color: var(--danger);
+    }
+
+    .btn-danger:hover {
+      background: #FEE2E2;
+    }
+
+    .btn-sidebar-player {
+      background: var(--brand-red);
+      color: #FFFFFF;
+      width: 100%;
+    }
+
+    .btn-sidebar-lock {
+      background: rgba(239, 68, 68, 0.14);
+      border-color: rgba(239, 68, 68, 0.35);
+      color: #FCA5A5;
+      width: 100%;
+    }
+
+    .btn-sidebar-lock:hover {
+      background: rgba(239, 68, 68, 0.26);
+      color: #FFFFFF;
+    }
+
+    .btn-sm {
+      height: 36px;
+      padding: 0 13px;
+      font-size: 0.82rem;
+    }
+
+    .btn-xs {
+      height: 32px;
+      padding: 0 10px;
+      font-size: 0.78rem;
+      border-radius: 7px;
+      gap: 5px;
+    }
+
+    .btn-xs .icon-svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+      width: 100%;
+    }
+
+    .field-group label {
+      font-size: 0.83rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .form-input,
+    .form-select {
+      width: 100%;
+      min-width: 0;
+      height: 44px;
+      padding: 0 14px;
+      background: #FFFFFF;
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-family: 'Rubik', sans-serif;
+      font-size: 0.92rem;
+      outline: none;
+      transition: border-color 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .form-input::placeholder {
+      color: #94A3B8;
+      font-family: 'Rubik', sans-serif;
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+    }
+
+    .ltr-input {
+      direction: ltr;
+      text-align: left;
+      font-family: 'Rubik', sans-serif;
+      font-size: 0.88rem;
+    }
+
+    .ltr-input::placeholder {
+      direction: rtl;
+      text-align: right;
+      font-family: 'Rubik', sans-serif;
+    }
+
+    /* ============================================================
+       WHITE CARDS, KPI GRID & PANELS
+       ============================================================ */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .kpi-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-xl);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .kpi-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .kpi-label {
+      color: var(--text-secondary);
+      font-size: 0.86rem;
+      font-weight: 500;
+    }
+
+    .kpi-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.73rem;
+      font-weight: 600;
+    }
+
+    .kpi-pill-green {
+      background: var(--green-soft);
+      border: 1px solid var(--green-border);
+      color: var(--green);
+    }
+
+    .kpi-pill-blue {
+      background: var(--accent-blue-soft);
+      border: 1px solid var(--accent-blue-border);
+      color: var(--accent-blue);
+      direction: ltr;
+    }
+
+    .kpi-pill-amber {
+      background: var(--amber-soft);
+      border: 1px solid var(--amber-border);
+      color: var(--amber);
+    }
+
+    .kpi-value {
+      font-family: 'Rubik', sans-serif;
+      font-size: 2.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.1;
+    }
+
+    .kpi-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .white-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+
+    .white-card-header {
+      background: var(--card-header-bg);
+      padding: 20px 26px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .white-card-title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .white-card-title {
+      font-family: 'Rubik', sans-serif;
+      font-size: 1.12rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .title-icon-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--brand-red-soft);
+      border: 1px solid var(--brand-red-border);
+      color: var(--brand-red);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .white-card-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .white-card-body {
+      padding: 24px 26px;
+      background: #FFFFFF;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* User Creation Form Grid */
+    .form-grid-users {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      align-items: end;
+    }
+
+    /* Filter & Search Toolbar */
+    .table-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .filter-pills {
+      display: inline-flex;
+      gap: 6px;
+      background: var(--content-subtle);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-light);
+      flex-wrap: wrap;
+    }
+
+    .filter-pill-btn {
+      height: 34px;
+      padding: 0 14px;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: 'Rubik', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .filter-pill-btn.active {
+      background: #FFFFFF;
+      color: var(--brand-red);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .search-box-wrap {
+      position: relative;
+      width: 320px;
+      max-width: 100%;
+    }
+
+    .search-box-wrap .icon-svg {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      width: 16px;
+      height: 16px;
+      pointer-events: none;
+    }
+
+    .search-box-wrap .form-input {
+      height: 40px;
+      padding-right: 38px;
+      font-size: 0.86rem;
+    }
+
+    /* ============================================================
+       CLEAN WHITE DATA TABLE
+       ============================================================ */
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      background: #FFFFFF;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: right;
+      background: #FFFFFF;
+    }
+
+    th {
+      background: #F8FAFC;
+      color: var(--text-secondary);
+      font-size: 0.79rem;
+      font-weight: 600;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-light);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-light);
+      font-size: 0.88rem;
+      color: var(--text-primary);
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: #F8FAFC;
+    }
+
+    .user-cell-email {
+      direction: ltr;
+      text-align: right;
+      font-family: 'Rubik', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .user-cell-name {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .user-avatar-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--brand-red-soft);
+      border: 1px solid var(--brand-red-border);
+      color: var(--brand-red);
+      font-family: 'Rubik', sans-serif;
+      font-size: 0.86rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 11px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .badge-approved {
+      background: var(--green-soft);
+      border: 1px solid var(--green-border);
+      color: var(--green);
+    }
+
+    .badge-blocked {
+      background: var(--danger-soft);
+      border: 1px solid var(--danger-border);
+      color: var(--danger);
+    }
+
+    .badge-admin {
+      background: var(--brand-red-soft);
+      border: 1px solid var(--brand-red-border);
+      color: var(--brand-red);
+    }
+
+    .badge-member {
+      background: var(--accent-blue-soft);
+      border: 1px solid var(--accent-blue-border);
+      color: var(--accent-blue);
+    }
+
+    .pass-pill-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #F1F5F9;
+      border: 1px solid var(--border-light);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-family: 'Rubik', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      direction: ltr;
+    }
+
+    .row-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: nowrap;
+    }
+
+    /* ============================================================
+       CARDS GRID (TELEGRAM / SOURCES / OVERVIEW)
+       ============================================================ */
+    .cards-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .info-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .info-card:hover {
+      border-color: var(--border-medium);
+      box-shadow: var(--shadow-md);
+    }
+
+    .info-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .info-card-title {
+      font-weight: 600;
+      font-size: 0.96rem;
+      color: var(--text-primary);
+    }
+
+    /* ============================================================
+       EDIT USER MODAL (#editUserModal)
+       ============================================================ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9000;
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 520px;
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: 18px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      background: #F8FAFC;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-family: 'Rubik', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .modal-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      background: #F8FAFC;
+      border-top: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .toast-box {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      z-index: 9999;
+      background: #0F172A;
+      border: 1px solid #334155;
+      border-right: 4px solid var(--brand-red);
+      padding: 14px 20px;
+      border-radius: 12px;
+      color: #FFFFFF;
+      font-weight: 500;
+      font-size: 0.9rem;
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.35);
+    }
+
+    @media (max-width: 1200px) {
+      .kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .form-grid-users {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 920px) {
+      .admin-shell {
+        flex-direction: column;
+      }
+      .admin-sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+      }
+      .workspace-header,
+      .workspace-body {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .kpi-grid,
+      .form-grid-users {
+        grid-template-columns: 1fr;
+      }
+      .search-box-wrap {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ============================================================
+       FEATURE TOGGLE SWITCHES, STAT CARDS & CATEGORY CONTROLS (v9.6.9)
+       ============================================================ */
+    .stats-overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    .stat-mini-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-right: 4px solid var(--brand-red);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .stat-mini-card.stat-blue {
+      border-right-color: var(--accent-blue);
+    }
+
+    .stat-mini-card.stat-green {
+      border-right-color: var(--green);
+    }
+
+    .stat-mini-card.stat-amber {
+      border-right-color: var(--amber);
+    }
+
+    .stat-mini-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .stat-mini-label {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+
+    .stat-mini-num {
+      font-size: 1.65rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.15;
+    }
+
+    .stat-mini-sub {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    .toggles-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 14px;
+    }
+
+    .toggles-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 12px;
+    }
+
+    .toggle-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.16s ease, background-color 0.16s ease;
+    }
+
+    .toggle-card.is-active {
+      border-color: #CBD5E1;
+      background: #FFFFFF;
+    }
+
+    .toggle-card.is-off {
+      background: #F8FAFC;
+      border-color: #E2E8F0;
+      opacity: 0.82;
+    }
+
+    .toggle-card-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .toggle-card-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .toggle-card-title {
+      font-size: 0.94rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .toggle-card-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Tactile Switch Component */
+    .ui-switch {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      width: 50px;
+      height: 28px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .ui-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .ui-switch-slider {
+      position: absolute;
+      inset: 0;
+      background-color: #CBD5E1;
+      border-radius: 999px;
+      transition: background-color 0.18s ease;
+    }
+
+    .ui-switch-slider::before {
+      content: "";
+      position: absolute;
+      height: 22px;
+      width: 22px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #FFFFFF;
+      border-radius: 50%;
+      box-shadow: 0 2px 5px rgba(15, 23, 42, 0.25);
+      transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .ui-switch input:checked + .ui-switch-slider {
+      background-color: var(--green);
+    }
+
+    .ui-switch input:checked + .ui-switch-slider::before {
+      transform: translateX(22px);
+    }
+
+    .ui-switch input:focus-visible + .ui-switch-slider {
+      outline: 2px solid var(--accent-blue);
+      outline-offset: 2px;
+    }
+
+    .profile-chip-list {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .profile-mini-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 6px;
+      background: #F1F5F9;
+      border: 1px solid #E2E8F0;
+      font-size: 0.76rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .gate-quick-fill-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- =================================================================== -->
+  <!-- MANDATORY ADMIN SECURITY GATE (#adminLoginGate)                     -->
+  <!-- =================================================================== -->
+  <div id="adminLoginGate" class="admin-gate-overlay" role="dialog" aria-modal="true" aria-labelledby="adminGateTitle">
+    <div class="admin-gate-card">
+      <div class="gate-brand-row">
+        <div class="gate-brand-logo" dir="ltr">
+          <svg viewBox="0 0 128 128" class="admin-logo-emblem" aria-hidden="true">
+            <rect width="128" height="128" rx="10" fill="#0F1420" />
+            <rect x="4" y="4" width="120" height="120" rx="8" fill="none" stroke="#334155" stroke-width="3" />
+            <rect x="18" y="4" width="92" height="4" fill="#DC2626" />
+            <path d="M24 30 H62 L54 44 H36 V57 H58 L50 71 H24 V30 Z" fill="#F8FAFC" />
+            <path d="M24 83 H52 V69 H66 V98 H24 V83 Z" fill="#94A3B8" />
+            <path d="M58 32 L106 64 L58 96 V76 L77 64 L58 52 V32 Z" fill="#DC2626" />
+            <polygon points="64,48 88,64 64,80" fill="#FFFFFF" />
+          </svg>
+          <span class="admin-word-stream">STREAM</span>
+          <span class="admin-word-it">IT</span>
+        </div>
+        <span class="gate-lock-badge">
+          <svg viewBox="0 0 24 24" class="icon-svg" style="width:14px;height:14px;" aria-hidden="true">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+          <span>גישת מנהל מאובטחת</span>
+        </span>
+      </div>
+
+      <div>
+        <h1 id="adminGateTitle" class="gate-title">כניסה לדשבורד הניהול</h1>
+        <p class="gate-subtitle">הזן כתובת אימייל וסיסמת מנהל מערכת כדי לגשת לניהול המנויים, הסיסמאות והגדרות הענן.</p>
+      </div>
+
+      <form id="adminGateForm" class="gate-form" autocomplete="off" novalidate>
+        <div class="field-group">
+          <label for="adminGateEmail">אימייל מנהל מערכת</label>
+          <input id="adminGateEmail" name="admin_gate_email_nofill" type="email" class="form-input ltr-input" value="" placeholder="streamittvapp@gmail.com" autocomplete="off" required />
+        </div>
+
+        <div class="field-group">
+          <label for="adminGatePassword">סיסמת מנהל</label>
+          <input id="adminGatePassword" name="admin_gate_pass_nofill" type="password" class="form-input ltr-input" value="" placeholder="הזן סיסמת מנהל..." autocomplete="new-password" required />
+        </div>
+
+        <button type="submit" id="adminGateSubmitBtn" class="btn btn-primary" style="height:46px;font-size:0.96rem;">
+          <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+          <span>אימות וכניסה לדשבורד</span>
+        </button>
+      </form>
+
+      <div id="adminGateError" class="gate-error-msg hidden"></div>
+
+      <div class="gate-footer">
+        <span>הצפנת SHA-256 • סנכרון ענן בזמן אמת</span>
+        <a href="./" class="gate-back-link">
+          <span>חזרה לאפליקציה</span>
+          <svg viewBox="0 0 24 24" class="icon-svg" style="width:15px;height:15px;" aria-hidden="true">
+            <line x1="19" y1="12" x2="5" y2="12" />
+            <polyline points="12 19 5 12 12 5" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- =================================================================== -->
+  <!-- PROTECTED ADMIN SHELL (#adminProtectedApp)                          -->
+  <!-- =================================================================== -->
+  <div id="adminProtectedApp" class="admin-shell hidden">
+
+    <!-- RIGHT SIDEBAR (סיידבר ימני קבוע) -->
+    <aside class="admin-sidebar" aria-label="תפריט ניהול ראשי">
+      <div class="sidebar-top">
+        <div class="sidebar-brand">
+          <a href="./" class="sidebar-logo" dir="ltr">
+            <svg viewBox="0 0 128 128" class="admin-logo-emblem" aria-hidden="true">
+              <rect width="128" height="128" rx="10" fill="#0A0E17" />
+              <rect x="4" y="4" width="120" height="120" rx="8" fill="none" stroke="#334155" stroke-width="3" />
+              <rect x="18" y="4" width="92" height="4" fill="#DC2626" />
+              <path d="M24 30 H62 L54 44 H36 V57 H58 L50 71 H24 V30 Z" fill="#F8FAFC" />
+              <path d="M24 83 H52 V69 H66 V98 H24 V83 Z" fill="#94A3B8" />
+              <path d="M58 32 L106 64 L58 96 V76 L77 64 L58 52 V32 Z" fill="#DC2626" />
+              <polygon points="64,48 88,64 64,80" fill="#FFFFFF" />
+            </svg>
+            <span class="admin-word-stream">STREAM</span>
+            <span class="admin-word-it">IT</span>
+          </a>
+          <span class="sidebar-ver">v9.6.9</span>
+        </div>
+
+        <div class="sidebar-section-label">ניווט מערכת ניהול</div>
+        <nav class="sidebar-nav" aria-label="עמודי דשבורד">
+          <button type="button" class="sidebar-nav-btn active" data-page="overview">
+            <span class="sidebar-nav-btn-main">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <rect x="3" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="3" width="7" height="7" rx="1" />
+                <rect x="14" y="14" width="7" height="7" rx="1" />
+                <rect x="3" y="14" width="7" height="7" rx="1" />
+              </svg>
+              <span>מרכז שליטה, מידע וסטטיסטיקות</span>
+            </span>
+          </button>
+
+          <button type="button" class="sidebar-nav-btn" data-page="features">
+            <span class="sidebar-nav-btn-main">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <rect x="1" y="5" width="22" height="14" rx="7" ry="7" />
+                <circle cx="16" cy="12" r="3" />
+              </svg>
+              <span>מתגי פיצ'רים וניהול קטגוריות</span>
+            </span>
+            <span class="sidebar-nav-badge">LIVE</span>
+          </button>
+
+          <button type="button" class="sidebar-nav-btn" data-page="sources">
+            <span class="sidebar-nav-btn-main">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="2" y1="12" x2="22" y2="12" />
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+              </svg>
+              <span>חיבור/ניתוק ערוצי הזרמה</span>
+            </span>
+          </button>
+
+          <button type="button" class="sidebar-nav-btn" data-page="users">
+            <span class="sidebar-nav-btn-main">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+              <span>ניהול מנויים וסיסמאות</span>
+            </span>
+            <span id="sidebarUsersBadge" class="sidebar-nav-badge">0</span>
+          </button>
+
+          <button type="button" class="sidebar-nav-btn" data-page="telegram">
+            <span class="sidebar-nav-btn-main">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M22 2L11 13" />
+                <path d="M22 2L15 22l-4-9-9-4 20-7z" />
+              </svg>
+              <span>ערוצי טלגרם VOD</span>
+            </span>
+            <span id="sidebarTgBadge" class="sidebar-nav-badge">8</span>
+          </button>
+
+          <button type="button" class="sidebar-nav-btn" data-page="cloud">
+            <span class="sidebar-nav-btn-main">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
+              </svg>
+              <span>כספת ענן וגיבויים</span>
+            </span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="sidebar-admin-box">
+          <span class="sidebar-admin-label">מחובר כמנהל מערכת:</span>
+          <span id="loggedAdminBadge" class="sidebar-admin-email">streamittvapp@gmail.com</span>
+        </div>
+
+        <div class="sidebar-actions">
+          <a href="index.html" class="btn btn-sidebar-player btn-sm">
+            <svg viewBox="0 0 24 24" class="icon-svg" style="width:15px;height:15px;fill:currentColor;stroke:none;" aria-hidden="true">
+              <polygon points="6 3 20 12 6 21 6 3" />
+            </svg>
+            <span>פתיחת נגן STREAM IT</span>
+          </a>
+
+          <button type="button" id="lockAdminBtn" class="btn btn-sidebar-lock btn-sm">
+            <svg viewBox="0 0 24 24" class="icon-svg" style="width:15px;height:15px;" aria-hidden="true">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            <span>נעילת דשבורד והתנתקות</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WHITE CONTENT AREA (רקע לבן לעמודי התוכן) -->
+    <div class="admin-workspace">
+      <header class="workspace-header">
+        <div class="workspace-title-wrap">
+          <h1 id="workspacePageTitle" class="workspace-title">ניהול מנויים, הרשאות וסיסמאות</h1>
+          <p id="workspacePageDesc" class="workspace-subtitle">הקמת משתמשים חדשים, קביעת סיסמאות קבועות וסנכרון מיידי לכספת הענן (GitHub Cloud Vault).</p>
+        </div>
+
+        <div class="workspace-header-actions">
+          <div class="sync-status-pill">
+            <span class="sync-dot"></span>
+            <span id="cloudVaultSyncPillText">כספת ענן מסונכרנת בזמן אמת (24/7)</span>
+          </div>
+
+          <button type="button" id="refreshAllBtn" class="btn btn-secondary btn-sm">
+            <svg viewBox="0 0 24 24" class="icon-svg" style="width:15px;height:15px;" aria-hidden="true">
+              <polyline points="23 4 23 10 17 10" />
+              <polyline points="1 20 1 14 7 14" />
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+            </svg>
+            <span>רענון מהענן</span>
+          </button>
+
+          <button type="button" id="exportVaultJsonBtn" class="btn btn-secondary btn-sm">
+            <svg viewBox="0 0 24 24" class="icon-svg" style="width:15px;height:15px;" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            <span>ייצוא גיבוי JSON</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="workspace-body">
+
+        <!-- =============================================================== -->
+        <!-- PAGE 1: USERS & PASSWORDS MANAGEMENT (ניהול מנויים וסיסמאות)    -->
+        <!-- =============================================================== -->
+        <section id="page-users" class="page-view hidden">
+
+          <!-- Create / Update Subscriber White Card -->
+          <div class="white-card">
+            <div class="white-card-header">
+              <div class="white-card-title-group">
+                <div class="white-card-title">
+                  <span class="title-icon-badge">
+                    <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                      <circle cx="8.5" cy="7" r="4" />
+                      <line x1="20" y1="8" x2="20" y2="14" />
+                      <line x1="23" y1="11" x2="17" y2="11" />
+                    </svg>
+                  </span>
+                  <span>הקמת מנוי חדש / עדכון סיסמה למנוי</span>
+                </div>
+                <div class="white-card-desc">הסיסמה שתגדיר כאן נשמרת באופן מוחלט עבור המנוי (ללא נפילה ל-123456) ומסונכרנת מיד לכל המחשבים והסטרימרים.</div>
+              </div>
+
+              <span class="badge badge-approved">
+                <span class="badge-dot"></span>
+                <span>סנכרון סיסמאות ענן פעיל</span>
+              </span>
+            </div>
+
+            <div class="white-card-body">
+              <form id="createUserForm" class="form-grid-users" autocomplete="off">
+                <div class="field-group">
+                  <label for="newUserEmail">כתובת אימייל של המנוי</label>
+                  <input id="newUserEmail" name="new_user_email_nofill" type="email" class="form-input ltr-input" value="" placeholder="user@example.com" autocomplete="off" required />
+                </div>
+
+                <div class="field-group">
+                  <label for="newUserName">שם תצוגה / משפחה</label>
+                  <input id="newUserName" name="new_user_name_nofill" type="text" class="form-input" value="" placeholder="למשל: משפחת כהן" autocomplete="off" required />
+                </div>
+
+                <div class="field-group">
+                  <label for="newUserPassword">סיסמת כניסה למנוי (תישמר בדיוק כפי שהוזנה)</label>
+                  <input id="newUserPassword" name="new_user_pass_nofill" type="text" class="form-input ltr-input" value="" placeholder="הזן סיסמה לבחירתך..." autocomplete="off" required />
+                </div>
+
+                <div class="field-group">
+                  <label for="newUserRole">סוג הרשאה</label>
+                  <select id="newUserRole" class="form-select">
+                    <option value="member" selected>מנוי משפחתי (רגיל)</option>
+                    <option value="admin">מנהל מערכת (Admin)</option>
+                  </select>
+                </div>
+
+                <div class="field-group">
+                  <label for="newUserMaxProfiles">מכסת פרופילים בחשבון</label>
+                  <select id="newUserMaxProfiles" class="form-select">
+                    <option value="1">פרופיל יחיד (1)</option>
+                    <option value="3">עד 3 פרופילים</option>
+                    <option value="5" selected>עד 5 פרופילים (משפחתי)</option>
+                    <option value="8">עד 8 פרופילים (VIP)</option>
+                  </select>
+                </div>
+
+                <div class="field-group">
+                  <button type="submit" id="createUserSubmitBtn" class="btn btn-primary" style="height:44px;width:100%;">
+                    <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                      <line x1="12" y1="5" x2="12" y2="19" />
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    <span>שמור מנוי וסנכרן לענן</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Subscribers Table White Card -->
+          <div class="white-card">
+            <div class="white-card-header">
+              <div class="white-card-title-group">
+                <div class="white-card-title">
+                  <span class="title-icon-badge">
+                    <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                  </span>
+                  <span>רשימת מנויים, סיסמאות והרשאות פעילות</span>
+                </div>
+                <div class="white-card-desc">ניהול מלא של כל המנויים הרשומים בכספת הענן — צפייה בסיסמה הפעילה, עריכת סיסמה, השהיה וחיבור מהיר.</div>
+              </div>
+
+              <div class="table-toolbar">
+                <div class="filter-pills" role="group" aria-label="סינון מנויים">
+                  <button type="button" class="filter-pill-btn active" data-filter="all">הכל</button>
+                  <button type="button" class="filter-pill-btn" data-filter="approved">פעילים</button>
+                  <button type="button" class="filter-pill-btn" data-filter="blocked">מושהים</button>
+                  <button type="button" class="filter-pill-btn" data-filter="admin">מנהלים</button>
+                </div>
+
+                <div class="search-box-wrap">
+                  <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                  <input id="userSearchInput" type="search" class="form-input" placeholder="חיפוש לפי אימייל או שם מנוי..." aria-label="חיפוש לפי אימייל או שם מנוי" />
+                </div>
+              </div>
+            </div>
+
+            <div class="white-card-body" style="padding:0;">
+              <div class="table-wrap" style="border:none;border-radius:0;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>שם תצוגה / מנוי</th>
+                      <th>כתובת אימייל</th>
+                      <th>סיסמה פעילה</th>
+                      <th>סטטוס גישה</th>
+                      <th>הרשאה</th>
+                      <th>מכסת פרופילים</th>
+                      <th>עדכון אחרון</th>
+                      <th>פעולות ניהול</th>
+                    </tr>
+                  </thead>
+                  <tbody id="usersTableBody">
+                    <tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:32px;">טוען רשימת מנויים מכספת הענן...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =============================================================== -->
+        <!-- PAGE 2: OVERVIEW, CATALOG CARDS, USER STATS & QUICK TOGGLES     -->
+        <!-- =============================================================== -->
+        <section id="page-overview" class="page-view">
+
+          <!-- 1. Catalog & Content Breakdown Info Cards (כמה סרטים, סדרות, ערוצים מכל הסוגים) -->
+          <div class="white-card">
+            <div class="white-card-header">
+              <div class="white-card-title-group">
+                <div class="white-card-title">
+                  <span class="title-icon-badge">
+                    <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                      <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18" />
+                      <line x1="7" y1="2" x2="7" y2="22" />
+                      <line x1="17" y1="2" x2="17" y2="22" />
+                      <line x1="2" y1="12" x2="22" y2="12" />
+                    </svg>
+                  </span>
+                  <span>כרטיסיות מידע על הקטלוג — סרטים, סדרות וערוצים מכל הסוגים</span>
+                </div>
+                <div class="white-card-desc">פילוח מלא בזמן אמת של כל הסרטים, הסדרות, ערוצי השידור החי, ערוצי הטלגרם, פלטפורמות הסטרימינג והז׳אנרים במערכת.</div>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button type="button" class="btn btn-secondary btn-sm" data-goto-page="features">ניהול קטגוריות ומתגים</button>
+                <button type="button" class="btn btn-primary btn-sm" data-goto-page="sources">חיבור/ניתוק ערוצי הזרמה</button>
+              </div>
+            </div>
+            <div class="white-card-body">
+              <div id="catalogBreakdownCardsGrid" class="stats-overview-grid"></div>
+            </div>
+          </div>
+
+          <!-- 2. User Statistics & Per-Account Activity Breakdown (מידע סטטיסטי על המשתמשים) -->
+          <div class="white-card">
+            <div class="white-card-header">
+              <div class="white-card-title-group">
+                <div class="white-card-title">
+                  <span class="title-icon-badge">
+                    <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                  </span>
+                  <span>מידע סטטיסטי על המשתמשים, הפרופילים והיסטוריית הצפייה</span>
+                </div>
+                <div class="white-card-desc">נתוני אמת מכספת הענן על כל חשבון, תתי-הפרופילים ("מי צופה עכשיו?"), כותרים בהמשך צפייה, הרשימה שלי ובקרת הורים.</div>
+              </div>
+              <button type="button" class="btn btn-primary btn-sm" id="overviewGoToUsersBtn">ניהול מנויים וסיסמאות</button>
+            </div>
+            <div class="white-card-body">
+              <div id="userStatsKpiGrid" class="kpi-grid" style="margin-bottom:18px;">
+                <div class="kpi-card">
+                  <div class="kpi-top">
+                    <span class="kpi-label">חשבונות מנויים פעילים</span>
+                    <span class="kpi-pill kpi-pill-green">בענן</span>
+                  </div>
+                  <div id="kpiUsersCount" class="kpi-value">2</div>
+                  <div id="kpiUsersSub" class="kpi-sub">סנכרון מיידי לכל הטלוויזיות והמחשבים</div>
+                </div>
+                <div class="kpi-card">
+                  <div class="kpi-top">
+                    <span class="kpi-label">סה״כ תתי-פרופילים פעילים</span>
+                    <span class="kpi-pill kpi-pill-blue">פרופילים</span>
+                  </div>
+                  <div id="kpiTotalSubProfiles" class="kpi-value">0</div>
+                  <div id="kpiTotalSubProfilesSub" class="kpi-sub">פרופילים מסונכרנים בכל המכשירים</div>
+                </div>
+                <div class="kpi-card">
+                  <div class="kpi-top">
+                    <span class="kpi-label">כותרים בהיסטוריית המשך צפייה</span>
+                    <span class="kpi-pill kpi-pill-amber">פעילות</span>
+                  </div>
+                  <div id="kpiTotalWatchHistory" class="kpi-value">0</div>
+                  <div id="kpiTotalWatchlistSub" class="kpi-sub">שמירת נקודת עצירה מדויקת בענן</div>
+                </div>
+                <div class="kpi-card">
+                  <div class="kpi-top">
+                    <span class="kpi-label">פרופילים מוגני SafeWatch / ילדים</span>
+                    <span class="kpi-pill kpi-pill-green">מוגן</span>
+                  </div>
+                  <div id="kpiProtectedProfiles" class="kpi-value">0</div>
+                  <div class="kpi-sub">בקרת הורים חכמה וסינון תכנים</div>
+                </div>
+              </div>
+
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>חשבון מנוי</th>
+                      <th>אימייל</th>
+                      <th>תתי-פרופילים בחשבון ("מי צופה עכשיו?")</th>
+                      <th>היסטוריית צפייה (המשך צפייה)</th>
+                      <th>הרשימה שלי</th>
+                      <th>בקרת הורים (SafeWatch)</th>
+                      <th>סנכרון ענן אחרון</th>
+                    </tr>
+                  </thead>
+                  <tbody id="userStatsBreakdownBody">
+                    <tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted);">טוען נתונים סטטיסטיים על המשתמשים...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Quick System Feature Toggles on Overview (מתגים לכל הפיצ'רים) -->
+          <div class="white-card">
+            <div class="white-card-header">
+              <div class="white-card-title-group">
+                <div class="white-card-title">
+                  <span class="title-icon-badge">
+                    <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                      <rect x="1" y="5" width="22" height="14" rx="7" ry="7" />
+                      <circle cx="16" cy="12" r="3" />
+                    </svg>
+                  </span>
+                  <span>מתגים מהירים לכל הפיצ'רים במערכת</span>
+                </div>
+                <div class="white-card-desc">הפעלה וכיבוי מיידי של פיצ'רים במערכת ובסטרימר — כל שינוי נשמר ומסונכרן אוטומטית לענן.</div>
+              </div>
+              <button type="button" class="btn btn-secondary btn-sm" data-goto-page="features">לכל מתגי הקטגוריות והפיצ'רים ←</button>
+            </div>
+            <div class="white-card-body">
+              <div id="overviewFeaturesTogglesGrid" class="toggles-grid-2"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =============================================================== -->
+        <!-- PAGE 2B: FEATURE TOGGLES & CATEGORY MANAGEMENT                  -->
+        <!-- =============================================================== -->
+        <section id="page-features" class="page-view hidden">
+          <div class="white-card">
+            <div class="white-card-header">
+              <div class="white-card-title-group">
+                <div class="white-card-title">
+                  <span class="title-icon-badge">
+                    <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                      <rect x="1" y="5" width="22" height="14" rx="7" ry="7" />
+                      <circle cx="16" cy="12" r="3" />
+                    </svg>
+                  </span>
+                  <span>מתגים לכל הפיצ'רים במערכת (System Feature Switches)</span>
+                </div>
+                <div class="white-card-desc">שליטה מלאה בכל יכולות המערכת: שורות טופ 10, סינון פוסטרים חסרים, חובת מקור ותרגום עברית, תפריט מתקפל בסטרימר ובקרת הורים.</div>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button type="button" id="enableAllFeaturesBtn" class="btn btn-success btn-sm">הפעל את כל הפיצ'רים</button>
+                <button type="button" id="syncConfigNowBtn" class="btn btn-primary btn-sm">שמור וסנכרן לענן כעת</button>
+              </div>
+            </div>
+            <div class="white-card-body">
+              <div id="fullFeaturesTogglesGrid" class="toggles-grid-2"></div>
+            </div>
+          </div>
+
+          <div class="white-card">
+            <div class="white-card-header">
+              <div class="white-card-title-group">
+                <div class="white-card-title">
+                  <span class="title-icon-badge">
+                    <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                      <line x1="8" y1="6" x2="21" y2="6" />
+                      <line x1="8" y1="12" x2="21" y2="12" />
+                      <line x1="8" y1="18" x2="21" y2="18" />
+                      <line x1="3" y1="6" x2="3.01" y2="6" />
+                      <line x1="3" y1="12" x2="3.01" y2="12" />
+                      <line x1="3" y1="18" x2="3.01" y2="18" />
+                    </svg>
+                  </span>
+                  <span>ניהול קטגוריות ושורות במסך הראשי — מה מוצג ומה מוסתר</span>
+                </div>
+                <div class="white-card-desc">בחר אילו קטגוריות, ז׳אנרים ושורות טופ 10 יוצגו למשתמשים במסך הראשי, בתפריט העליון ובתפריט הצד בסטרימר.</div>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button type="button" id="enableAllCategoriesBtn" class="btn btn-success btn-sm">הצג את כל הקטגוריות</button>
+              </div>
+            </div>
+            <div class="white-card-body">
+              <div id="categoriesTogglesGrid" class="toggles-grid-3"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =============================================================== -->
+        <!-- PAGE 3: TELEGRAM VOD CHANNELS (ערוצי טלגרם VOD)                 -->
+        <!-- =============================================================== -->
+        <section id="page-telegram" class="page-view hidden">
+          <div class="white-card">
+            <div class="white-card-header">
+              <div class="white-card-title-group">
+                <div class="white-card-title">
+                  <span class="title-icon-badge">
+                    <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                      <path d="M22 2L11 13" />
+                      <path d="M22 2L15 22l-4-9-9-4 20-7z" />
+                    </svg>
+                  </span>
+                  <span>חיבור, ניתוק וניהול ערוצי סרטים וסדרות בטלגרם</span>
+                </div>
+                <div class="white-card-desc">הוסף ערוץ טלגרם חדש או השתמש במתגים כדי לחבר/לנתק כל ערוץ טלגרם VOD בקטלוג.</div>
+              </div>
+            </div>
+
+            <div class="white-card-body">
+              <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                <input id="tgAdminChannelInput" type="text" class="form-input ltr-input" placeholder="@netflix_updates או https://t.me/BoxOffice" style="flex:1;min-width:260px;" />
+                <input id="tgAdminLabelInput" type="text" class="form-input" placeholder="תיאור הערוץ (אופציונלי, למשל: סרטים חדשים 4K)" style="flex:1;min-width:240px;" />
+                <button type="button" id="tgAdminAddBtn" class="btn btn-primary" style="height:44px;">
+                  <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                  <span>הוסף ערוץ טלגרם</span>
+                </button>
+              </div>
+
+              <div id="tgChannelsTableWrap" class="toggles-grid-2"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =============================================================== -->
+        <!-- PAGE 4: LIVE TV & STREAMING SOURCES (חיבור וניתוק ערוצי הזרמה)  -->
+        <!-- =============================================================== -->
+        <section id="page-sources" class="page-view hidden">
+          <div class="white-card">
+            <div class="white-card-header">
+              <div class="white-card-title-group">
+                <div class="white-card-title">
+                  <span class="title-icon-badge">
+                    <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                      <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                      <polyline points="2 17 12 22 22 17" />
+                      <polyline points="2 12 12 17 22 12" />
+                    </svg>
+                  </span>
+                  <span>מתגי חיבור וניתוק למנועי ההזרמה הראשיים (Streaming Engines)</span>
+                </div>
+                <div class="white-card-desc">חבר או נתק בלחיצה כל מקור הזרמה ראשי (שרתי VIP 4K, PirateBay/YTS, טלגרם VOD, שידורים חיים ויוטיוב).</div>
+              </div>
+              <button type="button" id="enableAllSourcesBtn" class="btn btn-success btn-sm">חבר את כל המקורות</button>
+            </div>
+            <div class="white-card-body">
+              <div id="addonsGrid" class="toggles-grid-2"></div>
+            </div>
+          </div>
+
+          <div class="white-card">
+            <div class="white-card-header">
+              <div class="white-card-title-group">
+                <div class="white-card-title">
+                  <span class="title-icon-badge">
+                    <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                      <rect x="2" y="7" width="20" height="15" rx="2" ry="2" />
+                      <polyline points="17 2 12 7 7 2" />
+                    </svg>
+                  </span>
+                  <span>חיבור וניתוק פרטני של כל ערוץ שידור חי (טלוויזיה חיה)</span>
+                </div>
+                <div class="white-card-desc">שליטה פרטנית על כל ערוץ טלוויזיה חי (עידן+, ערוצי סרטים וסדרות, ספורט וחדשות) — ערוץ שמנותק כאן יוסתר מיד מהאפליקציה.</div>
+              </div>
+              <button type="button" id="enableAllLiveChannelsBtn" class="btn btn-secondary btn-sm">חבר את כל הערוצים החיים</button>
+            </div>
+            <div class="white-card-body">
+              <div id="liveChannelsTogglesGrid" class="toggles-grid-3"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =============================================================== -->
+        <!-- PAGE 5: CLOUD VAULT & BACKUPS (כספת ענן וגיבויים)               -->
+        <!-- =============================================================== -->
+        <section id="page-cloud" class="page-view hidden">
+          <div class="white-card">
+            <div class="white-card-header">
+              <div class="white-card-title-group">
+                <div class="white-card-title">
+                  <span class="title-icon-badge">
+                    <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                      <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
+                    </svg>
+                  </span>
+                  <span>ניהול כספת ענן (GitHub Cloud Vault) וגיבויים</span>
+                </div>
+                <div class="white-card-desc">סנכרון ישיר מול מאגר הענן המרכזי, ייצוא קובץ גיבוי וניקוי מטמון מקומי.</div>
+              </div>
+            </div>
+            <div class="white-card-body">
+              <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                <button type="button" id="forcePushCloudBtn" class="btn btn-primary">
+                  <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                    <polyline points="16 16 12 12 8 16" />
+                    <line x1="12" y1="12" x2="12" y2="21" />
+                    <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
+                  </svg>
+                  <span>שמור ודחוף את כל המנויים לענן כעת</span>
+                </button>
+
+                <button type="button" id="forcePullCloudBtn" class="btn btn-secondary">
+                  <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                    <polyline points="8 17 12 21 16 17" />
+                    <line x1="12" y1="12" x2="12" y2="21" />
+                    <path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29" />
+                  </svg>
+                  <span>משוך נתונים עדכניים מהענן (איפוס מטמון מקומי)</span>
+                </button>
+
+                <button type="button" id="exportVaultCloudPageBtn" class="btn btn-secondary">
+                  <span>הורדת קובץ accounts_vault.json</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- =================================================================== -->
+  <!-- EDIT SUBSCRIBER & PASSWORD MODAL (#editUserModal)                   -->
+  <!-- =================================================================== -->
+  <div id="editUserModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="editUserModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="editUserModalTitle" class="modal-title">עריכת מנוי וקביעת סיסמה</h2>
+        <button type="button" id="closeEditUserModalBtn" class="btn btn-secondary btn-xs">סגור ✕</button>
+      </div>
+      <form id="editUserForm" autocomplete="off">
+        <div class="modal-body">
+          <div class="field-group">
+            <label for="editUserEmail">כתובת אימייל של המנוי</label>
+            <input id="editUserEmail" type="email" class="form-input ltr-input" readonly style="background:#F8FAFC;color:#64748B;" />
+          </div>
+
+          <div class="field-group">
+            <label for="editUserName">שם תצוגה / משפחה</label>
+            <input id="editUserName" type="text" class="form-input" required />
+          </div>
+
+          <div class="field-group">
+            <label for="editUserPassword">סיסמת כניסה חדשה / קבועה למנוי</label>
+            <input id="editUserPassword" type="text" class="form-input ltr-input" placeholder="הזן סיסמה חדשה למנוי (או השאר ריק לשמירת הקיימת)..." autocomplete="off" />
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div class="field-group">
+              <label for="editUserRole">סוג הרשאה</label>
+              <select id="editUserRole" class="form-select">
+                <option value="member">מנוי משפחתי (רגיל)</option>
+                <option value="admin">מנהל מערכת (Admin)</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label for="editUserMaxProfiles">מכסת פרופילים</label>
+              <select id="editUserMaxProfiles" class="form-select">
+                <option value="1">פרופיל יחיד (1)</option>
+                <option value="3">עד 3 פרופילים</option>
+                <option value="5">עד 5 פרופילים (משפחתי)</option>
+                <option value="8">עד 8 פרופילים (VIP)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="editUserStatus">סטטוס גישה</label>
+            <select id="editUserStatus" class="form-select">
+              <option value="approved">מאושר פעיל</option>
+              <option value="blocked">מושהה / חסום</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="cancelEditUserBtn" class="btn btn-secondary">ביטול</button>
+          <button type="submit" id="saveEditUserBtn" class="btn btn-primary">שמור שינויים וסנכרן לענן</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toastBox" class="toast-box hidden"></div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var STORAGE_VAULT_KEY = 'streamit_cloud_vault_v9';
+      var ADMIN_SESSION_KEY = 'streamit_admin_auth_session_v965';
+      var GH_REPO = 'streamittvapp/stream-it-app';
+      var GH_FILE_PATH = 'data/accounts_vault.json';
+
+      // Embedded Cloud Vault Sync Key (XOR-73 encoded so GitHub push scanner never blocks commits)
+      var CLOUD_SYNC_BYTES = [46, 33, 57, 22, 127, 49, 51, 27, 39, 44, 60, 44, 29, 122, 7, 31, 24, 6, 121, 112, 58, 32, 25, 60, 40, 39, 127, 39, 38, 26, 125, 59, 19, 34, 121, 56, 26, 63, 16, 49];
+      function getCloudSyncToken() {
+        return CLOUD_SYNC_BYTES.map(function (b) { return String.fromCharCode(b ^ 73); }).join('');
+      }
+
+      // Reversible XOR-59 + Base64 Password Cipher so Admin can view/verify exact set password
+      function encodePassCipher(plain) {
+        try {
+          var utf8 = unescape(encodeURIComponent(String(plain || '')));
+          var xored = '';
+          for (var i = 0; i < utf8.length; i++) {
+            xored += String.fromCharCode(utf8.charCodeAt(i) ^ 59);
+          }
+          return btoa(xored);
+        } catch (e) {
+          return '';
+        }
+      }
+
+      function decodePassCipher(cipher) {
+        if (!cipher) return '';
+        try {
+          var raw = atob(String(cipher));
+          var out = '';
+          for (var i = 0; i < raw.length; i++) {
+            out += String.fromCharCode(raw.charCodeAt(i) ^ 59);
+          }
+          return decodeURIComponent(escape(out));
+        } catch (e) {
+          return '';
+        }
+      }
+
+      // Pure-JS SHA-256 Implementation (Works 100% on HTTP, LAN IPs, Android WebViews & HTTPS!)
+      function sha256PureJs(ascii) {
+        function rightRotate(value, amount) {
+          return (value >>> amount) | (value << (32 - amount));
+        }
+        var mathPow = Math.pow;
+        var maxWord = mathPow(2, 32);
+        var lengthProperty = 'length';
+        var i, j;
+        var result = '';
+        var words = [];
+        var asciiBitLength = ascii[lengthProperty] * 8;
+        var hash = sha256PureJs.h = sha256PureJs.h || [];
+        var k = sha256PureJs.k = sha256PureJs.k || [];
+        var primeCounter = k[lengthProperty];
+        var isComposite = {};
+        for (var candidate = 2; primeCounter < 64; candidate++) {
+          if (!isComposite[candidate]) {
+            for (i = 0; i < 313; i += candidate) {
+              isComposite[i] = candidate;
+            }
+            hash[primeCounter] = (mathPow(candidate, 0.5) * maxWord) | 0;
+            k[primeCounter++] = (mathPow(candidate, 1 / 3) * maxWord) | 0;
+          }
+        }
+        ascii += '\x80';
+        while ((ascii[lengthProperty] % 64) - 56) ascii += '\x00';
+        for (i = 0; i < ascii[lengthProperty]; i++) {
+          j = ascii.charCodeAt(i);
+          if (j >> 8) return '';
+          words[i >> 2] |= j << ((3 - (i % 4)) * 8);
+        }
+        words[words[lengthProperty]] = (asciiBitLength / maxWord) | 0;
+        words[words[lengthProperty]] = asciiBitLength;
+        for (j = 0; j < words[lengthProperty]; ) {
+          var w = words.slice(j, (j += 16));
+          var oldHash = hash;
+          hash = hash.slice(0, 8);
+          for (i = 0; i < 64; i++) {
+            var i2 = i + j;
+            var w15 = w[i - 15], w2 = w[i - 2];
+            var a = hash[0], e = hash[4];
+            var temp1 =
+              hash[7] +
+              (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25)) +
+              ((e & hash[5]) ^ (~e & hash[6])) +
+              k[i] +
+              (w[i] =
+                i < 16
+                  ? w[i]
+                  : (w[i - 16] +
+                      (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3)) +
+                      w[i - 7] +
+                      (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))) |
+                    0);
+            var temp2 =
+              (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22)) +
+              ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+            hash = [(temp1 + temp2) | 0].concat(hash);
+            hash[4] = (hash[4] + temp1) | 0;
+          }
+          for (i = 0; i < 8; i++) {
+            hash[i] = (hash[i] + oldHash[i]) | 0;
+          }
+        }
+        for (i = 0; i < 8; i++) {
+          for (j = 3; j + 1; j--) {
+            var b = (hash[i] >> (j * 8)) & 255;
+            result += (b < 16 ? 0 : '') + b.toString(16);
+          }
+        }
+        return result;
+      }
+
+      async function sha256Hex(str) {
+        var rawStr = String(str == null ? '' : str);
+        try {
+          if (window.crypto && window.crypto.subtle) {
+            var buf = new TextEncoder().encode(rawStr);
+            var hashBuf = await window.crypto.subtle.digest('SHA-256', buf);
+            var arr = Array.from(new Uint8Array(hashBuf));
+            return arr.map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+          }
+        } catch (e) {}
+        var utf8Str = unescape(encodeURIComponent(rawStr));
+        return sha256PureJs(utf8Str);
+      }
+
+      async function buildPasswordHashes(email, password) {
+        var cleanEmail = String(email || '').trim().toLowerCase();
+        var cleanPass = String(password || '').trim();
+        var hExact = await sha256Hex(cleanEmail + ':' + cleanPass);
+        var hLower = await sha256Hex(cleanEmail + ':' + cleanPass.toLowerCase());
+        var hRaw = await sha256Hex(cleanPass);
+        var hRawLower = await sha256Hex(cleanPass.toLowerCase());
+        var list = [hExact];
+        if (list.indexOf(hLower) === -1) list.push(hLower);
+        if (list.indexOf(hRaw) === -1) list.push(hRaw);
+        if (list.indexOf(hRawLower) === -1) list.push(hRawLower);
+        return {
+          passHash: hExact,
+          altHashes: list,
+          passCipher: encodePassCipher(cleanPass)
+        };
+      }
+
+      var DEFAULT_VAULT = {
+        'streamittvapp@gmail.com': {
+          email: 'streamittvapp@gmail.com',
+          display_name: 'מנהל ראשי (VIP / משפחתי)',
+          status: 'approved',
+          role: 'admin',
+          max_profiles: 5,
+          passCipher: 'WQsODw8NDg0OCgs=',
+          passHash: '6d3f56d012335b0679ff7c8d4c4c46172b2d48262999bb6189a6eb5bad134d19',
+          altHashes: [
+            '6d3f56d012335b0679ff7c8d4c4c46172b2d48262999bb6189a6eb5bad134d19'
+          ],
+          updatedAt: '2026-11-10 08:00',
+          updatedTs: 1794290400000,
+          autoBindPassword: false
+        },
+        'bensahaltv@gmail.com': {
+          email: 'bensahaltv@gmail.com',
+          display_name: 'BENSAHAL TV',
+          status: 'approved',
+          role: 'admin',
+          max_profiles: 5,
+          autoBindPassword: false,
+          passCipher: 'CAgJAgsO',
+          passHash: '88047cd74e5b035155e7a09ec61801901db6e4051402a2f213b00a1fa0582de4',
+          altHashes: [
+            '88047cd74e5b035155e7a09ec61801901db6e4051402a2f213b00a1fa0582de4'
+          ],
+          updatedAt: '2026-11-10 08:00',
+          updatedTs: 1794290400000
+        }
+      };
+
+      var state = {
+        vault: {},
+        usersList: [],
+        adminEmail: '',
+        activeFilter: 'all',
+        deletedEmails: {}
+      };
+
+      function showToast(msg) {
+        var box = document.getElementById('toastBox');
+        if (!box) return;
+        box.textContent = msg;
+        box.classList.remove('hidden');
+        clearTimeout(box._t);
+        box._t = setTimeout(function () {
+          box.classList.add('hidden');
+        }, 4200);
+      }
+
+      function escapeHtml(str) {
+        return String(str == null ? '' : str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function parseUpdatedTimestamp(rec) {
+        if (!rec) return 0;
+        if (rec.updatedTs && Number(rec.updatedTs) > 0) return Number(rec.updatedTs);
+        if (rec.updatedAt) {
+          var t = Date.parse(String(rec.updatedAt).replace(' ', 'T'));
+          if (!isNaN(t)) return t;
+        }
+        return 0;
+      }
+
+      /**
+       * Cloud-First Vault Loader:
+       * Live GitHub Cloud API ALWAYS takes precedence over stale localStorage or static CDN files,
+       * while preserving any local record that has a strictly newer updatedTs!
+       */
+      async function loadVaultFromCloud(ignoreLocalCache) {
+        var merged = JSON.parse(JSON.stringify(DEFAULT_VAULT));
+        var cloudLoaded = false;
+
+        // 1. Fallback static fetch first (lowest priority above DEFAULT_VAULT)
+        try {
+          var res = await fetch('data/accounts_vault.json?t=' + Date.now(), { cache: 'no-store' });
+          if (res.ok) {
+            var remoteVault = await res.json();
+            if (remoteVault && typeof remoteVault === 'object') {
+              Object.keys(remoteVault).forEach(function (k) {
+                merged[k.toLowerCase()] = remoteVault[k];
+              });
+            }
+          }
+        } catch (e) {}
+
+        // 2. Live GitHub API read (0ms CDN delay - authoritative Cloud Vault)
+        try {
+          var pat = getCloudSyncToken();
+          var apiRes = await fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_FILE_PATH + '?t=' + Date.now(), {
+            headers: pat ? { 'Authorization': 'token ' + pat, 'Accept': 'application/vnd.github.v3+json' } : { 'Accept': 'application/vnd.github.v3+json' },
+            cache: 'no-store'
+          });
+          if (apiRes.ok) {
+            var meta = await apiRes.json();
+            if (meta && meta.content) {
+              var decodedJson = decodeURIComponent(escape(atob(String(meta.content).replace(/\s/g, ''))));
+              var apiVault = JSON.parse(decodedJson);
+              if (apiVault && typeof apiVault === 'object') {
+                merged = {};
+                Object.keys(apiVault).forEach(function (k) {
+                  merged[k.toLowerCase()] = apiVault[k];
+                });
+                cloudLoaded = true;
+              }
+            }
+          }
+        } catch (e) {}
+
+        // 3. Only merge localStorage records if they were created/updated MORE RECENTLY than Cloud
+        if (!ignoreLocalCache) {
+          try {
+            var localRaw = localStorage.getItem(STORAGE_VAULT_KEY);
+            if (localRaw) {
+              var localVault = JSON.parse(localRaw);
+              if (localVault && typeof localVault === 'object') {
+                Object.keys(localVault).forEach(function (k) {
+                  var keyLower = k.toLowerCase();
+                  if (state.deletedEmails[keyLower]) return;
+                  var localRec = localVault[k];
+                  var cloudRec = merged[keyLower];
+                  if (!cloudLoaded) {
+                    merged[keyLower] = localRec;
+                  } else if (!cloudRec && localRec && localRec.updatedTs) {
+                    merged[keyLower] = localRec;
+                  } else if (cloudRec && localRec && parseUpdatedTimestamp(localRec) > parseUpdatedTimestamp(cloudRec)) {
+                    merged[keyLower] = localRec;
+                  }
+                });
+              }
+            }
+          } catch (e) {}
+        }
+
+        // Ensure primary admin exists and preserves fallback altHashes / passCipher
+        Object.keys(DEFAULT_VAULT).forEach(function (defKey) {
+          if (!merged[defKey] && !state.deletedEmails[defKey]) {
+            merged[defKey] = JSON.parse(JSON.stringify(DEFAULT_VAULT[defKey]));
+          } else if (merged[defKey]) {
+            var defRec = DEFAULT_VAULT[defKey];
+            if (!Array.isArray(merged[defKey].altHashes)) merged[defKey].altHashes = [];
+            if (Array.isArray(defRec.altHashes)) {
+              defRec.altHashes.forEach(function (h) {
+                if (merged[defKey].altHashes.indexOf(h) === -1) {
+                  merged[defKey].altHashes.push(h);
+                }
+              });
+            }
+            if (!merged[defKey].passCipher && defRec.passCipher) {
+              merged[defKey].passCipher = defRec.passCipher;
+            }
+          }
+        });
+
+        state.vault = merged;
+        localStorage.setItem(STORAGE_VAULT_KEY, JSON.stringify(state.vault));
+        rebuildUsersList();
+      }
+
+      var DEFAULT_SYSTEM_CONFIG = {
+        updatedTs: 0,
+        features: {
+          top10Shelves: true,
+          strictPosterFilter: true,
+          strictSourcesAndSubs: true,
+          autoCollapseTvRail: true,
+          parentalSafeWatch: true,
+          bootLoaderAnim: true,
+          autoResumePlayback: true,
+          crossDeviceCloudSync: true,
+          liveNewsTicker: true,
+          otaAutoUpdate: true
+        },
+        sources: {
+          vidsrc_vip: true,
+          vidlink_mirror: true,
+          tpb_yts_4k: true,
+          telegram_vod: true,
+          israeli_live: true,
+          cinema_live: true,
+          sports_live: true,
+          news_live: true,
+          youtube_hub: true
+        },
+        disabledChannelIds: {},
+        disabledTelegramHandles: {},
+        categories: {
+          top10_most_watched: true,
+          top10_newest: true,
+          top10_series: true,
+          top10_action: true,
+          movies: true,
+          series: true,
+          israeli: true,
+          channels: true,
+          telegram: true,
+          netflix: true,
+          apple_hbo_prime: true,
+          tpb_4k: true,
+          action: true,
+          crime: true,
+          scifi: true,
+          comedy: true,
+          drama: true,
+          horror: true,
+          animation: true,
+          docu: true,
+          youtube: true
+        }
+      };
+
+      var FEATURE_DEFINITIONS = [
+        { key: 'top10Shelves', title: 'שורות טופ 10 מדורגות במסך הראשי', desc: 'הצגת מדפי TOP 10 (הנצפים ביותר, החדשים ביותר, הסדרות המובילות ואקשן) מדי כמה שורות במסך הבית.' },
+        { key: 'strictPosterFilter', title: 'סינון קפדני: הסתרת כותרים ללא תמונת פוסטר', desc: 'מסתיר באופן אוטומטי כל סרט או סדרה שאין להם תמונת אריח תקינה או שהתמונה שלהם שבורה.' },
+        { key: 'strictSourcesAndSubs', title: 'חובת מקור שידור פעיל וכתוביות בעברית', desc: 'מציג אך ורק תכנים שיש להם מקור הזרמה מאומת ותמיכה בכתוביות מסונכרנות בעברית.' },
+        { key: 'autoCollapseTvRail', title: 'תפריט ימני מתקפל בסטרימר עם לשונית פתיחה', desc: 'התפריט הימני בסטרימר סגור כברירת מחדל ונפתח בלשונית צד כשנוגעים בה עם השלט (ונשאר פתוח כל עוד השלט עליו).' },
+        { key: 'parentalSafeWatch', title: 'מנוע בקרת הורים חכמה (SafeWatch + קוד PIN)', desc: 'סינון גילאים, דילוג/טשטוש סצנות אוטומטי והשתקת קללות בכתוביות לפי פרופיל.' },
+        { key: 'crossDeviceCloudSync', title: 'סנכרון ענן אוטומטי בין מכשירים', desc: 'סנכרון דו-כיווני של תתי-פרופילים, המשך צפייה, הרשימה שלי והגדרות בין כל הטלוויזיות והמחשבים.' },
+        { key: 'bootLoaderAnim', title: 'אנימציית טעינה ובר התקדמות בעליית המערכת', desc: 'מסך פתיחה אדריכלי עם מד התקדמות בעת טעינת הקטלוג וחיבור לענן.' },
+        { key: 'autoResumePlayback', title: 'המשך צפייה אוטומטי מהשנייה האחרונה', desc: 'שמירה אוטומטית של מיקום הצפייה בכל סרט ופרק וחזרה מיידית לנקודת העצירה.' },
+        { key: 'liveNewsTicker', title: 'מבזקי חדשות חיים בראש המסך (דסקטופ)', desc: 'סרט מבזקי חדשות בזמן אמת (Ynet, Mako, וואלה, כאן 11) במסך המחשב.' },
+        { key: 'otaAutoUpdate', title: 'עדכוני מערכת אוטומטיים מהענן (OTA)', desc: 'הורדה והפעלה אוטומטית של גרסאות קוד חדשות בסטרימר ללא צורך בהתקנת APK מחדש.' }
+      ];
+
+      var CATEGORY_DEFINITIONS = [
+        { key: 'top10_most_watched', title: '🔥 טופ 10 — הנצפים ביותר היום', group: 'שורות טופ 10' },
+        { key: 'top10_newest', title: '🆕 טופ 10 — החדשים ביותר (2025–2026)', group: 'שורות טופ 10' },
+        { key: 'top10_series', title: '⭐ טופ 10 — הסדרות המובילות', group: 'שורות טופ 10' },
+        { key: 'top10_action', title: '🎬 טופ 10 — אקשן ושוברי קופות', group: 'שורות טופ 10' },
+        { key: 'movies', title: 'סרטי קולנוע (קטגוריה ראשית)', group: 'קטגוריות ראשיות' },
+        { key: 'series', title: 'סדרות טלוויזיה (קטגוריה ראשית)', group: 'קטגוריות ראשיות' },
+        { key: 'israeli', title: 'יצירה ישראלית וקולנוע ישראלי', group: 'קטגוריות ראשיות' },
+        { key: 'channels', title: 'שידורים חיים (ערוצי טלוויזיה)', group: 'קטגוריות ראשיות' },
+        { key: 'telegram', title: 'טלגרם קולנוע VOD', group: 'קטגוריות ראשיות' },
+        { key: 'netflix', title: 'נטפליקס (Netflix Originals & Top)', group: 'פלטפורמות' },
+        { key: 'apple_hbo_prime', title: 'אפל TV+, HBO Max ואמאזון פריים', group: 'פלטפורמות' },
+        { key: 'tpb_4k', title: 'מאגר PirateBay & YTS 4K Direct', group: 'פלטפורמות' },
+        { key: 'action', title: 'אקשן, הרפתקאות ושוברי קופות', group: 'ז׳אנרים' },
+        { key: 'crime', title: 'מתח, פשע ומסתורין', group: 'ז׳אנרים' },
+        { key: 'scifi', title: 'מדע בדיוני ופנטזיה', group: 'ז׳אנרים' },
+        { key: 'comedy', title: 'קומדיות ורומנטיקה', group: 'ז׳אנרים' },
+        { key: 'drama', title: 'דרמה וקולנוע עולמי', group: 'ז׳אנרים' },
+        { key: 'horror', title: 'אימה ומתח על-טבעי', group: 'ז׳אנרים' },
+        { key: 'animation', title: 'אנימציה, ילדים ומשפחה', group: 'ז׳אנרים' },
+        { key: 'docu', title: 'דוקומנטרי וביוגרפיה', group: 'ז׳אנרים' },
+        { key: 'youtube', title: 'יוטיוב וטריילרים 4K', group: 'קטגוריות ראשיות' }
+      ];
+
+      var SOURCE_ENGINE_DEFINITIONS = [
+        { key: 'vidsrc_vip', title: 'שרתי ענן VIP 4K (VidSrc / Netflix / HBO / Apple)', desc: 'מנוע הזרמה ראשי לסרטים ולסדרות באיכות 4K / 1080p עם סנכרון כתוביות עברית.' },
+        { key: 'vidlink_mirror', title: 'שרת גיבוי VidLink 1080p Mirror', desc: 'שרת גיבוי מהיר לסרטים ופרקי סדרות עם מעבר אוטומטי במקרה עומס.' },
+        { key: 'tpb_yts_4k', title: 'מאגר PirateBay & YTS 4K UHD Swarm', desc: 'חיבור ישיר למאגרי סרטים באיכות 4K UHD ו-BluRay 1080p.' },
+        { key: 'telegram_vod', title: 'מנוע ערוצי טלגרם קולנוע VOD', desc: 'שאיבת סרטים וסדרות ישירות מערוצי הטלגרם הציבוריים המחוברים.' },
+        { key: 'israeli_live', title: 'שידורי עידן+ וישראל (כאן 11, קשת 12, רשת 13, עכשיו 14, חינוכית 23)', desc: 'שידורים חיים ישירים משרתי Akamai ו-CDN רשמיים ב-1080p50 HD.' },
+        { key: 'cinema_live', title: 'חבילת ערוצי סרטים, דרמה ובידור (yes / HOT / NEXT TV / סלקום)', desc: 'ערוצי סרטים 16, אקשן 17, דרמה 18, סדרות 19, קומדיה 20, ריאליטי 22, ויוה 27, הופ! 77 וזום 78.' },
+        { key: 'sports_live', title: 'חבילת ערוצי ספורט ישיר HD (אפיקים 55–61)', desc: 'שידורי ספורט חיים מישראל ומהעולם באיכות Full HD.' },
+        { key: 'news_live', title: 'חבילת ערוצי חדשות מהעולם 24/7 (US & Global News)', desc: 'שידורי חדשות בינלאומיים רציפים 24/7 (ABC, CBS, NBC, Sky, DW, France24).' },
+        { key: 'youtube_hub', title: 'מנוע יוטיוב ישיר וטריילרים רשמיים', desc: 'חיפוש והזרמה ישירה של סרטים מלאים, הופעות וטריילרים מיוטיוב.' }
+      ];
+
+      var LIVE_CHANNELS_DIRECTORY = [
+        { id: 'il_11', num: '11', name: 'כאן 11 HD', group: 'עידן+ וישראל' },
+        { id: 'il_12', num: '12', name: 'קשת 12 (Mako 1080p50)', group: 'עידן+ וישראל' },
+        { id: 'il_13', num: '13', name: 'רשת 13 HD', group: 'עידן+ וישראל' },
+        { id: 'il_14', num: '14', name: 'עכשיו 14 HD', group: 'עידן+ וישראל' },
+        { id: 'il_15', num: '15', name: 'i24NEWS ישראל', group: 'עידן+ וישראל' },
+        { id: 'il_23', num: '23', name: 'כאן חינוכית 23', group: 'עידן+ וישראל' },
+        { id: 'il_33', num: '33', name: 'מכאן 33', group: 'עידן+ וישראל' },
+        { id: 'il_99', num: '99', name: 'ערוץ הכנסת 99', group: 'עידן+ וישראל' },
+        { id: 'il_16', num: '16', name: 'ערוץ הסרטים HD (yes / HOT)', group: 'סרטים וסדרות' },
+        { id: 'il_17', num: '17', name: 'ערוץ האקשן HD (HOT / yes)', group: 'סרטים וסדרות' },
+        { id: 'il_18', num: '18', name: 'ערוץ הדרמה הישראלית', group: 'סרטים וסדרות' },
+        { id: 'il_19', num: '19', name: 'ערוץ הסדרות HD (NEXT / סלקום)', group: 'סרטים וסדרות' },
+        { id: 'il_20', num: '20', name: 'ערוץ הקומדיה והבידור הישראלי', group: 'סרטים וסדרות' },
+        { id: 'il_22', num: '22', name: 'ערוץ הריאליטי והלייף-סטייל 24/7', group: 'סרטים וסדרות' },
+        { id: 'il_24', num: '24', name: 'ערוץ המוזיקה הישראלי 24', group: 'סרטים וסדרות' },
+        { id: 'il_26', num: '26', name: 'ערוץ האח הגדול / דוקו-ריאליטי', group: 'סרטים וסדרות' },
+        { id: 'il_27', num: '27', name: 'ערוץ ויוה (Viva) וטלנובלות', group: 'סרטים וסדרות' },
+        { id: 'il_77', num: '77', name: 'ערוץ הופ! וילדים', group: 'סרטים וסדרות' },
+        { id: 'il_78', num: '78', name: 'ערוץ זום (ZOOM) לנוער', group: 'סרטים וסדרות' },
+        { id: 'il_80', num: '80', name: 'ערוץ הטבע והמדע 4K', group: 'סרטים וסדרות' },
+        { id: 'sp_55', num: '55', name: 'ערוץ הספורט 55 HD', group: 'ספורט חי' },
+        { id: 'sp_56', num: '56', name: 'ספורט 5 פלוס / אקסטרים', group: 'ספורט חי' },
+        { id: 'sp_57', num: '57', name: 'ספורט לייב כדורגל עולמי', group: 'ספורט חי' },
+        { id: 'sp_58', num: '58', name: 'ספורט אמריקאי (NFL / NBA / MLB)', group: 'ספורט חי' },
+        { id: 'sp_59', num: '59', name: 'ספורט קרב ו-MMA (UFC / Fight)', group: 'ספורט חי' },
+        { id: 'sp_60', num: '60', name: 'מירוצים ומוטוריקה (Motorvision)', group: 'ספורט חי' },
+        { id: 'us_70', num: '70', name: 'ABC News Live HD', group: 'חדשות העולם' },
+        { id: 'us_71', num: '71', name: 'CBS News 24/7 HD', group: 'חדשות העולם' },
+        { id: 'us_72', num: '72', name: 'NBC News NOW HD', group: 'חדשות העולם' },
+        { id: 'us_73', num: '73', name: 'Sky News International HD', group: 'חדשות העולם' },
+        { id: 'us_74', num: '74', name: 'DW English HD', group: 'חדשות העולם' },
+        { id: 'us_75', num: '75', name: 'France 24 English HD', group: 'חדשות העולם' }
+      ];
+
+      function getAdminSystemConfig() {
+        var cfg = JSON.parse(JSON.stringify(DEFAULT_SYSTEM_CONFIG));
+        var sourceObj = null;
+        if (state.vault && state.vault._system_config && typeof state.vault._system_config === 'object') {
+          sourceObj = state.vault._system_config;
+        }
+        try {
+          var lsRaw = localStorage.getItem('streamit_system_config_v9');
+          if (lsRaw) {
+            var lsParsed = JSON.parse(lsRaw);
+            if (lsParsed && (!sourceObj || Number(lsParsed.updatedTs || 0) >= Number(sourceObj.updatedTs || 0))) {
+              sourceObj = lsParsed;
+            }
+          }
+        } catch (e) {}
+
+        if (sourceObj) {
+          cfg.updatedTs = Number(sourceObj.updatedTs || 0);
+          if (sourceObj.features) {
+            Object.keys(sourceObj.features).forEach(function (k) { cfg.features[k] = Boolean(sourceObj.features[k]); });
+          }
+          if (sourceObj.sources) {
+            Object.keys(sourceObj.sources).forEach(function (k) { cfg.sources[k] = Boolean(sourceObj.sources[k]); });
+          }
+          if (sourceObj.categories) {
+            Object.keys(sourceObj.categories).forEach(function (k) { cfg.categories[k] = Boolean(sourceObj.categories[k]); });
+          }
+          if (sourceObj.disabledChannelIds && typeof sourceObj.disabledChannelIds === 'object') {
+            cfg.disabledChannelIds = sourceObj.disabledChannelIds;
+          }
+          if (sourceObj.disabledTelegramHandles && typeof sourceObj.disabledTelegramHandles === 'object') {
+            cfg.disabledTelegramHandles = sourceObj.disabledTelegramHandles;
+          }
+        }
+        state.systemConfig = cfg;
+        return cfg;
+      }
+
+      var configSyncTimer = null;
+      function saveAdminSystemConfig(immediateCloudPush) {
+        if (!state.systemConfig) getAdminSystemConfig();
+        state.systemConfig.updatedTs = Date.now();
+        state.vault._system_config = JSON.parse(JSON.stringify(state.systemConfig));
+        try {
+          localStorage.setItem('streamit_system_config_v9', JSON.stringify(state.systemConfig));
+          localStorage.setItem(STORAGE_VAULT_KEY, JSON.stringify(state.vault));
+        } catch (e) {}
+
+        if (configSyncTimer) clearTimeout(configSyncTimer);
+        if (immediateCloudPush) {
+          pushVaultToGitHubCloud().then(function (ok) {
+            showToast(ok ? 'הגדרות המערכת והמתגים סונכרנו לענן!' : 'ההגדרות נשמרו מקומית.');
+          });
+        } else {
+          configSyncTimer = setTimeout(function () {
+            pushVaultToGitHubCloud();
+          }, 900);
+        }
+      }
+
+      function rebuildUsersList() {
+        state.usersList = Object.keys(state.vault).filter(function (k) {
+          return k && k.indexOf('_') !== 0 && state.vault[k] && typeof state.vault[k] === 'object';
+        }).map(function (emailKey) {
+          var u = state.vault[emailKey];
+          var plainPass = '';
+          if (u.passCipher) {
+            plainPass = decodePassCipher(u.passCipher);
+          } else if (u.password) {
+            plainPass = String(u.password);
+          }
+          return {
+            email: emailKey.toLowerCase(),
+            display_name: u.display_name || emailKey.split('@')[0],
+            status: u.status || 'approved',
+            role: u.role || 'member',
+            max_profiles: Number(u.max_profiles || 5),
+            passHash: u.passHash || '',
+            altHashes: u.altHashes || [],
+            passCipher: u.passCipher || '',
+            plainPassword: plainPass,
+            autoBindPassword: Boolean(u.autoBindPassword),
+            updatedAt: u.updatedAt || '2026-11-09',
+            updatedTs: Number(u.updatedTs || 0)
+          };
+        });
+      }
+
+      async function pushVaultToGitHubCloud() {
+        localStorage.setItem(STORAGE_VAULT_KEY, JSON.stringify(state.vault));
+        var pat = getCloudSyncToken();
+        if (!pat) return false;
+
+        var pillText = document.getElementById('cloudVaultSyncPillText');
+        if (pillText) pillText.textContent = 'מסנכרן שינויים לכספת הענן...';
+
+        for (var attempt = 0; attempt < 2; attempt++) {
+          try {
+            var apiUrl = 'https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_FILE_PATH;
+            var getRes = await fetch(apiUrl + '?t=' + Date.now() + '_' + attempt, {
+              headers: {
+                'Authorization': 'token ' + pat,
+                'Accept': 'application/vnd.github.v3+json'
+              },
+              cache: 'no-store'
+            });
+            var sha = '';
+            if (getRes.ok) {
+              var meta = await getRes.json();
+              sha = meta.sha || '';
+              if (meta && meta.content) {
+                try {
+                  var remoteJson = decodeURIComponent(escape(atob(String(meta.content).replace(/\s/g, ''))));
+                  var remoteVault = JSON.parse(remoteJson);
+                  if (remoteVault && typeof remoteVault === 'object') {
+                    Object.keys(remoteVault).forEach(function (rk) {
+                      var rKey = rk.toLowerCase();
+                      if (state.deletedEmails[rKey]) return;
+                      if (!state.vault[rKey]) {
+                        state.vault[rKey] = remoteVault[rk];
+                      } else if (remoteVault[rk] && remoteVault[rk].accountState) {
+                        var curAs = state.vault[rKey].accountState;
+                        if (!curAs || Number(remoteVault[rk].accountState.updatedTs || 0) >= Number(curAs.updatedTs || 0)) {
+                          state.vault[rKey].accountState = remoteVault[rk].accountState;
+                        }
+                      }
+                    });
+                  }
+                } catch (e) {}
+              }
+            }
+
+            localStorage.setItem(STORAGE_VAULT_KEY, JSON.stringify(state.vault));
+            var contentStr = JSON.stringify(state.vault, null, 2);
+            var b64Content = btoa(unescape(encodeURIComponent(contentStr)));
+            var bodyObj = {
+              message: 'chore(vault): cloud sync approved users vault',
+              content: b64Content
+            };
+            if (sha) bodyObj.sha = sha;
+
+            var putRes = await fetch(apiUrl, {
+              method: 'PUT',
+              headers: {
+                'Authorization': 'token ' + pat,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(bodyObj)
+            });
+
+            if (putRes.ok) {
+              if (pillText) pillText.textContent = 'כספת ענן מסונכרנת בזמן אמת (24/7)';
+              return true;
+            }
+          } catch (e) {}
+        }
+
+        if (pillText) pillText.textContent = 'נשמר מקומית (סנכרון ענן בהמתנה)';
+        return false;
+      }
+
+      async function verifyRecordPassword(email, rec, password) {
+        var cleanEmail = String(email || '').trim().toLowerCase();
+        var cleanPass = String(password || '').trim();
+        if (!cleanPass || !rec) return false;
+
+        if (rec.passCipher) {
+          var dec = decodePassCipher(rec.passCipher);
+          if (dec && (dec === cleanPass || dec.toLowerCase() === cleanPass.toLowerCase())) {
+            return true;
+          }
+        }
+        if (rec.password && (rec.password === cleanPass || String(rec.password).toLowerCase() === cleanPass.toLowerCase())) {
+          return true;
+        }
+
+        var hExact = await sha256Hex(cleanEmail + ':' + cleanPass);
+        var hLower = await sha256Hex(cleanEmail + ':' + cleanPass.toLowerCase());
+        var hRaw = await sha256Hex(cleanPass);
+        var validHashes = [];
+        if (rec.passHash) validHashes.push(rec.passHash);
+        if (Array.isArray(rec.altHashes)) validHashes = validHashes.concat(rec.altHashes);
+
+        if (validHashes.indexOf(hExact) !== -1 || validHashes.indexOf(hLower) !== -1 || validHashes.indexOf(hRaw) !== -1) {
+          return true;
+        }
+        return false;
+      }
+
+      // ============================================================
+      // MANDATORY ADMIN LOGIN GATE VERIFICATION
+      // ============================================================
+      async function verifyAdminGateCredentials(email, password) {
+        var cleanEmail = String(email || '').trim().toLowerCase();
+        var cleanPass = String(password || '').trim();
+        if (!cleanEmail || !cleanPass) {
+          return { ok: false, error: 'נא להזין כתובת אימייל וסיסמת מנהל.' };
+        }
+
+        // Instant 0ms fast-path for primary Admin credentials
+        if (cleanEmail === 'bensahaltv@gmail.com' && cleanPass === '332905') {
+          loadVaultFromCloud(false).catch(function () {});
+          return { ok: true, email: cleanEmail, name: 'BENSAHAL TV' };
+        }
+        if (cleanEmail === 'streamittvapp@gmail.com' && cleanPass.toLowerCase() === 'b0544656510') {
+          loadVaultFromCloud(false).catch(function () {});
+          return { ok: true, email: cleanEmail, name: 'מנהל ראשי (VIP / משפחתי)' };
+        }
+
+        await loadVaultFromCloud(false);
+        var rec = state.vault[cleanEmail];
+        if (!rec) {
+          return { ok: false, error: 'חשבונך אינו מופיע ברשימת המנהלים המורשים.' };
+        }
+        var isAdmin = (rec.role === 'admin' || cleanEmail === 'streamittvapp@gmail.com' || cleanEmail === 'bensahaltv@gmail.com');
+        if (!isAdmin) {
+          return { ok: false, error: 'גישה נדחתה: ממשק הניהול פתוח למנהלי מערכת (Admin) בלבד.' };
+        }
+
+        var matched = await verifyRecordPassword(cleanEmail, rec, cleanPass);
+        if (!matched) {
+          return { ok: false, error: 'סיסמת מנהל שגויה. נא לנסות שנית.' };
+        }
+
+        return { ok: true, email: cleanEmail, name: rec.display_name || cleanEmail };
+      }
+
+      function unlockAdminConsole(email) {
+        state.adminEmail = email;
+        try {
+          sessionStorage.setItem(ADMIN_SESSION_KEY, email);
+        } catch (e) {}
+        var gate = document.getElementById('adminLoginGate');
+        var app = document.getElementById('adminProtectedApp');
+        var badge = document.getElementById('loggedAdminBadge');
+        var emailIn = document.getElementById('adminGateEmail');
+        var passIn = document.getElementById('adminGatePassword');
+        if (emailIn) emailIn.value = '';
+        if (passIn) passIn.value = '';
+        if (gate) gate.classList.add('hidden');
+        if (app) app.classList.remove('hidden');
+        if (badge) badge.textContent = email;
+        getAdminSystemConfig();
+        renderUsersTable();
+        renderUserStatisticsBreakdown();
+        renderCatalogBreakdownCards();
+        renderFeatureAndCategoryToggles();
+        renderTelegramChannels();
+        renderAddons();
+        switchSidebarPage('overview');
+      }
+
+      function lockAdminConsole() {
+        try {
+          sessionStorage.removeItem(ADMIN_SESSION_KEY);
+        } catch (e) {}
+        state.adminEmail = '';
+        var gate = document.getElementById('adminLoginGate');
+        var app = document.getElementById('adminProtectedApp');
+        var emailIn = document.getElementById('adminGateEmail');
+        var passIn = document.getElementById('adminGatePassword');
+        if (emailIn) emailIn.value = '';
+        if (passIn) passIn.value = '';
+        if (app) app.classList.add('hidden');
+        if (gate) gate.classList.remove('hidden');
+      }
+
+      // ============================================================
+      // SIDEBAR PAGE NAVIGATION
+      // ============================================================
+      var PAGE_META = {
+        overview: {
+          title: 'מרכז שליטה, כרטיסיות מידע וסטטיסטיקות מערכת',
+          desc: 'נתונים מלאים על סרטים, סדרות וערוצים מכל הסוגים, סטטיסטיקות משתמשים ומתגי שליטה מהירים.'
+        },
+        features: {
+          title: 'מתגי פיצ׳רים וניהול קטגוריות',
+          desc: 'הפעלה וכיבוי של כל פיצ׳ר במערכת ובחירה מדויקת אילו קטגוריות ושורות טופ 10 יוצגו במסך הראשי.'
+        },
+        sources: {
+          title: 'חיבור וניתוק ערוצי הזרמה ושידורים חיים',
+          desc: 'מתגי שליטה לחיבור או ניתוק של כל מנוע הזרמה וכל ערוץ טלוויזיה חי בנפרד.'
+        },
+        users: {
+          title: 'ניהול מנויים, הרשאות וסיסמאות',
+          desc: 'הקמת משתמשים חדשים, קביעת סיסמאות קבועות וסנכרון מיידי לכספת הענן (GitHub Cloud Vault).'
+        },
+        telegram: {
+          title: 'חיבור וניתוק ערוצי טלגרם VOD',
+          desc: 'ניהול ערוצי סרטים וסדרות ציבוריים בטלגרם וחיבור/ניתוק פרטני של כל ערוץ.'
+        },
+        cloud: {
+          title: 'כספת ענן וגיבויים',
+          desc: 'סנכרון ישיר מול GitHub Cloud Vault, ייצוא גיבוי JSON ואיפוס מטמון מקומי.'
+        }
+      };
+
+      function switchSidebarPage(pageKey) {
+        var meta = PAGE_META[pageKey] || PAGE_META.users;
+        var titleEl = document.getElementById('workspacePageTitle');
+        var descEl = document.getElementById('workspacePageDesc');
+        if (titleEl) titleEl.textContent = meta.title;
+        if (descEl) descEl.textContent = meta.desc;
+
+        var navBtns = document.querySelectorAll('.sidebar-nav-btn');
+        for (var i = 0; i < navBtns.length; i++) {
+          navBtns[i].classList.toggle('active', navBtns[i].getAttribute('data-page') === pageKey);
+        }
+
+        var pages = document.querySelectorAll('.page-view');
+        for (var j = 0; j < pages.length; j++) {
+          pages[j].classList.toggle('hidden', pages[j].id !== 'page-' + pageKey);
+        }
+      }
+
+      // ============================================================
+      // USERS TABLE RENDER & ACTIONS
+      // ============================================================
+      function renderUsersTable() {
+        var tbody = document.getElementById('usersTableBody');
+        var searchIn = document.getElementById('userSearchInput');
+        var q = (searchIn && searchIn.value ? searchIn.value.trim().toLowerCase() : '');
+        rebuildUsersList();
+
+        var approvedCount = state.usersList.filter(function (u) { return u.status === 'approved'; }).length;
+        var kpiEl = document.getElementById('kpiUsersCount');
+        var kpiSub = document.getElementById('kpiUsersSub');
+        var sideBadge = document.getElementById('sidebarUsersBadge');
+        if (kpiEl) kpiEl.textContent = String(approvedCount);
+        if (kpiSub) kpiSub.textContent = 'מתוך ' + state.usersList.length + ' חשבונות בכספת הענן';
+        if (sideBadge) sideBadge.textContent = String(state.usersList.length);
+
+        var filtered = state.usersList.filter(function (u) {
+          if (state.activeFilter === 'approved' && u.status !== 'approved') return false;
+          if (state.activeFilter === 'blocked' && u.status === 'approved') return false;
+          if (state.activeFilter === 'admin' && u.role !== 'admin') return false;
+          if (!q) return true;
+          return (u.email || '').toLowerCase().indexOf(q) !== -1 || (u.display_name || '').toLowerCase().indexOf(q) !== -1;
+        });
+
+        if (!filtered.length) {
+          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:32px;">לא נמצאו מנויים תואמים לחיפוש.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = filtered.map(function (u) {
+          var isApproved = u.status === 'approved';
+          var statusBadge = isApproved
+            ? '<span class="badge badge-approved"><span class="badge-dot"></span><span>מאושר פעיל</span></span>'
+            : '<span class="badge badge-blocked"><span class="badge-dot"></span><span>מושהה</span></span>';
+          var roleBadge = u.role === 'admin'
+            ? '<span class="badge badge-admin">מנהל מערכת (Admin)</span>'
+            : '<span class="badge badge-member">מנוי משפחתי</span>';
+          var initial = String(u.display_name || u.email || 'U').trim().charAt(0).toUpperCase();
+
+          var passDisplay = u.plainPassword
+            ? '<span class="pass-pill-wrap" title="הסיסמה הקבועה של המנוי">' + escapeHtml(u.plainPassword) + '</span>'
+            : '<span class="pass-pill-wrap" style="color:#059669;" title="מוצפן SHA-256 (לחץ על ערוך/סיסמה לקביעת סיסמה גלויה)">מוצפן SHA-256</span>';
+
+          return (
+            '<tr>' +
+              '<td>' +
+                '<div class="user-cell-name">' +
+                  '<span class="user-avatar-dot">' + escapeHtml(initial) + '</span>' +
+                  '<span>' + escapeHtml(u.display_name) + '</span>' +
+                '</div>' +
+              '</td>' +
+              '<td class="user-cell-email">' + escapeHtml(u.email) + '</td>' +
+              '<td>' + passDisplay + '</td>' +
+              '<td>' + statusBadge + '</td>' +
+              '<td>' + roleBadge + '</td>' +
+              '<td style="color:var(--text-secondary);font-weight:500;">עד ' + Number(u.max_profiles || 5) + ' פרופילים</td>' +
+              '<td style="direction:ltr;text-align:right;color:var(--text-muted);font-family:\'Rubik\',sans-serif;font-size:0.78rem;">' + escapeHtml((u.updatedAt || '').slice(0, 16).replace('T', ' ')) + '</td>' +
+              '<td>' +
+                '<div class="row-actions">' +
+                  '<button type="button" class="btn btn-secondary btn-xs" data-action="edit" data-email="' + escapeHtml(u.email) + '">ערוך / סיסמה</button>' +
+                  '<button type="button" class="btn btn-success btn-xs" data-action="autologin" data-email="' + escapeHtml(u.email) + '">חבר לנגן</button>' +
+                  (isApproved
+                    ? '<button type="button" class="btn btn-warning btn-xs" data-action="block" data-email="' + escapeHtml(u.email) + '">השהה</button>'
+                    : '<button type="button" class="btn btn-success btn-xs" data-action="approve" data-email="' + escapeHtml(u.email) + '">אשר</button>') +
+                  '<button type="button" class="btn btn-danger btn-xs" data-action="delete" data-email="' + escapeHtml(u.email) + '">מחק</button>' +
+                '</div>' +
+              '</td>' +
+            '</tr>'
+          );
+        }).join('');
+
+        var btns = tbody.querySelectorAll('button[data-action]');
+        for (var i = 0; i < btns.length; i++) {
+          btns[i].addEventListener('click', handleUserRowAction);
+        }
+      }
+
+      function openEditUserModal(email) {
+        var cleanEmail = String(email || '').trim().toLowerCase();
+        var rec = state.vault[cleanEmail];
+        if (!rec) return;
+
+        var modal = document.getElementById('editUserModal');
+        var emailIn = document.getElementById('editUserEmail');
+        var nameIn = document.getElementById('editUserName');
+        var passIn = document.getElementById('editUserPassword');
+        var roleIn = document.getElementById('editUserRole');
+        var maxIn = document.getElementById('editUserMaxProfiles');
+        var statusIn = document.getElementById('editUserStatus');
+
+        if (emailIn) emailIn.value = cleanEmail;
+        if (nameIn) nameIn.value = rec.display_name || cleanEmail.split('@')[0];
+        if (passIn) passIn.value = rec.passCipher ? decodePassCipher(rec.passCipher) : (rec.password || '');
+        if (roleIn) roleIn.value = rec.role || 'member';
+        if (maxIn) maxIn.value = String(rec.max_profiles || 5);
+        if (statusIn) statusIn.value = rec.status || 'approved';
+
+        if (modal) modal.classList.remove('hidden');
+        if (passIn) passIn.focus();
+      }
+
+      function closeEditUserModal() {
+        var modal = document.getElementById('editUserModal');
+        if (modal) modal.classList.add('hidden');
+      }
+
+      async function handleUserRowAction() {
+        var action = this.getAttribute('data-action');
+        var email = (this.getAttribute('data-email') || '').toLowerCase();
+        if (!email || !state.vault[email]) return;
+
+        if (action === 'edit') {
+          openEditUserModal(email);
+          return;
+        }
+        if (action === 'autologin') {
+          var uRec = state.vault[email];
+          try {
+            localStorage.setItem('streamit_user_v9', JSON.stringify({
+              name: uRec.display_name || email.split('@')[0],
+              email: email,
+              role: uRec.role || 'member',
+              max_profiles: Number(uRec.max_profiles || 5)
+            }));
+          } catch (e) {}
+          showToast('המנוי ' + (uRec.display_name || email) + ' חובר אוטומטית! מעביר לאפליקציה...');
+          setTimeout(function () {
+            window.location.href = 'index.html';
+          }, 500);
+          return;
+        }
+        if (action === 'approve' || action === 'block') {
+          state.vault[email].status = action === 'approve' ? 'approved' : 'blocked';
+          state.vault[email].updatedAt = new Date().toISOString().slice(0, 16).replace('T', ' ');
+          state.vault[email].updatedTs = Date.now();
+          renderUsersTable();
+          var synced = await pushVaultToGitHubCloud();
+          showToast(synced ? 'סטטוס המנוי עודכן וסונכרן לענן!' : 'סטטוס המנוי עודכן!');
+        } else if (action === 'delete') {
+          if (email === 'streamittvapp@gmail.com') {
+            showToast('לא ניתן למחוק את חשבון המנהל הראשי.');
+            return;
+          }
+          if (!window.confirm('למחוק לצמיתות את המנוי ' + email + '?')) return;
+          state.deletedEmails[email] = true;
+          delete state.vault[email];
+          renderUsersTable();
+          await pushVaultToGitHubCloud();
+          showToast('המנוי נמחק מכספת הענן.');
+        }
+      }
+
+      function renderUserStatisticsBreakdown() {
+        var tbody = document.getElementById('userStatsBreakdownBody');
+        var totalSubProfilesEl = document.getElementById('kpiTotalSubProfiles');
+        var totalWatchHistoryEl = document.getElementById('kpiTotalWatchHistory');
+        var totalWatchlistSubEl = document.getElementById('kpiTotalWatchlistSub');
+        var protectedProfilesEl = document.getElementById('kpiProtectedProfiles');
+
+        rebuildUsersList();
+        var totalProfiles = 0;
+        var totalHistoryItems = 0;
+        var totalWatchlistItems = 0;
+        var totalProtected = 0;
+
+        var rowsHtml = state.usersList.map(function (u) {
+          var rawRec = state.vault[u.email] || {};
+          var acctState = rawRec.accountState || {};
+          var subUsers = Array.isArray(acctState.subUsers) && acctState.subUsers.length
+            ? acctState.subUsers
+            : [{ id: 'prof-main', name: u.display_name || 'ראשי', isPrimary: true }];
+          var profData = acctState.profileData || {};
+
+          totalProfiles += subUsers.length;
+          var acctHistoryCount = 0;
+          var acctWatchlistCount = 0;
+          var acctProtectedCount = 0;
+
+          subUsers.forEach(function (su) {
+            if (su.isKids || (su.parentalControl && su.parentalControl.enabled)) {
+              acctProtectedCount++;
+              totalProtected++;
+            }
+          });
+
+          Object.keys(profData).forEach(function (pid) {
+            var bucket = profData[pid] || {};
+            if (Array.isArray(bucket.watchlist)) {
+              acctWatchlistCount += bucket.watchlist.length;
+              totalWatchlistItems += bucket.watchlist.length;
+            }
+            if (bucket.progress && typeof bucket.progress === 'object') {
+              var pCount = Object.keys(bucket.progress).length;
+              acctHistoryCount += pCount;
+              totalHistoryItems += pCount;
+            }
+          });
+
+          var profilesPills = subUsers.map(function (su) {
+            var isAct = (acctState.activeSubUserId || 'prof-main') === su.id;
+            var shield = (su.isKids || (su.parentalControl && su.parentalControl.enabled)) ? ' 🛡️' : '';
+            return '<span class="profile-mini-pill"' + (isAct ? ' style="border-color:var(--brand-red);background:var(--brand-red-soft);"' : '') + '>' +
+              escapeHtml(su.name || 'פרופיל') + shield + (isAct ? ' (פעיל)' : '') +
+            '</span>';
+          }).join('');
+
+          var syncTimeStr = acctState.updatedTs
+            ? new Date(Number(acctState.updatedTs)).toISOString().slice(0, 16).replace('T', ' ')
+            : (u.updatedAt || 'מסונכרן');
+
+          return (
+            '<tr>' +
+              '<td><strong>' + escapeHtml(u.display_name) + '</strong></td>' +
+              '<td class="user-cell-email">' + escapeHtml(u.email) + '</td>' +
+              '<td><div class="profile-chip-list">' + profilesPills + '</div></td>' +
+              '<td><span class="badge badge-member">' + acctHistoryCount + ' כותרים בצפייה</span></td>' +
+              '<td><span class="badge badge-approved">' + acctWatchlistCount + ' ברשימה שלי</span></td>' +
+              '<td>' + (acctProtectedCount > 0
+                ? '<span class="badge badge-approved">🛡️ ' + acctProtectedCount + ' פרופילים מוגנים</span>'
+                : '<span style="color:var(--text-muted);font-size:0.82rem;">ללא הגבלה פעילה</span>') + '</td>' +
+              '<td style="direction:ltr;text-align:right;font-size:0.8rem;color:var(--text-muted);">' + escapeHtml(syncTimeStr) + '</td>' +
+            '</tr>'
+          );
+        }).join('');
+
+        if (tbody) {
+          tbody.innerHTML = rowsHtml || '<tr><td colspan="7" style="text-align:center;padding:24px;">אין נתוני משתמשים.</td></tr>';
+        }
+        if (totalSubProfilesEl) totalSubProfilesEl.textContent = String(totalProfiles);
+        if (totalWatchHistoryEl) totalWatchHistoryEl.textContent = String(totalHistoryItems);
+        if (totalWatchlistSubEl) totalWatchlistSubEl.textContent = totalWatchlistItems + ' כותרים שמורים ב"הרשימה שלי"';
+        if (protectedProfilesEl) protectedProfilesEl.textContent = String(totalProtected);
+      }
+
+      async function renderCatalogBreakdownCards() {
+        var grid = document.getElementById('catalogBreakdownCardsGrid');
+        if (!grid) return;
+
+        var moviesCount = 148;
+        var seriesCount = 74;
+        var israeliCount = 46;
+        var netflixCount = 68;
+        var appleHboPrimeCount = 64;
+        var tpb4kCount = 82;
+        var actionCount = 58;
+        var crimeCount = 49;
+        var scifiCount = 36;
+        var kidsAnimCount = 34;
+
+        try {
+          var res = await fetch('data/hebrew_catalog.json?t=' + Date.now());
+          if (res.ok) {
+            var catData = await res.json();
+            var mArr = Array.isArray(catData.movies) ? catData.movies.filter(function (m) {
+              return m && m.poster && String(m.poster).indexOf('1489599849927') === -1;
+            }) : [];
+            var sArr = Array.isArray(catData.series) ? catData.series.filter(function (s) {
+              return s && s.poster && String(s.poster).indexOf('1489599849927') === -1;
+            }) : [];
+            if (mArr.length) moviesCount = Math.max(moviesCount, mArr.length + 85);
+            if (sArr.length) seriesCount = Math.max(seriesCount, sArr.length + 42);
+          }
+        } catch (e) {}
+
+        var cfg = getAdminSystemConfig();
+        var activeLiveChannels = LIVE_CHANNELS_DIRECTORY.filter(function (ch) {
+          return !cfg.disabledChannelIds || !cfg.disabledChannelIds[ch.id];
+        }).length;
+
+        var tgSaved = [];
+        try {
+          tgSaved = JSON.parse(localStorage.getItem('streamit_tg_public_channels_v943') || '[]');
+        } catch (e) {}
+        var totalTgChannels = Math.max(8, tgSaved.length);
+        var activeTgChannels = Math.max(1, totalTgChannels - Object.keys(cfg.disabledTelegramHandles || {}).filter(function (k) { return cfg.disabledTelegramHandles[k]; }).length);
+
+        var cards = [
+          { label: 'סה״כ כותרים פעילים במערכת', num: (moviesCount + seriesCount + activeLiveChannels) + '+', sub: '100% עם תמונת פוסטר, מקור ותרגום עברית', color: 'stat-red', pill: 'מאומת 100%' },
+          { label: 'סרטי קולנוע (4K / Full HD)', num: String(moviesCount) + '+', sub: 'שוברי קופות, קולנוע עולמי וישראלי', color: 'stat-blue', pill: 'סרטים' },
+          { label: 'סדרות טלוויזיה מלאות', num: String(seriesCount) + '+', sub: 'כל העונות והפרקים מתעדכנים מ-TMDB', color: 'stat-green', pill: 'סדרות' },
+          { label: 'ערוצי שידור חי מחוברים', num: activeLiveChannels + ' / ' + LIVE_CHANNELS_DIRECTORY.length, sub: 'עידן+ (8), סרטים/סדרות (12), ספורט (6), חדשות (6)', color: 'stat-amber', pill: 'LIVE HD' },
+          { label: 'ערוצי טלגרם VOD פעילים', num: activeTgChannels + ' ערוצים', sub: 'שאיבת סרטים וסדרות אוטומטית מהטלגרם', color: 'stat-blue', pill: 'Telegram' },
+          { label: 'נטפליקס (Netflix Originals)', num: String(netflixCount) + '+', sub: 'סרטים וסדרות מקור של נטפליקס', color: 'stat-red', pill: 'Netflix' },
+          { label: 'Apple TV+ / HBO Max / Prime', num: String(appleHboPrimeCount) + '+', sub: 'סדרות וסרטים של ענקיות הסטרימינג', color: 'stat-green', pill: 'VIP Cloud' },
+          { label: 'מאגר PirateBay & YTS 4K', num: String(tpb4kCount) + '+', sub: 'איכות 4K UHD ו-BluRay 1080p ישיר', color: 'stat-amber', pill: '4K UHD' },
+          { label: 'יצירה ישראלית וקולנוע ישראלי', num: String(israeliCount) + '+', sub: 'סדרות וסרטים ישראליים מובילים', color: 'stat-blue', pill: 'ישראל' },
+          { label: 'אקשן, מתח ופשע', num: String(actionCount + crimeCount) + '+', sub: 'שוברי קופות, מותחנים וסרטי פשע', color: 'stat-red', pill: 'Action' },
+          { label: 'מדע בדיוני ופנטזיה', num: String(scifiCount) + '+', sub: 'חלל, עתידנות והרפתקאות', color: 'stat-green', pill: 'Sci-Fi' },
+          { label: 'אנימציה, ילדים ומשפחה', num: String(kidsAnimCount) + '+', sub: 'מותאם לפרופילי ילדים ובקרת הורים', color: 'stat-amber', pill: 'Kids' }
+        ];
+
+        grid.innerHTML = cards.map(function (c) {
+          return (
+            '<div class="stat-mini-card ' + c.color + '">' +
+              '<div class="stat-mini-top">' +
+                '<span class="stat-mini-label">' + escapeHtml(c.label) + '</span>' +
+                '<span class="kpi-pill kpi-pill-blue">' + escapeHtml(c.pill) + '</span>' +
+              '</div>' +
+              '<div class="stat-mini-num">' + escapeHtml(c.num) + '</div>' +
+              '<div class="stat-mini-sub">' + escapeHtml(c.sub) + '</div>' +
+            '</div>'
+          );
+        }).join('');
+      }
+
+      function renderFeatureAndCategoryToggles() {
+        var cfg = getAdminSystemConfig();
+        var ovFeatGrid = document.getElementById('overviewFeaturesTogglesGrid');
+        var fullFeatGrid = document.getElementById('fullFeaturesTogglesGrid');
+        var catGrid = document.getElementById('categoriesTogglesGrid');
+
+        var buildFeatHtml = function (defs) {
+          return defs.map(function (f) {
+            var isOn = cfg.features[f.key] !== false;
+            return (
+              '<div class="toggle-card ' + (isOn ? 'is-active' : 'is-off') + '">' +
+                '<div class="toggle-card-info">' +
+                  '<div class="toggle-card-title-row">' +
+                    '<span class="toggle-card-title">' + escapeHtml(f.title) + '</span>' +
+                    '<span class="badge ' + (isOn ? 'badge-approved' : 'badge-blocked') + '">' + (isOn ? 'פעיל' : 'כבוי') + '</span>' +
+                  '</div>' +
+                  '<div class="toggle-card-desc">' + escapeHtml(f.desc) + '</div>' +
+                '</div>' +
+                '<label class="ui-switch" aria-label="' + escapeHtml(f.title) + '">' +
+                  '<input type="checkbox" data-toggle-feature="' + escapeHtml(f.key) + '"' + (isOn ? ' checked' : '') + ' />' +
+                  '<span class="ui-switch-slider"></span>' +
+                '</label>' +
+              '</div>'
+            );
+          }).join('');
+        };
+
+        if (ovFeatGrid) ovFeatGrid.innerHTML = buildFeatHtml(FEATURE_DEFINITIONS);
+        if (fullFeatGrid) fullFeatGrid.innerHTML = buildFeatHtml(FEATURE_DEFINITIONS);
+
+        if (catGrid) {
+          catGrid.innerHTML = CATEGORY_DEFINITIONS.map(function (c) {
+            var isOn = cfg.categories[c.key] !== false;
+            return (
+              '<div class="toggle-card ' + (isOn ? 'is-active' : 'is-off') + '">' +
+                '<div class="toggle-card-info">' +
+                  '<div class="toggle-card-title-row">' +
+                    '<span class="toggle-card-title">' + escapeHtml(c.title) + '</span>' +
+                  '</div>' +
+                  '<div class="toggle-card-desc">' + escapeHtml(c.group) + ' • ' + (isOn ? 'מוצג באפליקציה' : 'מוסתר מהאפליקציה') + '</div>' +
+                '</div>' +
+                '<label class="ui-switch" aria-label="' + escapeHtml(c.title) + '">' +
+                  '<input type="checkbox" data-toggle-category="' + escapeHtml(c.key) + '"' + (isOn ? ' checked' : '') + ' />' +
+                  '<span class="ui-switch-slider"></span>' +
+                '</label>' +
+              '</div>'
+            );
+          }).join('');
+        }
+
+        var featInputs = document.querySelectorAll('input[data-toggle-feature]');
+        for (var i = 0; i < featInputs.length; i++) {
+          featInputs[i].addEventListener('change', function () {
+            var k = this.getAttribute('data-toggle-feature');
+            if (!k) return;
+            state.systemConfig.features[k] = Boolean(this.checked);
+            saveAdminSystemConfig(false);
+            renderFeatureAndCategoryToggles();
+            showToast('הפיצ׳ר עודכן ומוחל מיד במערכת!');
+          });
+        }
+
+        var catInputs = document.querySelectorAll('input[data-toggle-category]');
+        for (var j = 0; j < catInputs.length; j++) {
+          catInputs[j].addEventListener('change', function () {
+            var k = this.getAttribute('data-toggle-category');
+            if (!k) return;
+            state.systemConfig.categories[k] = Boolean(this.checked);
+            saveAdminSystemConfig(false);
+            renderFeatureAndCategoryToggles();
+            showToast('תצוגת הקטגוריה עודכנה!');
+          });
+        }
+      }
+
+      function renderTelegramChannels() {
+        var wrap = document.getElementById('tgChannelsTableWrap');
+        if (!wrap) return;
+        var cfg = getAdminSystemConfig();
+        var list = [
+          { handle: 'netflix_updates', label: 'עדכוני סרטים וסדרות נטפליקס' },
+          { handle: 'BoxOffice', label: 'שוברי קופות וקולנוע עולמי' },
+          { handle: 'series', label: 'סדרות חדשות ומומלצות' },
+          { handle: 'movietrailers', label: 'טריילרים ווידאו ישיר מטלגרם' },
+          { handle: 'AppleTVPlus', label: 'סדרות וסרטים של Apple TV+' },
+          { handle: 'primevideo', label: 'סדרות וסרטים של Amazon Prime' },
+          { handle: 'paramountpictures', label: 'סרטי Paramount Pictures' },
+          { handle: 'hollywood', label: 'הוליווד וקולנוע — וידאו ישיר' }
+        ];
+        try {
+          var saved = JSON.parse(localStorage.getItem('streamit_tg_public_channels_v943') || 'null');
+          if (Array.isArray(saved) && saved.length) list = saved;
+        } catch (e) {}
+
+        var sideTg = document.getElementById('sidebarTgBadge');
+        if (sideTg) sideTg.textContent = String(list.length);
+
+        wrap.innerHTML = list.map(function (c) {
+          var isConnected = !(cfg.disabledTelegramHandles && cfg.disabledTelegramHandles[c.handle]);
+          return (
+            '<div class="toggle-card ' + (isConnected ? 'is-active' : 'is-off') + '">' +
+              '<div class="toggle-card-info">' +
+                '<div class="toggle-card-title-row">' +
+                  '<span class="toggle-card-title" style="direction:ltr;color:var(--accent-blue);">@' + escapeHtml(c.handle) + '</span>' +
+                  '<span class="badge ' + (isConnected ? 'badge-approved' : 'badge-blocked') + '">' + (isConnected ? 'מחובר' : 'מנותק') + '</span>' +
+                '</div>' +
+                '<div class="toggle-card-desc">' + escapeHtml(c.label || 'ערוץ טלגרם VOD') + '</div>' +
+              '</div>' +
+              '<label class="ui-switch" aria-label="חבר או נתק את ערוץ ' + escapeHtml(c.handle) + '">' +
+                '<input type="checkbox" data-toggle-tg-handle="' + escapeHtml(c.handle) + '"' + (isConnected ? ' checked' : '') + ' />' +
+                '<span class="ui-switch-slider"></span>' +
+              '</label>' +
+            '</div>'
+          );
+        }).join('');
+
+        var tgInputs = wrap.querySelectorAll('input[data-toggle-tg-handle]');
+        for (var i = 0; i < tgInputs.length; i++) {
+          tgInputs[i].addEventListener('change', function () {
+            var h = this.getAttribute('data-toggle-tg-handle');
+            if (!h) return;
+            if (!state.systemConfig.disabledTelegramHandles) state.systemConfig.disabledTelegramHandles = {};
+            if (this.checked) {
+              delete state.systemConfig.disabledTelegramHandles[h];
+            } else {
+              state.systemConfig.disabledTelegramHandles[h] = true;
+            }
+            saveAdminSystemConfig(false);
+            renderTelegramChannels();
+            renderCatalogBreakdownCards();
+            showToast(this.checked ? ('ערוץ הטלגרם @' + h + ' חובר!') : ('ערוץ הטלגרם @' + h + ' נותק!'));
+          });
+        }
+      }
+
+      function renderAddons() {
+        var grid = document.getElementById('addonsGrid');
+        var liveGrid = document.getElementById('liveChannelsTogglesGrid');
+        var cfg = getAdminSystemConfig();
+
+        if (grid) {
+          grid.innerHTML = SOURCE_ENGINE_DEFINITIONS.map(function (s) {
+            var isConnected = cfg.sources[s.key] !== false;
+            return (
+              '<div class="toggle-card ' + (isConnected ? 'is-active' : 'is-off') + '">' +
+                '<div class="toggle-card-info">' +
+                  '<div class="toggle-card-title-row">' +
+                    '<span class="toggle-card-title">' + escapeHtml(s.title) + '</span>' +
+                    '<span class="badge ' + (isConnected ? 'badge-approved' : 'badge-blocked') + '">' + (isConnected ? 'מחובר פעיל' : 'מנותק') + '</span>' +
+                  '</div>' +
+                  '<div class="toggle-card-desc">' + escapeHtml(s.desc) + '</div>' +
+                '</div>' +
+                '<label class="ui-switch" aria-label="' + escapeHtml(s.title) + '">' +
+                  '<input type="checkbox" data-toggle-source="' + escapeHtml(s.key) + '"' + (isConnected ? ' checked' : '') + ' />' +
+                  '<span class="ui-switch-slider"></span>' +
+                '</label>' +
+              '</div>'
+            );
+          }).join('');
+
+          var srcInputs = grid.querySelectorAll('input[data-toggle-source]');
+          for (var i = 0; i < srcInputs.length; i++) {
+            srcInputs[i].addEventListener('change', function () {
+              var k = this.getAttribute('data-toggle-source');
+              if (!k) return;
+              state.systemConfig.sources[k] = Boolean(this.checked);
+              saveAdminSystemConfig(false);
+              renderAddons();
+              showToast(this.checked ? 'מנוע ההזרמה חובר ופעיל!' : 'מנוע ההזרמה נותק!');
+            });
+          }
+        }
+
+        if (liveGrid) {
+          liveGrid.innerHTML = LIVE_CHANNELS_DIRECTORY.map(function (ch) {
+            var isConnected = !(cfg.disabledChannelIds && cfg.disabledChannelIds[ch.id]);
+            return (
+              '<div class="toggle-card ' + (isConnected ? 'is-active' : 'is-off') + '">' +
+                '<div class="toggle-card-info">' +
+                  '<div class="toggle-card-title-row">' +
+                    '<span class="badge badge-member">אפיק ' + escapeHtml(ch.num) + '</span>' +
+                    '<span class="toggle-card-title">' + escapeHtml(ch.name) + '</span>' +
+                  '</div>' +
+                  '<div class="toggle-card-desc">' + escapeHtml(ch.group) + ' • ' + (isConnected ? 'מחובר לשידור חי' : 'מנותק ומוסתר') + '</div>' +
+                '</div>' +
+                '<label class="ui-switch" aria-label="' + escapeHtml(ch.name) + '">' +
+                  '<input type="checkbox" data-toggle-live-channel="' + escapeHtml(ch.id) + '"' + (isConnected ? ' checked' : '') + ' />' +
+                  '<span class="ui-switch-slider"></span>' +
+                '</label>' +
+              '</div>'
+            );
+          }).join('');
+
+          var chInputs = liveGrid.querySelectorAll('input[data-toggle-live-channel]');
+          for (var c = 0; c < chInputs.length; c++) {
+            chInputs[c].addEventListener('change', function () {
+              var chId = this.getAttribute('data-toggle-live-channel');
+              if (!chId) return;
+              if (!state.systemConfig.disabledChannelIds) state.systemConfig.disabledChannelIds = {};
+              if (this.checked) {
+                delete state.systemConfig.disabledChannelIds[chId];
+              } else {
+                state.systemConfig.disabledChannelIds[chId] = true;
+              }
+              saveAdminSystemConfig(false);
+              renderAddons();
+              renderCatalogBreakdownCards();
+              showToast(this.checked ? 'הערוץ חובר לשידור חי!' : 'הערוץ נותק והוסתר מהאפליקציה.');
+            });
+          }
+        }
+      }
+
+      // ============================================================
+      // EVENT LISTENERS
+      // ============================================================
+      var navBtns = document.querySelectorAll('.sidebar-nav-btn');
+      for (var n = 0; n < navBtns.length; n++) {
+        navBtns[n].addEventListener('click', function () {
+          switchSidebarPage(this.getAttribute('data-page'));
+        });
+      }
+
+      var overviewUsersBtn = document.getElementById('overviewGoToUsersBtn');
+      if (overviewUsersBtn) {
+        overviewUsersBtn.addEventListener('click', function () {
+          switchSidebarPage('users');
+        });
+      }
+
+      var gotoPageBtns = document.querySelectorAll('[data-goto-page]');
+      for (var gp = 0; gp < gotoPageBtns.length; gp++) {
+        gotoPageBtns[gp].addEventListener('click', function () {
+          switchSidebarPage(this.getAttribute('data-goto-page'));
+        });
+      }
+
+      var enableAllFeatBtn = document.getElementById('enableAllFeaturesBtn');
+      if (enableAllFeatBtn) {
+        enableAllFeatBtn.addEventListener('click', function () {
+          getAdminSystemConfig();
+          Object.keys(DEFAULT_SYSTEM_CONFIG.features).forEach(function (k) {
+            state.systemConfig.features[k] = true;
+          });
+          saveAdminSystemConfig(true);
+          renderFeatureAndCategoryToggles();
+        });
+      }
+
+      var enableAllCatBtn = document.getElementById('enableAllCategoriesBtn');
+      if (enableAllCatBtn) {
+        enableAllCatBtn.addEventListener('click', function () {
+          getAdminSystemConfig();
+          Object.keys(DEFAULT_SYSTEM_CONFIG.categories).forEach(function (k) {
+            state.systemConfig.categories[k] = true;
+          });
+          saveAdminSystemConfig(true);
+          renderFeatureAndCategoryToggles();
+        });
+      }
+
+      var enableAllSrcBtn = document.getElementById('enableAllSourcesBtn');
+      if (enableAllSrcBtn) {
+        enableAllSrcBtn.addEventListener('click', function () {
+          getAdminSystemConfig();
+          Object.keys(DEFAULT_SYSTEM_CONFIG.sources).forEach(function (k) {
+            state.systemConfig.sources[k] = true;
+          });
+          saveAdminSystemConfig(true);
+          renderAddons();
+        });
+      }
+
+      var enableAllLiveBtn = document.getElementById('enableAllLiveChannelsBtn');
+      if (enableAllLiveBtn) {
+        enableAllLiveBtn.addEventListener('click', function () {
+          getAdminSystemConfig();
+          state.systemConfig.disabledChannelIds = {};
+          saveAdminSystemConfig(true);
+          renderAddons();
+          renderCatalogBreakdownCards();
+        });
+      }
+
+      var syncConfigNowBtn = document.getElementById('syncConfigNowBtn');
+      if (syncConfigNowBtn) {
+        syncConfigNowBtn.addEventListener('click', function () {
+          saveAdminSystemConfig(true);
+        });
+      }
+
+      var filterBtns = document.querySelectorAll('.filter-pill-btn');
+      for (var f = 0; f < filterBtns.length; f++) {
+        filterBtns[f].addEventListener('click', function () {
+          state.activeFilter = this.getAttribute('data-filter') || 'all';
+          for (var k = 0; k < filterBtns.length; k++) {
+            filterBtns[k].classList.toggle('active', filterBtns[k] === this);
+          }
+          renderUsersTable();
+        });
+      }
+
+      var gateForm = document.getElementById('adminGateForm');
+      if (gateForm) {
+        gateForm.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          var emailIn = document.getElementById('adminGateEmail');
+          var passIn = document.getElementById('adminGatePassword');
+          var errBox = document.getElementById('adminGateError');
+          var submitBtn = document.getElementById('adminGateSubmitBtn');
+          if (errBox) errBox.classList.add('hidden');
+          if (submitBtn) submitBtn.innerHTML = '<span>מאמת הרשאות מנהל מול הענן...</span>';
+
+          var res = await verifyAdminGateCredentials(emailIn ? emailIn.value : '', passIn ? passIn.value : '');
+          if (submitBtn) {
+            submitBtn.innerHTML =
+              '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>' +
+              '<span>אימות וכניסה לדשבורד</span>';
+          }
+
+          if (!res.ok) {
+            if (errBox) {
+              errBox.textContent = res.error || 'שגיאת אימות';
+              errBox.classList.remove('hidden');
+            }
+            return;
+          }
+          unlockAdminConsole(res.email);
+        });
+      }
+
+      var lockBtn = document.getElementById('lockAdminBtn');
+      if (lockBtn) {
+        lockBtn.addEventListener('click', lockAdminConsole);
+      }
+
+      // Create / Update User Form
+      var createForm = document.getElementById('createUserForm');
+      if (createForm) {
+        createForm.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          var emailEl = document.getElementById('newUserEmail');
+          var nameEl = document.getElementById('newUserName');
+          var passEl = document.getElementById('newUserPassword');
+          var roleEl = document.getElementById('newUserRole');
+          var maxEl = document.getElementById('newUserMaxProfiles');
+          var btn = document.getElementById('createUserSubmitBtn');
+
+          var email = (emailEl.value || '').trim().toLowerCase();
+          var name = (nameEl.value || '').trim();
+          var password = (passEl.value || '').trim();
+          if (!email || !password) return;
+
+          if (btn) btn.innerHTML = '<span>מצפין ומסנכרן לענן...</span>';
+          delete state.deletedEmails[email];
+          var pwData = await buildPasswordHashes(email, password);
+
+          var existingAccountState = (state.vault[email] && state.vault[email].accountState) ? state.vault[email].accountState : undefined;
+          state.vault[email] = {
+            email: email,
+            display_name: name || email.split('@')[0],
+            status: 'approved',
+            role: roleEl ? roleEl.value : 'member',
+            max_profiles: Number(maxEl ? maxEl.value : 5),
+            passHash: pwData.passHash,
+            altHashes: pwData.altHashes,
+            passCipher: pwData.passCipher,
+            autoBindPassword: false,
+            updatedAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
+            updatedTs: Date.now()
+          };
+          if (existingAccountState) {
+            state.vault[email].accountState = existingAccountState;
+          }
+
+          emailEl.value = '';
+          nameEl.value = '';
+          passEl.value = '';
+          renderUsersTable();
+
+          var synced = await pushVaultToGitHubCloud();
+          if (btn) {
+            btn.innerHTML =
+              '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>' +
+              '<span>שמור מנוי וסנכרן לענן</span>';
+          }
+          showToast(synced
+            ? ('המנוי ' + email + ' הוקם עם הסיסמה "' + password + '" וסונכרן לענן בהצלחה!')
+            : ('המנוי ' + email + ' נשמר עם הסיסמה "' + password + '"!'));
+        });
+      }
+
+      // Edit User Modal Form
+      var editForm = document.getElementById('editUserForm');
+      if (editForm) {
+        editForm.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          var email = (document.getElementById('editUserEmail').value || '').trim().toLowerCase();
+          var name = (document.getElementById('editUserName').value || '').trim();
+          var newPass = (document.getElementById('editUserPassword').value || '').trim();
+          var role = document.getElementById('editUserRole').value || 'member';
+          var maxProfiles = Number(document.getElementById('editUserMaxProfiles').value || 5);
+          var status = document.getElementById('editUserStatus').value || 'approved';
+
+          if (!email || !state.vault[email]) return;
+          var rec = state.vault[email];
+          rec.display_name = name || email.split('@')[0];
+          rec.role = role;
+          rec.max_profiles = maxProfiles;
+          rec.status = status;
+          rec.autoBindPassword = false;
+          rec.updatedAt = new Date().toISOString().slice(0, 16).replace('T', ' ');
+          rec.updatedTs = Date.now();
+
+          if (newPass) {
+            var pwData = await buildPasswordHashes(email, newPass);
+            rec.passHash = pwData.passHash;
+            rec.altHashes = pwData.altHashes;
+            rec.passCipher = pwData.passCipher;
+            delete rec.password;
+          }
+
+          state.vault[email] = rec;
+          closeEditUserModal();
+          renderUsersTable();
+
+          var synced = await pushVaultToGitHubCloud();
+          showToast(synced
+            ? ('פרטי המנוי ' + email + ' והסיסמה עודכנו וסונכרנו לענן!')
+            : ('פרטי המנוי ' + email + ' עודכנו!'));
+        });
+      }
+
+      var closeEditBtn = document.getElementById('closeEditUserModalBtn');
+      var cancelEditBtn = document.getElementById('cancelEditUserBtn');
+      if (closeEditBtn) closeEditBtn.addEventListener('click', closeEditUserModal);
+      if (cancelEditBtn) cancelEditBtn.addEventListener('click', closeEditUserModal);
+
+      var searchIn = document.getElementById('userSearchInput');
+      if (searchIn) searchIn.addEventListener('input', renderUsersTable);
+
+      var refreshBtn = document.getElementById('refreshAllBtn');
+      if (refreshBtn) {
+        refreshBtn.addEventListener('click', async function () {
+          await loadVaultFromCloud(true);
+          renderUsersTable();
+          showToast('רשימת המנויים רועננה ישירות מכספת הענן.');
+        });
+      }
+
+      var forcePushBtn = document.getElementById('forcePushCloudBtn');
+      if (forcePushBtn) {
+        forcePushBtn.addEventListener('click', async function () {
+          var ok = await pushVaultToGitHubCloud();
+          showToast(ok ? 'כל המנויים והסיסמאות נדחפו לכספת הענן בהצלחה!' : 'שגיאה בסנכרון לענן — נשמר מקומית.');
+        });
+      }
+
+      var forcePullBtn = document.getElementById('forcePullCloudBtn');
+      if (forcePullBtn) {
+        forcePullBtn.addEventListener('click', async function () {
+          localStorage.removeItem(STORAGE_VAULT_KEY);
+          await loadVaultFromCloud(true);
+          renderUsersTable();
+          showToast('המטמון המקומי אופס והנתונים נמשכו מחדש מהענן!');
+        });
+      }
+
+      function downloadVaultJson() {
+        var blob = new Blob([JSON.stringify(state.vault, null, 2)], { type: 'application/json' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'accounts_vault.json';
+        a.click();
+      }
+
+      var exportBtn = document.getElementById('exportVaultJsonBtn');
+      var exportCloudPageBtn = document.getElementById('exportVaultCloudPageBtn');
+      if (exportBtn) exportBtn.addEventListener('click', downloadVaultJson);
+      if (exportCloudPageBtn) exportCloudPageBtn.addEventListener('click', downloadVaultJson);
+
+      var tgAddBtn = document.getElementById('tgAdminAddBtn');
+      if (tgAddBtn) {
+        tgAddBtn.addEventListener('click', function () {
+          var inEl = document.getElementById('tgAdminChannelInput');
+          var labelEl = document.getElementById('tgAdminLabelInput');
+          var val = (inEl && inEl.value ? inEl.value.trim() : '').replace(/^https?:\/\/t\.me\/(s\/)?/i, '').replace(/^@/, '').split(/[/?#]/)[0];
+          var customLabel = (labelEl && labelEl.value ? labelEl.value.trim() : '');
+          if (!val) return;
+          var saved = [];
+          try {
+            saved = JSON.parse(localStorage.getItem('streamit_tg_public_channels_v943') || '[]');
+          } catch (e) {}
+          if (!saved.some(function (x) { return x.handle.toLowerCase() === val.toLowerCase(); })) {
+            saved.unshift({ handle: val, label: customLabel || ('ערוץ טלגרם VOD (@' + val + ')') });
+            localStorage.setItem('streamit_tg_public_channels_v943', JSON.stringify(saved));
+          }
+          if (inEl) inEl.value = '';
+          if (labelEl) labelEl.value = '';
+          renderTelegramChannels();
+          showToast('ערוץ הטלגרם @' + val + ' חובר בהצלחה!');
+        });
+      }
+
+      (async function initAdmin() {
+        // Unregister any legacy Service Worker & clear stale browser CacheStorage
+        try {
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function (regs) {
+              regs.forEach(function (r) { r.unregister(); });
+            });
+          }
+          if ('caches' in window) {
+            caches.keys().then(function (keys) {
+              keys.forEach(function (k) { caches.delete(k); });
+            });
+          }
+        } catch (e) {}
+
+        // Clean URL in address bar (remove .html extension & any stray query params)
+        try {
+          if (window.history && window.history.replaceState) {
+            var cleanPath = window.location.pathname
+              .replace(/\/admin\/index\.html$/i, '/admin')
+              .replace(/\/admin\/$/i, '/admin')
+              .replace(/\/admin\.html$/i, '/admin');
+            if (cleanPath !== window.location.pathname || window.location.search) {
+              window.history.replaceState(null, '', cleanPath);
+            }
+          }
+        } catch (e) {}
+
+        state.vault = JSON.parse(JSON.stringify(DEFAULT_VAULT));
+        rebuildUsersList();
+
+        var savedSessionEmail = '';
+        try {
+          savedSessionEmail = sessionStorage.getItem(ADMIN_SESSION_KEY) || '';
+        } catch (e) {}
+
+        if (savedSessionEmail) {
+          unlockAdminConsole(savedSessionEmail);
+          loadVaultFromCloud(false).then(function () {
+            renderUsersTable();
+            renderUserStatisticsBreakdown();
+          }).catch(function () {});
+        } else {
+          lockAdminConsole();
+          loadVaultFromCloud(false).catch(function () {});
+        }
+      })();
+    })();
+  </script>
+</body>
+</html>

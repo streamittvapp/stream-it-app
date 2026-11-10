@@ -51,6 +51,22 @@ def build_www() -> None:
             shutil.copy2(data_file, os.path.join(dst_data, data_fname))
             shutil.copy2(data_file, os.path.join(and_data, data_fname))
 
+    # Build clean /admin route (admin/index.html) so URLs work without .html extension
+    admin_src = os.path.join(BASE_DIR, "admin.html")
+    if os.path.exists(admin_src):
+        with open(admin_src, "r", encoding="utf-8") as f:
+            admin_html = f.read()
+        admin_sub_html = admin_html.replace(
+            '<meta charset="UTF-8" />',
+            '<meta charset="UTF-8" />\n  <base href="../" />',
+            1,
+        )
+        for target_root in (BASE_DIR, WWW_DIR, ANDROID_PUBLIC_DIR):
+            admin_dir = os.path.join(target_root, "admin")
+            os.makedirs(admin_dir, exist_ok=True)
+            with open(os.path.join(admin_dir, "index.html"), "w", encoding="utf-8") as out_f:
+                out_f.write(admin_sub_html)
+
     print("[STREAM IT] Built standalone Capacitor / Git bundle in www/ and android/app/src/main/assets/public/")
 
 

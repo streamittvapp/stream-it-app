@@ -12,7 +12,110 @@
       "6d3f56d012335b0679ff7c8d4c4c46172b2d48262999bb6189a6eb5bad134d19"
     ],
     "updatedAt": "2026-11-10 00:58",
-    "updatedTs": 1794265080000
+    "updatedTs": 1794265080000,
+    "accountState": {
+      "updatedTs": 1794303268867,
+      "activeSubUserId": "prof-main",
+      "subUsers": [
+        {
+          "id": "prof-main",
+          "name": "מנהל ראשי (VIP / משפחתי)",
+          "color": "#b91c1c",
+          "isKids": false,
+          "isPrimary": true,
+          "parentalControl": {
+            "enabled": false,
+            "actionMode": "skip",
+            "profanityMode": "mute_censor",
+            "sensitivity": "balanced",
+            "categories": {
+              "sex": true,
+              "violence": true,
+              "profanity": true,
+              "drugs": true,
+              "horror": false
+            }
+          }
+        },
+        {
+          "id": "prof-living",
+          "name": "סלון",
+          "color": "#334155",
+          "isKids": false,
+          "isPrimary": false,
+          "parentalControl": {
+            "enabled": false,
+            "actionMode": "skip",
+            "profanityMode": "mute_censor",
+            "sensitivity": "balanced",
+            "categories": {
+              "sex": true,
+              "violence": true,
+              "profanity": true,
+              "drugs": true,
+              "horror": false
+            }
+          }
+        },
+        {
+          "id": "prof-bedroom",
+          "name": "חדר שינה",
+          "color": "#3f3f46",
+          "isKids": false,
+          "isPrimary": false,
+          "parentalControl": {
+            "enabled": false,
+            "actionMode": "skip",
+            "profanityMode": "mute_censor",
+            "sensitivity": "balanced",
+            "categories": {
+              "sex": true,
+              "violence": true,
+              "profanity": true,
+              "drugs": true,
+              "horror": false
+            }
+          }
+        },
+        {
+          "id": "prof-kids",
+          "name": "ילדים ונוער",
+          "color": "#475569",
+          "isKids": true,
+          "isPrimary": false,
+          "parentalControl": {
+            "enabled": true,
+            "actionMode": "skip",
+            "profanityMode": "mute_censor",
+            "sensitivity": "strict",
+            "categories": {
+              "sex": true,
+              "violence": true,
+              "profanity": true,
+              "drugs": true,
+              "horror": true
+            }
+          }
+        }
+      ],
+      "profileData": {
+        "prof-main": {
+          "watchlist": [],
+          "progress": {}
+        }
+      },
+      "parentalMaster": {
+        "pinCode": "",
+        "customSkipSegments": {}
+      },
+      "subPrefs": {
+        "size": "xlarge",
+        "fontPx": 42,
+        "color": "white",
+        "bg": "none",
+        "bottomPct": 3.5
+      }
+    }
   },
   "bensahaltv@gmail.com": {
     "email": "bensahaltv@gmail.com",
