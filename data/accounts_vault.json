@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794416645742,
+      "updatedTs": 1794432189834,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -330,45 +330,6 @@
             "tt10577736"
           ],
           "progress": {
-            "27": {
-              "id": "27",
-              "imdbId": "tt0411705",
-              "tmdbId": "27",
-              "title": "9 שירים",
-              "currentTime": 200,
-              "duration": 4179,
-              "percent": 5,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794402821800,
-              "snapshot": {
-                "id": "27",
-                "imdbId": "tt0411705",
-                "tmdbId": "27",
-                "type": "movie",
-                "title": "9 שירים",
-                "originalTitle": "9 Songs",
-                "year": "2004",
-                "rating": "5.5",
-                "runtimeHe": "שעתיים",
-                "ageRating": "12+",
-                "overview": "מתיו (קיראן אובריאן), צעיר לונדוני, עובד כמסקר לעיתון \"אטרטיקה\" הבריטי ואוהב לשמוע להקות אינדי. בעת שטס מעל הנוף הקוטבי הלא פורה, הוא נזכר במערכת יחסיו עם ליסה (מרגו סטילי), סטונדטית של מחלף אקדמאי אמריקאי. כאשר נפגש הזוג בטקס פרסי אקדמיה בבריטניה, הם נזכרים באהבתם הנשכחת ומביאים תשוקתם היישר למיטה. דרמה רומנטית אירוטית מגיל 18 המשלבת סצינות סקס נועזות ביחד עם מוזיקה בריטית עכשווית עם אומנים כמו \"פרנץ פרדיננד\", \"אלבו\", \"בלק רבל מוטורסייקל קלאב\", ניק מק'ארתי, בובי ג'ילפסי, יו בנפורד ועוד. האמת שחוץ משני השחקנים הצעירים הראשיים בסרט, כל שאר השחקנים הם בעצם הזמרים והלהקות המופיעות בסרט ונותנות הרבה רעש לסרט הנועז. ביים: מייקל ווינטרבוטום, הבמאי של \"אנשי המסיבות\" ו\"טריסטן שנדי: סיפור מצוץ מן האצבע\" החדש.",
-                "poster": "https://image.tmdb.org/t/p/w500/91O7z0vo7MiNWd5xD2BoivwbQsb.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/bybAHw5fenKXRFI4phanPhpljlT.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/bybAHw5fenKXRFI4phanPhpljlT.jpg",
-                "genres": [
-                  "drama",
-                  "music",
-                  "romance"
-                ],
-                "genresHe": [
-                  "דרמה",
-                  "מוזיקה והופעות",
-                  "רומנטיקה"
-                ],
-                "seasonsCount": 0
-              }
-            },
             "10580": {
               "id": "10580",
               "imdbId": "tt0079118",
@@ -506,22 +467,6 @@
               "episode": 1,
               "updatedAt": 1794386948593
             },
-            "tt1745960": {
-              "currentTime": 18,
-              "duration": 7814,
-              "percent": 3,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794203030102
-            },
-            "tt6263850": {
-              "currentTime": 5886,
-              "duration": 7753,
-              "percent": 76,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794323631225
-            },
             "tt4565380": {
               "currentTime": 16,
               "duration": 2500,
@@ -537,6 +482,22 @@
               "season": 1,
               "episode": 1,
               "updatedAt": 1794387260384
+            },
+            "tt1745960": {
+              "currentTime": 18,
+              "duration": 7814,
+              "percent": 3,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794203030102
+            },
+            "tt6263850": {
+              "currentTime": 5886,
+              "duration": 7753,
+              "percent": 76,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794323631225
             },
             "tt10577736": {
               "id": "tt10577736",
@@ -609,37 +570,54 @@
               "seasonsCount": 4
             }
           },
-          "watchlistUpdatedAt": 0
+          "watchlistUpdatedAt": 0,
+          "deletedProgressIds": {
+            "27": 1794432189831,
+            "tt0411705": 1794432189831,
+            "movie-27": 1794432189831,
+            "series-27": 1794432189831
+          },
+          "progressClearedAt": 0
         },
         "prof-living": {
           "watchlist": [],
           "progress": {},
           "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0
+          "watchlistUpdatedAt": 0,
+          "deletedProgressIds": {},
+          "progressClearedAt": 0
         },
         "prof-1794166536010": {
           "watchlist": [],
           "progress": {},
           "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0
+          "watchlistUpdatedAt": 0,
+          "deletedProgressIds": {},
+          "progressClearedAt": 0
         },
         "prof-1794166543582": {
           "watchlist": [],
           "progress": {},
           "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0
+          "watchlistUpdatedAt": 0,
+          "deletedProgressIds": {},
+          "progressClearedAt": 0
         },
         "prof-1794166553435": {
           "watchlist": [],
           "progress": {},
           "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0
+          "watchlistUpdatedAt": 0,
+          "deletedProgressIds": {},
+          "progressClearedAt": 0
         },
         "prof-1794166559616": {
           "watchlist": [],
           "progress": {},
           "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0
+          "watchlistUpdatedAt": 0,
+          "deletedProgressIds": {},
+          "progressClearedAt": 0
         },
         "prof-1794166564722": {
           "watchlist": [],
@@ -805,7 +783,9 @@
             }
           },
           "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0
+          "watchlistUpdatedAt": 0,
+          "deletedProgressIds": {},
+          "progressClearedAt": 0
         }
       },
       "parentalMaster": {
