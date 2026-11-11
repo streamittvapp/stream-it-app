@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794391842797,
+      "updatedTs": 1794391874676,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -145,7 +145,7 @@
           "isPrimary": true,
           "parentalControl": {
             "enabled": true,
-            "actionMode": "skip",
+            "actionMode": "blur_mute",
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
             "categories": {
