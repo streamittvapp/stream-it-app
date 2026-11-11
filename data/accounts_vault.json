@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794390912263,
+      "updatedTs": 1794391033024,
       "activeSubUserId": "prof-1794166564722",
       "subUsers": [
         {
@@ -256,6 +256,66 @@
               "horror": false
             }
           }
+        },
+        {
+          "id": "prof-living",
+          "name": "סלון",
+          "color": "#334155",
+          "isKids": false,
+          "isPrimary": false,
+          "parentalControl": {
+            "enabled": false,
+            "actionMode": "skip",
+            "profanityMode": "mute_censor",
+            "sensitivity": "balanced",
+            "categories": {
+              "sex": true,
+              "violence": true,
+              "profanity": true,
+              "drugs": true,
+              "horror": false
+            }
+          }
+        },
+        {
+          "id": "prof-bedroom",
+          "name": "חדר שינה",
+          "color": "#3f3f46",
+          "isKids": false,
+          "isPrimary": false,
+          "parentalControl": {
+            "enabled": false,
+            "actionMode": "skip",
+            "profanityMode": "mute_censor",
+            "sensitivity": "balanced",
+            "categories": {
+              "sex": true,
+              "violence": true,
+              "profanity": true,
+              "drugs": true,
+              "horror": false
+            }
+          }
+        },
+        {
+          "id": "prof-kids",
+          "name": "ילדים ונוער",
+          "color": "#475569",
+          "isKids": true,
+          "isPrimary": false,
+          "parentalControl": {
+            "enabled": true,
+            "actionMode": "skip",
+            "profanityMode": "mute_censor",
+            "sensitivity": "strict",
+            "categories": {
+              "sex": true,
+              "violence": true,
+              "profanity": true,
+              "drugs": true,
+              "horror": true
+            }
+          }
         }
       ],
       "profileData": {
@@ -269,6 +329,14 @@
             "1339713"
           ],
           "progress": {
+            "27": {
+              "currentTime": 217,
+              "duration": 4179,
+              "percent": 5,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794324068874
+            },
             "1283515": {
               "currentTime": 1706,
               "duration": 7256,
@@ -277,6 +345,14 @@
               "episode": 1,
               "updatedAt": 1794340722738
             },
+            "1381078": {
+              "currentTime": 5045,
+              "duration": 6678,
+              "percent": 76,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794323899601
+            },
             "1571955": {
               "currentTime": 131,
               "duration": 6381,
@@ -284,6 +360,22 @@
               "season": 1,
               "episode": 1,
               "updatedAt": 1794386948593
+            },
+            "tt1745960": {
+              "currentTime": 18,
+              "duration": 7814,
+              "percent": 3,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794203030102
+            },
+            "tt6263850": {
+              "currentTime": 5886,
+              "duration": 7753,
+              "percent": 76,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794323631225
             },
             "tt4565380": {
               "currentTime": 16,
@@ -417,6 +509,45 @@
                   "דרמה"
                 ],
                 "seasonsCount": 4
+              }
+            },
+            "tt15398776": {
+              "id": "tt15398776",
+              "imdbId": "tt15398776",
+              "tmdbId": "872585",
+              "title": "אופנהיימר",
+              "currentTime": 2131,
+              "duration": 10822,
+              "percent": 20,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794391033024,
+              "snapshot": {
+                "id": "tt15398776",
+                "imdbId": "tt15398776",
+                "tmdbId": "872585",
+                "type": "movie",
+                "title": "אופנהיימר",
+                "originalTitle": "Oppenheimer",
+                "year": "2023",
+                "rating": "8.9",
+                "runtimeHe": "3 שעות ו-00 דק'",
+                "ageRating": "16+",
+                "overview": "סיפורו המטלטל של הפיזיקאי האמריקאי ג'יי רוברט אופנהיימר ותפקידו המרכזי בפרויקט מנהטן הסודי לפיתוח הפצצה האטומית הראשונה במלחמת העולם השנייה.",
+                "poster": "https://images.metahub.space/poster/medium/tt15398776/img",
+                "backdrop": "https://images.metahub.space/background/medium/tt15398776/img",
+                "cardBackdrop": "https://images.metahub.space/background/medium/tt15398776/img",
+                "genres": [
+                  "drama",
+                  "docu",
+                  "war",
+                  "telegram"
+                ],
+                "genresHe": [
+                  "דרמה",
+                  "ביוגרפיה והיסטוריה"
+                ],
+                "seasonsCount": 0
               }
             }
           },
