@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794404796432,
+      "updatedTs": 1794404820666,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -506,12 +506,12 @@
               "imdbId": "tt10577736",
               "tmdbId": "103913",
               "title": "טהרן",
-              "currentTime": 455,
+              "currentTime": 470,
               "duration": 3014,
-              "percent": 15,
+              "percent": 16,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794404796432,
+              "updatedAt": 1794404820666,
               "snapshot": {
                 "id": "tt10577736",
                 "imdbId": "tt10577736",
