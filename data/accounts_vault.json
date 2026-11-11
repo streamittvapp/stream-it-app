@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794388483022,
+      "updatedTs": 1794389470255,
       "activeSubUserId": "prof-1794166564722",
       "subUsers": [
         {
@@ -301,31 +301,87 @@
               "episode": 1,
               "updatedAt": 1794387260384
             }
-          }
+          },
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0
         },
         "prof-living": {
           "watchlist": [],
-          "progress": {}
+          "progress": {},
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0
         },
         "prof-1794166536010": {
           "watchlist": [],
-          "progress": {}
+          "progress": {},
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0
         },
         "prof-1794166543582": {
           "watchlist": [],
-          "progress": {}
+          "progress": {},
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0
         },
         "prof-1794166553435": {
           "watchlist": [],
-          "progress": {}
+          "progress": {},
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0
         },
         "prof-1794166559616": {
           "watchlist": [],
-          "progress": {}
+          "progress": {},
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0
         },
         "prof-1794166564722": {
           "watchlist": [],
-          "progress": {}
+          "progress": {
+            "tt15239678": {
+              "id": "tt15239678",
+              "imdbId": "tt15239678",
+              "tmdbId": "693134",
+              "title": "חולית: חלק שני",
+              "currentTime": 21,
+              "duration": 9955,
+              "percent": 3,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794389470255,
+              "snapshot": {
+                "id": "tt15239678",
+                "imdbId": "tt15239678",
+                "tmdbId": "693134",
+                "type": "movie",
+                "title": "חולית: חלק שני",
+                "originalTitle": "Dune: Part Two",
+                "year": "2024",
+                "rating": "8.6",
+                "runtimeHe": "2 שעות ו-46 דק'",
+                "ageRating": "14+",
+                "overview": "פול אטריידיס מתאחד עם צ'אני ועם שבטי הדרשנים במדבר העמוק של אראקיס, ויוצא למסע נקמה גורלי נגד הקושרים שהחריבו את משפחתו — תוך שהוא נאבק למנוע עתיד אפל שרק הוא מסוגל לחזות.",
+                "poster": "https://images.metahub.space/poster/medium/tt15239678/img",
+                "backdrop": "https://images.metahub.space/background/medium/tt15239678/img",
+                "cardBackdrop": "https://images.metahub.space/background/medium/tt15239678/img",
+                "genres": [
+                  "scifi",
+                  "action",
+                  "drama",
+                  "tpb",
+                  "telegram"
+                ],
+                "genresHe": [
+                  "מדע בדיוני",
+                  "אקשן והרפתקאות",
+                  "דרמה"
+                ],
+                "seasonsCount": 0
+              }
+            }
+          },
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0
         }
       },
       "parentalMaster": {
