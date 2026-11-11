@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794402913780,
+      "updatedTs": 1794402933450,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -373,12 +373,12 @@
               "imdbId": "tt0079118",
               "tmdbId": "10580",
               "title": "אסקימו לימון",
-              "currentTime": 3412,
-              "duration": 7200,
-              "percent": 47,
+              "currentTime": 3450,
+              "duration": 5538,
+              "percent": 62,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794402913779,
+              "updatedAt": 1794402933450,
               "snapshot": {
                 "id": "10580",
                 "imdbId": "tt0079118",
