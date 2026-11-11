@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794391794372,
+      "updatedTs": 1794391808168,
       "activeSubUserId": "prof-1794166564722",
       "subUsers": [
         {
@@ -560,7 +560,7 @@
               "percent": 20,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794391052707,
+              "updatedAt": 1794391808167,
               "snapshot": {
                 "id": "tt15398776",
                 "imdbId": "tt15398776",
