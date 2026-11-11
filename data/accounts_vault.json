@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794415317160,
+      "updatedTs": 1794415335395,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -466,12 +466,12 @@
               "imdbId": "tt43612870",
               "tmdbId": "1568027",
               "title": "קופה ראשית: הסרט",
-              "currentTime": 1468,
+              "currentTime": 1485,
               "duration": 7200,
-              "percent": 20,
+              "percent": 21,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794415317160,
+              "updatedAt": 1794415335395,
               "snapshot": {
                 "id": "1568027",
                 "imdbId": "tt43612870",
