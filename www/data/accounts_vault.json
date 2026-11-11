@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794261966785,
+      "updatedTs": 1794340722738,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -144,8 +144,8 @@
           "isKids": false,
           "isPrimary": true,
           "parentalControl": {
-            "enabled": false,
-            "actionMode": "blur_mute",
+            "enabled": true,
+            "actionMode": "skip",
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
             "categories": {
@@ -250,25 +250,100 @@
             "sensitivity": "balanced",
             "categories": {
               "sex": true,
+              "violence": false,
+              "profanity": false,
+              "drugs": false,
+              "horror": false
+            }
+          }
+        },
+        {
+          "id": "prof-living",
+          "name": "סלון",
+          "color": "#334155",
+          "isKids": false,
+          "isPrimary": false,
+          "parentalControl": {
+            "enabled": false,
+            "actionMode": "skip",
+            "profanityMode": "mute_censor",
+            "sensitivity": "balanced",
+            "categories": {
+              "sex": true,
               "violence": true,
               "profanity": true,
               "drugs": true,
               "horror": false
             }
           }
+        },
+        {
+          "id": "prof-bedroom",
+          "name": "חדר שינה",
+          "color": "#3f3f46",
+          "isKids": false,
+          "isPrimary": false,
+          "parentalControl": {
+            "enabled": false,
+            "actionMode": "skip",
+            "profanityMode": "mute_censor",
+            "sensitivity": "balanced",
+            "categories": {
+              "sex": true,
+              "violence": true,
+              "profanity": true,
+              "drugs": true,
+              "horror": false
+            }
+          }
+        },
+        {
+          "id": "prof-kids",
+          "name": "ילדים ונוער",
+          "color": "#475569",
+          "isKids": true,
+          "isPrimary": false,
+          "parentalControl": {
+            "enabled": true,
+            "actionMode": "skip",
+            "profanityMode": "mute_censor",
+            "sensitivity": "strict",
+            "categories": {
+              "sex": true,
+              "violence": true,
+              "profanity": true,
+              "drugs": true,
+              "horror": true
+            }
+          }
         }
       ],
       "profileData": {
         "prof-main": {
-          "watchlist": [],
+          "watchlist": [
+            "791523",
+            "1283515",
+            "288673",
+            "58841",
+            "1236045",
+            "1339713"
+          ],
           "progress": {
-            "tt1745960": {
-              "currentTime": 18,
-              "duration": 7814,
+            "1283515": {
+              "currentTime": 1706,
+              "duration": 7256,
+              "percent": 24,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794340722738
+            },
+            "tt4565380": {
+              "currentTime": 16,
+              "duration": 2500,
               "percent": 3,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794203030102
+              "updatedAt": 1794174730171
             }
           }
         },
@@ -302,11 +377,11 @@
         "customSkipSegments": {}
       },
       "subPrefs": {
-        "size": "xlarge",
-        "fontPx": 52,
+        "size": "large",
+        "fontPx": 32,
         "color": "white",
         "bg": "none",
-        "bottomPct": 3.5
+        "bottomPct": 6.5
       }
     }
   },

@@ -10,7 +10,8 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.8.0';
+  var APP_VERSION = '9.8.1';
+  window.__STREAMIT_V981_BOOTED = true;
   window.__STREAMIT_V980_BOOTED = true;
   window.__STREAMIT_V971_BOOTED = true;
   var wasLegacyBooted = Boolean(
@@ -1782,9 +1783,67 @@
   function ensureActiveProfileBucket() {
     var pid = state.activeSubUserId || 'prof-main';
     if (!state.profileData[pid]) {
-      state.profileData[pid] = { watchlist: [], progress: {} };
+      state.profileData[pid] = { watchlist: [], watchlistSnapshots: {}, watchlistUpdatedAt: 0, progress: {} };
+    }
+    if (!Array.isArray(state.profileData[pid].watchlist)) {
+      state.profileData[pid].watchlist = [];
+    }
+    if (!state.profileData[pid].watchlistSnapshots || typeof state.profileData[pid].watchlistSnapshots !== 'object') {
+      state.profileData[pid].watchlistSnapshots = {};
+    }
+    if (!state.profileData[pid].progress || typeof state.profileData[pid].progress !== 'object') {
+      state.profileData[pid].progress = {};
     }
     return state.profileData[pid];
+  }
+
+  function buildCompactItemSnapshot(item) {
+    if (!item || typeof item !== 'object') return null;
+    return {
+      id: String(item.id || ''),
+      imdbId: String(item.imdbId || ''),
+      tmdbId: String(item.tmdbId || ''),
+      type: item.type || 'movie',
+      title: item.title || '',
+      originalTitle: item.originalTitle || '',
+      year: String(item.year || '2025'),
+      rating: String(item.rating || '8.4'),
+      runtimeHe: item.runtimeHe || '',
+      ageRating: item.ageRating || '14+',
+      overview: item.overview || '',
+      poster: item.poster || '',
+      backdrop: item.backdrop || '',
+      cardBackdrop: item.cardBackdrop || item.backdrop || item.poster || '',
+      genres: Array.isArray(item.genres) ? item.genres.slice(0, 5) : [],
+      genresHe: Array.isArray(item.genresHe) ? item.genresHe.slice(0, 5) : [],
+      seasonsCount: Number(item.seasonsCount || (item.type === 'series' ? 3 : 0))
+    };
+  }
+
+  function getSavedProgressForItem(item) {
+    if (!item) return null;
+    var profBucket = ensureActiveProfileBucket();
+    if (!profBucket || !profBucket.progress) return null;
+    if (profBucket.progress[item.id]) return profBucket.progress[item.id];
+    var targetImdb = String(item.imdbId || '').trim();
+    var targetTmdb = String(item.tmdbId || '').replace(/\D/g, '');
+    var keys = Object.keys(profBucket.progress);
+    var best = null;
+    for (var i = 0; i < keys.length; i++) {
+      var p = profBucket.progress[keys[i]];
+      if (!p) continue;
+      var pImdb = String(p.imdbId || (p.snapshot && p.snapshot.imdbId) || '').trim();
+      var pTmdb = String(p.tmdbId || (p.snapshot && p.snapshot.tmdbId) || '').replace(/\D/g, '');
+      var matched = false;
+      if (targetImdb && (keys[i] === targetImdb || pImdb === targetImdb)) matched = true;
+      else if (targetTmdb && (keys[i] === targetTmdb || keys[i] === ('movie-' + targetTmdb) || keys[i] === ('series-' + targetTmdb) || pTmdb === targetTmdb)) matched = true;
+      if (matched) {
+        if (!best || Number(p.updatedAt || 0) >= Number(best.updatedAt || 0)) {
+          best = p;
+        }
+      }
+    }
+    return best;
   }
 
   function getActiveSubUser() {
@@ -1909,18 +1968,38 @@
         var cBucket = cloudState.profileData[pid];
         if (!cBucket || typeof cBucket !== 'object') continue;
         if (!state.profileData[pid]) {
-          state.profileData[pid] = { watchlist: [], progress: {} };
+          state.profileData[pid] = { watchlist: [], watchlistSnapshots: {}, watchlistUpdatedAt: 0, progress: {} };
         }
         var lBucket = state.profileData[pid];
+        if (!lBucket.watchlistSnapshots || typeof lBucket.watchlistSnapshots !== 'object') {
+          lBucket.watchlistSnapshots = {};
+        }
 
-        // Watchlist merge
+        // Watchlist & Snapshots merge (Respects latest watchlistUpdatedAt for cross-device additions/removals)
+        if (cBucket.watchlistSnapshots && typeof cBucket.watchlistSnapshots === 'object') {
+          var snapKeys = Object.keys(cBucket.watchlistSnapshots);
+          for (var sn = 0; sn < snapKeys.length; sn++) {
+            var sId = snapKeys[sn];
+            if (cBucket.watchlistSnapshots[sId]) {
+              lBucket.watchlistSnapshots[sId] = cBucket.watchlistSnapshots[sId];
+            }
+          }
+        }
         if (Array.isArray(cBucket.watchlist)) {
-          if (cloudIsNewer) {
+          var cWlTs = Number(cBucket.watchlistUpdatedAt || 0);
+          var lWlTs = Number(lBucket.watchlistUpdatedAt || 0);
+          if (cWlTs > 0 && lWlTs > 0) {
+            if (cWlTs >= lWlTs) {
+              lBucket.watchlist = cBucket.watchlist.slice();
+              lBucket.watchlistUpdatedAt = cWlTs;
+            }
+          } else if (cloudIsNewer) {
             var wlSet = cBucket.watchlist.slice();
             for (var w = 0; w < (lBucket.watchlist || []).length; w++) {
               if (wlSet.indexOf(lBucket.watchlist[w]) === -1) wlSet.push(lBucket.watchlist[w]);
             }
             lBucket.watchlist = wlSet;
+            lBucket.watchlistUpdatedAt = Math.max(cWlTs, lWlTs);
           } else {
             for (var cw = 0; cw < cBucket.watchlist.length; cw++) {
               if (lBucket.watchlist.indexOf(cBucket.watchlist[cw]) === -1) {
@@ -1930,7 +2009,7 @@
           }
         }
 
-        // Continue Watching (`progress`) merge by newest `updatedAt` per item
+        // Continue Watching (`progress`) merge by newest `updatedAt` per item (with cross-ID deduplication)
         if (cBucket.progress && typeof cBucket.progress === 'object') {
           if (!lBucket.progress || typeof lBucket.progress !== 'object') lBucket.progress = {};
           var itemIds = Object.keys(cBucket.progress);
@@ -2086,6 +2165,9 @@
           role: state.user.role || 'member',
           max_profiles: Number(state.user.max_profiles || 5)
         };
+      } else if (remoteVault[cleanEmail].accountState && typeof remoteVault[cleanEmail].accountState === 'object') {
+        // Merge any newer watch progress / watchlist from other devices BEFORE writing back!
+        applyCloudAccountStateToLocal(remoteVault[cleanEmail].accountState);
       }
       remoteVault[cleanEmail].accountState = buildCurrentAccountStatePayload();
 
@@ -2297,7 +2379,8 @@
       year: String(year),
       rating: String(rating),
       runtimeHe: raw.runtime_he || (type === 'series' ? '45 דק׳ לפרק' : 'שעתיים'),
-      ageRating: raw.age_rating || '14+',
+      ageRating: raw.age_rating || ((raw.adult === true || /^(R|NC-17|TV-MA|18|18\+|X)$/i.test(String(raw.mpa_rating || raw.certification || ''))) ? '18+' : '14+'),
+      introEndSec: Number(raw.intro_end_sec || raw.introEndSec || 0),
       castHe: raw.cast_he || '',
       directorHe: raw.director_he || '',
       top10Rank: Number(raw.top10_rank || 0),
@@ -4191,17 +4274,34 @@
 
   function findItemById(id) {
     if (!id) return null;
+    var cleanId = String(id).trim();
+    var cleanTmdb = cleanId.replace(/^(movie-|series-|tv-)/i, '');
     var pools = [state.catalog.movies, state.catalog.series, state.catalog.channels, state.catalog.youtube || []];
     for (var p = 0; p < pools.length; p++) {
       for (var i = 0; i < pools[p].length; i++) {
-        if (String(pools[p][i].id) === String(id)) return pools[p][i];
+        var it = pools[p][i];
+        if (!it) continue;
+        if (String(it.id) === cleanId || (it.imdbId && String(it.imdbId) === cleanId) || (it.tmdbId && String(it.tmdbId) === cleanTmdb && (cleanId.indexOf('movie-') === 0 || cleanId.indexOf('series-') === 0 || /^\d+$/.test(cleanId)))) {
+          return it;
+        }
       }
     }
     var actorKeys = Object.keys(state.actorMoviesCache || {});
     for (var k = 0; k < actorKeys.length; k++) {
       var list = state.actorMoviesCache[actorKeys[k]] || [];
       for (var j = 0; j < list.length; j++) {
-        if (String(list[j].id) === String(id)) return list[j];
+        var ait = list[j];
+        if (ait && (String(ait.id) === cleanId || (ait.imdbId && String(ait.imdbId) === cleanId))) return ait;
+      }
+    }
+    // Cross-Device Snapshot Fallback: if the item was watched or watchlisted on another device and isn't in the initial catalog page yet, reconstruct it from its synced snapshot!
+    var profBucket = ensureActiveProfileBucket();
+    if (profBucket) {
+      if (profBucket.progress && profBucket.progress[cleanId] && profBucket.progress[cleanId].snapshot && profBucket.progress[cleanId].snapshot.poster) {
+        return profBucket.progress[cleanId].snapshot;
+      }
+      if (profBucket.watchlistSnapshots && profBucket.watchlistSnapshots[cleanId] && profBucket.watchlistSnapshots[cleanId].poster) {
+        return profBucket.watchlistSnapshots[cleanId].snapshot || profBucket.watchlistSnapshots[cleanId];
       }
     }
     return null;
@@ -4295,10 +4395,15 @@
     var actorId = state.activeActorId || 'all';
     var inlineQ = String(state.tvInlineSearchQuery || '').trim();
 
-    // 1. Continue Watching Shelf (Per Sub-User Profile — Movies & Series ONLY, NEVER Live TV Channels!)
-    var progressIds = Object.keys(profBucket.progress || {});
+    // 1. Continue Watching Shelf (Per Sub-User Profile — Movies & Series ONLY, NEVER Live TV Channels, sorted by newest updatedAt!)
+    var progressIds = Object.keys(profBucket.progress || {}).sort(function (a, b) {
+      var ta = Number((profBucket.progress[a] && profBucket.progress[a].updatedAt) || 0);
+      var tb = Number((profBucket.progress[b] && profBucket.progress[b].updatedAt) || 0);
+      return tb - ta;
+    });
     if (continueSec && continueRow) {
       var cwItems = [];
+      var seenCwCanonical = {};
       var cleanedAnyChannel = false;
       for (var p = 0; p < progressIds.length; p++) {
         var pid = progressIds[p];
@@ -4310,6 +4415,9 @@
           }
           continue;
         }
+        var canonKey = String(found.imdbId || found.tmdbId || found.id || pid);
+        if (seenCwCanonical[canonKey]) continue;
+        seenCwCanonical[canonKey] = true;
         cwItems.push(found);
       }
       if (cleanedAnyChannel) {
@@ -5081,7 +5189,7 @@
     }
 
     var profBucket = ensureActiveProfileBucket();
-    var prog = profBucket.progress ? profBucket.progress[item.id] : null;
+    var prog = getSavedProgressForItem(item);
     var progHtml = '';
     if (prog && prog.percent > 2 && prog.percent < 96) {
       progHtml =
@@ -5233,13 +5341,13 @@
     }
 
     if (wlBtn) {
-      var inWl = isInWatchlist(item.id);
+      var inWl = isInWatchlist(item);
       wlBtn.innerHTML = (inWl ? getSvgIcon('check') : getSvgIcon('plus')) + '<span>' + (inWl ? 'ברשימה שלי' : 'הרשימה שלי') + '</span>';
     }
 
     var remCwBtn = document.getElementById('detailsRemoveCwBtn');
     if (remCwBtn) {
-      remCwBtn.classList.toggle('hidden', !isInContinueWatching(item.id));
+      remCwBtn.classList.toggle('hidden', !getSavedProgressForItem(item));
     }
 
     closeDetailsSourcesDropdown();
@@ -5287,8 +5395,7 @@
     modal.classList.remove('hidden');
     var playBtn = document.getElementById('detailsPlayBtn');
     if (playBtn) {
-      var profBucket = ensureActiveProfileBucket();
-      var savedProg = profBucket.progress ? profBucket.progress[item.id] : null;
+      var savedProg = getSavedProgressForItem(item);
       var playSpan = playBtn.querySelector('span');
       if (savedProg && savedProg.currentTime > 15 && savedProg.percent < 96 && item.type !== 'channel' && item.type !== 'youtube') {
         state.activeSeason = savedProg.season || 1;
@@ -5646,11 +5753,10 @@
     state.activeSourceTab = forcedSourceMode || (item.type === 'youtube' ? 'trailer' : 'direct');
     startOffsetSec = Number(startOffsetSec) || 0;
 
-    // Automatic Resume Playback from where the user stopped!
+    // Automatic Resume Playback from where the user stopped (across all synced devices)!
     var resumedFromSaved = false;
     if (item.type !== 'channel' && item.type !== 'youtube' && startOffsetSec <= 0) {
-      var profBucket = ensureActiveProfileBucket();
-      var savedProg = profBucket.progress ? profBucket.progress[item.id] : null;
+      var savedProg = getSavedProgressForItem(item);
       if (savedProg && savedProg.currentTime > 15 && savedProg.percent < 96) {
         var sameEp = item.type !== 'series' || ((!savedProg.season || savedProg.season === state.activeSeason) && (!savedProg.episode || savedProg.episode === state.activeEpisode));
         if (sameEp) {
@@ -6334,6 +6440,9 @@
             }
             updateActiveSubtitleCue(getCurrentPlaybackTimeSec());
           }
+          // Rebuild SafeWatch parental skip timeline as translated Hebrew cues arrive
+          rebuildParentalSkipTimelineForCurrentMedia();
+          updateInPlayerParentalUi();
         }
       } catch (e) {}
     }
@@ -6669,8 +6778,8 @@
   var SEX_CUE_PATTERNS = [
     /\[[^\]]*(?:moan|groan|passion|sex|making love|nudity|naked|undress|heavy breathing|climax|orgasm|panting|אנחות|גניחות|נאנח|מתפשט|עירום|מין)[^\]]*\]/i,
     /\([^\)]*(?:moan|groan|passion|sex|making love|nudity|naked|undress|heavy breathing|climax|orgasm|אנחות|גניחות|נאנח|מתפשט|עירום|מין)[^\)]*\)/i,
-    /\b(?:have sex with|make love to|fuck me|fucking me|take off your clothes|get naked|strip for me|blowjob|handjob|orgasm)\b/i,
-    /(?:שכב איתי|תשכב איתי|לשכב איתך|נעשה סקס|יחסי מין|אורגזמה|תתפשטי|תתפשט|מתפשטים|בעירום)/
+    /\b(?:have sex|make love|making love|fuck me|fucking me|take off your clothes|get naked|strip for me|blowjob|handjob|orgasm|climax|undress(?:ing)?|naked body)\b/i,
+    /(?:שכב איתי|תשכב איתי|לשכב איתך|נעשה סקס|יחסי מין|אורגזמה|תתפשטי|תתפשט|מתפשטים|בעירום|תורידי את הבגדים|תוריד את הבגדים)/
   ];
   var SEX_STRICT_PATTERNS = [
     /\[[^\]]*(?:kiss|kissing|נשיקה|מתנשקים)[^\]]*\]/i,
@@ -6681,18 +6790,20 @@
   var VIOLENCE_CUE_PATTERNS = [
     /\[[^\]]*(?:gunshot|gunfire|screaming in pain|screaming in agony|bones crunch|flesh tear|blood splatter|stabbing|choking|strangl|יריות|צרחות כאב|צרחות אימה|דוקר|משסף|דם)[^\]]*\]/i,
     /\([^\)]*(?:gunshot|gunfire|screaming in pain|screaming in agony|bones crunch|flesh tear|blood splatter|stabbing|choking|יריות|צרחות כאב|צרחות אימה|דוקר|משסף)[^\)]*\)/i,
-    /(?:לשחוט אותו|לחתוך לו את הגרון|דם ניתז|עינויים קשים)/
+    /\b(?:slit (?:his|her|your) throat|cut (?:his|her|your) head off|blow (?:his|her|your) brains out|torture (?:him|her)|bleed to death)\b/i,
+    /(?:לשחוט אותו|לחתוך לו את הגרון|דם ניתז|עינויים קשים|יריתי בו|תירה בו|תירי בו)/
   ];
 
   var DRUGS_CUE_PATTERNS = [
     /\[[^\]]*(?:snort|cocaine|heroin|bong|joint|injecting|מסניף|קוקאין|הרואין|מזריק)[^\]]*\]/i,
-    /\b(?:snort(?:ing)? cocaine|shoot(?:ing)? heroin|crystal meth|crack pipe|smoke a joint|smoking weed|drug overdose)\b/i,
-    /(?:להסניף קוקאין|מסניף קוקאין|מזריק הרואין|נגלגל ג׳וינט|נגלגל ג'וינט|מנת יתר של סמים|קוקאין טהור)/
+    /\b(?:snort(?:ing)?|cocaine|heroin|crystal meth|methamphetamine|crack pipe|smoke a joint|smoking weed|drug overdose|fentanyl)\b/i,
+    /(?:להסניף|מסניף|קוקאין|הרואין|נגלגל ג׳וינט|נגלגל ג'וינט|מנת יתר|סמים קשים|קריסטל מת׳)/
   ];
 
   var HORROR_CUE_PATTERNS = [
     /\[[^\]]*(?:demonic|blood-curdling|terrifying scream|possessed|eerie shriek|צרחה מקפיאת דם|קול שטני|דיבוק)[^\]]*\]/i,
-    /\([^\)]*(?:demonic|blood-curdling|terrifying scream|possessed|eerie shriek|צרחה מקפיאת דם|דיבוק)[^\)]*\)/i
+    /\([^\)]*(?:demonic|blood-curdling|terrifying scream|possessed|eerie shriek|צרחה מקפיאת דם|דיבוק)[^\)]*\)/i,
+    /(?:רוח רפאים|דיבוק שטני|גירוש שדים|שטן|מפלצת)/
   ];
 
   function getMediaParentalKey(item, season, episode) {
@@ -7726,7 +7837,9 @@
       state.skipIntroHideTimer = null;
     }
 
-    if (!showNow || startOffsetSec >= 75) {
+    // Only show "Skip Intro" if the current series episode explicitly defines a real `introEndSec > 0`
+    var realIntroEnd = (state.playingItem && Number(state.playingItem.introEndSec) > 0) ? Number(state.playingItem.introEndSec) : 0;
+    if (!showNow || !realIntroEnd || startOffsetSec >= realIntroEnd) {
       skipBtn.classList.add('hidden');
       return;
     }
@@ -7738,7 +7851,7 @@
       if (document.activeElement === skipBtn && playPauseBtn && typeof window.streamItFocusElement === 'function') {
         window.streamItFocusElement(playPauseBtn);
       }
-    }, 9000);
+    }, 8000);
   }
 
   function triggerSkipIntro() {
@@ -7779,6 +7892,7 @@
 
   function seekVideoBy(deltaSeconds) {
     wakePlayerControls();
+    deltaSeconds = Number(deltaSeconds) || 0;
     var video = document.getElementById('videoElement');
     var seekSlider = document.getElementById('playerSeekSlider');
     var curEl = document.getElementById('playerCurrentTime');
@@ -7797,13 +7911,18 @@
         seekSlider.value = String(Math.round(ratio * 1000));
         var rect = seekSlider.getBoundingClientRect();
         var thumbX = (rect && rect.width) ? (rect.left + ratio * rect.width) : Math.round((window.innerWidth || 1280) / 2);
-        showSeekThumbnailPreview(next, thumbX, rect);
+        showSeekThumbnailPreview(next, thumbX, rect, deltaSeconds);
+      } else {
+        showSeekThumbnailPreview(next, Math.round((window.innerWidth || 1280) / 2), null, deltaSeconds);
       }
+      savePlaybackProgressForCurrentItem(next, dur || 5400);
     } else if (state.playingMode === 'embed') {
       var iframe = document.getElementById('streamEmbedIframe');
       var eDur = (state.embedDuration && state.embedDuration > 0) ? state.embedDuration : 5400;
       var nextEmbed = Math.max(0, Math.min(eDur, (state.embedCurrentTime || 0) + deltaSeconds));
       state.embedCurrentTime = nextEmbed;
+      // Lock embed time for 2.5s so incoming 250ms postMessage ticks don't snap the seek slider back!
+      state.embedSkipTargetUntil = Date.now() + 2500;
       updateActiveSubtitleCue(nextEmbed);
       if (curEl) curEl.textContent = formatSeconds(nextEmbed);
       var eRatio = eDur > 0 ? (nextEmbed / eDur) : 0;
@@ -7815,11 +7934,15 @@
       }
       var sRect = seekSlider ? seekSlider.getBoundingClientRect() : null;
       var eThumbX = (sRect && sRect.width) ? (sRect.left + eRatio * sRect.width) : Math.round((window.innerWidth || 1280) * (0.15 + eRatio * 0.7));
-      showSeekThumbnailPreview(nextEmbed, eThumbX, sRect);
+      showSeekThumbnailPreview(nextEmbed, eThumbX, sRect, deltaSeconds);
+      savePlaybackProgressForCurrentItem(nextEmbed, eDur);
       if (iframe && iframe.contentWindow) {
+        var seekSecInt = Math.floor(nextEmbed);
         try {
-          iframe.contentWindow.postMessage({ action: 'seek', time: Math.floor(nextEmbed) }, '*');
-          iframe.contentWindow.postMessage({ command: 'seek', time: Math.floor(nextEmbed) }, '*');
+          iframe.contentWindow.postMessage({ action: 'seek', time: seekSecInt }, '*');
+          iframe.contentWindow.postMessage({ command: 'seek', time: seekSecInt }, '*');
+          iframe.contentWindow.postMessage({ event: 'seek', time: seekSecInt }, '*');
+          iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'seekTo', args: [seekSecInt, true] }), '*');
         } catch (e) {}
       }
     }
@@ -7982,7 +8105,7 @@
     }
   }
 
-  function savePlaybackProgressForCurrentItem(curSec, durSec) {
+  function savePlaybackProgressForCurrentItem(curSec, durSec, forceImmediateCloud) {
     if (!state.playingItem || state.playingItem.type === 'channel' || state.playingItem.type === 'youtube') return;
     curSec = Math.floor(Number(curSec) || 0);
     durSec = Math.floor(Number(durSec) || 0);
@@ -7990,15 +8113,41 @@
     if (!durSec || durSec < 60) durSec = 5400; // Default 90m fallback if embed hasn't reported duration yet
     var pct = Math.min(99, Math.max(3, Math.round((curSec / durSec) * 100)));
     var profBucket = ensureActiveProfileBucket();
+    var nowTs = Date.now();
+    var snap = buildCompactItemSnapshot(state.playingItem);
     profBucket.progress[state.playingItem.id] = {
+      id: String(state.playingItem.id),
+      imdbId: String(state.playingItem.imdbId || ''),
+      tmdbId: String(state.playingItem.tmdbId || ''),
+      title: state.playingItem.title || '',
       currentTime: curSec,
       duration: durSec,
       percent: pct,
       season: state.activeSeason || 1,
       episode: state.activeEpisode || 1,
-      updatedAt: Date.now()
+      updatedAt: nowTs,
+      snapshot: snap
     };
-    saveSubUsersState();
+    // Also remove any duplicate progress key for the same IMDb/TMDB ID under a different prefix so all devices share one clean entry
+    var pKeys = Object.keys(profBucket.progress);
+    for (var i = 0; i < pKeys.length; i++) {
+      var k = pKeys[i];
+      if (k === String(state.playingItem.id)) continue;
+      var entry = profBucket.progress[k];
+      if (!entry) continue;
+      var sameImdb = state.playingItem.imdbId && (k === state.playingItem.imdbId || entry.imdbId === state.playingItem.imdbId);
+      var sameTmdb = state.playingItem.tmdbId && (entry.tmdbId === String(state.playingItem.tmdbId) || k === ('movie-' + state.playingItem.tmdbId) || k === ('series-' + state.playingItem.tmdbId));
+      if (sameImdb || sameTmdb) {
+        delete profBucket.progress[k];
+      }
+    }
+    var shouldPushCloud = Boolean(forceImmediateCloud) || !state.lastProgressCloudPushAt || (nowTs - state.lastProgressCloudPushAt >= 18000);
+    if (shouldPushCloud) {
+      state.lastProgressCloudPushAt = nowTs;
+      saveSubUsersState({ cloudDelayMs: forceImmediateCloud ? 300 : 1200 });
+    } else {
+      saveSubUsersState({ skipCloud: true });
+    }
   }
 
   function requestCloseVideoPlayer() {
@@ -8048,7 +8197,7 @@
       ? (document.getElementById('videoElement').duration || 0)
       : (state.embedDuration || 5400);
     if (curT > 10) {
-      savePlaybackProgressForCurrentItem(curT, durT);
+      savePlaybackProgressForCurrentItem(curT, durT, true);
     }
     if (document.fullscreenElement || document.webkitFullscreenElement) {
       try {
@@ -8146,10 +8295,8 @@
     } catch (e) {}
   }
 
-  function showSeekThumbnailPreview(targetSec, clientX, containerRect) {
+  function showSeekThumbnailPreview(targetSec, clientX, containerRect, deltaSec) {
     var previewEl = document.getElementById('seekThumbnailPreview');
-    var imgEl = document.getElementById('seekThumbImg');
-    var backdropEl = document.getElementById('seekThumbBackdrop');
     var sceneBadgeEl = document.getElementById('seekThumbSceneBadge');
     var timeEl = document.getElementById('seekThumbTimeBadge') || document.getElementById('seekThumbTime');
     var cueEl = document.getElementById('seekThumbCueText') || document.getElementById('seekThumbCue');
@@ -8166,34 +8313,17 @@
     }
 
     targetSec = Math.max(0, Math.min(dur, Number(targetSec) || 0));
-    timeEl.textContent = formatSeconds(targetSec);
+    timeEl.textContent = formatSeconds(targetSec) + ' / ' + formatSeconds(dur);
 
     var pct = dur > 0 ? Math.max(0, Math.min(0.999, targetSec / dur)) : 0;
-    var stills = (state.seekSceneStills && state.seekSceneStills.length)
-      ? state.seekSceneStills
-      : (state.playingItem ? [state.playingItem.backdrop || state.playingItem.poster || ''] : []);
-
-    var sceneIdx = stills.length > 1 ? Math.floor(pct * stills.length) : 0;
-    var thumbSrc = stills[sceneIdx] || (state.playingItem ? (state.playingItem.backdrop || state.playingItem.poster || '') : '');
-
     if (sceneBadgeEl) {
-      var totalChapters = Math.max(12, stills.length);
-      var curChapter = Math.min(totalChapters, Math.floor(pct * totalChapters) + 1);
-      sceneBadgeEl.textContent = 'סצנה ' + curChapter + ' / ' + totalChapters;
-    }
-
-    if (imgEl && thumbSrc) {
-      if (imgEl.getAttribute('src') !== thumbSrc) {
-        imgEl.setAttribute('src', thumbSrc);
+      if (typeof deltaSec === 'number' && deltaSec !== 0) {
+        sceneBadgeEl.textContent = deltaSec > 0 ? ('⏩ +' + Math.abs(deltaSec) + ' שניות') : ('⏪ -' + Math.abs(deltaSec) + ' שניות');
+      } else {
+        var totalChapters = 12;
+        var curChapter = Math.min(totalChapters, Math.floor(pct * totalChapters) + 1);
+        sceneBadgeEl.textContent = '⏱️ פרק זמן ' + curChapter + ' / ' + totalChapters;
       }
-      var panX = Math.round(((pct * 12) % 1) * 100);
-      var panY = Math.round(35 + Math.sin(pct * Math.PI * 8) * 22);
-      imgEl.style.objectPosition = panX + '% ' + panY + '%';
-    }
-    if (backdropEl && thumbSrc) {
-      backdropEl.style.backgroundImage = 'url("' + thumbSrc + '")';
-      var bgX = Math.round(((pct * 10) % 1) * 100);
-      backdropEl.style.backgroundPosition = bgX + '% center';
     }
 
     if (cueEl) {
@@ -8202,7 +8332,7 @@
     }
 
     var vw = window.innerWidth || 1280;
-    var clampedX = Math.max(130, Math.min(vw - 130, clientX || Math.round(vw / 2)));
+    var clampedX = Math.max(150, Math.min(vw - 150, clientX || Math.round(vw / 2)));
     previewEl.style.left = clampedX + 'px';
     previewEl.classList.remove('hidden');
 
@@ -8317,21 +8447,47 @@
   }
 
   /**
-   * Per-Sub-User Watchlist Helper
+   * Per-Sub-User Watchlist Helper (with Cross-Device Snapshot & Canonical ID matching)
    */
-  function isInWatchlist(itemId) {
+  function isInWatchlist(itemOrId) {
+    if (!itemOrId) return false;
     var bucket = ensureActiveProfileBucket();
-    return bucket.watchlist.indexOf(String(itemId)) !== -1;
+    var id = typeof itemOrId === 'object' ? String(itemOrId.id || '') : String(itemOrId);
+    if (bucket.watchlist.indexOf(id) !== -1) return true;
+    var itemObj = typeof itemOrId === 'object' ? itemOrId : findItemById(id);
+    if (itemObj) {
+      if (itemObj.imdbId && bucket.watchlist.indexOf(String(itemObj.imdbId)) !== -1) return true;
+      if (itemObj.tmdbId && (bucket.watchlist.indexOf(String(itemObj.tmdbId)) !== -1 || bucket.watchlist.indexOf('movie-' + itemObj.tmdbId) !== -1 || bucket.watchlist.indexOf('series-' + itemObj.tmdbId) !== -1)) return true;
+    }
+    return false;
   }
 
   function toggleWatchlist(item) {
     if (!item) return;
     var bucket = ensureActiveProfileBucket();
     var id = String(item.id);
-    var idx = bucket.watchlist.indexOf(id);
-    if (idx === -1) bucket.watchlist.push(id);
-    else bucket.watchlist.splice(idx, 1);
-    saveSubUsersState();
+    var existingIdx = bucket.watchlist.indexOf(id);
+    if (existingIdx === -1 && item.imdbId) {
+      existingIdx = bucket.watchlist.indexOf(String(item.imdbId));
+    }
+    if (existingIdx === -1 && item.tmdbId) {
+      var tKeyMov = 'movie-' + item.tmdbId;
+      var tKeySer = 'series-' + item.tmdbId;
+      if (bucket.watchlist.indexOf(tKeyMov) !== -1) existingIdx = bucket.watchlist.indexOf(tKeyMov);
+      else if (bucket.watchlist.indexOf(tKeySer) !== -1) existingIdx = bucket.watchlist.indexOf(tKeySer);
+    }
+    if (existingIdx === -1) {
+      bucket.watchlist.push(id);
+      bucket.watchlistSnapshots[id] = buildCompactItemSnapshot(item);
+      if (item.imdbId) bucket.watchlistSnapshots[String(item.imdbId)] = bucket.watchlistSnapshots[id];
+    } else {
+      var removedKey = bucket.watchlist[existingIdx];
+      bucket.watchlist.splice(existingIdx, 1);
+      if (removedKey && bucket.watchlistSnapshots) delete bucket.watchlistSnapshots[removedKey];
+      if (bucket.watchlistSnapshots) delete bucket.watchlistSnapshots[id];
+    }
+    bucket.watchlistUpdatedAt = Date.now();
+    saveSubUsersState({ cloudDelayMs: 300 });
     updateHeroBillboard(state.heroItem);
     if (state.activeCategory === 'mylist') renderCatalogShelves();
   }
@@ -9458,13 +9614,16 @@
             if (totEmbedEl) totEmbedEl.textContent = formatSeconds(d.duration);
           }
           if (typeof d.currentTime === 'number' && state.playingMode === 'embed' && d.currentTime >= 0) {
-            // Prevent stale pre-seek postMessages from overriding an active SafeWatch parental jump
-            if (state.embedSkipTargetUntil && Date.now() < state.embedSkipTargetUntil && d.currentTime < state.embedCurrentTime - 2) {
+            // Prevent stale pre-seek postMessages from overriding an active manual seek or SafeWatch parental jump
+            if (state.embedSkipTargetUntil && Date.now() < state.embedSkipTargetUntil && Math.abs(d.currentTime - state.embedCurrentTime) > 3) {
               var ifrSkip = document.getElementById('streamEmbedIframe');
               if (ifrSkip && ifrSkip.contentWindow) {
+                var targetSeekInt = Math.floor(state.embedCurrentTime);
                 try {
-                  ifrSkip.contentWindow.postMessage({ action: 'seek', time: Math.ceil(state.embedCurrentTime) }, '*');
-                  ifrSkip.contentWindow.postMessage({ command: 'seek', time: Math.ceil(state.embedCurrentTime) }, '*');
+                  ifrSkip.contentWindow.postMessage({ action: 'seek', time: targetSeekInt }, '*');
+                  ifrSkip.contentWindow.postMessage({ command: 'seek', time: targetSeekInt }, '*');
+                  ifrSkip.contentWindow.postMessage({ event: 'seek', time: targetSeekInt }, '*');
+                  ifrSkip.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'seekTo', args: [targetSeekInt, true] }), '*');
                 } catch (e) {}
               }
               return;
@@ -9776,12 +9935,19 @@
           savePlaybackProgressForCurrentItem(video.currentTime, video.duration);
         } else if (state.playingMode === 'embed') {
           state.embedCurrentTime = targetSec;
+          state.embedSkipTargetUntil = Date.now() + 2500;
+          var curEmbedEl = document.getElementById('playerCurrentTime');
+          if (curEmbedEl) curEmbedEl.textContent = formatSeconds(targetSec);
           updateActiveSubtitleCue(targetSec);
           savePlaybackProgressForCurrentItem(targetSec, dur);
           var ifr = document.getElementById('streamEmbedIframe');
           if (ifr && ifr.contentWindow) {
+            var targetInt = Math.floor(targetSec);
             try {
-              ifr.contentWindow.postMessage({ action: 'seek', time: Math.floor(targetSec) }, '*');
+              ifr.contentWindow.postMessage({ action: 'seek', time: targetInt }, '*');
+              ifr.contentWindow.postMessage({ command: 'seek', time: targetInt }, '*');
+              ifr.contentWindow.postMessage({ event: 'seek', time: targetInt }, '*');
+              ifr.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'seekTo', args: [targetInt, true] }), '*');
             } catch (e) {}
           }
         }
@@ -11828,6 +11994,22 @@
     initLiveNewsTicker();
     loadCatalog();
     syncAccountStateFromCloudVault().catch(function () {});
+    // Continuous Cross-Device Cloud Sync: pull latest Resume Playback & Watchlist when switching devices or returning to the app
+    if (!state.cloudPeriodicSyncInterval) {
+      state.cloudPeriodicSyncInterval = setInterval(function () {
+        if (!state.accountCloudSyncInFlight && !state.accountCloudSyncTimer) {
+          syncAccountStateFromCloudVault().catch(function () {});
+        }
+      }, 25000);
+    }
+    window.addEventListener('focus', function () {
+      syncAccountStateFromCloudVault().catch(function () {});
+    });
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden) {
+        syncAccountStateFromCloudVault().catch(function () {});
+      }
+    });
     setTimeout(checkCloudOtaUpdates, 2500);
     if (window.TVNavigation && typeof window.TVNavigation.ensureInitialFocus === 'function') {
       window.TVNavigation.ensureInitialFocus();

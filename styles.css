@@ -1550,32 +1550,33 @@ body.tv-mode #topHeader .nav-link {
   border: none !important;
 }
 
-/* Main Stage offset for 44px Top Header + 196px Right Side Menu */
+/* Main Stage offset for 48px Top Header */
 body.tv-mode #mainStage {
   height: 100vh;
-  padding-top: 44px;
-  margin-right: 196px;
-  width: calc(100vw - 196px);
+  padding-top: 48px !important;
+  margin-right: 0 !important;
+  width: 100vw !important;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-/* Fixed ~1/3 Screen Hero Banner on Streamer */
+/* Enlarged ~36% Screen Hero Banner on Streamer (Zero Top Clipping) */
 body.tv-mode #heroBillboard,
 body.tv-mode.tv-browsing-tiles #heroBillboard {
-  flex: 0 0 28vh;
-  height: 28vh;
-  min-height: 28vh;
-  max-height: 28vh;
-  padding: 1.2vh 2vw;
-  align-items: center;
+  flex: 0 0 36vh !important;
+  height: 36vh !important;
+  min-height: 210px !important;
+  max-height: 340px !important;
+  padding: 14px 2.6vw 12px 2.6vw !important;
+  align-items: center !important;
   transition: none !important;
 }
 
 body.tv-mode .hero-content {
-  max-width: 62vw;
-  gap: 4px;
+  max-width: 64vw;
+  gap: 5px;
+  justify-content: center;
 }
 
 body.tv-mode .hero-tag-row,
@@ -1586,35 +1587,37 @@ body.tv-mode #heroCategoryTag {
 
 body.tv-mode .hero-title,
 body.tv-mode.tv-browsing-tiles .hero-title {
-  font-size: clamp(1.25rem, 1.9vw, 1.6rem);
-  line-height: 1.14;
+  font-size: clamp(1.45rem, 2.1vw, 1.95rem);
+  line-height: 1.16;
   margin: 0;
+  padding-top: 2px;
 }
 
 body.tv-mode .hero-meta {
   gap: 8px;
-  font-size: 0.82rem;
+  font-size: 0.88rem;
+  margin: 0;
 }
 
 body.tv-mode .hero-overview,
 body.tv-mode.tv-browsing-tiles .hero-overview {
-  font-size: 0.84rem;
-  line-height: 1.36;
+  font-size: 0.92rem;
+  line-height: 1.34;
   -webkit-line-clamp: 2;
-  max-width: 54vw;
-  margin: 2px 0 4px 0;
+  max-width: 58vw;
+  margin: 1px 0 3px 0;
 }
 
 body.tv-mode .hero-actions {
-  gap: 8px;
-  margin-top: 3px;
+  gap: 10px;
+  margin-top: 4px;
 }
 
 body.tv-mode .hero-actions .btn-primary,
 body.tv-mode .hero-actions .btn-secondary {
-  height: 30px;
-  padding: 0 14px;
-  font-size: 0.82rem;
+  height: 36px;
+  padding: 0 18px;
+  font-size: 0.9rem;
   gap: 6px;
   background: rgba(255, 255, 255, 0.12);
   color: #ffffff;
@@ -1623,13 +1626,13 @@ body.tv-mode .hero-actions .btn-secondary {
 
 body.tv-mode .hero-actions .btn-primary svg,
 body.tv-mode .hero-actions .btn-secondary svg {
-  width: 14px;
-  height: 14px;
+  width: 15px;
+  height: 15px;
 }
 
 body.tv-mode #heroWatchlistBtn {
-  width: 30px;
-  min-width: 30px;
+  width: 36px;
+  min-width: 36px;
   padding: 0 !important;
   justify-content: center;
 }
@@ -1644,14 +1647,14 @@ body.tv-mode #heroWatchlistBtn #heroWatchlistIcon {
   line-height: 1;
 }
 
-/* Bottom ~2/3 Poster Tiles & Shelves on Streamer (6 Columns + Prominent Focus Animation) */
+/* Bottom ~64% Poster Tiles & Shelves on Streamer (6 Columns + Compact Row Spacing) */
 body.tv-mode #catalogMain,
 body.tv-mode.tv-browsing-tiles #catalogMain {
   flex: 1 1 auto;
-  height: calc(70vh - 46px);
+  height: calc(64vh - 48px);
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 8px 0 0 0;
+  padding: 4px 0 0 0;
   scrollbar-width: none;
 }
 
@@ -1667,23 +1670,23 @@ body.tv-mode #liveNewsTickerBar {
 
 body.tv-mode #continueWatchingSection {
   padding: 0 2.4vw;
-  margin-bottom: 10px;
-}
-
-body.tv-mode #catalogRowsContainer {
-  padding: 0 2.4vw 6vh 2.4vw;
-  gap: 18px;
-}
-
-body.tv-mode .row-title {
-  font-size: 1.32rem;
-  font-weight: 600;
   margin-bottom: 6px;
 }
 
+body.tv-mode #catalogRowsContainer {
+  padding: 0 2.4vw 4vh 2.4vw;
+  gap: 8px;
+}
+
+body.tv-mode .row-title {
+  font-size: 1.02rem;
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
 body.tv-mode .row-track {
-  gap: 14px;
-  padding: 10px 6px 14px 6px;
+  gap: 10px;
+  padding: 4px 4px 6px 4px;
   scroll-behavior: auto !important;
 }
 
@@ -6764,81 +6767,133 @@ body.tv-mode #topHeader {
   right: 0 !important;
   left: 0 !important;
   width: 100vw !important;
-  height: 54px !important;
+  height: 48px !important;
   padding: 0 2.4vw !important;
 }
 
 body.tv-mode #topHeader .nav-link {
-  height: 36px !important;
-  padding: 0 15px !important;
-  font-size: 1.02rem !important;
+  height: 34px !important;
+  padding: 0 14px !important;
+  font-size: 0.98rem !important;
   font-weight: 600 !important;
 }
 
 body.tv-mode #topHeader .icon-btn,
 body.tv-mode #topHeader .header-pill-btn {
-  height: 36px !important;
-  padding: 0 14px !important;
-  font-size: 0.96rem !important;
+  height: 34px !important;
+  padding: 0 13px !important;
+  font-size: 0.94rem !important;
 }
 
 body.tv-mode #mainStage {
+  padding-top: 48px !important;
   margin-right: 0 !important;
   width: 100vw !important;
 }
 
-/* Living-Room Hero Banner Typography & Buttons */
-body.tv-mode #heroBanner {
-  height: 30vh !important;
-  min-height: 210px !important;
-  max-height: 295px !important;
-  padding: 58px 2.8vw 14px 2.8vw !important;
+/* Living-Room Hero Billboard Typography & Buttons (Enlarged ~36vh, Zero Top Clipping) */
+body.tv-mode #heroBillboard,
+body.tv-mode.tv-browsing-tiles #heroBillboard {
+  flex: 0 0 36vh !important;
+  height: 36vh !important;
+  min-height: 215px !important;
+  max-height: 345px !important;
+  padding: 14px 2.6vw 12px 2.6vw !important;
+  align-items: center !important;
 }
 
-body.tv-mode .hero-title {
-  font-size: clamp(1.65rem, 2.35vw, 2.25rem) !important;
+body.tv-mode #heroBillboard .hero-content {
+  gap: 5px !important;
+  max-width: 64vw !important;
+  justify-content: center !important;
+}
+
+body.tv-mode .hero-title,
+body.tv-mode.tv-browsing-tiles .hero-title {
+  font-size: clamp(1.45rem, 2.1vw, 1.95rem) !important;
   font-weight: 700 !important;
-  line-height: 1.12 !important;
+  line-height: 1.16 !important;
+  margin: 0 !important;
+  padding-top: 2px !important;
 }
 
 body.tv-mode .hero-orig-title {
-  font-size: 0.92rem !important;
+  font-size: 0.88rem !important;
 }
 
+body.tv-mode .hero-meta,
 body.tv-mode .hero-meta-row {
-  font-size: 0.94rem !important;
+  font-size: 0.88rem !important;
   gap: 8px !important;
+  margin: 0 !important;
 }
 
 body.tv-mode .hero-badge {
-  font-size: 0.78rem !important;
+  font-size: 0.76rem !important;
   padding: 2px 8px !important;
 }
 
-body.tv-mode .hero-overview {
-  font-size: 1.0rem !important;
-  line-height: 1.38 !important;
-  max-width: 68ch !important;
+body.tv-mode .hero-overview,
+body.tv-mode.tv-browsing-tiles .hero-overview {
+  font-size: 0.92rem !important;
+  line-height: 1.34 !important;
+  -webkit-line-clamp: 2 !important;
+  max-width: 60ch !important;
+  margin: 1px 0 3px 0 !important;
 }
 
 body.tv-mode .hero-actions {
-  gap: 12px !important;
-  margin-top: 6px !important;
+  gap: 10px !important;
+  margin-top: 4px !important;
 }
 
 body.tv-mode .hero-actions .btn-primary,
 body.tv-mode .hero-actions .btn-secondary {
-  height: 40px !important;
-  padding: 0 20px !important;
-  font-size: 0.96rem !important;
+  height: 36px !important;
+  padding: 0 18px !important;
+  font-size: 0.92rem !important;
   font-weight: 600 !important;
   gap: 8px !important;
 }
 
 body.tv-mode .hero-actions .btn-primary svg,
 body.tv-mode .hero-actions .btn-secondary svg {
-  width: 16px !important;
-  height: 16px !important;
+  width: 15px !important;
+  height: 15px !important;
+}
+
+/* Compact Shelf Titles & Tighter Vertical Spacing Between Tile Rows */
+body.tv-mode #catalogMain,
+body.tv-mode.tv-browsing-tiles #catalogMain {
+  flex: 1 1 auto !important;
+  height: calc(64vh - 48px) !important;
+  padding: 4px 0 0 0 !important;
+}
+
+#catalogRowsContainer,
+body.tv-mode #catalogRowsContainer {
+  padding: 0 2.4vw 4vh 2.4vw !important;
+  gap: 8px !important;
+}
+
+.netflix-row,
+body.tv-mode .netflix-row {
+  gap: 3px !important;
+  margin: 0 !important;
+}
+
+.row-title,
+body.tv-mode .row-title {
+  font-size: 1.02rem !important;
+  font-weight: 600 !important;
+  line-height: 1.18 !important;
+  margin-bottom: 0 !important;
+}
+
+.row-track,
+body.tv-mode .row-track {
+  gap: 10px !important;
+  padding: 4px 4px 6px 4px !important;
 }
 
 /* Smooth GPU-Composited Right Side Menu Drawer (#tvSideRail) — Never shifts main stage */
@@ -7061,46 +7116,281 @@ body.tv-mode .poster-card:focus {
 }
 
 /* =========================================================================
-   BALANCED VIDEO PLAYER CONTROLS & BACK-BUTTON EXIT CONFIRMATION MODAL
+   BALANCED VIDEO PLAYER CONTROLS, COMPACT TOP BAR, SINGLE TIMELINE BAR,
+   COMPACT SUBTITLES MENU & BACK-BUTTON EXIT CONFIRMATION MODAL
    ========================================================================= */
-#playerModal .player-top-bar {
-  padding: 14px 24px !important;
+
+/* Hide fake Skip Intro button & duplicate floating Embed Timeline Hover Strip */
+#skipIntroOverlayBtn,
+.skip-intro-btn,
+#embedTimelineHoverStrip,
+.embed-timeline-hover-strip,
+.player-modal.embed-mode-active .embed-timeline-hover-strip {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
 }
 
-#playerModal .player-back-btn,
-#playerModal .player-source-switch-btn,
-#playerModal .player-ctrl-btn,
-#playerModal .player-sub-btn {
-  height: 42px !important;
-  min-height: 42px !important;
-  max-height: 42px !important;
-  padding: 0 16px !important;
-  font-size: 0.94rem !important;
+/* Position Player Controls Overlay close to top & bottom edges */
+#playerModal .player-controls-overlay {
+  padding: 10px 22px 14px 22px !important;
+}
+
+#playerModal .player-top-bar {
+  padding: 0 !important;
+  margin: 0 !important;
+  gap: 10px !important;
+  align-items: center !important;
+}
+
+#playerModal .player-title-group {
+  gap: 2px !important;
+}
+
+#playerModal .player-title {
+  font-size: 1.05rem !important;
   font-weight: 600 !important;
-  border-radius: 6px !important;
-  gap: 8px !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+}
+
+#playerModal .player-subtitle-status {
+  font-size: 0.76rem !important;
+}
+
+#playerModal .player-top-actions {
+  gap: 7px !important;
+  align-items: center !important;
+}
+
+/* Compact, sleek top bar buttons inside the player (not oversized, positioned near top edge) */
+#playerModal .player-top-actions > button,
+#playerModal .player-top-actions .details-sources-btn,
+#playerModal .player-top-actions .explorer-dropdown-btn,
+#playerModal #closePlayerBtn {
+  height: 32px !important;
+  min-height: 32px !important;
+  max-height: 32px !important;
+  padding: 0 11px !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  border-radius: 5px !important;
+  gap: 5px !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
+  background-color: rgba(15, 19, 29, 0.88) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #f8fafc !important;
 }
 
-#playerModal .player-back-btn svg,
-#playerModal .player-source-switch-btn svg,
-#playerModal .player-ctrl-btn svg,
-#playerModal .player-sub-btn svg {
-  width: 18px !important;
-  height: 18px !important;
+#playerModal #closePlayerBtn {
+  background-color: rgba(220, 38, 38, 0.88) !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
 }
 
-#playerModal .player-center-play-btn {
-  width: 64px !important;
-  height: 64px !important;
-  border-radius: 8px !important;
+#playerModal .player-top-actions > button.tv-focused,
+#playerModal .player-top-actions .details-sources-btn.tv-focused,
+#playerModal #closePlayerBtn.tv-focused,
+#playerModal .player-top-actions > button:hover,
+#playerModal .player-top-actions .details-sources-btn:hover,
+#playerModal #closePlayerBtn:hover {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border-color: #ffffff !important;
+  outline: 2px solid #e50914 !important;
 }
 
-#playerModal .player-center-play-btn svg {
-  width: 28px !important;
-  height: 28px !important;
+#playerModal .player-top-actions svg {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+/* Unified Single Bottom Bar & Seek Slider in BOTH Video and Embed Modes when Controls are Awake */
+#playerModal .player-bottom-bar,
+.player-modal.embed-mode-active .player-bottom-bar {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  padding: 10px 14px 8px 14px !important;
+  background: rgba(8, 10, 16, 0.94) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 6px !important;
+  pointer-events: auto !important;
+  z-index: 40 !important;
+}
+
+#playerModal .player-controls-overlay.idle-hidden .player-bottom-bar {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Hide redundant floating embed bottom-right overlay buttons since unified bottom bar has them */
+.player-modal.embed-mode-active .embed-cc-overlay-btn,
+.player-modal.embed-mode-active .embed-fullscreen-overlay-btn {
+  display: none !important;
+}
+
+#playerModal .player-seek-slider {
+  height: 7px !important;
+  background: rgba(255, 255, 255, 0.28) !important;
+  border-radius: 4px !important;
+}
+
+#playerModal .player-seek-slider.tv-focused,
+#playerModal .player-seek-slider:focus {
+  height: 10px !important;
+  background: rgba(229, 9, 20, 0.65) !important;
+  outline: 2px solid #ffffff !important;
+  box-shadow: 0 0 14px rgba(229, 9, 20, 0.9) !important;
+}
+
+#playerModal .player-transport-row .player-btn {
+  height: 34px !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
+  padding: 0 13px !important;
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
+  border-radius: 5px !important;
+  gap: 6px !important;
+}
+
+#playerModal .player-transport-row .player-btn svg {
+  width: 15px !important;
+  height: 15px !important;
+}
+
+/* Accurate Time & Subtitle Seek HUD Pill (No fake promotional poster image box) */
+#seekThumbnailPreview,
+.seek-thumbnail-preview {
+  bottom: 92px !important;
+  width: auto !important;
+  min-width: 190px !important;
+  max-width: 380px !important;
+  padding: 8px 14px !important;
+  background: rgba(9, 12, 20, 0.96) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.85) !important;
+  border-top: 3px solid #e50914 !important;
+  border-radius: 6px !important;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.95) !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+}
+
+#seekThumbImageBox,
+.seek-thumb-image-box {
+  height: auto !important;
+  background: transparent !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 0 !important;
+}
+
+#seekThumbImg,
+.seek-thumb-img,
+#seekThumbBackdrop,
+.seek-thumb-backdrop {
+  display: none !important;
+}
+
+#seekThumbSceneBadge,
+.seek-thumb-scene-badge {
+  position: static !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  font-size: 0.75rem !important;
+  padding: 2px 8px !important;
+  border-radius: 4px !important;
+}
+
+#seekThumbTimeBadge,
+.seek-thumb-time-badge {
+  position: static !important;
+  transform: none !important;
+  background: #e50914 !important;
+  font-size: 0.92rem !important;
+  font-weight: 700 !important;
+  padding: 2px 10px !important;
+  border-radius: 4px !important;
+}
+
+#seekThumbCueText,
+.seek-thumb-cue-text {
+  padding: 4px 4px 0 4px !important;
+  font-size: 0.84rem !important;
+  background: transparent !important;
+  min-height: 0 !important;
+  color: #e2e8f0 !important;
+}
+
+/* Compact Subtitles & Sync Menu (#playerSubsMenu) — Fits 100% inside screen without bottom overflow */
+#playerModal .player-subs-menu {
+  top: 46px !important;
+  left: 22px !important;
+  width: 336px !important;
+  max-width: 90vw !important;
+  max-height: calc(100vh - 58px) !important;
+  overflow-y: auto !important;
+  padding: 10px 13px !important;
+  gap: 6px !important;
+  border-radius: 6px !important;
+  background-color: rgba(11, 14, 22, 0.98) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+}
+
+#playerModal .subs-menu-header {
+  font-size: 0.86rem !important;
+  font-weight: 700 !important;
+  margin-bottom: 1px !important;
+}
+
+#playerModal .subs-list-container {
+  max-height: 76px !important;
+  gap: 4px !important;
+}
+
+#playerModal .subs-list-container button,
+#playerModal .sub-track-btn,
+#playerModal .sub-track-item {
+  min-height: 27px !important;
+  height: 27px !important;
+  padding: 0 9px !important;
+  font-size: 0.76rem !important;
+  border-radius: 4px !important;
+}
+
+#playerModal .subs-control-section {
+  gap: 3px !important;
+}
+
+#playerModal .subs-control-label {
+  font-size: 0.71rem !important;
+  line-height: 1.15 !important;
+}
+
+#playerModal .subs-sync-row,
+#playerModal .subs-options-row {
+  gap: 5px !important;
+}
+
+#playerModal .subs-chip-btn {
+  height: 26px !important;
+  min-height: 26px !important;
+  padding: 0 8px !important;
+  font-size: 0.75rem !important;
+  border-radius: 4px !important;
+}
+
+#playerModal .subs-chip-btn.tv-focused,
+#playerModal .sub-track-item.tv-focused,
+#playerModal .subs-list-container button.tv-focused {
+  outline: 2px solid #ffffff !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
 }
 
 /* Player Exit Confirmation Modal (#playerExitConfirmModal) */
@@ -7205,7 +7495,7 @@ body.tv-mode .poster-card:focus {
    ========================================================================= */
 .netflix-row.top10-row {
   position: relative;
-  padding: 12px 16px 8px 16px;
+  padding: 6px 12px 4px 12px;
   background: linear-gradient(90deg, rgba(17, 21, 32, 0.72) 0%, rgba(12, 15, 23, 0.92) 100%);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-right: 3px solid #e50914;

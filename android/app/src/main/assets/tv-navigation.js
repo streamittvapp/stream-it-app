@@ -602,15 +602,14 @@
       return setFocus(shieldSkipBtn, { scroll: false });
     }
 
-    // Direct Remote Control when Player Controls are idle-hidden:
-    // Up/Down = Subtitle Vertical Position; Right/Left = Instant ±10s Seek + Netflix Scene Thumbnail Preview!
-    if (
-      controlsOverlay &&
-      controlsOverlay.classList.contains('idle-hidden') &&
+    var isMenusClosed =
       (!subsMenu || subsMenu.classList.contains('hidden')) &&
       (!parentalMenu || parentalMenu.classList.contains('hidden')) &&
-      (!sourceTabsPanel || sourceTabsPanel.classList.contains('hidden'))
-    ) {
+      (!sourceTabsPanel || sourceTabsPanel.classList.contains('hidden'));
+
+    // Direct Remote Control when Player Controls are idle-hidden OR when no button is focused yet (including Fullscreen):
+    // Right/Left = Instant ±10s Seek + Live Time/Subtitle HUD without exiting fullscreen!
+    if (isMenusClosed && controlsOverlay && controlsOverlay.classList.contains('idle-hidden')) {
       if (direction === 'down' && typeof window.adjustSubtitleVerticalPosition === 'function') {
         window.adjustSubtitleVerticalPosition(-1.5);
         return true;
@@ -619,20 +618,28 @@
         window.adjustSubtitleVerticalPosition(1.5);
         return true;
       }
-      if (direction === 'right' && typeof window.seekVideoBy === 'function') {
-        window.seekVideoBy(10);
-        if (seekSlider && isElementVisible(seekSlider)) setFocus(seekSlider, { scroll: false });
-        return true;
-      }
-      if (direction === 'left' && typeof window.seekVideoBy === 'function') {
-        window.seekVideoBy(-10);
-        if (seekSlider && isElementVisible(seekSlider)) setFocus(seekSlider, { scroll: false });
+      if ((direction === 'right' || direction === 'left') && typeof window.seekVideoBy === 'function') {
+        window.seekVideoBy(direction === 'right' ? 10 : -10);
+        if (seekSlider && isElementVisible(seekSlider)) {
+          setFocus(seekSlider, { scroll: false });
+        }
         return true;
       }
     }
 
     if (typeof window.wakePlayerControls === 'function') {
       window.wakePlayerControls();
+    }
+
+    // Even when controls overlay is visible, if nothing is focused yet and user presses Left/Right on the remote, seek immediately!
+    if (isMenusClosed && (!currentFocused || !player.contains(currentFocused) || !isElementVisible(currentFocused))) {
+      if ((direction === 'right' || direction === 'left') && typeof window.seekVideoBy === 'function') {
+        window.seekVideoBy(direction === 'right' ? 10 : -10);
+        if (seekSlider && isElementVisible(seekSlider)) {
+          setFocus(seekSlider, { scroll: false });
+        }
+        return true;
+      }
     }
 
     var skipBtn = document.getElementById('skipIntroOverlayBtn');
@@ -742,28 +749,32 @@
     var topBarBtns = [topParentalBtn, topSubsBtn, sourcesDropBtn, topFsBtn, closeBtn].filter(isElementVisible);
     var transportBtns = [playPauseBtn, rewindBtn, forwardBtn, nextEpBtn, subsBtn, fullscreenBtn].filter(isElementVisible);
     var embedOverlayBtns = [embedCcBtn, embedFsBtn].filter(isElementVisible);
-    var isEmbedMode = player.classList.contains('embed-mode-active');
 
     if (!currentFocused || !player.contains(currentFocused) || !isElementVisible(currentFocused)) {
-      if (skipBtn && isElementVisible(skipBtn)) return setFocus(skipBtn);
-      if (resumeRestartBtn && isElementVisible(resumeRestartBtn)) return setFocus(resumeRestartBtn);
-      if (!isEmbedMode && playPauseBtn && isElementVisible(playPauseBtn)) return setFocus(playPauseBtn);
-      if (topBarBtns.length) return setFocus(topBarBtns[0]);
-      if (closeBtn) return setFocus(closeBtn);
+      if (direction === 'up' && topBarBtns.length) return setFocus(topBarBtns[0], { scroll: false });
+      if (resumeRestartBtn && isElementVisible(resumeRestartBtn)) return setFocus(resumeRestartBtn, { scroll: false });
+      if (seekSlider && isElementVisible(seekSlider)) return setFocus(seekSlider, { scroll: false });
+      if (playPauseBtn && isElementVisible(playPauseBtn)) return setFocus(playPauseBtn, { scroll: false });
+      if (topBarBtns.length) return setFocus(topBarBtns[0], { scroll: false });
+      if (closeBtn) return setFocus(closeBtn, { scroll: false });
       return true;
     }
 
     // 3. Resume Playback Toast Button (#resumeRestartFromZeroBtn)
     if (currentFocused === resumeRestartBtn) {
       if (direction === 'up') {
-        if (topBarBtns.length) return setFocus(topBarBtns[0]);
+        if (topBarBtns.length) return setFocus(topBarBtns[0], { scroll: false });
         return true;
       }
       if (direction === 'down') {
-        if (skipBtn && isElementVisible(skipBtn)) return setFocus(skipBtn);
-        if (!isEmbedMode && seekSlider && isElementVisible(seekSlider)) return setFocus(seekSlider);
-        if (!isEmbedMode && playPauseBtn && isElementVisible(playPauseBtn)) return setFocus(playPauseBtn);
-        if (isEmbedMode && embedOverlayBtns.length) return setFocus(embedOverlayBtns[0]);
+        if (seekSlider && isElementVisible(seekSlider)) return setFocus(seekSlider, { scroll: false });
+        if (playPauseBtn && isElementVisible(playPauseBtn)) return setFocus(playPauseBtn, { scroll: false });
+        if (transportBtns.length) return setFocus(transportBtns[0], { scroll: false });
+        return true;
+      }
+      if (direction === 'right' || direction === 'left') {
+        if (typeof window.seekVideoBy === 'function') window.seekVideoBy(direction === 'right' ? 10 : -10);
+        if (seekSlider && isElementVisible(seekSlider)) return setFocus(seekSlider, { scroll: false });
         return true;
       }
       return true;
@@ -780,14 +791,13 @@
         return true;
       }
       if (direction === 'down') {
-        if (playPauseBtn && isElementVisible(playPauseBtn)) return setFocus(playPauseBtn);
-        if (transportBtns.length) return setFocus(transportBtns[0]);
+        if (playPauseBtn && isElementVisible(playPauseBtn)) return setFocus(playPauseBtn, { scroll: false });
+        if (transportBtns.length) return setFocus(transportBtns[0], { scroll: false });
         return true;
       }
       if (direction === 'up') {
-        if (skipBtn && isElementVisible(skipBtn)) return setFocus(skipBtn);
-        if (resumeRestartBtn && isElementVisible(resumeRestartBtn)) return setFocus(resumeRestartBtn);
-        if (topBarBtns.length) return setFocus(topBarBtns[0]);
+        if (resumeRestartBtn && isElementVisible(resumeRestartBtn)) return setFocus(resumeRestartBtn, { scroll: false });
+        if (topBarBtns.length) return setFocus(topBarBtns[0], { scroll: false });
         return true;
       }
     }
@@ -795,32 +805,30 @@
     // 5. Skip Intro Button (#skipIntroOverlayBtn)
     if (currentFocused === skipBtn) {
       if (direction === 'down') {
-        if (!isEmbedMode && seekSlider && isElementVisible(seekSlider)) return setFocus(seekSlider);
-        if (!isEmbedMode && playPauseBtn && isElementVisible(playPauseBtn)) return setFocus(playPauseBtn);
-        if (isEmbedMode && embedOverlayBtns.length) return setFocus(embedOverlayBtns[0]);
+        if (seekSlider && isElementVisible(seekSlider)) return setFocus(seekSlider, { scroll: false });
+        if (playPauseBtn && isElementVisible(playPauseBtn)) return setFocus(playPauseBtn, { scroll: false });
         return true;
       }
       if (direction === 'up') {
-        if (resumeRestartBtn && isElementVisible(resumeRestartBtn)) return setFocus(resumeRestartBtn);
-        if (topBarBtns.length) return setFocus(topBarBtns[0]);
+        if (resumeRestartBtn && isElementVisible(resumeRestartBtn)) return setFocus(resumeRestartBtn, { scroll: false });
+        if (topBarBtns.length) return setFocus(topBarBtns[0], { scroll: false });
         return true;
       }
       return true;
     }
 
-    // 6. Top Bar Buttons (#playerTopSubsBtn, #playerSourcesDropdownBtn, #playerTopFullscreenBtn, #closePlayerBtn)
+    // 6. Top Bar Buttons (#playerTopParentalBtn, #playerTopSubsBtn, #playerSourcesDropdownBtn, #playerTopFullscreenBtn, #closePlayerBtn)
     if (topBarBtns.indexOf(currentFocused) !== -1) {
       if (direction === 'left' || direction === 'right') {
         var nearTop = findNearestPhysical(currentFocused, direction, topBarBtns);
-        if (nearTop) return setFocus(nearTop);
+        if (nearTop) return setFocus(nearTop, { scroll: false });
         return true;
       }
       if (direction === 'down') {
-        if (resumeRestartBtn && isElementVisible(resumeRestartBtn)) return setFocus(resumeRestartBtn);
-        if (skipBtn && isElementVisible(skipBtn)) return setFocus(skipBtn);
-        if (!isEmbedMode && seekSlider && isElementVisible(seekSlider)) return setFocus(seekSlider);
-        if (!isEmbedMode && playPauseBtn && isElementVisible(playPauseBtn)) return setFocus(playPauseBtn);
-        if (isEmbedMode && embedOverlayBtns.length) return setFocus(embedOverlayBtns[0]);
+        if (resumeRestartBtn && isElementVisible(resumeRestartBtn)) return setFocus(resumeRestartBtn, { scroll: false });
+        if (seekSlider && isElementVisible(seekSlider)) return setFocus(seekSlider, { scroll: false });
+        if (playPauseBtn && isElementVisible(playPauseBtn)) return setFocus(playPauseBtn, { scroll: false });
+        if (transportBtns.length) return setFocus(transportBtns[0], { scroll: false });
         return true;
       }
       return true;
@@ -831,13 +839,12 @@
     if (eIdx !== -1) {
       if (direction === 'left' || direction === 'right') {
         var nearEmbedBtn = findNearestPhysical(currentFocused, direction, embedOverlayBtns);
-        if (nearEmbedBtn) return setFocus(nearEmbedBtn);
+        if (nearEmbedBtn) return setFocus(nearEmbedBtn, { scroll: false });
         return true;
       }
       if (direction === 'up') {
-        if (skipBtn && isElementVisible(skipBtn)) return setFocus(skipBtn);
-        if (resumeRestartBtn && isElementVisible(resumeRestartBtn)) return setFocus(resumeRestartBtn);
-        if (topBarBtns.length) return setFocus(topBarBtns[0]);
+        if (seekSlider && isElementVisible(seekSlider)) return setFocus(seekSlider, { scroll: false });
+        if (topBarBtns.length) return setFocus(topBarBtns[0], { scroll: false });
         return true;
       }
       return true;
@@ -846,23 +853,21 @@
     // 8. Bottom Transport Row Buttons (#playerPlayPauseBtn, -10s, +10s, NextEp, Subs, Fullscreen)
     var tIdx = transportBtns.indexOf(currentFocused);
     if (tIdx !== -1) {
-      if (direction === 'right') {
-        if (tIdx < transportBtns.length - 1) return setFocus(transportBtns[tIdx + 1]);
-        return true;
-      }
-      if (direction === 'left') {
-        if (tIdx > 0) return setFocus(transportBtns[tIdx - 1]);
+      if (direction === 'left' || direction === 'right') {
+        var nearTrans = findNearestPhysical(currentFocused, direction, transportBtns);
+        if (nearTrans) return setFocus(nearTrans, { scroll: false });
         return true;
       }
       if (direction === 'up') {
-        if (seekSlider && isElementVisible(seekSlider)) return setFocus(seekSlider);
-        if (topBarBtns.length) return setFocus(topBarBtns[0]);
+        if (seekSlider && isElementVisible(seekSlider)) return setFocus(seekSlider, { scroll: false });
+        if (topBarBtns.length) return setFocus(topBarBtns[0], { scroll: false });
         return true;
       }
       return true;
     }
 
-    if (!isEmbedMode && playPauseBtn && isElementVisible(playPauseBtn)) return setFocus(playPauseBtn);
+    if (seekSlider && isElementVisible(seekSlider)) return setFocus(seekSlider, { scroll: false });
+    if (playPauseBtn && isElementVisible(playPauseBtn)) return setFocus(playPauseBtn, { scroll: false });
     if (topBarBtns.length) return setFocus(topBarBtns[0]);
     return true;
   }
@@ -2756,6 +2761,26 @@
     }
 
     var activeScope = getActiveScope();
+    if (activeScope && activeScope.id === 'parentalControlModal') {
+      var pCandidates = getFocusableElements(activeScope);
+      if (!pCandidates.length) return true;
+      if (!currentFocused || !activeScope.contains(currentFocused) || !isElementVisible(currentFocused)) {
+        var firstP = document.getElementById('parentalMasterToggleBtn') || pCandidates[0];
+        return setFocus(firstP);
+      }
+      var nearP = findNearestPhysical(currentFocused, directionOrAction, pCandidates);
+      if (nearP) {
+        return setFocus(nearP);
+      }
+      var pCurIdx = pCandidates.indexOf(currentFocused);
+      if (directionOrAction === 'down' && pCurIdx < pCandidates.length - 1) {
+        return setFocus(pCandidates[pCurIdx + 1]);
+      }
+      if (directionOrAction === 'up' && pCurIdx > 0) {
+        return setFocus(pCandidates[pCurIdx - 1]);
+      }
+      return true;
+    }
     if (activeScope && activeScope.id === 'authModal') {
       return navigateAuthModal(directionOrAction);
     }
