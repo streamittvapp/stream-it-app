@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794433089454,
+      "updatedTs": 1794433105736,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -335,12 +335,12 @@
               "imdbId": "tt32261958",
               "tmdbId": "1283515",
               "title": "תעתוע",
-              "currentTime": 685,
+              "currentTime": 710,
               "duration": 7256,
-              "percent": 9,
+              "percent": 10,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794433089454,
+              "updatedAt": 1794433105736,
               "snapshot": {
                 "id": "1283515",
                 "imdbId": "tt32261958",
