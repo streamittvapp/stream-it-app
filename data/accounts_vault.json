@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794404842266,
+      "updatedTs": 1794404843682,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -511,7 +511,7 @@
               "percent": 46,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794404842266,
+              "updatedAt": 1794404843682,
               "snapshot": {
                 "id": "tt10577736",
                 "imdbId": "tt10577736",
@@ -785,8 +785,8 @@
         }
       },
       "subPrefs": {
-        "size": "large",
-        "fontPx": 32,
+        "size": "xlarge",
+        "fontPx": 52,
         "color": "white",
         "bg": "none",
         "bottomPct": 8
