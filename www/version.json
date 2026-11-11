@@ -1,9 +1,9 @@
 {
-  "version": "9.8.2",
-  "native_apk_version": "9.8.2",
+  "version": "9.8.3",
+  "native_apk_version": "9.8.3",
   "apk_download_url": "https://streamittvapp.github.io/stream-it-app/StreamIt-AndroidTV.apk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-11T12:00:00Z",
-  "notes": "v9.8.2 — Live Version Sync across Streamer & Admin, White-Background Brand & Android TV Launcher Card, Tile Metadata (Year + Top 2 Genres), Hero Category + Recommended Age Rating, Strict Content Readiness Filter, Expanded Multi-Thousand Streaming Pool & Live Dashboard Stats, Clear White/Gray Exit Modal Focus, Netflix-Style Visual Seek Thumbnails, and Ultra-Fast TV Performance."
+  "updated_at": "2026-11-11T13:14:00Z",
+  "notes": "v9.8.3 — Series Seasons Count in Hero Banner, 100% Strict Hebrew Title/Overview & Verified Hebrew Subtitles, 60fps Streamer Hardware Acceleration & O(1) D-Pad Speed, 1-Click APK Update Button, SafeWatch Heavy Optical Blur + Mute, Dynamic Seek Scene Previews, and Instant Double-Back Exit."
 }

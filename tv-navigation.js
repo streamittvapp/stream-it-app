@@ -171,32 +171,28 @@
         el.focus({ preventScroll: true });
       } catch (e) {}
     } else {
-      if (document.activeElement && document.activeElement !== document.body && document.activeElement !== el) {
+      var actEl = document.activeElement;
+      if (actEl && actEl !== document.body && actEl !== el) {
+        var actTag = (actEl.tagName || '').toUpperCase();
         try {
-          document.activeElement.blur();
+          actEl.blur();
         } catch (e) {}
-      }
-      try {
-        if (window.AndroidTvBridge && typeof window.AndroidTvBridge.hideSoftKeyboard === 'function') {
-          window.AndroidTvBridge.hideSoftKeyboard();
+        if (actTag === 'INPUT' || actTag === 'TEXTAREA') {
+          try {
+            if (window.AndroidTvBridge && typeof window.AndroidTvBridge.hideSoftKeyboard === 'function') {
+              window.AndroidTvBridge.hideSoftKeyboard();
+            }
+          } catch (e) {}
         }
-      } catch (e) {}
+      }
     }
 
     if (el.closest('#mainStage')) {
       lastMainFocus = el;
     }
 
-    // Record descriptor so if a container re-renders in the background, focus recovers in-place without jumping
+    // Record lightweight O(1) descriptor without querying full DOM on every key press
     var pRow = el.closest('.netflix-row');
-    var allR = pRow ? Array.prototype.slice.call(document.querySelectorAll('#catalogMain .netflix-row')) : [];
-    var rIdx = pRow ? allR.indexOf(pRow) : -1;
-    var cIdx = -1;
-    if (pRow) {
-      cIdx = Array.prototype.slice.call(pRow.querySelectorAll('.poster-card')).indexOf(el);
-    } else if (el.closest('.catalog-poster-grid')) {
-      cIdx = Array.prototype.slice.call(document.querySelectorAll('#catalogMain .catalog-poster-grid .poster-card')).indexOf(el);
-    }
     lastFocusedDescriptor = {
       id: el.id || '',
       itemId: el.getAttribute('data-item-id') || '',
@@ -207,9 +203,9 @@
       miniChar: el.getAttribute('data-mini-char') || '',
       miniAct: el.getAttribute('data-mini-act') || '',
       category: el.getAttribute('data-category') || '',
-      rowIdx: rIdx,
-      colIdx: cIdx,
-      inSideRail: Boolean(el.closest('#tvSideRail')),
+      rowIdx: pRow ? 0 : -1,
+      colIdx: 0,
+      inSideRail: Boolean(inRailNow),
       inTopHeader: Boolean(el.closest('#topHeader')),
       inHero: Boolean(el.closest('#heroBillboard'))
     };
@@ -235,7 +231,7 @@
     // Vertical scrolling — clean, non-jerky viewport alignment
     if (options.scroll !== false) {
       var prevRow = prevFocused ? prevFocused.closest('.netflix-row') : null;
-      var curRow = el.closest('.netflix-row');
+      var curRow = pRow;
       var sameNetflixRow = Boolean(prevRow && curRow && prevRow === curRow);
       if (!sameNetflixRow) {
         var scrollTarget = curRow || el;
@@ -244,7 +240,8 @@
           var cRect = scrollContainer.getBoundingClientRect();
           var tRect = scrollTarget.getBoundingClientRect();
           var pad = 20;
-          if (scrollContainer.id === 'catalogMain' && (el.closest('#heroBillboard') || rIdx === 0)) {
+          var isTopFirstRow = Boolean(curRow && !curRow.previousElementSibling && curRow.parentElement && curRow.parentElement.id === 'catalogRowsContainer');
+          if (scrollContainer.id === 'catalogMain' && (el.closest('#heroBillboard') || isTopFirstRow)) {
             if (scrollContainer.scrollTop > 0) {
               scrollContainer.scrollTop = 0;
             }
@@ -962,8 +959,9 @@
    * Handles: Top Header, Side Rail, Hero Stage, Explorer Bar, Continue Watching Actions, Horizontal Rows, and Poster Grid
    */
   function navigateHomeStage(direction) {
-    // Ultra-fast O(1) sibling shortcut when moving horizontally inside a shelf row-track
+    // Ultra-fast O(1) sibling shortcut when moving horizontally or vertically between shelf rows
     if (currentFocused && currentFocused.classList.contains('poster-card') && currentFocused.parentElement && currentFocused.parentElement.classList.contains('row-track')) {
+      var parentTrack = currentFocused.parentElement;
       if (direction === 'left') {
         var nextSiblingCard = currentFocused.nextElementSibling;
         if (nextSiblingCard && nextSiblingCard.classList.contains('poster-card')) {
@@ -975,6 +973,28 @@
         var prevSiblingCard = currentFocused.previousElementSibling;
         if (prevSiblingCard && prevSiblingCard.classList.contains('poster-card')) {
           return setFocus(prevSiblingCard);
+        }
+      }
+      var parentRowFast = parentTrack.closest('.netflix-row');
+      if (parentRowFast && !currentFocused.classList.contains('cw-poster-card')) {
+        if (direction === 'down') {
+          var nextRowFast = parentRowFast.nextElementSibling;
+          if (nextRowFast && nextRowFast.classList.contains('netflix-row')) {
+            var curIdxDown = Array.prototype.indexOf.call(parentTrack.children, currentFocused);
+            var nextTrackCards = nextRowFast.querySelectorAll('.poster-card');
+            if (nextTrackCards.length) {
+              return setFocus(nextTrackCards[Math.min(Math.max(0, curIdxDown), nextTrackCards.length - 1)]);
+            }
+          }
+        } else if (direction === 'up') {
+          var prevRowFast = parentRowFast.previousElementSibling;
+          if (prevRowFast && prevRowFast.classList.contains('netflix-row')) {
+            var curIdxUp = Array.prototype.indexOf.call(parentTrack.children, currentFocused);
+            var prevTrackCards = prevRowFast.querySelectorAll('.poster-card');
+            if (prevTrackCards.length) {
+              return setFocus(prevTrackCards[Math.min(Math.max(0, curIdxUp), prevTrackCards.length - 1)]);
+            }
+          }
         }
       }
     }
@@ -2382,10 +2402,28 @@
   function handleBackButton() {
     var isTv = Boolean(document.body && document.body.classList.contains('tv-mode'));
     var now = Date.now();
-    if (isTv && now - lastBackHandledAt < 220) {
+    var playerCheck = document.getElementById('playerModal');
+    var isPlayerActive = Boolean(playerCheck && !playerCheck.classList.contains('hidden'));
+    var isQuickDoubleBackInPlayer = isPlayerActive && (now - lastBackHandledAt < 520);
+
+    // Do not block double-press Back inside the video player so double-Back exits immediately!
+    if (isTv && !isPlayerActive && now - lastBackHandledAt < 220) {
       return true;
     }
     lastBackHandledAt = now;
+
+    // Fast Double-Click Back inside a movie/series: immediately exit the player and skip the exit menu!
+    if (isQuickDoubleBackInPlayer) {
+      if (typeof window.confirmExitVideoPlayer === 'function') {
+        window.confirmExitVideoPlayer();
+      } else if (typeof window.closeVideoPlayer === 'function') {
+        window.closeVideoPlayer();
+      } else if (playerCheck) {
+        playerCheck.classList.add('hidden');
+      }
+      if (lastMainFocus && isElementVisible(lastMainFocus)) setFocus(lastMainFocus);
+      return true;
+    }
 
     var vk = document.getElementById('tvVirtualKeyboard');
     if (vk && !vk.classList.contains('hidden')) {
@@ -2465,18 +2503,22 @@
 
     var player = document.getElementById('playerModal');
     if (player && !player.classList.contains('hidden')) {
-      // 1. If the Exit Confirmation Modal (#playerExitConfirmModal) is already open, pressing Back cancels exit and resumes playback!
+      // 1. If the Exit Confirmation Modal (#playerExitConfirmModal) is already open, pressing Back a second time exits the movie immediately!
       var exitConfirmModal = document.getElementById('playerExitConfirmModal');
       if (exitConfirmModal && !exitConfirmModal.classList.contains('hidden')) {
-        if (typeof window.cancelExitVideoPlayer === 'function') {
-          window.cancelExitVideoPlayer();
+        if (typeof window.confirmExitVideoPlayer === 'function') {
+          window.confirmExitVideoPlayer();
+        } else if (typeof window.closeVideoPlayer === 'function') {
+          window.closeVideoPlayer();
         } else {
           exitConfirmModal.classList.add('hidden');
+          player.classList.add('hidden');
         }
+        if (lastMainFocus && isElementVisible(lastMainFocus)) setFocus(lastMainFocus);
         return true;
       }
 
-      // 2. Otherwise, pressing Back in the player opens the Exit Confirmation Dialog ("לצאת מהצפייה?") instead of abruptly exiting!
+      // 2. Otherwise, first Back press in the player opens the Exit Confirmation Dialog ("לצאת מהצפייה?")
       if (typeof window.requestCloseVideoPlayer === 'function') {
         window.requestCloseVideoPlayer();
         return true;

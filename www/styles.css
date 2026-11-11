@@ -6219,11 +6219,29 @@ body.auth-gate-locked #quickTestLoginBtn {
   color: #d4d4d8;
 }
 
+#playerModal.parental-blur-active #videoElement,
+#playerModal.parental-blur-active .plyr,
+#playerModal.parental-blur-active #embedPlayerContainer,
+#playerModal.parental-blur-active #streamEmbedIframe,
+.player-stage.parental-blur-active #videoElement,
+.player-stage.parental-blur-active .plyr,
+.player-stage.parental-blur-active #embedPlayerContainer,
+.player-stage.parental-blur-active #streamEmbedIframe {
+  filter: blur(44px) brightness(0.92) saturate(1.18) !important;
+  -webkit-filter: blur(44px) brightness(0.92) saturate(1.18) !important;
+  transform: scale(1.08) !important;
+  transition: filter 0.22s ease, transform 0.22s ease !important;
+}
+
+#parentalShieldOverlay,
+body.tv-mode #parentalShieldOverlay,
 .parental-shield-overlay {
   position: absolute;
   inset: 0;
   z-index: 44;
-  background: rgba(6, 8, 12, 0.98);
+  background: rgba(18, 24, 38, 0.22) !important;
+  backdrop-filter: blur(44px) saturate(1.2) !important;
+  -webkit-backdrop-filter: blur(44px) saturate(1.2) !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -6231,18 +6249,18 @@ body.auth-gate-locked #quickTestLoginBtn {
 }
 
 .parental-shield-card {
-  max-width: 460px;
-  background: #12151e;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  max-width: 440px;
+  background: rgba(15, 20, 30, 0.84);
+  border: 1px solid rgba(255, 255, 255, 0.24);
   border-top: 3px solid #e50914;
-  border-radius: 0;
-  padding: 28px 24px;
+  border-radius: 8px;
+  padding: 24px 22px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 12px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.92);
+  gap: 10px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65);
 }
 
 .parental-shield-svg {
@@ -7585,9 +7603,25 @@ body.tv-mode .poster-card:focus {
   font-weight: 600;
 }
 
-body.tv-mode .netflix-row {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 215px;
+#heroMeta .meta-seasons-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  border-radius: 4px;
+  color: #ffffff;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+body.tv-mode #topHeader,
+body.tv-mode .header-search-box,
+body.tv-mode #tvSideRail,
+body.tv-mode .explorer-dropdown-btn,
+body.tv-mode .genre-chip-btn {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 body.tv-mode .poster-card:not(.tv-focused) {
@@ -7673,4 +7707,18 @@ body.tv-mode .poster-card:not(.tv-focused) {
   letter-spacing: 0.02em;
   z-index: 6;
   pointer-events: none;
+}
+
+.seek-thumb-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 2;
+  display: block;
+}
+
+.seek-thumb-canvas.hidden {
+  display: none !important;
 }

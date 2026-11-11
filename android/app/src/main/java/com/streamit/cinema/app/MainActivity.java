@@ -3,6 +3,7 @@ package com.streamit.cinema.app;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -26,8 +27,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends BridgeActivity {
-    private static final String INSTALLED_APP_VERSION = "9.8.2";
-    private static final String INSTALLED_NATIVE_APK_VERSION = "9.8.2";
+    private static final String INSTALLED_APP_VERSION = "9.8.3";
+    private static final String INSTALLED_NATIVE_APK_VERSION = "9.8.3";
     private static final String OTA_PREFS_NAME = "streamit_ota_prefs";
     private StreamItEmbeddedServer embeddedServer;
     private volatile boolean apkUpdateInProgress = false;
@@ -105,6 +106,26 @@ public class MainActivity extends BridgeActivity {
         }
 
         @JavascriptInterface
+        public void installLatestApkUpdate() {
+            triggerNativeApkDownloadAndInstall("https://is.gd/streamittv_apk");
+        }
+
+        @JavascriptInterface
+        public void setStreamMuted(boolean muted) {
+            try {
+                AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                if (am != null) {
+                    am.adjustStreamVolume(
+                            AudioManager.STREAM_MUSIC,
+                            muted ? AudioManager.ADJUST_MUTE : AudioManager.ADJUST_UNMUTE,
+                            0
+                    );
+                }
+            } catch (Exception ignored) {
+            }
+        }
+
+        @JavascriptInterface
         public void tapCenterOfScreen() {
             runOnUiThread(() -> {
                 if (getBridge() != null && getBridge().getWebView() != null) {
@@ -157,17 +178,18 @@ public class MainActivity extends BridgeActivity {
         super.onCreate(savedInstanceState);
         // Prevent Android TV / Streamer screensaver from dimming or turning off the TV during movies
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
 
         // Start built-in standalone 1080p stream & HLS proxy engine on 127.0.0.1:8092 inside the Streamer APK
         embeddedServer = new StreamItEmbeddedServer();
         embeddedServer.start();
 
-        // Configure WebView for 1080p Smart TV viewport, 100% readable fonts, and native keyboard bridge
+        // Configure WebView for 1080p Smart TV viewport, 60fps Hardware GPU Layer, and native keyboard bridge
         if (getBridge() != null && getBridge().getWebView() != null) {
             WebView webView = getBridge().getWebView();
+            webView.setLayerType(android.view.View.LAYER_TYPE_HARDWARE, null);
             webView.setFocusable(true);
             webView.setFocusableInTouchMode(true);
-            webView.clearCache(true);
             WebSettings ws = webView.getSettings();
             ws.setUseWideViewPort(true);
             ws.setLoadWithOverviewMode(true);
