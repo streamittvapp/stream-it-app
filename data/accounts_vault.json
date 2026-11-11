@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794393135167,
+      "updatedTs": 1794393142776,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -381,12 +381,12 @@
               "imdbId": "tt37287335",
               "tmdbId": "1339713",
               "title": "אובססיה",
-              "currentTime": 135,
+              "currentTime": 143,
               "duration": 6533,
               "percent": 3,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794393135167,
+              "updatedAt": 1794393142776,
               "snapshot": {
                 "id": "1339713",
                 "imdbId": "tt37287335",
