@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794415162517,
+      "updatedTs": 1794415317160,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -461,6 +461,43 @@
               "episode": 1,
               "updatedAt": 1794323899601
             },
+            "1568027": {
+              "id": "1568027",
+              "imdbId": "tt43612870",
+              "tmdbId": "1568027",
+              "title": "קופה ראשית: הסרט",
+              "currentTime": 1468,
+              "duration": 7200,
+              "percent": 20,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794415317160,
+              "snapshot": {
+                "id": "1568027",
+                "imdbId": "tt43612870",
+                "tmdbId": "1568027",
+                "type": "movie",
+                "title": "קופה ראשית: הסרט",
+                "originalTitle": "קופה ראשית: הסרט",
+                "year": "2026",
+                "rating": "6.2",
+                "runtimeHe": "שעתיים",
+                "ageRating": "12+",
+                "overview": "כוכבה, ניסים, אנטולי, שירה, ראמזי ואמנון יוצאים להרפתקה של חייהם, כשאירוע בלתי צפוי מטלטל את ״שפע יששכר״ ולוקח את החבורה הכי מצחיקה במדינה רחוק מאוד מהקופה.",
+                "poster": "https://image.tmdb.org/t/p/w500/5fFgTGCuL9hcGNN5dhVzF37C75l.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/3mWDbDn7piiznyEDysEHMGeJldI.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/3mWDbDn7piiznyEDysEHMGeJldI.jpg",
+                "genres": [
+                  "comedy",
+                  "israeli"
+                ],
+                "genresHe": [
+                  "קומדיה",
+                  "יצירה ישראלית"
+                ],
+                "seasonsCount": 0
+              }
+            },
             "1571955": {
               "currentTime": 131,
               "duration": 6381,
@@ -571,32 +608,38 @@
               ],
               "seasonsCount": 4
             }
-          }
+          },
+          "watchlistUpdatedAt": 0
         },
         "prof-living": {
           "watchlist": [],
           "progress": {},
-          "watchlistSnapshots": {}
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0
         },
         "prof-1794166536010": {
           "watchlist": [],
           "progress": {},
-          "watchlistSnapshots": {}
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0
         },
         "prof-1794166543582": {
           "watchlist": [],
           "progress": {},
-          "watchlistSnapshots": {}
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0
         },
         "prof-1794166553435": {
           "watchlist": [],
           "progress": {},
-          "watchlistSnapshots": {}
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0
         },
         "prof-1794166559616": {
           "watchlist": [],
           "progress": {},
-          "watchlistSnapshots": {}
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0
         },
         "prof-1794166564722": {
           "watchlist": [],
@@ -761,7 +804,8 @@
               }
             }
           },
-          "watchlistSnapshots": {}
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0
         }
       },
       "parentalMaster": {
