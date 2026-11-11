@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794404875425,
+      "updatedTs": 1794415162517,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -145,14 +145,14 @@
           "isPrimary": true,
           "parentalControl": {
             "enabled": true,
-            "actionMode": "blur_mute",
+            "actionMode": "skip",
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
             "categories": {
               "sex": true,
               "violence": false,
-              "profanity": false,
-              "drugs": false,
+              "profanity": true,
+              "drugs": true,
               "horror": false
             }
           }
@@ -244,7 +244,7 @@
           "isKids": false,
           "isPrimary": false,
           "parentalControl": {
-            "enabled": true,
+            "enabled": false,
             "actionMode": "skip",
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
@@ -571,38 +571,32 @@
               ],
               "seasonsCount": 4
             }
-          },
-          "watchlistUpdatedAt": 1794404768241
+          }
         },
         "prof-living": {
           "watchlist": [],
           "progress": {},
-          "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0
+          "watchlistSnapshots": {}
         },
         "prof-1794166536010": {
           "watchlist": [],
           "progress": {},
-          "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0
+          "watchlistSnapshots": {}
         },
         "prof-1794166543582": {
           "watchlist": [],
           "progress": {},
-          "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0
+          "watchlistSnapshots": {}
         },
         "prof-1794166553435": {
           "watchlist": [],
           "progress": {},
-          "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0
+          "watchlistSnapshots": {}
         },
         "prof-1794166559616": {
           "watchlist": [],
           "progress": {},
-          "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0
+          "watchlistSnapshots": {}
         },
         "prof-1794166564722": {
           "watchlist": [],
@@ -767,8 +761,7 @@
               }
             }
           },
-          "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0
+          "watchlistSnapshots": {}
         }
       },
       "parentalMaster": {
