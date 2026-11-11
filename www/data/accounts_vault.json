@@ -134,8 +134,8 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794388483022,
-      "activeSubUserId": "prof-1794166564722",
+      "updatedTs": 1794416645742,
+      "activeSubUserId": "prof-main",
       "subUsers": [
         {
           "id": "prof-main",
@@ -256,6 +256,66 @@
               "horror": false
             }
           }
+        },
+        {
+          "id": "prof-living",
+          "name": "סלון",
+          "color": "#334155",
+          "isKids": false,
+          "isPrimary": false,
+          "parentalControl": {
+            "enabled": false,
+            "actionMode": "skip",
+            "profanityMode": "mute_censor",
+            "sensitivity": "balanced",
+            "categories": {
+              "sex": true,
+              "violence": true,
+              "profanity": true,
+              "drugs": true,
+              "horror": false
+            }
+          }
+        },
+        {
+          "id": "prof-bedroom",
+          "name": "חדר שינה",
+          "color": "#3f3f46",
+          "isKids": false,
+          "isPrimary": false,
+          "parentalControl": {
+            "enabled": false,
+            "actionMode": "skip",
+            "profanityMode": "mute_censor",
+            "sensitivity": "balanced",
+            "categories": {
+              "sex": true,
+              "violence": true,
+              "profanity": true,
+              "drugs": true,
+              "horror": false
+            }
+          }
+        },
+        {
+          "id": "prof-kids",
+          "name": "ילדים ונוער",
+          "color": "#475569",
+          "isKids": true,
+          "isPrimary": false,
+          "parentalControl": {
+            "enabled": true,
+            "actionMode": "skip",
+            "profanityMode": "mute_censor",
+            "sensitivity": "strict",
+            "categories": {
+              "sex": true,
+              "violence": true,
+              "profanity": true,
+              "drugs": true,
+              "horror": true
+            }
+          }
         }
       ],
       "profileData": {
@@ -266,9 +326,88 @@
             "288673",
             "58841",
             "1236045",
-            "1339713"
+            "1339713",
+            "tt10577736"
           ],
           "progress": {
+            "27": {
+              "id": "27",
+              "imdbId": "tt0411705",
+              "tmdbId": "27",
+              "title": "9 שירים",
+              "currentTime": 200,
+              "duration": 4179,
+              "percent": 5,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794402821800,
+              "snapshot": {
+                "id": "27",
+                "imdbId": "tt0411705",
+                "tmdbId": "27",
+                "type": "movie",
+                "title": "9 שירים",
+                "originalTitle": "9 Songs",
+                "year": "2004",
+                "rating": "5.5",
+                "runtimeHe": "שעתיים",
+                "ageRating": "12+",
+                "overview": "מתיו (קיראן אובריאן), צעיר לונדוני, עובד כמסקר לעיתון \"אטרטיקה\" הבריטי ואוהב לשמוע להקות אינדי. בעת שטס מעל הנוף הקוטבי הלא פורה, הוא נזכר במערכת יחסיו עם ליסה (מרגו סטילי), סטונדטית של מחלף אקדמאי אמריקאי. כאשר נפגש הזוג בטקס פרסי אקדמיה בבריטניה, הם נזכרים באהבתם הנשכחת ומביאים תשוקתם היישר למיטה. דרמה רומנטית אירוטית מגיל 18 המשלבת סצינות סקס נועזות ביחד עם מוזיקה בריטית עכשווית עם אומנים כמו \"פרנץ פרדיננד\", \"אלבו\", \"בלק רבל מוטורסייקל קלאב\", ניק מק'ארתי, בובי ג'ילפסי, יו בנפורד ועוד. האמת שחוץ משני השחקנים הצעירים הראשיים בסרט, כל שאר השחקנים הם בעצם הזמרים והלהקות המופיעות בסרט ונותנות הרבה רעש לסרט הנועז. ביים: מייקל ווינטרבוטום, הבמאי של \"אנשי המסיבות\" ו\"טריסטן שנדי: סיפור מצוץ מן האצבע\" החדש.",
+                "poster": "https://image.tmdb.org/t/p/w500/91O7z0vo7MiNWd5xD2BoivwbQsb.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/bybAHw5fenKXRFI4phanPhpljlT.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/bybAHw5fenKXRFI4phanPhpljlT.jpg",
+                "genres": [
+                  "drama",
+                  "music",
+                  "romance"
+                ],
+                "genresHe": [
+                  "דרמה",
+                  "מוזיקה והופעות",
+                  "רומנטיקה"
+                ],
+                "seasonsCount": 0
+              }
+            },
+            "10580": {
+              "id": "10580",
+              "imdbId": "tt0079118",
+              "tmdbId": "10580",
+              "title": "אסקימו לימון",
+              "currentTime": 4965,
+              "duration": 5538,
+              "percent": 90,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794403003191,
+              "snapshot": {
+                "id": "10580",
+                "imdbId": "tt0079118",
+                "tmdbId": "10580",
+                "type": "movie",
+                "title": "אסקימו לימון",
+                "originalTitle": "אסקימו לימון",
+                "year": "1978",
+                "rating": "6.2",
+                "runtimeHe": "שעתיים",
+                "ageRating": "12+",
+                "overview": "סיפורם של שלושה תיכוניסטים מיוחמים ומתבגרים המחפשים לאבד את בתוליהם. הזמן- סוף שנות ה- 50 שלושת החברים הקרובים- בנצי מומו ויודל'ה לומדים יחד בגימנסיה לא איכותית בת\"א, אך לא הלימודים מצויים בראש דאגותיהם, אלא העיסוק המתמיד במין כיאה לגיל ההתבגרות. בנצי שחש שהמין המזדמן אינו התשובה הנאותה לכמיהות ליבו מתאהב באחת המסיבות בנילי היפה, אלא שנילי דווקא בוחרת לעשות את זה עם מומו חברו הטוב ואף להיכנס להריון ממנו.",
+                "poster": "https://image.tmdb.org/t/p/w500/cRqAYpGZaO8Vp2SVXSssgML4iXu.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/A7lbu014Gfr5dhohXP79fg72VkO.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/A7lbu014Gfr5dhohXP79fg72VkO.jpg",
+                "genres": [
+                  "comedy",
+                  "romance",
+                  "israeli"
+                ],
+                "genresHe": [
+                  "קומדיה",
+                  "רומנטיקה",
+                  "יצירה ישראלית"
+                ],
+                "seasonsCount": 0
+              }
+            },
             "1283515": {
               "currentTime": 1706,
               "duration": 7256,
@@ -277,6 +416,88 @@
               "episode": 1,
               "updatedAt": 1794340722738
             },
+            "1339713": {
+              "id": "1339713",
+              "imdbId": "tt37287335",
+              "tmdbId": "1339713",
+              "title": "אובססיה",
+              "currentTime": 143,
+              "duration": 6533,
+              "percent": 3,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794393142776,
+              "snapshot": {
+                "id": "1339713",
+                "imdbId": "tt37287335",
+                "tmdbId": "1339713",
+                "type": "movie",
+                "title": "אובססיה",
+                "originalTitle": "Obsession",
+                "year": "2026",
+                "rating": "8.2",
+                "runtimeHe": "שעתיים",
+                "ageRating": "16+",
+                "overview": "לאחר ששבר את \"ערבת המשאלה האחת\" המסתורית כדי לזכות בליבה של אהובת ליבו, רומנטיקן חסר תקנה מגלה שהוא מקבל בדיוק את מה שביקש, אך עד מהרה מגלה שחלק מהתשוקות מגיעות במחיר אפל ומרושע.",
+                "poster": "https://image.tmdb.org/t/p/w500/hhrWmkcGksuI3BsqSbiyFC3Lzk4.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/5lTZyuBTNOfawsfPT8Q0cIg6qAF.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/5lTZyuBTNOfawsfPT8Q0cIg6qAF.jpg",
+                "genres": [
+                  "horror",
+                  "thriller"
+                ],
+                "genresHe": [
+                  "אימה",
+                  "מותחנים"
+                ],
+                "seasonsCount": 0
+              }
+            },
+            "1381078": {
+              "currentTime": 5045,
+              "duration": 6678,
+              "percent": 76,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794323899601
+            },
+            "1568027": {
+              "id": "1568027",
+              "imdbId": "tt43612870",
+              "tmdbId": "1568027",
+              "title": "קופה ראשית: הסרט",
+              "currentTime": 35,
+              "duration": 7200,
+              "percent": 3,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794416645742,
+              "snapshot": {
+                "id": "1568027",
+                "imdbId": "tt43612870",
+                "tmdbId": "1568027",
+                "type": "movie",
+                "title": "קופה ראשית: הסרט",
+                "originalTitle": "קופה ראשית: הסרט",
+                "year": "2026",
+                "rating": "6.2",
+                "runtimeHe": "שעתיים",
+                "ageRating": "12+",
+                "overview": "כוכבה, ניסים, אנטולי, שירה, ראמזי ואמנון יוצאים להרפתקה של חייהם, כשאירוע בלתי צפוי מטלטל את ״שפע יששכר״ ולוקח את החבורה הכי מצחיקה במדינה רחוק מאוד מהקופה.",
+                "poster": "https://image.tmdb.org/t/p/w500/5fFgTGCuL9hcGNN5dhVzF37C75l.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/3mWDbDn7piiznyEDysEHMGeJldI.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/3mWDbDn7piiznyEDysEHMGeJldI.jpg",
+                "genres": [
+                  "comedy",
+                  "israeli"
+                ],
+                "genresHe": [
+                  "קומדיה",
+                  "יצירה ישראלית"
+                ],
+                "seasonsCount": 0
+              }
+            },
             "1571955": {
               "currentTime": 131,
               "duration": 6381,
@@ -284,6 +505,22 @@
               "season": 1,
               "episode": 1,
               "updatedAt": 1794386948593
+            },
+            "tt1745960": {
+              "currentTime": 18,
+              "duration": 7814,
+              "percent": 3,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794203030102
+            },
+            "tt6263850": {
+              "currentTime": 5886,
+              "duration": 7753,
+              "percent": 76,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794323631225
             },
             "tt4565380": {
               "currentTime": 16,
@@ -300,41 +537,293 @@
               "season": 1,
               "episode": 1,
               "updatedAt": 1794387260384
+            },
+            "tt10577736": {
+              "id": "tt10577736",
+              "imdbId": "tt10577736",
+              "tmdbId": "103913",
+              "title": "טהרן",
+              "currentTime": 1396,
+              "duration": 3014,
+              "percent": 46,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794404875425,
+              "snapshot": {
+                "id": "tt10577736",
+                "imdbId": "tt10577736",
+                "tmdbId": "103913",
+                "type": "series",
+                "title": "טהרן",
+                "originalTitle": "Tehran",
+                "year": "2020",
+                "rating": "7.6",
+                "runtimeHe": "3 עונות • 24 פרקים",
+                "ageRating": "16+",
+                "overview": "תמר רביניאן, האקרית ולוחמת סייבר צעירה במוסד, מוחדרת בזהות בדויה לבירת איראן למשימה מסוכנת של השבתת מערכות המכ\"ם.",
+                "poster": "https://images.metahub.space/poster/medium/tt10577736/img",
+                "backdrop": "https://images.metahub.space/background/medium/tt10577736/img",
+                "cardBackdrop": "https://images.metahub.space/background/medium/tt10577736/img",
+                "genres": [
+                  "israeli",
+                  "drama",
+                  "action",
+                  "telegram"
+                ],
+                "genresHe": [
+                  "יצירה ישראלית",
+                  "מתח וריגול",
+                  "דרמה"
+                ],
+                "seasonsCount": 4
+              }
             }
-          }
+          },
+          "watchlistSnapshots": {
+            "tt10577736": {
+              "id": "tt10577736",
+              "imdbId": "tt10577736",
+              "tmdbId": "103913",
+              "type": "series",
+              "title": "טהרן",
+              "originalTitle": "Tehran",
+              "year": "2020",
+              "rating": "7.6",
+              "runtimeHe": "3 עונות • 24 פרקים",
+              "ageRating": "16+",
+              "overview": "תמר רביניאן, האקרית ולוחמת סייבר צעירה במוסד, מוחדרת בזהות בדויה לבירת איראן למשימה מסוכנת של השבתת מערכות המכ\"ם.",
+              "poster": "https://images.metahub.space/poster/medium/tt10577736/img",
+              "backdrop": "https://images.metahub.space/background/medium/tt10577736/img",
+              "cardBackdrop": "https://images.metahub.space/background/medium/tt10577736/img",
+              "genres": [
+                "israeli",
+                "drama",
+                "action",
+                "telegram"
+              ],
+              "genresHe": [
+                "יצירה ישראלית",
+                "מתח וריגול",
+                "דרמה"
+              ],
+              "seasonsCount": 4
+            }
+          },
+          "watchlistUpdatedAt": 0
         },
         "prof-living": {
           "watchlist": [],
-          "progress": {}
+          "progress": {},
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0
         },
         "prof-1794166536010": {
           "watchlist": [],
-          "progress": {}
+          "progress": {},
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0
         },
         "prof-1794166543582": {
           "watchlist": [],
-          "progress": {}
+          "progress": {},
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0
         },
         "prof-1794166553435": {
           "watchlist": [],
-          "progress": {}
+          "progress": {},
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0
         },
         "prof-1794166559616": {
           "watchlist": [],
-          "progress": {}
+          "progress": {},
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0
         },
         "prof-1794166564722": {
           "watchlist": [],
-          "progress": {}
+          "progress": {
+            "27": {
+              "id": "27",
+              "imdbId": "tt0411705",
+              "tmdbId": "27",
+              "title": "9 שירים",
+              "currentTime": 90,
+              "duration": 4179,
+              "percent": 3,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794391707310,
+              "snapshot": {
+                "id": "27",
+                "imdbId": "tt0411705",
+                "tmdbId": "27",
+                "type": "movie",
+                "title": "9 שירים",
+                "originalTitle": "9 Songs",
+                "year": "2004",
+                "rating": "5.5",
+                "runtimeHe": "שעתיים",
+                "ageRating": "14+",
+                "overview": "מתיו (קיראן אובריאן), צעיר לונדוני, עובד כמסקר לעיתון \"אטרטיקה\" הבריטי ואוהב לשמוע להקות אינדי. בעת שטס מעל הנוף הקוטבי הלא פורה, הוא נזכר במערכת יחסיו עם ליסה (מרגו סטילי), סטונדטית של מחלף אקדמאי אמריקאי. כאשר נפגש הזוג בטקס פרסי אקדמיה בבריטניה, הם נזכרים באהבתם הנשכחת ומביאים תשוקתם היישר למיטה. דרמה רומנטית אירוטית מגיל 18 המשלבת סצינות סקס נועזות ביחד עם מוזיקה בריטית עכשווית עם אומנים כמו \"פרנץ פרדיננד\", \"אלבו\", \"בלק רבל מוטורסייקל קלאב\", ניק מק'ארתי, בובי ג'ילפסי, יו בנפורד ועוד. האמת שחוץ משני השחקנים הצעירים הראשיים בסרט, כל שאר השחקנים הם בעצם הזמרים והלהקות המופיעות בסרט ונותנות הרבה רעש לסרט הנועז. ביים: מייקל ווינטרבוטום, הבמאי של \"אנשי המסיבות\" ו\"טריסטן שנדי: סיפור מצוץ מן האצבע\" החדש.",
+                "poster": "https://image.tmdb.org/t/p/w500/91O7z0vo7MiNWd5xD2BoivwbQsb.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/bybAHw5fenKXRFI4phanPhpljlT.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w780/bybAHw5fenKXRFI4phanPhpljlT.jpg",
+                "genres": [
+                  "drama",
+                  "music",
+                  "romance"
+                ],
+                "genresHe": [
+                  "דרמה",
+                  "מוזיקה והופעות",
+                  "רומנטיקה"
+                ],
+                "seasonsCount": 0
+              }
+            },
+            "tt15239678": {
+              "id": "tt15239678",
+              "imdbId": "tt15239678",
+              "tmdbId": "693134",
+              "title": "חולית: חלק שני",
+              "currentTime": 323,
+              "duration": 9955,
+              "percent": 3,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794389610432,
+              "snapshot": {
+                "id": "tt15239678",
+                "imdbId": "tt15239678",
+                "tmdbId": "693134",
+                "type": "movie",
+                "title": "חולית: חלק שני",
+                "originalTitle": "Dune: Part Two",
+                "year": "2024",
+                "rating": "8.6",
+                "runtimeHe": "2 שעות ו-46 דק'",
+                "ageRating": "14+",
+                "overview": "פול אטריידיס מתאחד עם צ'אני ועם שבטי הדרשנים במדבר העמוק של אראקיס, ויוצא למסע נקמה גורלי נגד הקושרים שהחריבו את משפחתו — תוך שהוא נאבק למנוע עתיד אפל שרק הוא מסוגל לחזות.",
+                "poster": "https://images.metahub.space/poster/medium/tt15239678/img",
+                "backdrop": "https://images.metahub.space/background/medium/tt15239678/img",
+                "cardBackdrop": "https://images.metahub.space/background/medium/tt15239678/img",
+                "genres": [
+                  "scifi",
+                  "action",
+                  "drama",
+                  "tpb",
+                  "telegram"
+                ],
+                "genresHe": [
+                  "מדע בדיוני",
+                  "אקשן והרפתקאות",
+                  "דרמה"
+                ],
+                "seasonsCount": 0
+              }
+            },
+            "tt10577736": {
+              "id": "tt10577736",
+              "imdbId": "tt10577736",
+              "tmdbId": "103913",
+              "title": "טהרן",
+              "currentTime": 874,
+              "duration": 2936,
+              "percent": 30,
+              "season": 3,
+              "episode": 1,
+              "updatedAt": 1794390912263,
+              "snapshot": {
+                "id": "tt10577736",
+                "imdbId": "tt10577736",
+                "tmdbId": "103913",
+                "type": "series",
+                "title": "טהרן",
+                "originalTitle": "Tehran",
+                "year": "2020",
+                "rating": "7.6",
+                "runtimeHe": "3 עונות • 24 פרקים",
+                "ageRating": "16+",
+                "overview": "תמר רביניאן, האקרית ולוחמת סייבר צעירה במוסד, מוחדרת בזהות בדויה לבירת איראן למשימה מסוכנת של השבתת מערכות המכ\"ם.",
+                "poster": "https://images.metahub.space/poster/medium/tt10577736/img",
+                "backdrop": "https://images.metahub.space/background/medium/tt10577736/img",
+                "cardBackdrop": "https://images.metahub.space/background/medium/tt10577736/img",
+                "genres": [
+                  "israeli",
+                  "drama",
+                  "action",
+                  "telegram"
+                ],
+                "genresHe": [
+                  "יצירה ישראלית",
+                  "מתח וריגול",
+                  "דרמה"
+                ],
+                "seasonsCount": 4
+              }
+            },
+            "tt15398776": {
+              "id": "tt15398776",
+              "imdbId": "tt15398776",
+              "tmdbId": "872585",
+              "title": "אופנהיימר",
+              "currentTime": 2143,
+              "duration": 10822,
+              "percent": 20,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794391810533,
+              "snapshot": {
+                "id": "tt15398776",
+                "imdbId": "tt15398776",
+                "tmdbId": "872585",
+                "type": "movie",
+                "title": "אופנהיימר",
+                "originalTitle": "Oppenheimer",
+                "year": "2023",
+                "rating": "8.9",
+                "runtimeHe": "3 שעות ו-00 דק'",
+                "ageRating": "16+",
+                "overview": "סיפורו המטלטל של הפיזיקאי האמריקאי ג'יי רוברט אופנהיימר ותפקידו המרכזי בפרויקט מנהטן הסודי לפיתוח הפצצה האטומית הראשונה במלחמת העולם השנייה.",
+                "poster": "https://images.metahub.space/poster/medium/tt15398776/img",
+                "backdrop": "https://images.metahub.space/background/medium/tt15398776/img",
+                "cardBackdrop": "https://images.metahub.space/background/medium/tt15398776/img",
+                "genres": [
+                  "drama",
+                  "docu",
+                  "war",
+                  "telegram"
+                ],
+                "genresHe": [
+                  "דרמה",
+                  "ביוגרפיה והיסטוריה"
+                ],
+                "seasonsCount": 0
+              }
+            }
+          },
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0
         }
       },
       "parentalMaster": {
         "pinCode": "",
-        "customSkipSegments": {}
+        "customSkipSegments": {
+          "tt0411705": [
+            {
+              "start": 18,
+              "end": 50,
+              "category": "sex",
+              "label": "קטע שסומן ע״י המשתמש"
+            }
+          ]
+        }
       },
       "subPrefs": {
-        "size": "large",
-        "fontPx": 32,
+        "size": "xlarge",
+        "fontPx": 52,
         "color": "white",
         "bg": "none",
         "bottomPct": 8
