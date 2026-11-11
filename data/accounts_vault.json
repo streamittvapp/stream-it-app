@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794432189834,
+      "updatedTs": 1794432196250,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -330,45 +330,6 @@
             "tt10577736"
           ],
           "progress": {
-            "10580": {
-              "id": "10580",
-              "imdbId": "tt0079118",
-              "tmdbId": "10580",
-              "title": "אסקימו לימון",
-              "currentTime": 4965,
-              "duration": 5538,
-              "percent": 90,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794403003191,
-              "snapshot": {
-                "id": "10580",
-                "imdbId": "tt0079118",
-                "tmdbId": "10580",
-                "type": "movie",
-                "title": "אסקימו לימון",
-                "originalTitle": "אסקימו לימון",
-                "year": "1978",
-                "rating": "6.2",
-                "runtimeHe": "שעתיים",
-                "ageRating": "12+",
-                "overview": "סיפורם של שלושה תיכוניסטים מיוחמים ומתבגרים המחפשים לאבד את בתוליהם. הזמן- סוף שנות ה- 50 שלושת החברים הקרובים- בנצי מומו ויודל'ה לומדים יחד בגימנסיה לא איכותית בת\"א, אך לא הלימודים מצויים בראש דאגותיהם, אלא העיסוק המתמיד במין כיאה לגיל ההתבגרות. בנצי שחש שהמין המזדמן אינו התשובה הנאותה לכמיהות ליבו מתאהב באחת המסיבות בנילי היפה, אלא שנילי דווקא בוחרת לעשות את זה עם מומו חברו הטוב ואף להיכנס להריון ממנו.",
-                "poster": "https://image.tmdb.org/t/p/w500/cRqAYpGZaO8Vp2SVXSssgML4iXu.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/A7lbu014Gfr5dhohXP79fg72VkO.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/A7lbu014Gfr5dhohXP79fg72VkO.jpg",
-                "genres": [
-                  "comedy",
-                  "romance",
-                  "israeli"
-                ],
-                "genresHe": [
-                  "קומדיה",
-                  "רומנטיקה",
-                  "יצירה ישראלית"
-                ],
-                "seasonsCount": 0
-              }
-            },
             "1283515": {
               "currentTime": 1706,
               "duration": 7256,
@@ -573,9 +534,13 @@
           "watchlistUpdatedAt": 0,
           "deletedProgressIds": {
             "27": 1794432189831,
+            "10580": 1794432196249,
             "tt0411705": 1794432189831,
             "movie-27": 1794432189831,
-            "series-27": 1794432189831
+            "series-27": 1794432189831,
+            "tt0079118": 1794432196249,
+            "movie-10580": 1794432196249,
+            "series-10580": 1794432196249
           },
           "progressClearedAt": 0
         },
