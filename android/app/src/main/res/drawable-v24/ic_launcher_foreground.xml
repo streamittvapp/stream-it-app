@@ -4,16 +4,16 @@
     android:height="108dp"
     android:viewportHeight="108"
     android:viewportWidth="108">
-    <!-- Outer subtle dark card frame -->
-    <path
-        android:fillColor="#12121A"
-        android:pathData="M24,24h60v60h-60z" />
-    <!-- Top Crimson Bar of Bold Cinema 'S' -->
+    <!-- Crimson Cinema Play Emblem -->
     <path
         android:fillColor="#E50914"
-        android:pathData="M31,29h34v11h-23v8h23v31h-34v-11h23v-9h-23z" />
-    <!-- Glowing White Cinema Play Triangle Accent -->
+        android:pathData="M34,26h40c4.4,0 8,3.6 8,8v40c0,4.4 -3.6,8 -8,8h-40c-4.4,0 -8,-3.6 -8,-8v-40c0,-4.4 3.6,-8 8,-8z" />
+    <!-- Left Vertical Cinema Bar -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M68,42L83,54L68,66Z" />
+        android:pathData="M42,39h4v30h-4z" />
+    <!-- Crisp White Play Triangle -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M51,39L71,54L51,69Z" />
 </vector>

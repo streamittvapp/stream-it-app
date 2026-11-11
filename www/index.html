@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
-  <link rel="stylesheet" href="styles.css?v=9.8.1" />
+  <link rel="stylesheet" href="styles.css?v=9.8.2" />
   <script>
     (function () {
       try {
@@ -34,13 +34,13 @@
           });
         }
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (!otaVer || otaVer <= '9.8.1') {
+        if (!otaVer || otaVer <= '9.8.2') {
           localStorage.removeItem('streamit_ota_css_v9');
           localStorage.removeItem('streamit_ota_app_js_v9');
           localStorage.removeItem('streamit_ota_tv_nav_v9');
         }
         var otaCss = localStorage.getItem('streamit_ota_css_v9') || '';
-        if (otaVer && otaVer > '9.8.0' && otaCss.length > 500) {
+        if (otaVer && otaVer > '9.8.1' && otaCss.length > 500) {
           var st = document.createElement('style');
           st.id = 'streamit-ota-live-style-v9';
           st.textContent = otaCss;
@@ -61,24 +61,11 @@
     <div class="boot-loader-card">
       <div class="boot-loader-brand" dir="ltr">
         <svg viewBox="0 0 128 128" class="boot-loader-emblem" aria-hidden="true">
-          <defs>
-            <linearGradient id="bootBgSlate" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#151C2C" />
-              <stop offset="100%" stop-color="#070A10" />
-            </linearGradient>
-            <linearGradient id="bootCrimson" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#EF4444" />
-              <stop offset="55%" stop-color="#DC2626" />
-              <stop offset="100%" stop-color="#991B1B" />
-            </linearGradient>
-          </defs>
-          <rect width="128" height="128" rx="10" fill="url(#bootBgSlate)" />
-          <rect x="3" y="3" width="122" height="122" rx="8" fill="none" stroke="#1E293B" stroke-width="2" />
-          <rect x="18" y="3" width="92" height="3" fill="url(#bootCrimson)" />
-          <path d="M24 30 H62 L54 44 H36 V57 H58 L50 71 H24 V30 Z" fill="#F8FAFC" />
-          <path d="M24 83 H52 V69 H66 V98 H24 V83 Z" fill="#94A3B8" />
-          <path d="M58 32 L106 64 L58 96 V76 L77 64 L58 52 V32 Z" fill="url(#bootCrimson)" />
-          <polygon points="64,48 88,64 64,80" fill="#FFFFFF" opacity="0.95" />
+          <rect width="128" height="128" rx="12" fill="#FFFFFF" />
+          <rect x="3" y="3" width="122" height="122" rx="10" fill="none" stroke="#E2E8F0" stroke-width="3" />
+          <rect x="14" y="3" width="100" height="6" rx="3" fill="#E50914" />
+          <rect x="20" y="22" width="88" height="84" rx="12" fill="#E50914" />
+          <polygon points="50,42 86,64 50,86" fill="#FFFFFF" />
         </svg>
         <div class="boot-loader-wordmark-wrap">
           <div class="boot-loader-wordmark">
@@ -115,13 +102,11 @@
       <div class="header-right">
         <a href="#home" id="brandLogo" class="brand-logo tv-focusable" data-category="all" dir="ltr" aria-label="STREAM IT דף הבית">
           <svg viewBox="0 0 128 128" class="brand-logo-emblem" aria-hidden="true">
-            <rect width="128" height="128" rx="10" fill="#0F1420" />
-            <rect x="4" y="4" width="120" height="120" rx="8" fill="none" stroke="#334155" stroke-width="3" />
-            <rect x="18" y="4" width="92" height="4" fill="#DC2626" />
-            <path d="M24 30 H62 L54 44 H36 V57 H58 L50 71 H24 V30 Z" fill="#F8FAFC" />
-            <path d="M24 83 H52 V69 H66 V98 H24 V83 Z" fill="#94A3B8" />
-            <path d="M58 32 L106 64 L58 96 V76 L77 64 L58 52 V32 Z" fill="#DC2626" />
-            <polygon points="64,48 88,64 64,80" fill="#FFFFFF" />
+            <rect width="128" height="128" rx="12" fill="#FFFFFF" />
+            <rect x="3" y="3" width="122" height="122" rx="10" fill="none" stroke="#CBD5E1" stroke-width="3" />
+            <rect x="14" y="3" width="100" height="6" rx="3" fill="#E50914" />
+            <rect x="20" y="22" width="88" height="84" rx="12" fill="#E50914" />
+            <polygon points="50,42 86,64 50,86" fill="#FFFFFF" />
           </svg>
           <span class="brand-logo-wordmark">
             <span class="brand-word-stream">STREAM</span>
@@ -138,6 +123,7 @@
           <button type="button" class="nav-link tv-focusable" data-category="youtube" aria-label="יוטיוב">יוטיוב</button>
           <button type="button" class="nav-link tv-focusable" data-category="mylist" aria-label="הרשימה שלי">הרשימה שלי</button>
           <span id="tvTopClock" class="tv-top-clock" dir="ltr" aria-label="שעה נוכחית"></span>
+          <span id="appVersionBadge" class="app-version-badge" dir="ltr" aria-label="גרסת מערכת">v9.8.2</span>
         </nav>
       </div>
 
@@ -341,6 +327,7 @@
         </svg>
         <span id="tvRailProfileName" class="tv-rail-profile-name">ראשי</span>
       </button>
+      <span id="tvRailVersionBadge" class="tv-rail-version-badge" dir="ltr">v9.8.2</span>
       <button type="button" id="tvRailSettingsBtn" class="tv-rail-bottom-btn tv-rail-settings-btn tv-focusable" aria-label="הגדרות">
         <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
           <circle cx="12" cy="12" r="3" />
@@ -1617,13 +1604,13 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Core Application & Smart TV Navigation Scripts -->
-  <script src="tv-navigation.js?v=9.8.1"></script>
-  <script src="app.js?v=9.8.1"></script>
+  <script src="tv-navigation.js?v=9.8.2"></script>
+  <script src="app.js?v=9.8.2"></script>
   <script>
     (function () {
       try {
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (otaVer && otaVer > '9.8.1') {
+        if (otaVer && otaVer > '9.8.2') {
           var navCode = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
           if (navCode.length > 500) {
             var s1 = document.createElement('script');

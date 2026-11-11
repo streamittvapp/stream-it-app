@@ -10,7 +10,8 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.8.1';
+  var APP_VERSION = '9.8.2';
+  window.__STREAMIT_V982_BOOTED = true;
   window.__STREAMIT_V981_BOOTED = true;
   window.__STREAMIT_V980_BOOTED = true;
   window.__STREAMIT_V971_BOOTED = true;
@@ -2217,9 +2218,17 @@
       tmdbId = rawIdStr.replace(/^(movie-|tv-|series-)/, '');
     }
 
-    var rawTitleHe = raw.title_he || raw.israeliTitle || raw.title || raw.name || 'ללא שם';
-    var heTitle = ISRAELI_TITLES[tmdbId] || rawTitleHe;
-    var origTitle = raw.title_en || raw.title_english || raw.originalTitle || raw.original_title || raw.original_name || '';
+    var rawTitleHe = String(raw.title_he || raw.israeliTitle || raw.title || raw.name || '').trim() || 'ללא שם';
+    var heTitle = String(ISRAELI_TITLES[tmdbId] || rawTitleHe).trim();
+    var origTitle = String(raw.title_en || raw.title_english || raw.originalTitle || raw.original_title || raw.original_name || '').trim();
+
+    // Strict Readiness Check #1: Reject items with missing, placeholder, or raw Telegram/torrent spam titles
+    if (type !== 'channel' && type !== 'youtube') {
+      var badTitleRe = /(https?:\/\/|t\.me\/|@[a-zA-Z0-9_]{3,}|\b(1080p|720p|2160p|x264|x265|bluray|webrip|hdrip|camrip|dvdrip|brrip|hdtv)\b|הצטרפו|ערוץ הגיבוי|לינק|ללא שם|טלגרם\s*@)/i;
+      if (!heTitle || heTitle.length < 2 || badTitleRe.test(heTitle)) {
+        return null;
+      }
+    }
 
     // Filter out untranslated Far-East / CJK / Thai / Indic scripts and Indian/South-Asian dubbed/regional items
     var farEastScriptRe = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f\uac00-\ud7af\u0e00-\u0e7f\u0b80-\u0bff\u0900-\u097f]/;
@@ -2257,15 +2266,14 @@
     }
     var sysCfgNorm = getSystemConfig();
     if (type !== 'channel') {
-      var hasBadPoster = !poster ||
-        String(poster).indexOf('1489599849927') !== -1 ||
-        String(poster).indexOf('undefined') !== -1 ||
-        String(poster).indexOf('null') !== -1 ||
-        String(poster).trim().length < 10;
-      if (hasBadPoster && sysCfgNorm.features.strictPosterFilter !== false) {
-        return null;
-      }
-      if (!poster) {
+      var posterStr = String(poster || '').trim();
+      var hasBadPoster = !posterStr ||
+        posterStr.indexOf('http') !== 0 ||
+        posterStr.indexOf('1489599849927') !== -1 ||
+        posterStr.indexOf('undefined') !== -1 ||
+        posterStr.indexOf('null') !== -1 ||
+        posterStr.length < 15;
+      if (hasBadPoster) {
         return null;
       }
     }
@@ -2276,7 +2284,7 @@
       backdrop = poster;
     }
     if (!backdrop) backdrop = poster;
-    var cardBackdrop = raw.cardBackdrop || (raw.backdrop_path ? ('https://image.tmdb.org/t/p/w780' + raw.backdrop_path) : backdrop.replace('/t/p/original/', '/t/p/w780/').replace('/t/p/w1280/', '/t/p/w780/'));
+    var cardBackdrop = raw.cardBackdrop || (raw.backdrop_path ? ('https://image.tmdb.org/t/p/w500' + raw.backdrop_path) : backdrop.replace('/t/p/original/', '/t/p/w500/').replace('/t/p/w1280/', '/t/p/w500/').replace('/t/p/w780/', '/t/p/w500/'));
 
     var year = raw.year || '';
     if (!year && (raw.release_date || raw.first_air_date || raw.releaseInfo)) {
@@ -2287,9 +2295,20 @@
     var rating = raw.imdb_rating || raw.rating || raw.imdbRating || raw.vote_average || '8.4';
     if (typeof rating === 'number') rating = rating.toFixed(1);
 
-    var overview = raw.overview_he || raw.description_he || raw.overview || raw.description || raw.synopsis || raw.plot || '';
-    if (!overview || overview.length < 10) {
-      overview = (type === 'series' ? 'סדרת טלוויזיה מובילה ' : 'סרט קולנוע מוביל ') + 'לצפייה ישירה באיכות Full HD / 4K עם כתוביות מסונכרנות בעברית.';
+    var overview = String(raw.overview_he || raw.description_he || raw.overview || raw.description || raw.synopsis || raw.summary || raw.description_full || raw.plot || '').trim();
+    if (type !== 'channel' && type !== 'youtube') {
+      // Strict Readiness Check #2: Reject items that lack a real synopsis or contain fake boilerplate / raw Telegram links
+      if (
+        !overview ||
+        overview.length < 18 ||
+        overview.indexOf('לצפייה ישירה באיכות Full HD') !== -1 ||
+        overview.indexOf('וידאו מתוך ערוץ הטלגרם') !== -1 ||
+        /(https?:\/\/|t\.me\/|הצטרפו לערוץ)/i.test(overview)
+      ) {
+        return null;
+      }
+    } else if (!overview || overview.length < 10) {
+      overview = 'שידור חי ישיר באיכות Full HD / 4K.';
     }
 
     var isRealTelegramItem = (raw.source === 'telegram' || String(raw.id || '').indexOf('tg_') === 0 || forcedGenreKey === 'telegram');
@@ -2354,6 +2373,22 @@
       }
     }
 
+    var computedAgeRating = raw.age_rating || '';
+    if (!computedAgeRating) {
+      var mpaStr = String(raw.mpa_rating || raw.certification || '').toUpperCase();
+      if (raw.adult === true || /^(R|NC-17|TV-MA|18|18\+|X)$/.test(mpaStr)) {
+        computedAgeRating = '18+';
+      } else if (genreKeys.indexOf('horror') !== -1 || genreKeys.indexOf('crime') !== -1) {
+        computedAgeRating = '16+';
+      } else if (genreKeys.indexOf('kids') !== -1 || genreKeys.indexOf('animation') !== -1 || /^(G|TV-G|TV-Y|TV-Y7|PG|ALL)$/.test(mpaStr)) {
+        computedAgeRating = 'לכל המשפחה (8+)';
+      } else if (genreKeys.indexOf('comedy') !== -1 || genreKeys.indexOf('romance') !== -1 || genreKeys.indexOf('docu') !== -1) {
+        computedAgeRating = '12+';
+      } else {
+        computedAgeRating = '14+';
+      }
+    }
+
     var idKey = isYtsItem
       ? String(imdbId || ('yts_' + rawIdStr))
       : String(raw.id || imdbId || (type + '-' + tmdbId));
@@ -2379,7 +2414,7 @@
       year: String(year),
       rating: String(rating),
       runtimeHe: raw.runtime_he || (type === 'series' ? '45 דק׳ לפרק' : 'שעתיים'),
-      ageRating: raw.age_rating || ((raw.adult === true || /^(R|NC-17|TV-MA|18|18\+|X)$/i.test(String(raw.mpa_rating || raw.certification || ''))) ? '18+' : '14+'),
+      ageRating: computedAgeRating,
       introEndSec: Number(raw.intro_end_sec || raw.introEndSec || 0),
       castHe: raw.cast_he || '',
       directorHe: raw.director_he || '',
@@ -2396,6 +2431,63 @@
       seasonsCount: Number(raw.total_seasons || raw.seasonsCount || raw.number_of_seasons || (type === 'series' ? 3 : 0)),
       seasonsData: Array.isArray(raw.seasons) ? raw.seasons : []
     };
+  }
+
+  var TILE_GENRE_HE_MAP = {
+    action: 'אקשן',
+    thriller: 'מותחן',
+    horror: 'אימה',
+    crime: 'פשע',
+    mystery: 'מסתורין',
+    scifi: 'מדע בדיוני',
+    fantasy: 'פנטזיה',
+    drama: 'דרמה',
+    comedy: 'קומדיה',
+    romance: 'רומנטיקה',
+    adventure: 'הרפתקאות',
+    animation: 'אנימציה',
+    kids: 'משפחה',
+    family: 'משפחה',
+    docu: 'דוקו',
+    war: 'מלחמה',
+    history: 'היסטוריה',
+    western: 'מערבון',
+    music: 'מוזיקה',
+    israeli: 'ישראלי'
+  };
+
+  function getItemLeadingGenresText(item, maxCount, sep) {
+    if (!item) return 'דרמה';
+    var limit = maxCount || 2;
+    var joiner = typeof sep === 'string' ? sep : ' / ';
+    var out = [];
+    var seen = {};
+    var gKeys = Array.isArray(item.genres) ? item.genres : [];
+    for (var i = 0; i < gKeys.length; i++) {
+      var k = String(gKeys[i] || '').toLowerCase();
+      var label = TILE_GENRE_HE_MAP[k];
+      if (label && !seen[label]) {
+        seen[label] = true;
+        out.push(label);
+        if (out.length >= limit) break;
+      }
+    }
+    if (!out.length && Array.isArray(item.genresHe)) {
+      for (var j = 0; j < item.genresHe.length; j++) {
+        var gh = String(item.genresHe[j] || '').trim();
+        if (!gh || /נטפליקס|Netflix|Apple|HBO|Amazon|Disney|PirateBay|YTS|טלגרם/i.test(gh)) continue;
+        var shortGh = gh.split(' ו')[0].trim();
+        if (shortGh && !seen[shortGh]) {
+          seen[shortGh] = true;
+          out.push(shortGh);
+          if (out.length >= limit) break;
+        }
+      }
+    }
+    if (!out.length) {
+      out.push(item.type === 'series' ? 'דרמה' : 'קולנוע');
+    }
+    return out.slice(0, limit).join(joiner);
   }
 
   /**
@@ -2604,7 +2696,8 @@
     // 1. Restore cached enriched catalog from localStorage for instant 0ms repeat boot
     var hadCachedEnriched = false;
     try {
-      var cachedRaw = localStorage.getItem('streamit_enriched_catalog_cache_v980');
+      localStorage.removeItem('streamit_enriched_catalog_cache_v980');
+      var cachedRaw = localStorage.getItem('streamit_enriched_catalog_cache_v982');
       if (cachedRaw) {
         var cachedObj = JSON.parse(cachedRaw);
         if (cachedObj && Array.isArray(cachedObj.movies) && cachedObj.movies.length > 20) {
@@ -2723,10 +2816,10 @@
 
     var saveCatalogCacheSnapshot = function () {
       try {
-        localStorage.setItem('streamit_enriched_catalog_cache_v980', JSON.stringify({
+        localStorage.setItem('streamit_enriched_catalog_cache_v982', JSON.stringify({
           ts: Date.now(),
-          movies: (state.catalog.movies || []).slice(0, 600),
-          series: (state.catalog.series || []).slice(0, 400)
+          movies: (state.catalog.movies || []).slice(0, 1400),
+          series: (state.catalog.series || []).slice(0, 750)
         }));
       } catch (e) {}
     };
@@ -2767,7 +2860,7 @@
           } catch (err) {}
         }));
         saveCatalogCacheSnapshot();
-        renderCatalogShelves();
+        scheduleRenderCatalogShelves(220);
       } catch (e) {}
       fetchWorldSwarmCatalogs();
       checkCloudOtaUpdates();
@@ -2775,17 +2868,19 @@
   }
 
   async function fetchWorldSwarmCatalogs() {
-    var ytsPages = [1, 2, 3, 4, 5, 6];
+    var ytsPages = [1, 2, 3, 4, 5, 6, 7, 8];
     var cinemetaEndpoints = [
       { url: 'https://v3-cinemeta.strem.io/catalog/movie/top.json', type: 'movie' },
       { url: 'https://v3-cinemeta.strem.io/catalog/movie/top/skip=100.json', type: 'movie' },
       { url: 'https://v3-cinemeta.strem.io/catalog/movie/top/skip=200.json', type: 'movie' },
+      { url: 'https://v3-cinemeta.strem.io/catalog/movie/top/skip=300.json', type: 'movie' },
       { url: 'https://v3-cinemeta.strem.io/catalog/series/top.json', type: 'series' },
-      { url: 'https://v3-cinemeta.strem.io/catalog/series/top/skip=100.json', type: 'series' }
+      { url: 'https://v3-cinemeta.strem.io/catalog/series/top/skip=100.json', type: 'series' },
+      { url: 'https://v3-cinemeta.strem.io/catalog/series/top/skip=200.json', type: 'series' }
     ];
 
     await Promise.all([
-      // A. YTS Official 4K / 1080p Multi-Page API (`yts.mx`, 300+ verified 4K/1080p torrents) -> tagged with `'tpb'`
+      // A. YTS Official 4K / 1080p Multi-Page API (`yts.mx`, 400+ verified 4K/1080p torrents) -> tagged with `'tpb'`
       Promise.all(ytsPages.map(async function (pg) {
         try {
           var ytsRes = await fetch('https://yts.mx/api/v2/list_movies.json?sort_by=download_count&limit=50&page=' + pg);
@@ -2798,7 +2893,7 @@
           }
         } catch (e) {}
       })),
-      // B. Stremio Cinemeta Official Global Top Movies & Series (500+ blockbusters & series)
+      // B. Stremio Cinemeta Official Global Top Movies & Series (700+ blockbusters & series)
       Promise.all(cinemetaEndpoints.map(async function (ep) {
         try {
           var cmRes = await fetch(ep.url);
@@ -2812,7 +2907,7 @@
       }))
     ]);
 
-    renderCatalogShelves();
+    scheduleRenderCatalogShelves(250);
 
     // C. Deep Wave 3 (Stream hundreds more TMDB & YTS pages in background without blocking UI)
     setTimeout(async function () {
@@ -2821,14 +2916,21 @@
         { url: '/movie/popular?language=he-IL&page=6', type: 'movie', genre: null },
         { url: '/movie/popular?language=he-IL&page=7', type: 'movie', genre: null },
         { url: '/movie/popular?language=he-IL&page=8', type: 'movie', genre: null },
+        { url: '/movie/popular?language=he-IL&page=9', type: 'movie', genre: null },
+        { url: '/movie/popular?language=he-IL&page=10', type: 'movie', genre: null },
         { url: '/movie/top_rated?language=he-IL&page=4', type: 'movie', genre: 'drama' },
         { url: '/movie/top_rated?language=he-IL&page=5', type: 'movie', genre: 'drama' },
+        { url: '/movie/top_rated?language=he-IL&page=6', type: 'movie', genre: 'drama' },
         { url: '/tv/popular?language=he-IL&page=4', type: 'series', genre: null },
         { url: '/tv/popular?language=he-IL&page=5', type: 'series', genre: null },
         { url: '/tv/popular?language=he-IL&page=6', type: 'series', genre: null },
+        { url: '/tv/popular?language=he-IL&page=7', type: 'series', genre: null },
+        { url: '/tv/popular?language=he-IL&page=8', type: 'series', genre: null },
         { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=28&page=4', type: 'movie', genre: 'action' },
         { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=28&page=5', type: 'movie', genre: 'action' },
         { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=53&page=3', type: 'movie', genre: 'thriller' },
+        { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=53&page=4', type: 'movie', genre: 'thriller' },
+        { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=27&page=2', type: 'movie', genre: 'horror' },
         { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=878,14&page=3', type: 'movie', genre: 'scifi' },
         { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=35&page=3', type: 'movie', genre: 'comedy' }
       ];
@@ -2842,7 +2944,7 @@
             }
           } catch (err) {}
         }));
-        var moreYtsPages = [7, 8, 9, 10];
+        var moreYtsPages = [9, 10, 11, 12, 13, 14, 15, 16];
         await Promise.all(moreYtsPages.map(async function (pg) {
           try {
             var yr = await fetch('https://yts.mx/api/v2/list_movies.json?sort_by=like_count&limit=50&page=' + pg);
@@ -2853,11 +2955,18 @@
             }
           } catch (e) {}
         }));
-        renderCatalogShelves();
+        try {
+          localStorage.setItem('streamit_enriched_catalog_cache_v982', JSON.stringify({
+            ts: Date.now(),
+            movies: (state.catalog.movies || []).slice(0, 1400),
+            series: (state.catalog.series || []).slice(0, 750)
+          }));
+        } catch (eCache) {}
+        scheduleRenderCatalogShelves(300);
       } catch (e) {}
     }, 3200);
 
-    // D. Sync Zero-Account Public Telegram VOD Channels (calls renderCatalogShelves once when done)
+    // D. Sync Zero-Account Public Telegram VOD Channels
     await syncTelegramPublicChannels(false);
   }
 
@@ -3058,14 +3167,13 @@
           }
         }
 
-        if (matchedTmdbRaw) {
+        if (matchedTmdbRaw && matchedTmdbRaw.poster_path && matchedTmdbRaw.overview && String(matchedTmdbRaw.overview).trim().length >= 20) {
           var normMatched = normalizeItem(matchedTmdbRaw, matchedType, 'telegram');
           if (normMatched) {
             normMatched.telegramChannel = '@' + post.channel;
             if (post.videoUrl && post.videoUrl.indexOf('http') === 0) {
               normMatched.directTelegramMp4 = post.videoUrl;
             }
-            normMatched.overview = '📱 [נמשך מערוץ הטלגרם @' + post.channel + '] ' + (normMatched.overview || post.text || '');
             var targetArr = matchedType === 'series' ? state.catalog.series : state.catalog.movies;
             var existing = targetArr.find(function (x) { return x.id === normMatched.id || (x.tmdbId && x.tmdbId === normMatched.tmdbId); });
             if (existing) {
@@ -3078,38 +3186,11 @@
             return;
           }
         }
-
-        if (post.videoUrl && post.videoUrl.indexOf('http') === 0) {
-          var fallbackPoster = post.photoUrl || (allMovies[idx % Math.max(1, allMovies.length)] ? allMovies[idx % allMovies.length].poster : '');
-          var directItem = normalizeItem({
-            id: post.id,
-            title: post.title,
-            original_title: '@' + post.channel,
-            type: 'movie',
-            source: 'telegram',
-            year: 2025,
-            rating: 8.6,
-            quality: 'TG DIRECT MP4',
-            genres: ['telegram', 'action'],
-            poster: fallbackPoster,
-            backdrop: fallbackPoster,
-            overview: '📱 [נמשך מערוץ הטלגרם @' + post.channel + '] ' + post.text,
-            stream_url: post.videoUrl
-          }, 'movie', 'telegram');
-          if (directItem) {
-            directItem.telegramChannel = '@' + post.channel;
-            directItem.directTelegramMp4 = post.videoUrl;
-            var existsDirect = state.catalog.movies.some(function (x) { return x.id === directItem.id; });
-            if (!existsDirect) {
-              state.catalog.movies.unshift(directItem);
-            }
-          }
-        }
       } catch (e) {}
     }));
 
     state.telegramPosts = discoveredPosts.reverse();
-    renderCatalogShelves();
+    scheduleRenderCatalogShelves(250);
     renderTelegramModalContent();
 
     if (statusEl) {
@@ -3416,6 +3497,22 @@
     return '';
   }
 
+  function updateVersionBadgesUi(forcedVer) {
+    try {
+      var otaStored = localStorage.getItem('streamit_ota_version_v9') || '';
+      var activeVer = forcedVer || (otaStored && otaStored > APP_VERSION ? otaStored : APP_VERSION);
+      var verLabel = 'v' + String(activeVer).replace(/^v/i, '');
+      var topBadge = document.getElementById('appVersionBadge');
+      if (topBadge) topBadge.textContent = verLabel;
+      var railBadge = document.getElementById('tvRailVersionBadge');
+      if (railBadge) railBadge.textContent = verLabel;
+      var authEmailLabel = document.getElementById('userMenuAccountEmail');
+      if (authEmailLabel && (!state.user || !state.user.email)) {
+        authEmailLabel.textContent = 'STREAM IT ' + verLabel;
+      }
+    } catch (e) {}
+  }
+
   async function checkCloudOtaUpdates() {
     try {
       var verTxt = await fetchCloudKey('ver');
@@ -3423,13 +3520,22 @@
       var verObj = JSON.parse(verTxt);
       if (!verObj || !verObj.version) return;
 
+      updateVersionBadgesUi(verObj.version >= APP_VERSION ? verObj.version : APP_VERSION);
+
       var cachedVer = localStorage.getItem('streamit_ota_version_v9') || APP_VERSION;
       if (verObj.version !== cachedVer && verObj.version >= APP_VERSION) {
         var cssTxt = await fetchCloudKey('css');
         var navTxt = await fetchCloudKey('nav');
         var jsTxt = await fetchCloudKey('js');
+        try {
+          localStorage.removeItem('streamit_enriched_catalog_cache_v980');
+        } catch (eClean) {}
         if (cssTxt && cssTxt.length > 200) {
-          localStorage.setItem('streamit_ota_css_v9', cssTxt);
+          try {
+            localStorage.setItem('streamit_ota_css_v9', cssTxt);
+          } catch (eQuota1) {
+            try { localStorage.removeItem('streamit_enriched_catalog_cache_v982'); localStorage.setItem('streamit_ota_css_v9', cssTxt); } catch (e2) {}
+          }
           var otaStyle = document.getElementById('streamit-ota-css');
           if (!otaStyle) {
             otaStyle = document.createElement('style');
@@ -3439,12 +3545,23 @@
           otaStyle.textContent = cssTxt;
         }
         if (navTxt && navTxt.length > 500) {
-          localStorage.setItem('streamit_ota_tv_nav_v9', navTxt);
+          try {
+            localStorage.setItem('streamit_ota_tv_nav_v9', navTxt);
+          } catch (eQuota2) {
+            try { localStorage.removeItem('streamit_enriched_catalog_cache_v982'); localStorage.setItem('streamit_ota_tv_nav_v9', navTxt); } catch (e3) {}
+          }
         }
         if (jsTxt && jsTxt.length > 2000) {
-          localStorage.setItem('streamit_ota_app_js_v9', jsTxt);
+          try {
+            localStorage.setItem('streamit_ota_app_js_v9', jsTxt);
+          } catch (eQuota3) {
+            try { localStorage.removeItem('streamit_enriched_catalog_cache_v982'); localStorage.setItem('streamit_ota_app_js_v9', jsTxt); } catch (e4) {}
+          }
         }
-        localStorage.setItem('streamit_ota_version_v9', verObj.version);
+        try {
+          localStorage.setItem('streamit_ota_version_v9', verObj.version);
+        } catch (eVer) {}
+        updateVersionBadgesUi(verObj.version);
         if (verObj.version !== APP_VERSION) {
           try {
             var reloadKey = 'streamit_ota_reloaded_' + verObj.version;
@@ -4155,9 +4272,17 @@
       if (!item) return false;
       if (item.type !== 'channel') {
         if (state.brokenPosterIds && state.brokenPosterIds[String(item.id)]) return false;
-        if (strictPoster) {
-          var p = String(item.poster || '').trim();
-          if (!p || p.indexOf('1489599849927') !== -1 || p.indexOf('undefined') !== -1 || p.indexOf('null') !== -1) {
+        var tStr = String(item.title || '').trim();
+        if (!tStr || tStr.length < 2 || tStr === 'ללא שם' || /(https?:\/\/|t\.me\/|@[a-zA-Z0-9_]{3,}|טלגרם\s*@)/i.test(tStr)) {
+          return false;
+        }
+        var p = String(item.poster || '').trim();
+        if (!p || p.indexOf('http') !== 0 || p.indexOf('1489599849927') !== -1 || p.indexOf('undefined') !== -1 || p.indexOf('null') !== -1) {
+          return false;
+        }
+        if (item.type !== 'youtube') {
+          var ov = String(item.overview || '').trim();
+          if (!ov || ov.length < 18 || ov.indexOf('לצפייה ישירה באיכות Full HD') !== -1 || ov.indexOf('וידאו מתוך ערוץ הטלגרם') !== -1) {
             return false;
           }
         }
@@ -4239,8 +4364,14 @@
         backdropEl.style.backgroundImage = 'url("' + bgUrl + '")';
       }
     }
+    var heroGenresText = item.type === 'channel'
+      ? (item.subLabel || 'שידור חי ישיר')
+      : getItemLeadingGenresText(item, 2, ' / ');
+    var heroAgeText = item.ageRating || '14+';
+
     if (catTagEl) {
-      catTagEl.textContent = item.type === 'series' ? 'סדרת טלוויזיה' : (item.type === 'channel' ? 'שידור חי' : 'סרט קולנוע');
+      var baseTypeLabel = item.type === 'series' ? 'סדרת טלוויזיה' : (item.type === 'channel' ? 'שידור חי' : 'סרט קולנוע');
+      catTagEl.textContent = item.type === 'channel' ? baseTypeLabel : (baseTypeLabel + ' • ' + heroGenresText);
     }
     if (titleEl) {
       titleEl.textContent = item.title;
@@ -4250,6 +4381,8 @@
       metaEl.innerHTML =
         '<span class="meta-match">' + matchScore + '% התאמה</span>' +
         '<span class="meta-year">' + escapeHtml(item.year) + '</span>' +
+        '<span class="meta-genre-pill">' + escapeHtml(heroGenresText) + '</span>' +
+        (item.type !== 'channel' ? ('<span class="meta-age-badge">גיל צפייה מומלץ: ' + escapeHtml(heroAgeText) + '</span>') : '') +
         '<span class="meta-quality">4K HDR</span>' +
         '<span class="meta-sub">כתוביות בעברית</span>';
     }
@@ -4366,7 +4499,24 @@
     }
   }
 
+  function scheduleRenderCatalogShelves(delayMs) {
+    if (state.catalogRenderTimer) {
+      clearTimeout(state.catalogRenderTimer);
+    }
+    state.catalogRenderTimer = setTimeout(function () {
+      state.catalogRenderTimer = null;
+      var playerOpen = document.getElementById('playerModal') && !document.getElementById('playerModal').classList.contains('hidden');
+      var detailsOpen = document.getElementById('detailsModal') && !document.getElementById('detailsModal').classList.contains('hidden');
+      if (playerOpen || detailsOpen) {
+        state.pendingCatalogRender = true;
+        return;
+      }
+      renderCatalogShelves();
+    }, typeof delayMs === 'number' ? delayMs : 220);
+  }
+
   function renderCatalogShelves() {
+    state.pendingCatalogRender = false;
     var container = document.getElementById('catalogRowsContainer');
     var continueSec = document.getElementById('continueWatchingSection');
     var continueRow = document.getElementById('continueWatchingRow');
@@ -4971,11 +5121,14 @@
       gridWallItems = (catVis.movies === false ? [] : allMovies).concat(catVis.series === false ? [] : allSeries);
     }
 
+    var isTvPerfMode = Boolean(document.body && document.body.classList.contains('tv-mode'));
+    var maxShelfRowItems = isTvPerfMode ? 12 : 20;
     var html = '';
     for (var s = 0; s < shelves.length; s++) {
       var shelf = shelves[s];
       if (!shelf.items || !shelf.items.length) continue;
-      var cardsHtml = shelf.items.map(function (it, idx) {
+      var shelfItemsSlice = shelf.isTop10 ? shelf.items.slice(0, 10) : shelf.items.slice(0, maxShelfRowItems);
+      var cardsHtml = shelfItemsSlice.map(function (it, idx) {
         return renderPosterCardHtml(it, shelf.isTop10 ? { rankNumber: idx + 1 } : undefined);
       }).filter(Boolean).join('');
       if (!cardsHtml) continue;
@@ -5000,7 +5153,8 @@
 
     // Always render the Multi-Row & Multi-Column Grid Wall (paginated for instant DOM speed!)
     if (gridWallItems && gridWallItems.length) {
-      var wallLimit = state.catalogWallLimit || 48;
+      var defaultWallLimit = isTvPerfMode ? 24 : 48;
+      var wallLimit = state.catalogWallLimit || defaultWallLimit;
       var wallSlice = gridWallItems.slice(0, wallLimit);
       var remainingWallCount = Math.max(0, gridWallItems.length - wallSlice.length);
       var loadMoreLabel = remainingWallCount > 0
@@ -5219,12 +5373,14 @@
 
     var tileImg = item.cardBackdrop || item.backdrop || item.poster;
     if (tileImg && String(tileImg).indexOf('/t/p/original/') !== -1) {
-      tileImg = String(tileImg).replace('/t/p/original/', '/t/p/w780/');
+      tileImg = String(tileImg).replace('/t/p/original/', '/t/p/w500/');
     } else if (tileImg && String(tileImg).indexOf('/t/p/w1280/') !== -1) {
-      tileImg = String(tileImg).replace('/t/p/w1280/', '/t/p/w780/');
+      tileImg = String(tileImg).replace('/t/p/w1280/', '/t/p/w500/');
+    } else if (tileImg && String(tileImg).indexOf('/t/p/w780/') !== -1) {
+      tileImg = String(tileImg).replace('/t/p/w780/', '/t/p/w500/');
     }
     var fallbackPoster = item.poster || item.backdrop || '';
-    var typeBadgeText = item.type === 'series' ? 'סדרה' : 'סרט';
+    var leadingGenresText = getItemLeadingGenresText(item, 2, ' / ');
 
     return (
       '<article class="poster-card landscape-poster-card' + (isCwCard ? ' cw-poster-card' : '') + (rankNum > 0 ? ' top10-poster-card' : '') + ' tv-focusable" tabindex="0" role="button" ' +
@@ -5236,11 +5392,8 @@
         '<div class="poster-hover-overlay">' +
           '<span class="poster-hover-title">' + escapeHtml(item.title) + '</span>' +
           '<div class="poster-hover-meta">' +
-            '<span class="poster-meta-year">' + escapeHtml(item.year || '2025') + '</span>' +
-            '<span class="poster-meta-dot">•</span>' +
-            '<span class="poster-meta-type">' + escapeHtml(typeBadgeText) + '</span>' +
-            '<span class="poster-meta-dot">•</span>' +
-            '<span class="poster-meta-sub">מתורגם</span>' +
+            '<span class="poster-meta-year" dir="rtl">' + escapeHtml(item.year || '2025') + '.</span>' +
+            '<span class="poster-meta-type">' + escapeHtml(leadingGenresText) + '</span>' +
           '</div>' +
         '</div>' +
         progHtml +
@@ -8268,35 +8421,87 @@
   async function fetchSceneThumbnailsForItem(item, season, episode) {
     state.seekSceneStills = [];
     if (!item || item.type === 'channel' || item.type === 'youtube') return;
-    if (item.backdrop) state.seekSceneStills.push(item.backdrop);
-    if (item.poster && item.poster !== item.backdrop) state.seekSceneStills.push(item.poster);
+    if (item.cardBackdrop) state.seekSceneStills.push(item.cardBackdrop);
+    else if (item.backdrop) state.seekSceneStills.push(item.backdrop);
+    if (item.poster && state.seekSceneStills.indexOf(item.poster) === -1) state.seekSceneStills.push(item.poster);
+
+    var thumbImgEl = document.getElementById('seekThumbImg');
+    var thumbBackdropEl = document.getElementById('seekThumbBackdrop');
+    if (thumbImgEl && state.seekSceneStills[0]) {
+      thumbImgEl.setAttribute('data-src', state.seekSceneStills[0]);
+      thumbImgEl.src = state.seekSceneStills[0];
+    }
+    if (thumbBackdropEl && state.seekSceneStills[0]) {
+      thumbBackdropEl.style.backgroundImage = 'url("' + state.seekSceneStills[0] + '")';
+    }
 
     var cleanTmdb = String(item.tmdbId || '').replace(/\D/g, '');
-    if (!cleanTmdb) return;
+    var stills = [];
 
-    try {
-      var endpoint = item.type === 'series'
-        ? (TMDB_BASE + '/tv/' + encodeURIComponent(cleanTmdb) + '/images?api_key=' + TMDB_API_KEY)
-        : (TMDB_BASE + '/movie/' + encodeURIComponent(cleanTmdb) + '/images?api_key=' + TMDB_API_KEY);
-      var res = await fetch(endpoint);
-      if (res.ok) {
-        var data = await res.json();
-        var backdrops = (data && Array.isArray(data.backdrops)) ? data.backdrops : [];
-        var stills = [];
-        for (var i = 0; i < Math.min(28, backdrops.length); i++) {
-          if (backdrops[i] && backdrops[i].file_path) {
-            stills.push('https://image.tmdb.org/t/p/w500' + backdrops[i].file_path);
+    if (cleanTmdb) {
+      try {
+        if (item.type === 'series' && season && episode) {
+          var epEndpoint = TMDB_BASE + '/tv/' + encodeURIComponent(cleanTmdb) + '/season/' + encodeURIComponent(season) + '/episode/' + encodeURIComponent(episode) + '/images?api_key=' + TMDB_API_KEY;
+          var epRes = await fetch(epEndpoint);
+          if (epRes.ok) {
+            var epData = await epRes.json();
+            var epStills = (epData && Array.isArray(epData.stills)) ? epData.stills : [];
+            for (var es = 0; es < Math.min(20, epStills.length); es++) {
+              if (epStills[es] && epStills[es].file_path) {
+                stills.push('https://image.tmdb.org/t/p/w500' + epStills[es].file_path);
+              }
+            }
           }
         }
-        if (stills.length >= 2) {
-          state.seekSceneStills = stills;
+        var endpoint = item.type === 'series'
+          ? (TMDB_BASE + '/tv/' + encodeURIComponent(cleanTmdb) + '/images?api_key=' + TMDB_API_KEY + '&include_image_language=null,en,he')
+          : (TMDB_BASE + '/movie/' + encodeURIComponent(cleanTmdb) + '/images?api_key=' + TMDB_API_KEY + '&include_image_language=null,en,he');
+        var res = await fetch(endpoint);
+        if (res.ok) {
+          var data = await res.json();
+          var backdrops = (data && Array.isArray(data.backdrops)) ? data.backdrops : [];
+          for (var i = 0; i < Math.min(36, backdrops.length); i++) {
+            if (backdrops[i] && backdrops[i].file_path) {
+              var u = 'https://image.tmdb.org/t/p/w500' + backdrops[i].file_path;
+              if (stills.indexOf(u) === -1) stills.push(u);
+            }
+          }
         }
+      } catch (e) {}
+    }
+
+    if (item.imdbId && item.type !== 'series' && stills.length < 8) {
+      try {
+        var ytsImgRes = await fetch('https://yts.mx/api/v2/movie_details.json?imdb_id=' + encodeURIComponent(item.imdbId) + '&with_images=true');
+        if (ytsImgRes.ok) {
+          var ytsImgData = await ytsImgRes.json();
+          var mv = ytsImgData && ytsImgData.data && ytsImgData.data.movie;
+          if (mv) {
+            var ytsShots = [mv.medium_screenshot_image1, mv.medium_screenshot_image2, mv.medium_screenshot_image3, mv.large_screenshot_image1, mv.large_screenshot_image2, mv.large_screenshot_image3];
+            for (var ys = 0; ys < ytsShots.length; ys++) {
+              if (ytsShots[ys] && stills.indexOf(ytsShots[ys]) === -1) {
+                stills.push(ytsShots[ys]);
+              }
+            }
+          }
+        }
+      } catch (eYts) {}
+    }
+
+    if (stills.length >= 1) {
+      state.seekSceneStills = stills;
+      // Preload first 10 stills into browser memory for instant 0ms scrubbing
+      for (var p = 0; p < Math.min(10, stills.length); p++) {
+        var pre = new Image();
+        pre.src = stills[p];
       }
-    } catch (e) {}
+    }
   }
 
   function showSeekThumbnailPreview(targetSec, clientX, containerRect, deltaSec) {
     var previewEl = document.getElementById('seekThumbnailPreview');
+    var thumbImgEl = document.getElementById('seekThumbImg');
+    var thumbBackdropEl = document.getElementById('seekThumbBackdrop');
     var sceneBadgeEl = document.getElementById('seekThumbSceneBadge');
     var timeEl = document.getElementById('seekThumbTimeBadge') || document.getElementById('seekThumbTime');
     var cueEl = document.getElementById('seekThumbCueText') || document.getElementById('seekThumbCue');
@@ -8316,13 +8521,34 @@
     timeEl.textContent = formatSeconds(targetSec) + ' / ' + formatSeconds(dur);
 
     var pct = dur > 0 ? Math.max(0, Math.min(0.999, targetSec / dur)) : 0;
+
+    // Update Netflix-style visual scene thumbnail image
+    var stills = (state.seekSceneStills && state.seekSceneStills.length)
+      ? state.seekSceneStills
+      : (state.playingItem ? [state.playingItem.cardBackdrop || state.playingItem.backdrop || state.playingItem.poster].filter(Boolean) : []);
+    if (stills.length) {
+      var stillIdx = Math.min(stills.length - 1, Math.max(0, Math.floor(pct * stills.length)));
+      var chosenUrl = stills[stillIdx] || stills[0];
+      if (thumbImgEl && chosenUrl) {
+        if (thumbImgEl.getAttribute('data-src') !== chosenUrl) {
+          thumbImgEl.setAttribute('data-src', chosenUrl);
+          thumbImgEl.src = chosenUrl;
+        }
+        var subPan = Math.round(((pct * stills.length) % 1) * 100);
+        thumbImgEl.style.objectPosition = subPan + '% center';
+      }
+      if (thumbBackdropEl && chosenUrl) {
+        thumbBackdropEl.style.backgroundImage = 'url("' + chosenUrl + '")';
+      }
+    }
+
     if (sceneBadgeEl) {
       if (typeof deltaSec === 'number' && deltaSec !== 0) {
         sceneBadgeEl.textContent = deltaSec > 0 ? ('⏩ +' + Math.abs(deltaSec) + ' שניות') : ('⏪ -' + Math.abs(deltaSec) + ' שניות');
       } else {
         var totalChapters = 12;
         var curChapter = Math.min(totalChapters, Math.floor(pct * totalChapters) + 1);
-        sceneBadgeEl.textContent = '⏱️ פרק זמן ' + curChapter + ' / ' + totalChapters;
+        sceneBadgeEl.textContent = 'סצנה ' + curChapter + ' / ' + totalChapters;
       }
     }
 
@@ -11988,8 +12214,10 @@
       cloud: 'active'
     });
     initTvTopClock();
+    updateVersionBadgesUi();
     loadLocalStorageState();
     updateAuthUi();
+    updateVersionBadgesUi();
     bindUiEvents();
     initLiveNewsTicker();
     loadCatalog();

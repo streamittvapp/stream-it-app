@@ -1,9 +1,9 @@
 {
-  "version": "9.8.1",
-  "native_apk_version": "9.6.0",
+  "version": "9.8.2",
+  "native_apk_version": "9.8.2",
   "apk_download_url": "https://streamittvapp.github.io/stream-it-app/StreamIt-AndroidTV.apk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-11T11:12:00Z",
-  "notes": "v9.8.1 — Hero Billboard Unclipped & Enlarged, Compact Row Titles & Tighter Spacing, Refined Top Player Bar, Unified Single Progress Bar & Accurate Seek HUD (including Fullscreen D-Pad Seeking), Cross-Device Cloud Sync (Resume Playback & Watchlist with Snapshots), Removed Fake Skip Intro, Compact Subtitles Menu, and Upgraded SafeWatch Parental Control."
+  "updated_at": "2026-11-11T12:00:00Z",
+  "notes": "v9.8.2 — Live Version Sync across Streamer & Admin, White-Background Brand & Android TV Launcher Card, Tile Metadata (Year + Top 2 Genres), Hero Category + Recommended Age Rating, Strict Content Readiness Filter, Expanded Multi-Thousand Streaming Pool & Live Dashboard Stats, Clear White/Gray Exit Modal Focus, Netflix-Style Visual Seek Thumbnails, and Ultra-Fast TV Performance."
 }

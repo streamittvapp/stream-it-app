@@ -76,6 +76,10 @@
   function isElementVisible(el) {
     if (!el || !el.isConnected || el.disabled) return false;
     if (el.classList.contains('hidden')) return false;
+    if (el.classList.contains('poster-card')) {
+      var modalParent = el.closest('.modal-overlay');
+      return !modalParent || !modalParent.classList.contains('hidden');
+    }
     if (el.closest('.hidden')) return false;
     if (el.closest('.tv-rail-sec-list:not(.open)')) return false;
     return el.offsetWidth > 2 && el.offsetHeight > 2;
@@ -264,7 +268,7 @@
         if (currentFocused === el) {
           window.previewCardInHero(el);
         }
-      }, isTv ? 480 : 260);
+      }, isTv ? 650 : 280);
     }
 
     return true;
@@ -2617,7 +2621,7 @@
    */
   function handleRemoteCommand(directionOrAction) {
     var nowCmd = Date.now();
-    if (directionOrAction === lastCmdDir && nowCmd - lastCmdAt < 45) {
+    if (directionOrAction === lastCmdDir && nowCmd - lastCmdAt < 22) {
       return true;
     }
     lastCmdDir = directionOrAction;

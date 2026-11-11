@@ -26,8 +26,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends BridgeActivity {
-    private static final String INSTALLED_APP_VERSION = "9.6.0";
-    private static final String INSTALLED_NATIVE_APK_VERSION = "9.6.0";
+    private static final String INSTALLED_APP_VERSION = "9.8.2";
+    private static final String INSTALLED_NATIVE_APK_VERSION = "9.8.2";
     private static final String OTA_PREFS_NAME = "streamit_ota_prefs";
     private StreamItEmbeddedServer embeddedServer;
     private volatile boolean apkUpdateInProgress = false;
@@ -50,6 +50,14 @@ public class MainActivity extends BridgeActivity {
 
         @JavascriptInterface
         public String getAppVersion() {
+            try {
+                SharedPreferences prefs = getSharedPreferences(OTA_PREFS_NAME, Context.MODE_PRIVATE);
+                String cloudVer = prefs.getString("cached_cloud_version", INSTALLED_APP_VERSION);
+                if (cloudVer != null && !cloudVer.trim().isEmpty()) {
+                    return cloudVer.trim();
+                }
+            } catch (Exception ignored) {
+            }
             return INSTALLED_APP_VERSION;
         }
 
