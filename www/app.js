@@ -10,7 +10,8 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.8.4';
+  var APP_VERSION = '9.8.5';
+  window.__STREAMIT_V985_BOOTED = true;
   window.__STREAMIT_V984_BOOTED = true;
   window.__STREAMIT_V983_BOOTED = true;
   window.__STREAMIT_V982_BOOTED = true;
@@ -38,6 +39,8 @@
   window.__STREAMIT_V968_BOOTED = true;
   window.__STREAMIT_V969_BOOTED = true;
   window.__STREAMIT_V970_BOOTED = true;
+  // Block any older bundled v9.7.0-v9.8.4 script from firing its DOMContentLoaded boot handler after OTA loads
+  window.__STREAMIT_V970_BOOT_DONE = true;
 
   // Preserve direct reference to native fetch and freeze any stale in-flight async loops from legacy bundled v9.6.0 APK scripts
   var nativeFetch = window.fetch ? window.fetch.bind(window) : null;
@@ -2466,10 +2469,32 @@
     var cardBackdrop = raw.cardBackdrop || (raw.backdrop_path ? ('https://image.tmdb.org/t/p/w500' + raw.backdrop_path) : backdrop.replace('/t/p/original/', '/t/p/w500/').replace('/t/p/w1280/', '/t/p/w500/').replace('/t/p/w780/', '/t/p/w500/'));
 
     var year = raw.year || '';
-    if (!year && (raw.release_date || raw.first_air_date || raw.releaseInfo)) {
-      year = String(raw.release_date || raw.first_air_date || raw.releaseInfo).slice(0, 4);
+    var rawRelDateStr = String(raw.release_date || raw.first_air_date || '').trim();
+    if (!year && (rawRelDateStr || raw.releaseInfo)) {
+      year = String(rawRelDateStr || raw.releaseInfo).slice(0, 4);
     }
     if (!year) year = type === 'channel' ? 'LIVE' : '2025';
+
+    // Strict Readiness Check #1b: Reject unreleased future theatrical stubs (e.g. TMDB 1568027 "קופה ראשית: הסרט" 2026-06-17)
+    // and raw TMDB discovery items with very low vote counts that do not yet exist on any VOD streaming server
+    var hasDirectCustomStream = Boolean(raw.stream_url || raw.streamUrl || raw.hls_url || raw.directUrl || raw.direct_yt_id || raw.directYtId || raw.videoId);
+    if (type !== 'channel' && type !== 'youtube' && !hasDirectCustomStream && !isYtsItem && !isTelegramItem) {
+      if (tmdbId === '1568027' || tmdbId === '851725') {
+        return null;
+      }
+      if (raw.vote_count !== undefined) {
+        var vcNum = Number(raw.vote_count) || 0;
+        if (vcNum < 15) {
+          return null;
+        }
+        if (isTrulyIsraeli && type === 'movie' && vcNum < 35) {
+          return null;
+        }
+        if (rawRelDateStr && rawRelDateStr > '2026-04-01' && vcNum < 80) {
+          return null;
+        }
+      }
+    }
 
     var rating = raw.imdb_rating || raw.rating || raw.imdbRating || raw.vote_average || '8.4';
     if (typeof rating === 'number') rating = rating.toFixed(1);
@@ -2880,18 +2905,19 @@
     mergeCustomChannelsIntoState();
     state.catalog.youtube = BUILTIN_YOUTUBE_ITEMS.slice();
 
-    // 1. Restore cached enriched catalog from localStorage for instant 0ms repeat boot (strictly Hebrew-verified v983)
+    // 1. Restore cached enriched catalog from localStorage for instant 0ms repeat boot (strictly Hebrew-verified v985)
     var hadCachedEnriched = false;
     try {
       localStorage.removeItem('streamit_enriched_catalog_cache_v980');
       localStorage.removeItem('streamit_enriched_catalog_cache_v982');
-      var cachedRaw = localStorage.getItem('streamit_enriched_catalog_cache_v983');
+      localStorage.removeItem('streamit_enriched_catalog_cache_v983');
+      var cachedRaw = localStorage.getItem('streamit_enriched_catalog_cache_v985');
       if (cachedRaw) {
         var cachedObj = JSON.parse(cachedRaw);
         var heRe = /[\u0590-\u05FF]/;
         if (cachedObj && Array.isArray(cachedObj.movies) && cachedObj.movies.length > 20) {
           state.catalog.movies = cachedObj.movies.filter(function (m) {
-            return m && heRe.test(String(m.overview || '')) && (heRe.test(String(m.title || '')) || /^[\d\s:.\-]+$/.test(String(m.title || '')));
+            return m && String(m.tmdbId) !== '1568027' && heRe.test(String(m.overview || '')) && (heRe.test(String(m.title || '')) || /^[\d\s:.\-]+$/.test(String(m.title || '')));
           });
           state.catalog.series = (Array.isArray(cachedObj.series) ? cachedObj.series : []).filter(function (s) {
             return s && heRe.test(String(s.overview || '')) && (heRe.test(String(s.title || '')) || /^[\d\s:.\-]+$/.test(String(s.title || '')));
@@ -3003,7 +3029,7 @@
 
     var saveCatalogCacheSnapshot = function () {
       try {
-        localStorage.setItem('streamit_enriched_catalog_cache_v983', JSON.stringify({
+        localStorage.setItem('streamit_enriched_catalog_cache_v985', JSON.stringify({
           ts: Date.now(),
           movies: (state.catalog.movies || []).slice(0, 1200),
           series: (state.catalog.series || []).slice(0, 650)
@@ -3121,7 +3147,7 @@
           }));
         }
         try {
-          localStorage.setItem('streamit_enriched_catalog_cache_v983', JSON.stringify({
+          localStorage.setItem('streamit_enriched_catalog_cache_v985', JSON.stringify({
             ts: Date.now(),
             movies: (state.catalog.movies || []).slice(0, 1200),
             series: (state.catalog.series || []).slice(0, 650)
@@ -6586,7 +6612,7 @@
     var ytId = item.videoId || item.directYtId || item.trailerYtId || '';
     if (!ytId && item.tmdbId) {
       try {
-        var ep = (item.type === 'series' ? '/tv/' : '/movie/') + encodeURIComponent(item.tmdbId) + '/videos?api_key=' + TMDB_API_KEY;
+        var ep = (item.type === 'series' ? '/tv/' : '/movie/') + encodeURIComponent(item.tmdbId) + '/videos?api_key=' + TMDB_API_KEY + '&include_video_language=he,en,null';
         var r = await fetch(TMDB_BASE + ep);
         if (r.ok) {
           var d = await r.json();
@@ -6962,7 +6988,9 @@
       } catch (e) {}
     }, 600);
 
-    // Automatic Failover Watchdog: allow up to 15s for multi-server probing (`Vertex -> Beta -> Nebula -> Vega`) inside `cdn.vidspark.to`
+    // Automatic Failover Watchdog: only reveal `#streamEmbedIframe` when `vidspark-player` confirms a real stream via postMessage;
+    // if no stream exists on the server (which would otherwise fall back to a secondary "Sandbox Detected" page), keep opacity:0 and fail over cleanly!
+    var watchdogMs = state.embedActiveServerKey === 'embed1' ? 7000 : 5500;
     state.embedWatchdogTimer = setTimeout(function () {
       if (state.playingMode === 'embed' && !state.embedVerified && state.playingItem) {
         if (state.embedActiveServerKey === 'embed1') {
@@ -6971,7 +6999,7 @@
           playYoutubeVideoOrTrailer(state.playingItem);
         }
       }
-    }, 15000);
+    }, watchdogMs);
 
     if (iframe) {
       iframe.addEventListener('load', function () {
@@ -6979,27 +7007,10 @@
           if (iframe.contentWindow) {
             iframe.contentWindow.postMessage({ action: 'getStatus' }, '*');
           }
-          setTimeout(function () {
-            var curIfr = document.getElementById('streamEmbedIframe');
-            if (curIfr && state.playingMode === 'embed') {
-              curIfr.style.opacity = '1';
-              var sp = document.getElementById('playerLoadingSpinner');
-              if (sp) sp.classList.add('hidden');
-              if (!state.embedVerified) {
-                state.embedVerified = true;
-              }
-              if (state.embedStartOffsetSec > 15 && curIfr.contentWindow) {
-                try {
-                  curIfr.contentWindow.postMessage({ action: 'seek', time: Math.floor(state.embedStartOffsetSec) }, '*');
-                  curIfr.contentWindow.postMessage({ command: 'seek', time: Math.floor(state.embedStartOffsetSec) }, '*');
-                } catch (e) {}
-              }
-            }
-          }, 3200);
           if (window.AndroidTvBridge && typeof window.AndroidTvBridge.tapCenterOfScreen === 'function') {
             setTimeout(function () {
               var pm = document.getElementById('playerModal');
-              if (pm && !pm.classList.contains('hidden')) {
+              if (pm && !pm.classList.contains('hidden') && state.embedVerified) {
                 window.AndroidTvBridge.tapCenterOfScreen();
               }
             }, 900);
@@ -12905,7 +12916,8 @@
   }
 
   function bootStreamItApp() {
-    if (window.__STREAMIT_V970_BOOT_DONE) return;
+    if (window.__STREAMIT_V985_BOOT_DONE) return;
+    window.__STREAMIT_V985_BOOT_DONE = true;
     window.__STREAMIT_V970_BOOT_DONE = true;
 
     // If an older bundled APK script ran 1ms earlier, strip its stale DOM listeners via cloneNode(true)

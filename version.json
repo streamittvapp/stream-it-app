@@ -1,9 +1,9 @@
 {
-  "version": "9.8.4",
-  "native_apk_version": "9.8.4",
+  "version": "9.8.5",
+  "native_apk_version": "9.8.5",
   "apk_download_url": "https://streamittvapp.github.io/stream-it-app/StreamIt-AndroidTV.apk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-11T15:58:00Z",
-  "notes": "v9.8.4 — Complete & Permanent Removal from Continue Watching (wipes red progress bar, resume timestamp & cloud resurrection across all alias IDs) + Confirmation Dialog before clearing Continue Watching list."
+  "updated_at": "2026-11-11T17:08:00Z",
+  "notes": "v9.8.5 — Zero Sandbox Detected screen (strict postMessage stream verification before iframe reveal + automatic YouTube/Direct failover), filter unreleased future TMDB titles, and version-isolated OTA boot guard."
 }
