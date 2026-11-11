@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794402993595,
+      "updatedTs": 1794404768241,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -326,7 +326,8 @@
             "288673",
             "58841",
             "1236045",
-            "1339713"
+            "1339713",
+            "tt10577736"
           ],
           "progress": {
             "27": {
@@ -373,12 +374,12 @@
               "imdbId": "tt0079118",
               "tmdbId": "10580",
               "title": "אסקימו לימון",
-              "currentTime": 4955,
+              "currentTime": 4965,
               "duration": 5538,
-              "percent": 89,
+              "percent": 90,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794402993595,
+              "updatedAt": 1794403003191,
               "snapshot": {
                 "id": "10580",
                 "imdbId": "tt0079118",
@@ -501,8 +502,37 @@
               "updatedAt": 1794387260384
             }
           },
-          "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0
+          "watchlistSnapshots": {
+            "tt10577736": {
+              "id": "tt10577736",
+              "imdbId": "tt10577736",
+              "tmdbId": "103913",
+              "type": "series",
+              "title": "טהרן",
+              "originalTitle": "Tehran",
+              "year": "2020",
+              "rating": "7.6",
+              "runtimeHe": "3 עונות • 24 פרקים",
+              "ageRating": "16+",
+              "overview": "תמר רביניאן, האקרית ולוחמת סייבר צעירה במוסד, מוחדרת בזהות בדויה לבירת איראן למשימה מסוכנת של השבתת מערכות המכ\"ם.",
+              "poster": "https://images.metahub.space/poster/medium/tt10577736/img",
+              "backdrop": "https://images.metahub.space/background/medium/tt10577736/img",
+              "cardBackdrop": "https://images.metahub.space/background/medium/tt10577736/img",
+              "genres": [
+                "israeli",
+                "drama",
+                "action",
+                "telegram"
+              ],
+              "genresHe": [
+                "יצירה ישראלית",
+                "מתח וריגול",
+                "דרמה"
+              ],
+              "seasonsCount": 4
+            }
+          },
+          "watchlistUpdatedAt": 1794404768241
         },
         "prof-living": {
           "watchlist": [],
