@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794433004422,
+      "updatedTs": 1794433026521,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -329,7 +329,45 @@
             "1339713",
             "tt10577736"
           ],
-          "progress": {},
+          "progress": {
+            "1283515": {
+              "id": "1283515",
+              "imdbId": "tt32261958",
+              "tmdbId": "1283515",
+              "title": "תעתוע",
+              "currentTime": 113,
+              "duration": 7256,
+              "percent": 3,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794433026521,
+              "snapshot": {
+                "id": "1283515",
+                "imdbId": "tt32261958",
+                "tmdbId": "1283515",
+                "type": "movie",
+                "title": "תעתוע",
+                "originalTitle": "Verity",
+                "year": "2026",
+                "rating": "7.0",
+                "runtimeHe": "שעתיים",
+                "ageRating": "14+",
+                "overview": "סופרת מתקשה עוברת להתגורר באחוזת קרופורד המבודדת כדי לכתוב בשמה של וריטי. לאחר שלואן מגלה מה שנראה כרשימות אוטוביוגרפיות מצמררות של וריטי, היא מתמודדת עם וידויים מטרידים ומעוותים הנוגעים לבעלה של וריטי, ג'רמי ומתקשה להבחין בין דמיון למציאות, בין מניפולציה למשיכה, ובין הזדמנות לאובססיה.",
+                "poster": "https://image.tmdb.org/t/p/w500/fhkXXgxth4IxoplvQvQZ0BSo3F4.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
+                "genres": [
+                  "mystery",
+                  "thriller"
+                ],
+                "genresHe": [
+                  "מסתורין ובלשי",
+                  "מותחנים"
+                ],
+                "seasonsCount": 0
+              }
+            }
+          },
           "watchlistSnapshots": {
             "tt10577736": {
               "id": "tt10577736",
