@@ -89,6 +89,9 @@
     var vk = document.getElementById('tvVirtualKeyboard');
     if (vk && !vk.classList.contains('hidden')) return vk;
 
+    var clearCwModal = document.getElementById('clearCwConfirmModal');
+    if (clearCwModal && !clearCwModal.classList.contains('hidden')) return clearCwModal;
+
     var parentalModal = document.getElementById('parentalControlModal');
     if (parentalModal && !parentalModal.classList.contains('hidden')) return parentalModal;
 
@@ -2430,6 +2433,17 @@
       return closeVirtualKeyboard();
     }
 
+    var clearCwModal = document.getElementById('clearCwConfirmModal');
+    if (clearCwModal && !clearCwModal.classList.contains('hidden')) {
+      if (typeof window.cancelClearAllContinueWatching === 'function') {
+        window.cancelClearAllContinueWatching();
+      } else {
+        clearCwModal.classList.add('hidden');
+        if (lastMainFocus && isElementVisible(lastMainFocus)) setFocus(lastMainFocus);
+      }
+      return true;
+    }
+
     var parentalModal = document.getElementById('parentalControlModal');
     if (parentalModal && !parentalModal.classList.contains('hidden')) {
       if (typeof window.closeParentalControlModal === 'function') {
@@ -2793,6 +2807,19 @@
     var vk = document.getElementById('tvVirtualKeyboard');
     if (vk && !vk.classList.contains('hidden')) {
       return navigateVirtualKeyboard(directionOrAction);
+    }
+
+    var clearCwModalNav = document.getElementById('clearCwConfirmModal');
+    if (clearCwModalNav && !clearCwModalNav.classList.contains('hidden')) {
+      var cwCancelBtn = document.getElementById('clearCwCancelBtn');
+      var cwConfirmBtn = document.getElementById('clearCwConfirmBtn');
+      if (currentFocused === cwCancelBtn && cwConfirmBtn && isElementVisible(cwConfirmBtn)) {
+        return setFocus(cwConfirmBtn, { scroll: false });
+      }
+      if (cwCancelBtn && isElementVisible(cwCancelBtn)) {
+        return setFocus(cwCancelBtn, { scroll: false });
+      }
+      return true;
     }
 
     var parentalModalNav = document.getElementById('parentalControlModal');

@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
-  <link rel="stylesheet" href="styles.css?v=9.8.2" />
+  <link rel="stylesheet" href="styles.css?v=9.8.4" />
   <script>
     (function () {
       try {
@@ -123,7 +123,7 @@
           <button type="button" class="nav-link tv-focusable" data-category="youtube" aria-label="יוטיוב">יוטיוב</button>
           <button type="button" class="nav-link tv-focusable" data-category="mylist" aria-label="הרשימה שלי">הרשימה שלי</button>
           <span id="tvTopClock" class="tv-top-clock" dir="ltr" aria-label="שעה נוכחית"></span>
-          <span id="appVersionBadge" class="app-version-badge" dir="ltr" aria-label="גרסת מערכת">v9.8.2</span>
+          <span id="appVersionBadge" class="app-version-badge" dir="ltr" aria-label="גרסת מערכת">v9.8.4</span>
         </nav>
       </div>
 
@@ -339,7 +339,7 @@
         </svg>
         <span id="tvRailProfileName" class="tv-rail-profile-name">ראשי</span>
       </button>
-      <span id="tvRailVersionBadge" class="tv-rail-version-badge" dir="ltr">v9.8.2</span>
+      <span id="tvRailVersionBadge" class="tv-rail-version-badge" dir="ltr">v9.8.4</span>
       <button type="button" id="tvRailSettingsBtn" class="tv-rail-bottom-btn tv-rail-settings-btn tv-focusable" aria-label="הגדרות">
         <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
           <circle cx="12" cy="12" r="3" />
@@ -1623,17 +1623,31 @@
     </div>
   </div>
 
+  <!-- ===================================================================== -->
+  <!-- CLEAR CONTINUE WATCHING CONFIRMATION MODAL (#clearCwConfirmModal)     -->
+  <!-- ===================================================================== -->
+  <div id="clearCwConfirmModal" class="player-exit-confirm-overlay clear-cw-confirm-overlay hidden" dir="rtl" role="dialog" aria-modal="true" aria-labelledby="clearCwConfirmHeading">
+    <div class="player-exit-confirm-card">
+      <h3 id="clearCwConfirmHeading" class="player-exit-confirm-title">ניקוי רשימת המשך צפייה?</h3>
+      <p class="player-exit-confirm-sub">האם אתה בטוח שברצונך למחוק את כל הסרטים והסדרות מרשימת המשך הצפייה ולאפס את נקודות העצירה שלהם?</p>
+      <div class="player-exit-confirm-actions">
+        <button type="button" id="clearCwCancelBtn" class="btn-primary player-exit-btn tv-focusable">ביטול</button>
+        <button type="button" id="clearCwConfirmBtn" class="btn-secondary player-exit-btn tv-focusable">כן, נקה הכל</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notifications Container -->
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Core Application & Smart TV Navigation Scripts -->
-  <script src="tv-navigation.js?v=9.8.3"></script>
-  <script src="app.js?v=9.8.3"></script>
+  <script src="tv-navigation.js?v=9.8.4"></script>
+  <script src="app.js?v=9.8.4"></script>
   <script>
     (function () {
       try {
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (otaVer && otaVer > '9.8.3') {
+        if (otaVer && otaVer > '9.8.4') {
           var navCode = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
           if (navCode.length > 500) {
             var s1 = document.createElement('script');

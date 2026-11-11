@@ -10,7 +10,8 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.8.3';
+  var APP_VERSION = '9.8.4';
+  window.__STREAMIT_V984_BOOTED = true;
   window.__STREAMIT_V983_BOOTED = true;
   window.__STREAMIT_V982_BOOTED = true;
   window.__STREAMIT_V981_BOOTED = true;
@@ -1785,7 +1786,7 @@
   function ensureActiveProfileBucket() {
     var pid = state.activeSubUserId || 'prof-main';
     if (!state.profileData[pid]) {
-      state.profileData[pid] = { watchlist: [], watchlistSnapshots: {}, watchlistUpdatedAt: 0, progress: {} };
+      state.profileData[pid] = { watchlist: [], watchlistSnapshots: {}, watchlistUpdatedAt: 0, progress: {}, deletedProgressIds: {}, progressClearedAt: 0 };
     }
     if (!Array.isArray(state.profileData[pid].watchlist)) {
       state.profileData[pid].watchlist = [];
@@ -1796,7 +1797,127 @@
     if (!state.profileData[pid].progress || typeof state.profileData[pid].progress !== 'object') {
       state.profileData[pid].progress = {};
     }
+    if (!state.profileData[pid].deletedProgressIds || typeof state.profileData[pid].deletedProgressIds !== 'object') {
+      state.profileData[pid].deletedProgressIds = {};
+    }
+    if (typeof state.profileData[pid].progressClearedAt !== 'number') {
+      state.profileData[pid].progressClearedAt = Number(state.profileData[pid].progressClearedAt || 0);
+    }
     return state.profileData[pid];
+  }
+
+  function isProgressEntryDeleted(profBucket, key, progEntry) {
+    if (!profBucket) return false;
+    var entryTs = Number((progEntry && progEntry.updatedAt) || 0);
+    var clearedTs = Number(profBucket.progressClearedAt || 0);
+    if (clearedTs > 0 && clearedTs >= entryTs) {
+      return true;
+    }
+    var delMap = profBucket.deletedProgressIds;
+    if (!delMap || typeof delMap !== 'object') return false;
+    var candidates = [];
+    if (key) {
+      var rawKey = String(key);
+      candidates.push(rawKey);
+      var baseEpIdx = rawKey.indexOf('_s');
+      if (baseEpIdx > 0) candidates.push(rawKey.slice(0, baseEpIdx));
+    }
+    if (progEntry && typeof progEntry === 'object') {
+      if (progEntry.id) candidates.push(String(progEntry.id));
+      var pImdb = String(progEntry.imdbId || (progEntry.snapshot && progEntry.snapshot.imdbId) || '').trim();
+      if (pImdb) candidates.push(pImdb);
+      var pTmdb = String(progEntry.tmdbId || (progEntry.snapshot && progEntry.snapshot.tmdbId) || '').replace(/\D/g, '');
+      if (pTmdb) {
+        candidates.push(pTmdb);
+        candidates.push('movie-' + pTmdb);
+        candidates.push('series-' + pTmdb);
+      }
+    }
+    for (var i = 0; i < candidates.length; i++) {
+      var delTs = Number(delMap[candidates[i]] || 0);
+      if (delTs > 0 && delTs >= entryTs) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function purgeAllProgressForItem(profBucket, itemOrId) {
+    if (!profBucket) return;
+    if (!profBucket.progress || typeof profBucket.progress !== 'object') profBucket.progress = {};
+    if (!profBucket.deletedProgressIds || typeof profBucket.deletedProgressIds !== 'object') profBucket.deletedProgressIds = {};
+
+    var rawId = (typeof itemOrId === 'object' && itemOrId) ? String(itemOrId.id || '') : String(itemOrId || '');
+    var targetItem = (typeof itemOrId === 'object' && itemOrId)
+      ? itemOrId
+      : (findItemById(rawId) || (state.detailsItem && String(state.detailsItem.id) === rawId ? state.detailsItem : null));
+    var existingEntry = rawId && profBucket.progress[rawId] ? profBucket.progress[rawId] : null;
+
+    var targetImdb = String(
+      (targetItem && targetItem.imdbId) ||
+      (existingEntry && (existingEntry.imdbId || (existingEntry.snapshot && existingEntry.snapshot.imdbId))) ||
+      (rawId.indexOf('tt') === 0 ? rawId : '')
+    ).trim();
+    var targetTmdb = String(
+      (targetItem && targetItem.tmdbId) ||
+      (existingEntry && (existingEntry.tmdbId || (existingEntry.snapshot && existingEntry.snapshot.tmdbId))) ||
+      ''
+    ).replace(/\D/g, '');
+    var targetTitle = String(
+      (targetItem && targetItem.title) ||
+      (existingEntry && (existingEntry.title || (existingEntry.snapshot && existingEntry.snapshot.title))) ||
+      ''
+    ).trim();
+
+    var nowTs = Date.now();
+    var aliasKeys = [];
+    var addAlias = function (k) {
+      var s = String(k || '').trim();
+      if (s && aliasKeys.indexOf(s) === -1) aliasKeys.push(s);
+    };
+    addAlias(rawId);
+    if (targetItem && targetItem.id) addAlias(targetItem.id);
+    if (targetImdb) addAlias(targetImdb);
+    if (targetTmdb) {
+      addAlias(targetTmdb);
+      addAlias('movie-' + targetTmdb);
+      addAlias('series-' + targetTmdb);
+    }
+
+    var pKeys = Object.keys(profBucket.progress);
+    for (var i = 0; i < pKeys.length; i++) {
+      var k = pKeys[i];
+      var entry = profBucket.progress[k];
+      var shouldDelete = false;
+
+      for (var a = 0; a < aliasKeys.length; a++) {
+        var al = aliasKeys[a];
+        if (k === al || k.indexOf(al + '_s') === 0) {
+          shouldDelete = true;
+          break;
+        }
+      }
+
+      if (!shouldDelete && entry && typeof entry === 'object') {
+        var eId = String(entry.id || (entry.snapshot && entry.snapshot.id) || '').trim();
+        var eImdb = String(entry.imdbId || (entry.snapshot && entry.snapshot.imdbId) || '').trim();
+        var eTmdb = String(entry.tmdbId || (entry.snapshot && entry.snapshot.tmdbId) || '').replace(/\D/g, '');
+        var eTitle = String(entry.title || (entry.snapshot && entry.snapshot.title) || '').trim();
+        if (eId && aliasKeys.indexOf(eId) !== -1) shouldDelete = true;
+        else if (targetImdb && eImdb && eImdb === targetImdb) shouldDelete = true;
+        else if (targetTmdb && eTmdb && eTmdb === targetTmdb) shouldDelete = true;
+        else if (targetTitle && eTitle && eTitle === targetTitle) shouldDelete = true;
+      }
+
+      if (shouldDelete) {
+        delete profBucket.progress[k];
+        addAlias(k);
+      }
+    }
+
+    for (var d = 0; d < aliasKeys.length; d++) {
+      profBucket.deletedProgressIds[aliasKeys[d]] = nowTs;
+    }
   }
 
   function buildCompactItemSnapshot(item) {
@@ -1826,20 +1947,49 @@
     if (!item) return null;
     var profBucket = ensureActiveProfileBucket();
     if (!profBucket || !profBucket.progress) return null;
-    if (profBucket.progress[item.id]) return profBucket.progress[item.id];
+
+    var targetId = String(item.id || '').trim();
     var targetImdb = String(item.imdbId || '').trim();
     var targetTmdb = String(item.tmdbId || '').replace(/\D/g, '');
+    var delMap = (profBucket.deletedProgressIds && typeof profBucket.deletedProgressIds === 'object') ? profBucket.deletedProgressIds : {};
+    var itemDeletedTs = Math.max(
+      Number(profBucket.progressClearedAt || 0),
+      Number((targetId && delMap[targetId]) || 0),
+      Number((targetImdb && delMap[targetImdb]) || 0),
+      Number((targetTmdb && delMap[targetTmdb]) || 0),
+      Number((targetTmdb && delMap['movie-' + targetTmdb]) || 0),
+      Number((targetTmdb && delMap['series-' + targetTmdb]) || 0)
+    );
+
+    if (targetId && profBucket.progress[targetId]) {
+      var directProg = profBucket.progress[targetId];
+      if (isProgressEntryDeleted(profBucket, targetId, directProg) || (itemDeletedTs > 0 && itemDeletedTs >= Number(directProg.updatedAt || 0))) {
+        delete profBucket.progress[targetId];
+      } else {
+        return directProg;
+      }
+    }
+
     var keys = Object.keys(profBucket.progress);
     var best = null;
     for (var i = 0; i < keys.length; i++) {
-      var p = profBucket.progress[keys[i]];
+      var k = keys[i];
+      var p = profBucket.progress[k];
       if (!p) continue;
+      if (isProgressEntryDeleted(profBucket, k, p)) {
+        delete profBucket.progress[k];
+        continue;
+      }
       var pImdb = String(p.imdbId || (p.snapshot && p.snapshot.imdbId) || '').trim();
       var pTmdb = String(p.tmdbId || (p.snapshot && p.snapshot.tmdbId) || '').replace(/\D/g, '');
       var matched = false;
-      if (targetImdb && (keys[i] === targetImdb || pImdb === targetImdb)) matched = true;
-      else if (targetTmdb && (keys[i] === targetTmdb || keys[i] === ('movie-' + targetTmdb) || keys[i] === ('series-' + targetTmdb) || pTmdb === targetTmdb)) matched = true;
+      if (targetImdb && (k === targetImdb || pImdb === targetImdb)) matched = true;
+      else if (targetTmdb && (k === targetTmdb || k === ('movie-' + targetTmdb) || k === ('series-' + targetTmdb) || pTmdb === targetTmdb)) matched = true;
       if (matched) {
+        if (itemDeletedTs > 0 && itemDeletedTs >= Number(p.updatedAt || 0)) {
+          delete profBucket.progress[k];
+          continue;
+        }
         if (!best || Number(p.updatedAt || 0) >= Number(best.updatedAt || 0)) {
           best = p;
         }
@@ -2011,15 +2161,39 @@
           }
         }
 
-        // Continue Watching (`progress`) merge by newest `updatedAt` per item (with cross-ID deduplication)
+        // Continue Watching (`progress`) merge by newest `updatedAt` per item (respecting `progressClearedAt` & `deletedProgressIds` so deleted items never resurrect!)
+        if (!lBucket.progress || typeof lBucket.progress !== 'object') lBucket.progress = {};
+        if (!lBucket.deletedProgressIds || typeof lBucket.deletedProgressIds !== 'object') lBucket.deletedProgressIds = {};
+        lBucket.progressClearedAt = Math.max(
+          Number(lBucket.progressClearedAt || 0),
+          Number(cBucket.progressClearedAt || 0)
+        );
+        if (cBucket.deletedProgressIds && typeof cBucket.deletedProgressIds === 'object') {
+          var cDelKeys = Object.keys(cBucket.deletedProgressIds);
+          for (var cd = 0; cd < cDelKeys.length; cd++) {
+            var delK = cDelKeys[cd];
+            var cDelTs = Number(cBucket.deletedProgressIds[delK] || 0);
+            var lDelTs = Number(lBucket.deletedProgressIds[delK] || 0);
+            if (cDelTs > lDelTs) {
+              lBucket.deletedProgressIds[delK] = cDelTs;
+            }
+          }
+        }
+        var existingLocalKeys = Object.keys(lBucket.progress);
+        for (var el = 0; el < existingLocalKeys.length; el++) {
+          var lk = existingLocalKeys[el];
+          if (isProgressEntryDeleted(lBucket, lk, lBucket.progress[lk])) {
+            delete lBucket.progress[lk];
+          }
+        }
         if (cBucket.progress && typeof cBucket.progress === 'object') {
-          if (!lBucket.progress || typeof lBucket.progress !== 'object') lBucket.progress = {};
           var itemIds = Object.keys(cBucket.progress);
           for (var it = 0; it < itemIds.length; it++) {
             var itemId = itemIds[it];
             var cProg = cBucket.progress[itemId];
-            var lProg = lBucket.progress[itemId];
             if (!cProg) continue;
+            if (isProgressEntryDeleted(lBucket, itemId, cProg)) continue;
+            var lProg = lBucket.progress[itemId];
             if (!lProg || Number(cProg.updatedAt || 0) >= Number(lProg.updatedAt || 0)) {
               lBucket.progress[itemId] = cProg;
             }
@@ -4707,6 +4881,12 @@
       var cleanedAnyChannel = false;
       for (var p = 0; p < progressIds.length; p++) {
         var pid = progressIds[p];
+        var progEntry = profBucket.progress[pid];
+        if (!progEntry || isProgressEntryDeleted(profBucket, pid, progEntry)) {
+          delete profBucket.progress[pid];
+          cleanedAnyChannel = true;
+          continue;
+        }
         var found = findItemById(pid);
         if (!found || found.type === 'channel' || String(pid).indexOf('il_') === 0 || String(pid).indexOf('us_') === 0 || String(pid).indexOf('ch_') === 0) {
           if (found && found.type === 'channel') {
@@ -5400,34 +5580,55 @@
 
   function isInContinueWatching(itemId) {
     if (!itemId) return false;
+    var item = (typeof itemId === 'object' && itemId) ? itemId : findItemById(itemId);
+    if (item) {
+      return Boolean(getSavedProgressForItem(item));
+    }
     var profBucket = ensureActiveProfileBucket();
-    return Boolean(profBucket && profBucket.progress && profBucket.progress[itemId]);
+    return Boolean(profBucket && profBucket.progress && profBucket.progress[itemId] && !isProgressEntryDeleted(profBucket, itemId, profBucket.progress[itemId]));
   }
 
   function removeFromContinueWatching(itemId) {
     if (!itemId) return;
-    var removedItem = findItemById(itemId);
+    var removedItem = findItemById(itemId) || (state.detailsItem && String(state.detailsItem.id) === String(itemId) ? state.detailsItem : null);
     var profBucket = ensureActiveProfileBucket();
-    if (profBucket && profBucket.progress && profBucket.progress[itemId]) {
-      delete profBucket.progress[itemId];
-    }
-    var prefix = String(itemId) + '_s';
-    var pKeys = Object.keys((profBucket && profBucket.progress) || {});
-    for (var k = 0; k < pKeys.length; k++) {
-      if (pKeys[k].indexOf(prefix) === 0) {
-        delete profBucket.progress[pKeys[k]];
-      }
-    }
-    saveSubUsersState();
+    purgeAllProgressForItem(profBucket, removedItem || itemId);
+    saveSubUsersState({ cloudDelayMs: 300 });
     renderCatalogShelves();
+
+    var searchModal = document.getElementById('searchModal');
+    var searchInput = document.getElementById('searchInput');
+    if (searchModal && !searchModal.classList.contains('hidden')) {
+      renderSearchResults(searchInput ? searchInput.value : '');
+    }
+
+    var detailsModal = document.getElementById('detailsModal');
     var remBtn = document.getElementById('detailsRemoveCwBtn');
-    if (remBtn && state.detailsItem && String(state.detailsItem.id) === String(itemId)) {
-      remBtn.classList.add('hidden');
+    var isSameDetailsItem = Boolean(
+      state.detailsItem && (
+        String(state.detailsItem.id) === String(itemId) ||
+        (removedItem && state.detailsItem.imdbId && removedItem.imdbId && state.detailsItem.imdbId === removedItem.imdbId) ||
+        (removedItem && state.detailsItem.tmdbId && removedItem.tmdbId && String(state.detailsItem.tmdbId) === String(removedItem.tmdbId))
+      )
+    );
+    if (isSameDetailsItem) {
+      if (remBtn) remBtn.classList.add('hidden');
+      state.activeSeason = 1;
+      state.activeEpisode = 1;
+      state.embedStartOffsetSec = 0;
       var playBtn = document.getElementById('detailsPlayBtn');
-      if (playBtn && typeof window.streamItFocusElement === 'function') {
-        window.streamItFocusElement(playBtn, { scroll: false });
+      if (playBtn) {
+        var playSpan = playBtn.querySelector('span');
+        if (playSpan) playSpan.textContent = 'הפעל';
+        if (detailsModal && !detailsModal.classList.contains('hidden') && typeof window.streamItFocusElement === 'function') {
+          window.streamItFocusElement(playBtn, { scroll: false });
+        }
       }
-    } else if (document.getElementById('detailsModal') && document.getElementById('detailsModal').classList.contains('hidden')) {
+      if (state.detailsItem && state.detailsItem.type === 'series') {
+        renderSeasonSelector(state.detailsItem);
+        loadSeriesSeasonEpisodes(state.detailsItem, 1);
+      }
+    } else if (!detailsModal || detailsModal.classList.contains('hidden')) {
       var nextCwCard = document.querySelector('#continueWatchingRow .poster-card') ||
         document.querySelector('#catalogRowsContainer .poster-card') ||
         document.getElementById('heroPlayBtn');
@@ -5435,23 +5636,129 @@
         window.streamItFocusElement(nextCwCard, { scroll: false });
       }
     }
-    showCinemaToast(removedItem && removedItem.title ? ('הוסר מהמשך צפייה: ' + removedItem.title) : 'הוסר מרשימת המשך הצפייה');
+    showCinemaToast(removedItem && removedItem.title ? ('הוסר לחלוטין מהמשך צפייה: ' + removedItem.title) : 'הוסר לחלוטין מרשימת המשך הצפייה');
   }
 
+  function ensureClearCwConfirmModalDom() {
+    var modal = document.getElementById('clearCwConfirmModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'clearCwConfirmModal';
+      modal.className = 'player-exit-confirm-overlay clear-cw-confirm-overlay hidden';
+      modal.setAttribute('dir', 'rtl');
+      modal.setAttribute('role', 'dialog');
+      modal.setAttribute('aria-modal', 'true');
+      modal.setAttribute('aria-labelledby', 'clearCwConfirmHeading');
+      modal.innerHTML =
+        '<div class="player-exit-confirm-card">' +
+          '<h3 id="clearCwConfirmHeading" class="player-exit-confirm-title">ניקוי רשימת המשך צפייה?</h3>' +
+          '<p class="player-exit-confirm-sub">האם אתה בטוח שברצונך למחוק את כל הסרטים והסדרות מרשימת המשך הצפייה ולאפס את נקודות העצירה שלהם?</p>' +
+          '<div class="player-exit-confirm-actions">' +
+            '<button type="button" id="clearCwCancelBtn" class="btn-primary player-exit-btn tv-focusable">ביטול</button>' +
+            '<button type="button" id="clearCwConfirmBtn" class="btn-secondary player-exit-btn tv-focusable">כן, נקה הכל</button>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(modal);
+    }
+    if (!modal._boundClearCwEvents) {
+      modal._boundClearCwEvents = true;
+      var cancelBtn = document.getElementById('clearCwCancelBtn');
+      var confirmBtn = document.getElementById('clearCwConfirmBtn');
+      if (cancelBtn) {
+        cancelBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          cancelClearAllContinueWatching();
+        });
+      }
+      if (confirmBtn) {
+        confirmBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          confirmClearAllContinueWatching();
+        });
+      }
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) {
+          cancelClearAllContinueWatching();
+        }
+      });
+    }
+    return modal;
+  }
+
+  function requestClearAllContinueWatching() {
+    var modal = ensureClearCwConfirmModalDom();
+    if (!modal) {
+      clearAllContinueWatching();
+      return;
+    }
+    modal.classList.remove('hidden');
+    var cancelBtn = document.getElementById('clearCwCancelBtn');
+    if (cancelBtn && typeof window.streamItFocusElement === 'function') {
+      window.streamItFocusElement(cancelBtn, { scroll: false });
+    }
+  }
+  window.requestClearAllContinueWatching = requestClearAllContinueWatching;
+
+  function cancelClearAllContinueWatching() {
+    var modal = document.getElementById('clearCwConfirmModal');
+    if (modal) modal.classList.add('hidden');
+    var clrBtn = document.getElementById('clearContinueWatchingBtn');
+    var firstCwCard = document.querySelector('#continueWatchingRow .poster-card') || document.querySelector('#catalogRowsContainer .poster-card');
+    var targetFocus = (clrBtn && clrBtn.offsetWidth > 0) ? clrBtn : firstCwCard;
+    if (targetFocus && typeof window.streamItFocusElement === 'function') {
+      window.streamItFocusElement(targetFocus, { scroll: false });
+    }
+  }
+  window.cancelClearAllContinueWatching = cancelClearAllContinueWatching;
+
+  function confirmClearAllContinueWatching() {
+    var modal = document.getElementById('clearCwConfirmModal');
+    if (modal) modal.classList.add('hidden');
+    clearAllContinueWatching();
+  }
+  window.confirmClearAllContinueWatching = confirmClearAllContinueWatching;
+
   function clearAllContinueWatching() {
+    var modal = document.getElementById('clearCwConfirmModal');
+    if (modal) modal.classList.add('hidden');
     var profBucket = ensureActiveProfileBucket();
     if (profBucket) {
+      var nowTs = Date.now();
+      var oldKeys = Object.keys(profBucket.progress || {});
+      if (!profBucket.deletedProgressIds || typeof profBucket.deletedProgressIds !== 'object') {
+        profBucket.deletedProgressIds = {};
+      }
+      for (var i = 0; i < oldKeys.length; i++) {
+        var k = oldKeys[i];
+        var entry = profBucket.progress[k];
+        profBucket.deletedProgressIds[k] = nowTs;
+        if (entry && entry.imdbId) profBucket.deletedProgressIds[String(entry.imdbId)] = nowTs;
+        if (entry && entry.tmdbId) {
+          var tId = String(entry.tmdbId).replace(/\D/g, '');
+          if (tId) {
+            profBucket.deletedProgressIds[tId] = nowTs;
+            profBucket.deletedProgressIds['movie-' + tId] = nowTs;
+            profBucket.deletedProgressIds['series-' + tId] = nowTs;
+          }
+        }
+      }
       profBucket.progress = {};
-      saveSubUsersState();
+      profBucket.progressClearedAt = nowTs;
+      saveSubUsersState({ cloudDelayMs: 300 });
       renderCatalogShelves();
     }
     var remBtn = document.getElementById('detailsRemoveCwBtn');
     if (remBtn) remBtn.classList.add('hidden');
+    var playBtn = document.getElementById('detailsPlayBtn');
+    if (playBtn) {
+      var playSpan = playBtn.querySelector('span');
+      if (playSpan) playSpan.textContent = 'הפעל';
+    }
     var fallbackFocus = document.querySelector('#catalogRowsContainer .poster-card') || document.getElementById('heroPlayBtn');
     if (fallbackFocus && typeof window.streamItFocusElement === 'function') {
       window.streamItFocusElement(fallbackFocus, { scroll: false });
     }
-    showCinemaToast('רשימת המשך הצפייה נוקתה');
+    showCinemaToast('רשימת המשך הצפייה נוקתה לחלוטין');
   }
 
   function renderPosterCardHtml(item, opts) {
@@ -5591,8 +5898,7 @@
         if (item.type === 'channel' || item.type === 'youtube') {
           startPlayback(item, 1, 1);
         } else if (isContinueRow) {
-          var profBucket = ensureActiveProfileBucket();
-          var saved = profBucket.progress ? profBucket.progress[item.id] : null;
+          var saved = getSavedProgressForItem(item);
           var sNum = (saved && saved.season) ? saved.season : 1;
           var eNum = (saved && saved.episode) ? saved.episode : 1;
           startPlayback(item, sNum, eNum);
@@ -8520,6 +8826,16 @@
     var profBucket = ensureActiveProfileBucket();
     var nowTs = Date.now();
     var snap = buildCompactItemSnapshot(state.playingItem);
+    if (profBucket.deletedProgressIds && typeof profBucket.deletedProgressIds === 'object') {
+      delete profBucket.deletedProgressIds[String(state.playingItem.id)];
+      if (state.playingItem.imdbId) delete profBucket.deletedProgressIds[String(state.playingItem.imdbId)];
+      var cleanPlayingTmdb = String(state.playingItem.tmdbId || '').replace(/\D/g, '');
+      if (cleanPlayingTmdb) {
+        delete profBucket.deletedProgressIds[cleanPlayingTmdb];
+        delete profBucket.deletedProgressIds['movie-' + cleanPlayingTmdb];
+        delete profBucket.deletedProgressIds['series-' + cleanPlayingTmdb];
+      }
+    }
     profBucket.progress[state.playingItem.id] = {
       id: String(state.playingItem.id),
       imdbId: String(state.playingItem.imdbId || ''),
@@ -10098,10 +10414,12 @@
     }
     var clearAllCwBtn = document.getElementById('clearContinueWatchingBtn');
     if (clearAllCwBtn) {
-      clearAllCwBtn.addEventListener('click', function () {
-        clearAllContinueWatching();
+      clearAllCwBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        requestClearAllContinueWatching();
       });
     }
+    ensureClearCwConfirmModalDom();
 
     // Video Player Controls
     var closePlayer = document.getElementById('closePlayerBtn');
@@ -10563,10 +10881,8 @@
         state.embedResumeSeekDone = true;
         if (state.playingItem) {
           var profBucket = ensureActiveProfileBucket();
-          if (profBucket.progress && profBucket.progress[state.playingItem.id]) {
-            delete profBucket.progress[state.playingItem.id];
-            saveSubUsersState();
-          }
+          purgeAllProgressForItem(profBucket, state.playingItem);
+          saveSubUsersState({ cloudDelayMs: 300 });
           if (state.playingMode === 'video') {
             var vEl = document.getElementById('videoElement');
             if (vEl) vEl.currentTime = 0;
@@ -12285,6 +12601,7 @@
         '</div>';
       playerStage.appendChild(exitDiv);
     }
+    ensureClearCwConfirmModalDom();
 
     if (playerStage && !document.getElementById('parentalSkipBanner')) {
       var pBanner = document.createElement('div');

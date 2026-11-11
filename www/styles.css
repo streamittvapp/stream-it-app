@@ -7467,6 +7467,12 @@ body.tv-mode .poster-card:focus {
   display: none !important;
 }
 
+.clear-cw-confirm-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 10050 !important;
+}
+
 .player-exit-confirm-card {
   width: 100%;
   max-width: 440px;
