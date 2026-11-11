@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794393028473,
+      "updatedTs": 1794393044310,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -334,12 +334,12 @@
               "imdbId": "tt0411705",
               "tmdbId": "27",
               "title": "9 שירים",
-              "currentTime": 2101,
+              "currentTime": 2316,
               "duration": 4179,
-              "percent": 50,
+              "percent": 55,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794393028473,
+              "updatedAt": 1794393044310,
               "snapshot": {
                 "id": "27",
                 "imdbId": "tt0411705",
