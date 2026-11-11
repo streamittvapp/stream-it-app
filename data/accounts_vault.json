@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794391621161,
+      "updatedTs": 1794391632636,
       "activeSubUserId": "prof-1794166564722",
       "subUsers": [
         {
@@ -435,12 +435,12 @@
               "imdbId": "tt0411705",
               "tmdbId": "27",
               "title": "9 שירים",
-              "currentTime": 10,
+              "currentTime": 50,
               "duration": 4179,
               "percent": 3,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794391621161,
+              "updatedAt": 1794391632636,
               "snapshot": {
                 "id": "27",
                 "imdbId": "tt0411705",
@@ -596,7 +596,16 @@
       },
       "parentalMaster": {
         "pinCode": "",
-        "customSkipSegments": {}
+        "customSkipSegments": {
+          "tt0411705": [
+            {
+              "start": 18,
+              "end": 50,
+              "category": "sex",
+              "label": "קטע שסומן ע״י המשתמש"
+            }
+          ]
+        }
       },
       "subPrefs": {
         "size": "large",
