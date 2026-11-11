@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794432943482,
+      "updatedTs": 1794432994121,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -152,7 +152,7 @@
               "sex": true,
               "violence": false,
               "profanity": true,
-              "drugs": true,
+              "drugs": false,
               "horror": false
             }
           }
