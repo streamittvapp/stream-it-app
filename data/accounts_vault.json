@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794388443285,
+      "updatedTs": 1794388450982,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -253,26 +253,6 @@
               "violence": false,
               "profanity": false,
               "drugs": false,
-              "horror": false
-            }
-          }
-        },
-        {
-          "id": "prof-bedroom",
-          "name": "חדר שינה",
-          "color": "#3f3f46",
-          "isKids": false,
-          "isPrimary": false,
-          "parentalControl": {
-            "enabled": false,
-            "actionMode": "skip",
-            "profanityMode": "mute_censor",
-            "sensitivity": "balanced",
-            "categories": {
-              "sex": true,
-              "violence": true,
-              "profanity": true,
-              "drugs": true,
               "horror": false
             }
           }
