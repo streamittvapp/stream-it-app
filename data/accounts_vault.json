@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794393044310,
+      "updatedTs": 1794393116798,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -375,6 +375,43 @@
               "season": 1,
               "episode": 1,
               "updatedAt": 1794340722738
+            },
+            "1339713": {
+              "id": "1339713",
+              "imdbId": "tt37287335",
+              "tmdbId": "1339713",
+              "title": "אובססיה",
+              "currentTime": 103,
+              "duration": 6533,
+              "percent": 3,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794393116797,
+              "snapshot": {
+                "id": "1339713",
+                "imdbId": "tt37287335",
+                "tmdbId": "1339713",
+                "type": "movie",
+                "title": "אובססיה",
+                "originalTitle": "Obsession",
+                "year": "2026",
+                "rating": "8.2",
+                "runtimeHe": "שעתיים",
+                "ageRating": "16+",
+                "overview": "לאחר ששבר את \"ערבת המשאלה האחת\" המסתורית כדי לזכות בליבה של אהובת ליבו, רומנטיקן חסר תקנה מגלה שהוא מקבל בדיוק את מה שביקש, אך עד מהרה מגלה שחלק מהתשוקות מגיעות במחיר אפל ומרושע.",
+                "poster": "https://image.tmdb.org/t/p/w500/hhrWmkcGksuI3BsqSbiyFC3Lzk4.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/5lTZyuBTNOfawsfPT8Q0cIg6qAF.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/5lTZyuBTNOfawsfPT8Q0cIg6qAF.jpg",
+                "genres": [
+                  "horror",
+                  "thriller"
+                ],
+                "genresHe": [
+                  "אימה",
+                  "מותחנים"
+                ],
+                "seasonsCount": 0
+              }
             },
             "1381078": {
               "currentTime": 5045,
