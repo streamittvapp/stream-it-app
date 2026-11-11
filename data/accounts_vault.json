@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794432202875,
+      "updatedTs": 1794432217227,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -346,43 +346,6 @@
               "episode": 1,
               "updatedAt": 1794323899601
             },
-            "1568027": {
-              "id": "1568027",
-              "imdbId": "tt43612870",
-              "tmdbId": "1568027",
-              "title": "קופה ראשית: הסרט",
-              "currentTime": 35,
-              "duration": 7200,
-              "percent": 3,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794416645742,
-              "snapshot": {
-                "id": "1568027",
-                "imdbId": "tt43612870",
-                "tmdbId": "1568027",
-                "type": "movie",
-                "title": "קופה ראשית: הסרט",
-                "originalTitle": "קופה ראשית: הסרט",
-                "year": "2026",
-                "rating": "6.2",
-                "runtimeHe": "שעתיים",
-                "ageRating": "12+",
-                "overview": "כוכבה, ניסים, אנטולי, שירה, ראמזי ואמנון יוצאים להרפתקה של חייהם, כשאירוע בלתי צפוי מטלטל את ״שפע יששכר״ ולוקח את החבורה הכי מצחיקה במדינה רחוק מאוד מהקופה.",
-                "poster": "https://image.tmdb.org/t/p/w500/5fFgTGCuL9hcGNN5dhVzF37C75l.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/3mWDbDn7piiznyEDysEHMGeJldI.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/3mWDbDn7piiznyEDysEHMGeJldI.jpg",
-                "genres": [
-                  "comedy",
-                  "israeli"
-                ],
-                "genresHe": [
-                  "קומדיה",
-                  "יצירה ישראלית"
-                ],
-                "seasonsCount": 0
-              }
-            },
             "1571955": {
               "currentTime": 131,
               "duration": 6381,
@@ -499,6 +462,7 @@
             "27": 1794432189831,
             "10580": 1794432196249,
             "1339713": 1794432202875,
+            "1568027": 1794432217226,
             "tt0411705": 1794432189831,
             "movie-27": 1794432189831,
             "series-27": 1794432189831,
@@ -507,7 +471,10 @@
             "series-10580": 1794432196249,
             "tt37287335": 1794432202875,
             "movie-1339713": 1794432202875,
-            "series-1339713": 1794432202875
+            "series-1339713": 1794432202875,
+            "tt43612870": 1794432217226,
+            "movie-1568027": 1794432217226,
+            "series-1568027": 1794432217226
           },
           "progressClearedAt": 0
         },
