@@ -134,8 +134,8 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794391824237,
-      "activeSubUserId": "prof-1794166564722",
+      "updatedTs": 1794391842797,
+      "activeSubUserId": "prof-main",
       "subUsers": [
         {
           "id": "prof-main",
