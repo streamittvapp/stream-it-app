@@ -134,7 +134,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794391892247,
+      "updatedTs": 1794391945104,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -330,12 +330,43 @@
           ],
           "progress": {
             "27": {
-              "currentTime": 217,
+              "id": "27",
+              "imdbId": "tt0411705",
+              "tmdbId": "27",
+              "title": "9 שירים",
+              "currentTime": 167,
               "duration": 4179,
-              "percent": 5,
+              "percent": 4,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794324068874
+              "updatedAt": 1794391945104,
+              "snapshot": {
+                "id": "27",
+                "imdbId": "tt0411705",
+                "tmdbId": "27",
+                "type": "movie",
+                "title": "9 שירים",
+                "originalTitle": "9 Songs",
+                "year": "2004",
+                "rating": "5.5",
+                "runtimeHe": "שעתיים",
+                "ageRating": "14+",
+                "overview": "מתיו (קיראן אובריאן), צעיר לונדוני, עובד כמסקר לעיתון \"אטרטיקה\" הבריטי ואוהב לשמוע להקות אינדי. בעת שטס מעל הנוף הקוטבי הלא פורה, הוא נזכר במערכת יחסיו עם ליסה (מרגו סטילי), סטונדטית של מחלף אקדמאי אמריקאי. כאשר נפגש הזוג בטקס פרסי אקדמיה בבריטניה, הם נזכרים באהבתם הנשכחת ומביאים תשוקתם היישר למיטה. דרמה רומנטית אירוטית מגיל 18 המשלבת סצינות סקס נועזות ביחד עם מוזיקה בריטית עכשווית עם אומנים כמו \"פרנץ פרדיננד\", \"אלבו\", \"בלק רבל מוטורסייקל קלאב\", ניק מק'ארתי, בובי ג'ילפסי, יו בנפורד ועוד. האמת שחוץ משני השחקנים הצעירים הראשיים בסרט, כל שאר השחקנים הם בעצם הזמרים והלהקות המופיעות בסרט ונותנות הרבה רעש לסרט הנועז. ביים: מייקל ווינטרבוטום, הבמאי של \"אנשי המסיבות\" ו\"טריסטן שנדי: סיפור מצוץ מן האצבע\" החדש.",
+                "poster": "https://image.tmdb.org/t/p/w500/91O7z0vo7MiNWd5xD2BoivwbQsb.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/bybAHw5fenKXRFI4phanPhpljlT.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w780/bybAHw5fenKXRFI4phanPhpljlT.jpg",
+                "genres": [
+                  "drama",
+                  "music",
+                  "romance"
+                ],
+                "genresHe": [
+                  "דרמה",
+                  "מוזיקה והופעות",
+                  "רומנטיקה"
+                ],
+                "seasonsCount": 0
+              }
             },
             "1283515": {
               "currentTime": 1706,
