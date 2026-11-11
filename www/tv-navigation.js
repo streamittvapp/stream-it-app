@@ -156,7 +156,7 @@
     if (sideRailEl) {
       sideRailEl.classList.toggle('rail-open', inRailNow);
       if (document.body) {
-        document.body.classList.toggle('tv-rail-expanded', inRailNow);
+        document.body.classList.remove('tv-rail-expanded');
       }
     }
 
@@ -210,46 +210,49 @@
       inHero: Boolean(el.closest('#heroBillboard'))
     };
 
-    var scrollBehavior = isTv ? 'auto' : 'smooth';
-
-    // Horizontal strip or row scrolling
+    // Horizontal strip or row scrolling — only scroll when the focused card is actually clipped at the left/right edge!
+    // Never shift the track when moving among the 6 already-visible cards on screen.
     var stripOrTrack = el.closest('.row-track, .genre-filter-strip');
     if (stripOrTrack && options.scroll !== false) {
       var itemRect = el.getBoundingClientRect();
       var trackRect = stripOrTrack.getBoundingClientRect();
-      var deltaX = (itemRect.left + itemRect.width / 2) - (trackRect.left + trackRect.width / 2);
-      if (Math.abs(deltaX) > 36) {
-        if (isTv) {
-          stripOrTrack.scrollLeft += deltaX;
-        } else {
-          stripOrTrack.scrollBy({ left: deltaX, behavior: scrollBehavior });
-        }
+      var edgePad = 10;
+      var shiftX = 0;
+      if (itemRect.left < trackRect.left + edgePad) {
+        shiftX = itemRect.left - (trackRect.left + edgePad);
+      } else if (itemRect.right > trackRect.right - edgePad) {
+        shiftX = itemRect.right - (trackRect.right - edgePad);
+      }
+      if (Math.abs(shiftX) > 2) {
+        stripOrTrack.scrollLeft += shiftX;
       }
     }
 
-    // Vertical scrolling inside #tvRailListsScroll, #catalogMain, #detailsModal, #searchModal, #tvMoreModal, or open dropdown panel
+    // Vertical scrolling — clean, non-jerky viewport alignment
     if (options.scroll !== false) {
       var prevRow = prevFocused ? prevFocused.closest('.netflix-row') : null;
       var curRow = el.closest('.netflix-row');
       var sameNetflixRow = Boolean(prevRow && curRow && prevRow === curRow);
       if (!sameNetflixRow) {
         var scrollTarget = curRow || el;
-        var scrollContainer = el.closest('#tvRailListsScroll, #catalogMain, .details-modal-sheet, .auth-modal-card, .parental-modal-card, #parentalControlModal, #searchModal, #tvMoreModal, .explorer-dropdown-panel');
+        var scrollContainer = el.closest('#tvRailListsScroll, #catalogMain, .details-modal-sheet, .search-modal-sheet, .auth-modal-card, .parental-modal-card, #parentalControlModal, #searchModal, #tvMoreModal, .explorer-dropdown-panel');
         if (scrollContainer) {
-          if (isTv) {
-            var cRect = scrollContainer.getBoundingClientRect();
-            var tRect = scrollTarget.getBoundingClientRect();
-            var pad = 14;
-            if (tRect.bottom > cRect.bottom - pad) {
-              scrollContainer.scrollTop += (tRect.bottom - (cRect.bottom - pad));
-            } else if (tRect.top < cRect.top + pad) {
-              scrollContainer.scrollTop -= ((cRect.top + pad) - tRect.top);
+          var cRect = scrollContainer.getBoundingClientRect();
+          var tRect = scrollTarget.getBoundingClientRect();
+          var pad = 20;
+          if (scrollContainer.id === 'catalogMain' && (el.closest('#heroBillboard') || rIdx === 0)) {
+            if (scrollContainer.scrollTop > 0) {
+              scrollContainer.scrollTop = 0;
             }
-          } else {
-            try {
-              scrollTarget.scrollIntoView({ block: 'nearest', behavior: scrollBehavior });
-            } catch (e) {}
+          } else if (tRect.bottom > cRect.bottom - pad) {
+            scrollContainer.scrollTop += (tRect.bottom - (cRect.bottom - pad));
+          } else if (tRect.top < cRect.top + pad) {
+            scrollContainer.scrollTop = Math.max(0, scrollContainer.scrollTop - ((cRect.top + pad) - tRect.top));
           }
+        } else if (el.closest('#heroBillboard') || el.closest('#topHeader')) {
+          var catMainEl = document.getElementById('catalogMain');
+          if (catMainEl && catMainEl.scrollTop > 0) catMainEl.scrollTop = 0;
+          if (window.scrollY > 0) window.scrollTo(0, 0);
         }
       }
     }
@@ -261,7 +264,7 @@
         if (currentFocused === el) {
           window.previewCardInHero(el);
         }
-      }, isTv ? 260 : 200);
+      }, isTv ? 480 : 260);
     }
 
     return true;
@@ -562,6 +565,31 @@
   function navigatePlayerModal(direction) {
     var player = document.getElementById('playerModal');
     if (!player || player.classList.contains('hidden')) return false;
+
+    // 00. Exit Confirmation Dialog (#playerExitConfirmModal)
+    var exitConfirmModal = document.getElementById('playerExitConfirmModal');
+    if (exitConfirmModal && !exitConfirmModal.classList.contains('hidden')) {
+      var cancelExitBtn = document.getElementById('playerExitCancelBtn');
+      var confirmExitBtn = document.getElementById('playerExitConfirmBtn');
+      var exitBtns = [cancelExitBtn, confirmExitBtn].filter(isElementVisible);
+      if (!exitBtns.length) return true;
+      if (!currentFocused || !exitConfirmModal.contains(currentFocused)) {
+        return setFocus(exitBtns[0], { scroll: false });
+      }
+      if (direction === 'left' || direction === 'down') {
+        if (currentFocused === cancelExitBtn && confirmExitBtn && isElementVisible(confirmExitBtn)) {
+          return setFocus(confirmExitBtn, { scroll: false });
+        }
+        return true;
+      }
+      if (direction === 'right' || direction === 'up') {
+        if (currentFocused === confirmExitBtn && cancelExitBtn && isElementVisible(cancelExitBtn)) {
+          return setFocus(cancelExitBtn, { scroll: false });
+        }
+        return true;
+      }
+      return true;
+    }
 
     var controlsOverlay = document.getElementById('playerControlsOverlay');
     var subsMenu = document.getElementById('playerSubsMenu');
@@ -966,7 +994,7 @@
     function focusPreferredRailItem() {
       if (!sideRail) return false;
       sideRail.classList.add('rail-open');
-      if (document.body) document.body.classList.add('tv-rail-expanded');
+      if (document.body) document.body.classList.remove('tv-rail-expanded');
       var activeListBtn = sideRail.querySelector('#tvRailListsScroll .tv-rail-sec-list.open .tv-rail-item.active');
       if (activeListBtn && isElementVisible(activeListBtn)) {
         return setFocus(activeListBtn, { scroll: false });
@@ -975,18 +1003,16 @@
       if (searchBtn && isElementVisible(searchBtn)) {
         return setFocus(searchBtn, { scroll: false });
       }
-      var freshRailBtns = Array.prototype.slice.call(sideRail.querySelectorAll('.tv-focusable:not(#tvSideRailTabHandle)')).filter(isElementVisible);
+      var freshRailBtns = Array.prototype.slice.call(sideRail.querySelectorAll('.tv-focusable')).filter(isElementVisible);
       if (freshRailBtns.length) {
         return setFocus(freshRailBtns[0], { scroll: false });
-      }
-      var tabHandle = document.getElementById('tvSideRailTabHandle');
-      if (tabHandle && isElementVisible(tabHandle)) {
-        return setFocus(tabHandle, { scroll: false });
       }
       return false;
     }
 
     function focusMainStageFromRail() {
+      if (sideRail) sideRail.classList.remove('rail-open');
+      if (document.body) document.body.classList.remove('tv-rail-expanded');
       if (lastMainFocus && isElementVisible(lastMainFocus)) {
         return setFocus(lastMainFocus);
       }
@@ -1105,21 +1131,6 @@
       var railProfileBtn = document.getElementById('tvRailProfileBtn');
       var railSettingsBtn = document.getElementById('tvRailSettingsBtn');
 
-      // A0-Tab. Side Rail Tab Handle (#tvSideRailTabHandle)
-      var railTabHandle = document.getElementById('tvSideRailTabHandle');
-      if (currentFocused === railTabHandle) {
-        sideRail.classList.add('rail-open');
-        if (document.body) document.body.classList.add('tv-rail-expanded');
-        if (direction === 'left') {
-          return focusMainStageFromRail();
-        }
-        if (direction === 'right' || direction === 'down' || direction === 'up') {
-          if (railListItems.length) return setFocus(railListItems[0], { scroll: false });
-          if (railSearchBtn && isElementVisible(railSearchBtn)) return setFocus(railSearchBtn, { scroll: false });
-          return true;
-        }
-      }
-
       // A1. Search Header Row (#tvRailSearchBtn, #tvRailSearchClearBtn)
       if (currentFocused === railSearchBtn || currentFocused === railSearchClearBtn) {
         if (direction === 'left') {
@@ -1156,7 +1167,6 @@
         var chIdx = charKeys.indexOf(currentFocused);
         if (chIdx !== -1) {
           var vkCols = 6;
-          var chRow = Math.floor(chIdx / vkCols);
           var chCol = chIdx % vkCols;
           if (direction === 'right') {
             if (chCol < vkCols - 1 && chIdx + 1 < charKeys.length) {
@@ -1235,14 +1245,6 @@
           return true;
         }
         if (direction === 'up') {
-          var openPlatList = document.getElementById('tvRailPlatformsList');
-          if (openPlatList && openPlatList.classList.contains('open')) {
-            var pCardsUp = Array.prototype.slice.call(openPlatList.querySelectorAll('.tv-rail-platform-card')).filter(isElementVisible);
-            if (pCardsUp.length >= 2) {
-              var targetCard = (currentFocused === railSettingsBtn) ? pCardsUp[pCardsUp.length - 1] : pCardsUp[pCardsUp.length - 2];
-              return setFocus(targetCard);
-            }
-          }
           if (railListItems.length) return setFocus(railListItems[railListItems.length - 1]);
           if (railSearchBtn && isElementVisible(railSearchBtn)) return setFocus(railSearchBtn, { scroll: false });
           return true;
@@ -1250,48 +1252,59 @@
         return true;
       }
 
-      // A4. Scrollable Accordion Headers & Open Section Items (#tvRailListsScroll + 2-Column Platforms Grid)
-      var platGridEl = document.getElementById('tvRailPlatformsList');
-      if (platGridEl && platGridEl.classList.contains('open') && platGridEl.contains(currentFocused)) {
-        var platCards = Array.prototype.slice.call(platGridEl.querySelectorAll('.tv-rail-platform-card')).filter(isElementVisible);
-        var pIdx = platCards.indexOf(currentFocused);
-        if (pIdx !== -1) {
-          var isRightCol = (pIdx % 2 === 0);
-          if (direction === 'left') {
-            if (isRightCol && pIdx + 1 < platCards.length) {
-              return setFocus(platCards[pIdx + 1], { scroll: false });
+      // A4. Any 2-Column Open Section List inside #tvRailListsScroll (#tvRailCategoriesList, #tvRailYearsList, #tvRailActorsList, #tvRailPlatformsList)
+      var openSecList = currentFocused.closest('.tv-rail-sec-list.open');
+      if (openSecList) {
+        var secItems = Array.prototype.slice.call(openSecList.querySelectorAll('.tv-rail-item')).filter(isElementVisible);
+        var sItemIdx = secItems.indexOf(currentFocused);
+        if (sItemIdx !== -1 && secItems.length > 0) {
+          var isTwoColSec = secItems.length > 1 && Math.abs(secItems[0].offsetTop - secItems[1].offsetTop) <= 12;
+          if (isTwoColSec) {
+            var isRightCol = (sItemIdx % 2 === 0);
+            if (direction === 'left') {
+              if (isRightCol && sItemIdx + 1 < secItems.length) {
+                return setFocus(secItems[sItemIdx + 1], { scroll: false });
+              }
+              return focusMainStageFromRail();
             }
-            return focusMainStageFromRail();
-          }
-          if (direction === 'right') {
-            if (!isRightCol && pIdx - 1 >= 0) {
-              return setFocus(platCards[pIdx - 1], { scroll: false });
+            if (direction === 'right') {
+              if (!isRightCol && sItemIdx - 1 >= 0) {
+                return setFocus(secItems[sItemIdx - 1], { scroll: false });
+              }
+              return true;
+            }
+            if (direction === 'down') {
+              if (sItemIdx + 2 < secItems.length) {
+                return setFocus(secItems[sItemIdx + 2]);
+              }
+              var parentSecDown = openSecList.closest('.tv-rail-section');
+              var nextSecDown = parentSecDown ? parentSecDown.nextElementSibling : null;
+              if (nextSecDown) {
+                var nextHeader = nextSecDown.querySelector('.tv-rail-sec-header');
+                if (nextHeader && isElementVisible(nextHeader)) return setFocus(nextHeader);
+              }
+              if (!isRightCol && railSettingsBtn && isElementVisible(railSettingsBtn)) {
+                return setFocus(railSettingsBtn, { scroll: false });
+              }
+              if (railProfileBtn && isElementVisible(railProfileBtn)) {
+                return setFocus(railProfileBtn, { scroll: false });
+              }
+              return true;
+            }
+            if (direction === 'up') {
+              if (sItemIdx - 2 >= 0) {
+                return setFocus(secItems[sItemIdx - 2]);
+              }
+              var ownSecHeader = openSecList.closest('.tv-rail-section')
+                ? openSecList.closest('.tv-rail-section').querySelector('.tv-rail-sec-header')
+                : null;
+              if (ownSecHeader && isElementVisible(ownSecHeader)) {
+                return setFocus(ownSecHeader);
+              }
+              return true;
             }
             return true;
           }
-          if (direction === 'down') {
-            if (pIdx + 2 < platCards.length) {
-              return setFocus(platCards[pIdx + 2]);
-            }
-            if (!isRightCol && railSettingsBtn && isElementVisible(railSettingsBtn)) {
-              return setFocus(railSettingsBtn, { scroll: false });
-            }
-            if (railProfileBtn && isElementVisible(railProfileBtn)) {
-              return setFocus(railProfileBtn, { scroll: false });
-            }
-            return true;
-          }
-          if (direction === 'up') {
-            if (pIdx - 2 >= 0) {
-              return setFocus(platCards[pIdx - 2]);
-            }
-            var platHeaderBtn = document.getElementById('tvRailSecPlatformsBtn');
-            if (platHeaderBtn && isElementVisible(platHeaderBtn)) {
-              return setFocus(platHeaderBtn);
-            }
-            return true;
-          }
-          return true;
         }
       }
 
@@ -1655,7 +1668,231 @@
   }
 
   /**
-   * Universal On-Screen TV Keyboard Builder & Controller (v9.6.9 Streamer Edition)
+   * Deterministic Navigation inside Search Modal (#searchModal — 6-Column Grid + Filter Tabs + Top Input)
+   */
+  function navigateSearchModal(direction) {
+    var searchModal = document.getElementById('searchModal');
+    if (!searchModal || searchModal.classList.contains('hidden')) return false;
+
+    var searchInput = document.getElementById('searchInput');
+    var clearBtn = document.getElementById('clearSearchBtn');
+    var closeBtn = document.getElementById('closeSearchBtn');
+    var topRow = [searchInput, clearBtn, closeBtn].filter(isElementVisible);
+    var filterTabs = Array.prototype.slice.call(searchModal.querySelectorAll('#searchFilterTabs .filter-tab')).filter(isElementVisible);
+    var resultCards = Array.prototype.slice.call(searchModal.querySelectorAll('#searchResultsGrid .poster-card, #searchResultsGrid .channel-tile-card')).filter(isElementVisible);
+
+    if (!currentFocused || !searchModal.contains(currentFocused) || !isElementVisible(currentFocused)) {
+      if (resultCards.length) return setFocus(resultCards[0]);
+      if (searchInput && isElementVisible(searchInput)) return setFocus(searchInput, { scroll: false });
+      return false;
+    }
+
+    var tIdx = topRow.indexOf(currentFocused);
+    if (tIdx !== -1) {
+      if (direction === 'left') {
+        if (tIdx < topRow.length - 1) return setFocus(topRow[tIdx + 1], { scroll: false });
+        return true;
+      }
+      if (direction === 'right') {
+        if (tIdx > 0) return setFocus(topRow[tIdx - 1], { scroll: false });
+        return true;
+      }
+      if (direction === 'down') {
+        if (filterTabs.length) {
+          var activeTab = searchModal.querySelector('#searchFilterTabs .filter-tab.active') || filterTabs[0];
+          return setFocus(activeTab, { scroll: false });
+        }
+        if (resultCards.length) return setFocus(resultCards[0]);
+        return true;
+      }
+      return true;
+    }
+
+    var fIdx = filterTabs.indexOf(currentFocused);
+    if (fIdx !== -1) {
+      if (direction === 'left') {
+        if (fIdx < filterTabs.length - 1) return setFocus(filterTabs[fIdx + 1], { scroll: false });
+        return true;
+      }
+      if (direction === 'right') {
+        if (fIdx > 0) return setFocus(filterTabs[fIdx - 1], { scroll: false });
+        return true;
+      }
+      if (direction === 'up') {
+        if (searchInput && isElementVisible(searchInput)) return setFocus(searchInput, { scroll: false });
+        if (topRow.length) return setFocus(topRow[0], { scroll: false });
+        return true;
+      }
+      if (direction === 'down') {
+        if (resultCards.length) return setFocus(resultCards[0]);
+        return true;
+      }
+      return true;
+    }
+
+    var rIdx = resultCards.indexOf(currentFocused);
+    if (rIdx !== -1) {
+      var cols = 1;
+      var row0Top = resultCards[0].offsetTop;
+      for (var ci = 1; ci < Math.min(12, resultCards.length); ci++) {
+        if (Math.abs(resultCards[ci].offsetTop - row0Top) <= 18) cols++;
+        else break;
+      }
+      var col = rIdx % cols;
+      if (direction === 'left') {
+        if (col < cols - 1 && rIdx + 1 < resultCards.length) return setFocus(resultCards[rIdx + 1]);
+        return true;
+      }
+      if (direction === 'right') {
+        if (col > 0) return setFocus(resultCards[rIdx - 1]);
+        return true;
+      }
+      if (direction === 'down') {
+        if (rIdx + cols < resultCards.length) return setFocus(resultCards[rIdx + cols]);
+        var lastRowIdx = Math.floor((resultCards.length - 1) / cols);
+        if (Math.floor(rIdx / cols) < lastRowIdx) return setFocus(resultCards[resultCards.length - 1]);
+        return true;
+      }
+      if (direction === 'up') {
+        if (rIdx - cols >= 0) return setFocus(resultCards[rIdx - cols]);
+        if (filterTabs.length) {
+          var actTabUp = searchModal.querySelector('#searchFilterTabs .filter-tab.active') || filterTabs[0];
+          return setFocus(actTabUp, { scroll: false });
+        }
+        if (searchInput && isElementVisible(searchInput)) return setFocus(searchInput, { scroll: false });
+        return true;
+      }
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Deterministic Navigation inside Movie / Series Details Modal (#detailsModal)
+   */
+  function navigateDetailsModal(direction) {
+    var details = document.getElementById('detailsModal');
+    if (!details || details.classList.contains('hidden')) return false;
+
+    var sourcesPanel = document.getElementById('detailsStreamsDropdownPanel');
+    if (sourcesPanel && !sourcesPanel.classList.contains('hidden')) {
+      var streamBtns = Array.prototype.slice.call(sourcesPanel.querySelectorAll('.stream-source-card, button')).filter(isElementVisible);
+      var stIdx = streamBtns.indexOf(currentFocused);
+      if (stIdx === -1 && streamBtns.length) return setFocus(streamBtns[0]);
+      if (direction === 'down') {
+        if (stIdx < streamBtns.length - 1) return setFocus(streamBtns[stIdx + 1]);
+        return true;
+      }
+      if (direction === 'up') {
+        if (stIdx > 0) return setFocus(streamBtns[stIdx - 1]);
+        sourcesPanel.classList.add('hidden');
+        var srcTrig = document.getElementById('detailsSourcesDropdownBtn');
+        if (srcTrig && isElementVisible(srcTrig)) return setFocus(srcTrig);
+        return true;
+      }
+      return true;
+    }
+
+    var closeBtn = document.getElementById('closeDetailsBtn');
+    var actionBtns = Array.prototype.slice.call(details.querySelectorAll('.details-actions button')).filter(isElementVisible);
+    var sourcesBtn = document.getElementById('detailsSourcesDropdownBtn');
+    var seasonBtns = Array.prototype.slice.call(details.querySelectorAll('#seasonSelector .season-tab-btn')).filter(isElementVisible);
+    var midRow = ([sourcesBtn].concat(seasonBtns)).filter(isElementVisible);
+    var epCards = Array.prototype.slice.call(details.querySelectorAll('#episodesGrid .episode-card')).filter(isElementVisible);
+
+    if (!currentFocused || !details.contains(currentFocused) || !isElementVisible(currentFocused)) {
+      if (actionBtns.length) return setFocus(actionBtns[0], { scroll: false });
+      if (closeBtn && isElementVisible(closeBtn)) return setFocus(closeBtn, { scroll: false });
+      return false;
+    }
+
+    if (currentFocused === closeBtn) {
+      if (direction === 'down' || direction === 'right') {
+        if (actionBtns.length) return setFocus(actionBtns[0], { scroll: false });
+      }
+      return true;
+    }
+
+    var aIdx = actionBtns.indexOf(currentFocused);
+    if (aIdx !== -1) {
+      if (direction === 'left') {
+        if (aIdx < actionBtns.length - 1) return setFocus(actionBtns[aIdx + 1], { scroll: false });
+        if (closeBtn && isElementVisible(closeBtn)) return setFocus(closeBtn, { scroll: false });
+        return true;
+      }
+      if (direction === 'right') {
+        if (aIdx > 0) return setFocus(actionBtns[aIdx - 1], { scroll: false });
+        return true;
+      }
+      if (direction === 'up') {
+        if (closeBtn && isElementVisible(closeBtn)) return setFocus(closeBtn, { scroll: false });
+        return true;
+      }
+      if (direction === 'down') {
+        if (midRow.length) return setFocus(midRow[0]);
+        if (epCards.length) return setFocus(epCards[0]);
+        return true;
+      }
+      return true;
+    }
+
+    var mIdx = midRow.indexOf(currentFocused);
+    if (mIdx !== -1) {
+      if (direction === 'left') {
+        if (mIdx < midRow.length - 1) return setFocus(midRow[mIdx + 1], { scroll: false });
+        return true;
+      }
+      if (direction === 'right') {
+        if (mIdx > 0) return setFocus(midRow[mIdx - 1], { scroll: false });
+        return true;
+      }
+      if (direction === 'up') {
+        if (actionBtns.length) return setFocus(actionBtns[0]);
+        return true;
+      }
+      if (direction === 'down') {
+        if (epCards.length) return setFocus(epCards[0]);
+        return true;
+      }
+      return true;
+    }
+
+    var eIdx = epCards.indexOf(currentFocused);
+    if (eIdx !== -1) {
+      var epCols = 1;
+      var ep0Top = epCards[0].offsetTop;
+      for (var ei = 1; ei < Math.min(8, epCards.length); ei++) {
+        if (Math.abs(epCards[ei].offsetTop - ep0Top) <= 18) epCols++;
+        else break;
+      }
+      var eCol = eIdx % epCols;
+      if (direction === 'left') {
+        if (eCol < epCols - 1 && eIdx + 1 < epCards.length) return setFocus(epCards[eIdx + 1]);
+        return true;
+      }
+      if (direction === 'right') {
+        if (eCol > 0) return setFocus(epCards[eIdx - 1]);
+        return true;
+      }
+      if (direction === 'down') {
+        if (eIdx + epCols < epCards.length) return setFocus(epCards[eIdx + epCols]);
+        return true;
+      }
+      if (direction === 'up') {
+        if (eIdx - epCols >= 0) return setFocus(epCards[eIdx - epCols]);
+        if (midRow.length) return setFocus(midRow[0]);
+        if (actionBtns.length) return setFocus(actionBtns[0]);
+        return true;
+      }
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Universal On-Screen TV Keyboard Builder & Controller (v9.8.0 Streamer Edition)
    */
   function ensureRubikFontLink() {
     try {
@@ -1669,29 +1906,15 @@
     } catch (e) {}
   }
 
-  function ensureSideRailTabHandle() {
-    var rail = document.getElementById('tvSideRail');
-    if (!rail) return;
-    if (!document.getElementById('tvSideRailTabHandle')) {
-      var tab = document.createElement('button');
-      tab.type = 'button';
-      tab.id = 'tvSideRailTabHandle';
-      tab.className = 'tv-side-rail-tab-handle';
-      tab.setAttribute('aria-label', 'פתח תפריט צד');
-      tab.innerHTML =
-        '<svg viewBox="0 0 24 24" class="rail-tab-icon" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>' +
-        '<span class="rail-tab-label">תפריט</span>';
-      tab.addEventListener('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        var sBtn = document.getElementById('tvRailSearchBtn') || rail.querySelector('.tv-focusable');
-        if (sBtn) setFocus(sBtn, { scroll: false });
-      });
-      tab.addEventListener('mouseenter', function () {
-        var sBtn = document.getElementById('tvRailSearchBtn') || rail.querySelector('.tv-focusable');
-        if (sBtn) setFocus(sBtn, { scroll: false });
-      });
-      rail.insertBefore(tab, rail.firstChild);
+  function removeLegacySideRailTabHandle() {
+    var oldHandles = document.querySelectorAll('#tvSideRailTabHandle, .tv-side-rail-tab-handle');
+    for (var i = 0; i < oldHandles.length; i++) {
+      if (oldHandles[i] && oldHandles[i].parentNode) {
+        oldHandles[i].parentNode.removeChild(oldHandles[i]);
+      }
+    }
+    if (document.body) {
+      document.body.classList.remove('tv-rail-expanded');
     }
   }
 
@@ -1762,7 +1985,7 @@
 
   function ensureVirtualKeyboardDom() {
     ensureRubikFontLink();
-    ensureSideRailTabHandle();
+    removeLegacySideRailTabHandle();
     ensureAuthFormDomUpgraded();
     var vk = document.getElementById('tvVirtualKeyboard');
     if (!vk) return null;
@@ -2233,24 +2456,23 @@
 
     var player = document.getElementById('playerModal');
     if (player && !player.classList.contains('hidden')) {
-      if (isTv) {
-        if (now - lastPlayerOverlayDismissedAt < 850) {
-          return true;
+      // 1. If the Exit Confirmation Modal (#playerExitConfirmModal) is already open, pressing Back cancels exit and resumes playback!
+      var exitConfirmModal = document.getElementById('playerExitConfirmModal');
+      if (exitConfirmModal && !exitConfirmModal.classList.contains('hidden')) {
+        if (typeof window.cancelExitVideoPlayer === 'function') {
+          window.cancelExitVideoPlayer();
+        } else {
+          exitConfirmModal.classList.add('hidden');
         }
-        var pOverlay = document.getElementById('playerControlsOverlay');
-        if (
-          pOverlay &&
-          !pOverlay.classList.contains('idle-hidden') &&
-          currentFocused &&
-          player.contains(currentFocused) &&
-          currentFocused.id !== 'closePlayerBtn'
-        ) {
-          lastPlayerOverlayDismissedAt = now;
-          pOverlay.classList.add('idle-hidden');
-          clearPlayerFocus();
-          return true;
-        }
+        return true;
       }
+
+      // 2. Otherwise, pressing Back in the player opens the Exit Confirmation Dialog ("לצאת מהצפייה?") instead of abruptly exiting!
+      if (typeof window.requestCloseVideoPlayer === 'function') {
+        window.requestCloseVideoPlayer();
+        return true;
+      }
+
       if (typeof window.closeVideoPlayer === 'function') {
         window.closeVideoPlayer();
       } else {
@@ -2357,6 +2579,20 @@
       return true;
     }
 
+    // If inside #tvSideRail or #tvSideRail is open, Back closes the side menu and returns to the catalog!
+    var sideRail = document.getElementById('tvSideRail');
+    if (sideRail && (sideRail.classList.contains('rail-open') || (currentFocused && sideRail.contains(currentFocused)))) {
+      sideRail.classList.remove('rail-open');
+      if (document.body) document.body.classList.remove('tv-rail-expanded');
+      if (lastMainFocus && isElementVisible(lastMainFocus)) {
+        return setFocus(lastMainFocus);
+      }
+      var firstTile = document.querySelector('#catalogMain .poster-card');
+      if (firstTile && isElementVisible(firstTile)) {
+        return setFocus(firstTile);
+      }
+    }
+
     // On Home Stage: if scrolled down or not inside #topHeader, Back scrolls to top & focuses Top Header!
     var catalogMain = document.getElementById('catalogMain');
     var topHeader = document.getElementById('topHeader');
@@ -2366,12 +2602,6 @@
     }
     if (topHeader && isElementVisible(topHeader) && (!currentFocused || !topHeader.contains(currentFocused))) {
       if (focusTopHeaderNav(false)) return true;
-    }
-
-    var sideRail = document.getElementById('tvSideRail');
-    if (sideRail && isElementVisible(sideRail) && !sideRail.contains(currentFocused)) {
-      var activeRail = sideRail.querySelector('#tvRailSearchBtn') || sideRail.querySelector('.tv-rail-item.active') || sideRail.querySelector('.tv-focusable');
-      if (activeRail) return setFocus(activeRail, { scroll: false });
     }
 
     return false;
@@ -2397,6 +2627,16 @@
       var player = document.getElementById('playerModal');
       var isTv = Boolean(document.body && document.body.classList.contains('tv-mode'));
       if (player && !player.classList.contains('hidden') && (!parentalModalOpen || parentalModalOpen.classList.contains('hidden'))) {
+        var exitConfirmModal = document.getElementById('playerExitConfirmModal');
+        if (exitConfirmModal && !exitConfirmModal.classList.contains('hidden')) {
+          if (currentFocused && exitConfirmModal.contains(currentFocused) && isElementVisible(currentFocused)) {
+            currentFocused.click();
+          } else {
+            var cancelExitBtn = document.getElementById('playerExitCancelBtn');
+            if (cancelExitBtn) cancelExitBtn.click();
+          }
+          return true;
+        }
         if (isTv) {
           var shieldSkipBtn = document.getElementById('parentalShieldSkipNowBtn');
           if (shieldSkipBtn && isElementVisible(shieldSkipBtn)) {
@@ -2518,6 +2758,12 @@
     var activeScope = getActiveScope();
     if (activeScope && activeScope.id === 'authModal') {
       return navigateAuthModal(directionOrAction);
+    }
+    if (activeScope && activeScope.id === 'searchModal') {
+      if (navigateSearchModal(directionOrAction)) return true;
+    }
+    if (activeScope && activeScope.id === 'detailsModal') {
+      if (navigateDetailsModal(directionOrAction)) return true;
     }
     if (activeScope === document.body || (activeScope && activeScope.classList && activeScope.classList.contains('explorer-dropdown-panel'))) {
       if (navigateHomeStage(directionOrAction)) return true;

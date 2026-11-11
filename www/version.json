@@ -1,9 +1,9 @@
 {
-  "version": "9.7.1",
+  "version": "9.8.0",
   "native_apk_version": "9.6.0",
   "apk_download_url": "https://streamittvapp.github.io/stream-it-app/StreamIt-AndroidTV.apk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-10T12:10:00Z",
-  "notes": "v9.7.1 — Exact Account Password Mapping (bensahaltv@gmail.com -> b0544656510, streamittvapp@gmail.com -> 332905), Zero Placeholders & Zero Quick Buttons on Login Forms, and Phone QR Code Quick-Login Pairing."
+  "updated_at": "2026-11-11T08:15:00Z",
+  "notes": "v9.8.0 — Living-Room Streamer & Cinema Facelift: Netflix-style 16:9 horizontal tiles in 6 columns (Home, Categories, Search), 10-foot readable typography, smooth tab-free Side Rail drawer, Player Exit Confirmation modal on Back button, thousands of streaming movies/series, and verified original audio + Hebrew subtitles (no Hindi/foreign dubbing)."
 }

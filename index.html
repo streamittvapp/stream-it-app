@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
-  <link rel="stylesheet" href="styles.css?v=9.7.1" />
+  <link rel="stylesheet" href="styles.css?v=9.8.0" />
   <script>
     (function () {
       try {
@@ -34,13 +34,13 @@
           });
         }
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (!otaVer || otaVer <= '9.7.1') {
+        if (!otaVer || otaVer <= '9.8.0') {
           localStorage.removeItem('streamit_ota_css_v9');
           localStorage.removeItem('streamit_ota_app_js_v9');
           localStorage.removeItem('streamit_ota_tv_nav_v9');
         }
         var otaCss = localStorage.getItem('streamit_ota_css_v9') || '';
-        if (otaVer && otaVer > '9.7.1' && otaCss.length > 500) {
+        if (otaVer && otaVer > '9.8.0' && otaCss.length > 500) {
           var st = document.createElement('style');
           st.id = 'streamit-ota-live-style-v9';
           st.textContent = otaCss;
@@ -773,6 +773,23 @@
           <button type="button" id="parentalShieldSkipNowBtn" class="btn-primary parental-shield-skip-btn tv-focusable">
             <span>דלג מיד לסוף הקטע</span>
           </button>
+        </div>
+      </div>
+
+      <!-- Player Back / Exit Confirmation Dialog (#playerExitConfirmModal) -->
+      <div id="playerExitConfirmModal" class="player-exit-confirm-modal hidden" dir="rtl" role="alertdialog" aria-modal="true" aria-labelledby="playerExitConfirmHeading">
+        <div class="player-exit-confirm-card">
+          <div class="player-exit-confirm-badge">יציאה מהנגן</div>
+          <h3 id="playerExitConfirmHeading" class="player-exit-confirm-heading">לצאת מהצפייה?</h3>
+          <p id="playerExitConfirmDesc" class="player-exit-confirm-desc">האם אתה בטוח שברצונך לצאת מהסרט? נקודת העצירה שלך נשמרה אוטומטית.</p>
+          <div class="player-exit-confirm-actions">
+            <button type="button" id="playerExitCancelBtn" class="btn-primary player-exit-btn tv-focusable" aria-label="המשך צפייה">
+              <span>המשך צפייה</span>
+            </button>
+            <button type="button" id="playerExitConfirmBtn" class="btn-secondary player-exit-btn player-exit-leave-btn tv-focusable" aria-label="צא מהסרט">
+              <span>צא מהסרט</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1600,13 +1617,13 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Core Application & Smart TV Navigation Scripts -->
-  <script src="tv-navigation.js?v=9.7.1"></script>
-  <script src="app.js?v=9.7.1"></script>
+  <script src="tv-navigation.js?v=9.8.0"></script>
+  <script src="app.js?v=9.8.0"></script>
   <script>
     (function () {
       try {
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (otaVer && otaVer > '9.7.1') {
+        if (otaVer && otaVer > '9.8.0') {
           var navCode = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
           if (navCode.length > 500) {
             var s1 = document.createElement('script');

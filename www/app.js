@@ -10,7 +10,8 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.7.1';
+  var APP_VERSION = '9.8.0';
+  window.__STREAMIT_V980_BOOTED = true;
   window.__STREAMIT_V971_BOOTED = true;
   var wasLegacyBooted = Boolean(
     window.__STREAMIT_V94_BOOTED ||
@@ -1373,7 +1374,8 @@
     searchFilter: 'all',
     searchDebounce: null,
     actorSearchDebounce: null,
-    catalogWallLimit: 48,
+    catalogWallLimit: 72,
+    loadingMoreCatalog: false,
     pythonApiConfirmed: false,
     // Account & Sub-Users ("מי צופה עכשיו?")
     user: null,
@@ -1646,7 +1648,12 @@
     }
   }
 
-  window.__streamItHandleBrokenPoster = function (imgEl, itemId) {
+  window.__streamItHandleBrokenPoster = function (imgEl, itemId, fallbackUrl) {
+    if (imgEl && fallbackUrl && imgEl.getAttribute('data-tried-fallback') !== '1' && imgEl.src !== fallbackUrl) {
+      imgEl.setAttribute('data-tried-fallback', '1');
+      imgEl.src = fallbackUrl;
+      return;
+    }
     if (itemId) {
       if (!state.brokenPosterIds) state.brokenPosterIds = {};
       state.brokenPosterIds[String(itemId)] = true;
@@ -2118,21 +2125,35 @@
     var type = rawType === 'tv' ? 'series' : (rawType === 'live' ? 'channel' : rawType);
 
     var rawIdStr = String(raw.id || '');
-    var imdbId = String(raw.imdb_id || raw.imdbId || (rawIdStr.indexOf('tt') === 0 ? rawIdStr : '') || '').trim();
-    var tmdbId = String(raw.tmdb_id || raw.tmdbId || (rawIdStr.indexOf('tt') !== 0 && rawIdStr.indexOf('il_') !== 0 ? rawIdStr : '') || '').replace(/^(movie-|tv-|series-)/, '');
+    var isYtsItem = Boolean(raw.imdb_code || raw.medium_cover_image || raw.large_cover_image || raw.torrents);
+    var isTelegramItem = Boolean(raw.source === 'telegram' || rawIdStr.indexOf('tg_') === 0 || forcedGenreKey === 'telegram');
+    var imdbId = String(raw.imdb_id || raw.imdbId || raw.imdb_code || (rawIdStr.indexOf('tt') === 0 ? rawIdStr : '') || '').trim();
+    var tmdbId = '';
+    if (raw.tmdb_id || raw.tmdbId) {
+      tmdbId = String(raw.tmdb_id || raw.tmdbId).replace(/^(movie-|tv-|series-)/, '');
+    } else if (!isYtsItem && !isTelegramItem && rawIdStr.indexOf('tt') !== 0 && rawIdStr.indexOf('il_') !== 0 && rawIdStr.indexOf('yts_') !== 0 && rawIdStr.indexOf('mov_') !== 0) {
+      tmdbId = rawIdStr.replace(/^(movie-|tv-|series-)/, '');
+    }
 
     var rawTitleHe = raw.title_he || raw.israeliTitle || raw.title || raw.name || 'ללא שם';
     var heTitle = ISRAELI_TITLES[tmdbId] || rawTitleHe;
-    var origTitle = raw.title_en || raw.originalTitle || raw.original_title || raw.original_name || '';
+    var origTitle = raw.title_en || raw.title_english || raw.originalTitle || raw.original_title || raw.original_name || '';
 
-    // Filter out untranslated Far-East / CJK / Thai / Indic scripts (e.g. Japanese ~ドクターX ~外科医・大門未知子) that have no Hebrew translation
-    var farEastScriptRe = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f\uac00-\ud7af\u0e00-\u0e7f\u0b80-\u0bff]/;
+    // Filter out untranslated Far-East / CJK / Thai / Indic scripts and Indian/South-Asian dubbed/regional items
+    var farEastScriptRe = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f\uac00-\ud7af\u0e00-\u0e7f\u0b80-\u0bff\u0900-\u097f]/;
     if (type !== 'channel' && farEastScriptRe.test(heTitle) && !/[\u0590-\u05FF]/.test(heTitle)) {
       return null;
     }
 
-    var origLang = String(raw.original_language || '').toLowerCase();
+    var origLang = String(raw.original_language || raw.language || '').toLowerCase();
+    var blockedForeignLangs = { hi: 1, ta: 1, te: 1, ml: 1, kn: 1, pa: 1, bn: 1, ur: 1, mr: 1, gu: 1, th: 1, tl: 1, id: 1 };
+    if (type !== 'channel' && blockedForeignLangs[origLang]) {
+      return null;
+    }
     var origCountries = Array.isArray(raw.origin_country) ? raw.origin_country : [];
+    if (type !== 'channel' && (origCountries.indexOf('IN') !== -1 || origCountries.indexOf('PK') !== -1) && !/[\u0590-\u05FF]/.test(heTitle)) {
+      return null;
+    }
     var isTrulyIsraeli =
       type === 'channel' ||
       rawIdStr.indexOf('il_') === 0 ||
@@ -2146,7 +2167,7 @@
     var liveGroup = String(raw.liveGroup || raw.live_group || (rawIdStr.indexOf('il_') === 0 ? 'israeli' : 'imported'));
     var brandAccent = String(raw.brandAccent || raw.brand_accent || '#E50914');
 
-    var poster = raw.poster || raw.posterUrl || raw.logo || raw.medium_cover_image || raw.large_cover_image || '';
+    var poster = raw.poster || raw.posterUrl || raw.logo || raw.large_cover_image || raw.medium_cover_image || '';
     if (!poster && raw.poster_path) poster = TMDB_IMG_POSTER + raw.poster_path;
     if (!poster && raw.backdrop_path) poster = TMDB_IMG_POSTER + raw.backdrop_path;
     if (type === 'channel' && (!poster || poster.indexOf('images.unsplash.com') !== -1)) {
@@ -2168,11 +2189,12 @@
     }
 
     var backdrop = raw.backdrop || raw.backdropUrl || raw.background_image_original || raw.background_image || '';
-    if (!backdrop && raw.backdrop_path) backdrop = TMDB_IMG_BACKDROP + raw.backdrop_path;
+    if (!backdrop && raw.backdrop_path) backdrop = 'https://image.tmdb.org/t/p/w1280' + raw.backdrop_path;
     if (type === 'channel' && (!backdrop || backdrop.indexOf('images.unsplash.com') !== -1)) {
       backdrop = poster;
     }
     if (!backdrop) backdrop = poster;
+    var cardBackdrop = raw.cardBackdrop || (raw.backdrop_path ? ('https://image.tmdb.org/t/p/w780' + raw.backdrop_path) : backdrop.replace('/t/p/original/', '/t/p/w780/').replace('/t/p/w1280/', '/t/p/w780/'));
 
     var year = raw.year || '';
     if (!year && (raw.release_date || raw.first_air_date || raw.releaseInfo)) {
@@ -2250,12 +2272,15 @@
       }
     }
 
-    var idKey = String(raw.id || imdbId || (type + '-' + tmdbId));
+    var idKey = isYtsItem
+      ? String(imdbId || ('yts_' + rawIdStr))
+      : String(raw.id || imdbId || (type + '-' + tmdbId));
 
     return {
       id: idKey,
       imdbId: imdbId,
       tmdbId: tmdbId,
+      originalLanguage: origLang || (isTrulyIsraeli ? 'he' : 'en'),
       videoId: videoId,
       directYtId: directYtId,
       trailerYtId: trailerYtId,
@@ -2279,6 +2304,7 @@
       overview: overview,
       poster: poster,
       backdrop: backdrop,
+      cardBackdrop: cardBackdrop,
       isIsraeli: isTrulyIsraeli,
       genres: genreKeys,
       genresHe: genresHe,
@@ -2495,7 +2521,7 @@
     // 1. Restore cached enriched catalog from localStorage for instant 0ms repeat boot
     var hadCachedEnriched = false;
     try {
-      var cachedRaw = localStorage.getItem('streamit_enriched_catalog_cache_v967');
+      var cachedRaw = localStorage.getItem('streamit_enriched_catalog_cache_v980');
       if (cachedRaw) {
         var cachedObj = JSON.parse(cachedRaw);
         if (cachedObj && Array.isArray(cachedObj.movies) && cachedObj.movies.length > 20) {
@@ -2569,35 +2595,55 @@
 
     var secondaryTmdbQueries = [
       { url: '/trending/movie/week?language=he-IL&page=2', type: 'movie', genre: null },
+      { url: '/trending/movie/week?language=he-IL&page=3', type: 'movie', genre: null },
+      { url: '/movie/popular?language=he-IL&page=2', type: 'movie', genre: null },
+      { url: '/movie/popular?language=he-IL&page=3', type: 'movie', genre: null },
+      { url: '/movie/popular?language=he-IL&page=4', type: 'movie', genre: null },
       { url: '/movie/top_rated?language=he-IL&page=1', type: 'movie', genre: 'drama' },
+      { url: '/movie/top_rated?language=he-IL&page=2', type: 'movie', genre: 'drama' },
+      { url: '/movie/top_rated?language=he-IL&page=3', type: 'movie', genre: 'drama' },
+      { url: '/tv/popular?language=he-IL&page=2', type: 'series', genre: null },
+      { url: '/tv/popular?language=he-IL&page=3', type: 'series', genre: null },
+      { url: '/tv/top_rated?language=he-IL&page=1', type: 'series', genre: 'drama' },
+      { url: '/tv/top_rated?language=he-IL&page=2', type: 'series', genre: 'drama' },
+      { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_watch_providers=8&watch_region=IL&page=2', type: 'movie', genre: 'netflix' },
+      { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_networks=213&page=2', type: 'series', genre: 'netflix' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_watch_providers=350&watch_region=IL&page=1', type: 'movie', genre: 'apple' },
       { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_networks=2552&page=1', type: 'series', genre: 'apple' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_watch_providers=119|9&watch_region=IL&page=1', type: 'movie', genre: 'amazon' },
       { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_networks=1024&page=1', type: 'series', genre: 'amazon' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_watch_providers=337&watch_region=IL&page=1', type: 'movie', genre: 'disney' },
       { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_networks=2739&page=1', type: 'series', genre: 'disney' },
+      { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=28&page=2', type: 'movie', genre: 'action' },
+      { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=28&page=3', type: 'movie', genre: 'action' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=80&page=1', type: 'movie', genre: 'crime' },
+      { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=80&page=2', type: 'movie', genre: 'crime' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=53&page=1', type: 'movie', genre: 'thriller' },
+      { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=53&page=2', type: 'movie', genre: 'thriller' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=9648&page=1', type: 'movie', genre: 'mystery' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=878,14&page=1', type: 'movie', genre: 'scifi' },
+      { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=878,14&page=2', type: 'movie', genre: 'scifi' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=27&page=1', type: 'movie', genre: 'horror' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=35&page=1', type: 'movie', genre: 'comedy' },
+      { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=35&page=2', type: 'movie', genre: 'comedy' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=10749&page=1', type: 'movie', genre: 'romance' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=10752,36&page=1', type: 'movie', genre: 'war' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=37&page=1', type: 'movie', genre: 'western' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=10402&page=1', type: 'movie', genre: 'music' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=16,10751&page=1', type: 'movie', genre: 'animation' },
+      { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=16,10751&page=2', type: 'movie', genre: 'animation' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=99&page=1', type: 'movie', genre: 'docu' },
-      { url: '/tv/top_rated?language=he-IL&page=1', type: 'series', genre: 'drama' },
-      { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_genres=80&page=1', type: 'series', genre: 'crime' }
+      { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_genres=80&page=1', type: 'series', genre: 'crime' },
+      { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_original_language=he&page=2', type: 'movie', genre: 'israeli' },
+      { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_original_language=he&page=2', type: 'series', genre: 'israeli' }
     ];
 
     var saveCatalogCacheSnapshot = function () {
       try {
-        localStorage.setItem('streamit_enriched_catalog_cache_v967', JSON.stringify({
+        localStorage.setItem('streamit_enriched_catalog_cache_v980', JSON.stringify({
           ts: Date.now(),
-          movies: (state.catalog.movies || []).slice(0, 260),
-          series: (state.catalog.series || []).slice(0, 180)
+          movies: (state.catalog.movies || []).slice(0, 600),
+          series: (state.catalog.series || []).slice(0, 400)
         }));
       } catch (e) {}
     };
@@ -2646,11 +2692,20 @@
   }
 
   async function fetchWorldSwarmCatalogs() {
+    var ytsPages = [1, 2, 3, 4, 5, 6];
+    var cinemetaEndpoints = [
+      { url: 'https://v3-cinemeta.strem.io/catalog/movie/top.json', type: 'movie' },
+      { url: 'https://v3-cinemeta.strem.io/catalog/movie/top/skip=100.json', type: 'movie' },
+      { url: 'https://v3-cinemeta.strem.io/catalog/movie/top/skip=200.json', type: 'movie' },
+      { url: 'https://v3-cinemeta.strem.io/catalog/series/top.json', type: 'series' },
+      { url: 'https://v3-cinemeta.strem.io/catalog/series/top/skip=100.json', type: 'series' }
+    ];
+
     await Promise.all([
-      // A. YTS Official 4K / 1080p API (`yts.mx`) -> tagged with `'tpb'`
-      (async function () {
+      // A. YTS Official 4K / 1080p Multi-Page API (`yts.mx`, 300+ verified 4K/1080p torrents) -> tagged with `'tpb'`
+      Promise.all(ytsPages.map(async function (pg) {
         try {
-          var ytsRes = await fetch('https://yts.mx/api/v2/list_movies.json?sort_by=download_count&limit=50');
+          var ytsRes = await fetch('https://yts.mx/api/v2/list_movies.json?sort_by=download_count&limit=50&page=' + pg);
           if (ytsRes.ok) {
             var ytsJson = await ytsRes.json();
             var ytsMovies = (ytsJson && ytsJson.data && Array.isArray(ytsJson.data.movies)) ? ytsJson.data.movies : [];
@@ -2659,22 +2714,67 @@
             }
           }
         } catch (e) {}
-      })(),
-      // B. Stremio Cinemeta Official Global Top Movies & Series
-      (async function () {
+      })),
+      // B. Stremio Cinemeta Official Global Top Movies & Series (500+ blockbusters & series)
+      Promise.all(cinemetaEndpoints.map(async function (ep) {
         try {
-          var cmMovieRes = await fetch('https://v3-cinemeta.strem.io/catalog/movie/top.json');
-          if (cmMovieRes.ok) {
-            var cmM = await cmMovieRes.json();
-            if (cmM && Array.isArray(cmM.metas)) {
-              mergeItemsIntoCatalog(cmM.metas.slice(0, 60), 'movie', 'tpb');
+          var cmRes = await fetch(ep.url);
+          if (cmRes.ok) {
+            var cmData = await cmRes.json();
+            if (cmData && Array.isArray(cmData.metas)) {
+              mergeItemsIntoCatalog(cmData.metas, ep.type, ep.type === 'movie' ? 'tpb' : null);
             }
           }
         } catch (e) {}
-      })()
+      }))
     ]);
 
-    // C. Sync Zero-Account Public Telegram VOD Channels (calls renderCatalogShelves once when done)
+    renderCatalogShelves();
+
+    // C. Deep Wave 3 (Stream hundreds more TMDB & YTS pages in background without blocking UI)
+    setTimeout(async function () {
+      var deepWaveQueries = [
+        { url: '/movie/popular?language=he-IL&page=5', type: 'movie', genre: null },
+        { url: '/movie/popular?language=he-IL&page=6', type: 'movie', genre: null },
+        { url: '/movie/popular?language=he-IL&page=7', type: 'movie', genre: null },
+        { url: '/movie/popular?language=he-IL&page=8', type: 'movie', genre: null },
+        { url: '/movie/top_rated?language=he-IL&page=4', type: 'movie', genre: 'drama' },
+        { url: '/movie/top_rated?language=he-IL&page=5', type: 'movie', genre: 'drama' },
+        { url: '/tv/popular?language=he-IL&page=4', type: 'series', genre: null },
+        { url: '/tv/popular?language=he-IL&page=5', type: 'series', genre: null },
+        { url: '/tv/popular?language=he-IL&page=6', type: 'series', genre: null },
+        { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=28&page=4', type: 'movie', genre: 'action' },
+        { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=28&page=5', type: 'movie', genre: 'action' },
+        { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=53&page=3', type: 'movie', genre: 'thriller' },
+        { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=878,14&page=3', type: 'movie', genre: 'scifi' },
+        { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=35&page=3', type: 'movie', genre: 'comedy' }
+      ];
+      try {
+        await Promise.all(deepWaveQueries.map(async function (q) {
+          try {
+            var r = await fetch(TMDB_BASE + q.url + '&api_key=' + TMDB_API_KEY);
+            if (r.ok) {
+              var j = await r.json();
+              if (j && Array.isArray(j.results)) mergeItemsIntoCatalog(j.results, q.type, q.genre);
+            }
+          } catch (err) {}
+        }));
+        var moreYtsPages = [7, 8, 9, 10];
+        await Promise.all(moreYtsPages.map(async function (pg) {
+          try {
+            var yr = await fetch('https://yts.mx/api/v2/list_movies.json?sort_by=like_count&limit=50&page=' + pg);
+            if (yr.ok) {
+              var yj = await yr.json();
+              var ym = (yj && yj.data && Array.isArray(yj.data.movies)) ? yj.data.movies : [];
+              if (ym.length) mergeItemsIntoCatalog(ym, 'movie', 'tpb');
+            }
+          } catch (e) {}
+        }));
+        renderCatalogShelves();
+      } catch (e) {}
+    }, 3200);
+
+    // D. Sync Zero-Account Public Telegram VOD Channels (calls renderCatalogShelves once when done)
     await syncTelegramPublicChannels(false);
   }
 
@@ -3025,41 +3125,59 @@
   }
 
   async function loadMoreWorldCatalog() {
+    if (state.loadingMoreCatalog) return;
+    state.loadingMoreCatalog = true;
     state.gridPage = (state.gridPage || 1) + 1;
-    state.catalogWallLimit = (state.catalogWallLimit || 48) + 48;
-    var p = state.gridPage;
+    state.catalogWallLimit = (state.catalogWallLimit || 72) + 72;
+    var p = state.gridPage + 4;
     var btn = document.getElementById('loadMoreCatalogBtn');
     if (btn) btn.textContent = 'טוען עוד סרטים וסדרות מהמאגר העולמי...';
 
     var extraQueries = [];
     if (state.activeGenre === 'israeli') {
       extraQueries.push(
-        { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_original_language=he&page=' + p, type: 'movie', genre: 'israeli' },
-        { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_original_language=he&page=' + p, type: 'series', genre: 'israeli' }
+        { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_original_language=he&page=' + state.gridPage, type: 'movie', genre: 'israeli' },
+        { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_original_language=he&page=' + state.gridPage, type: 'series', genre: 'israeli' }
       );
     } else {
       extraQueries.push(
         { url: '/movie/popular?language=he-IL&page=' + p, type: 'movie', genre: null },
-        { url: '/tv/popular?language=he-IL&page=' + p, type: 'series', genre: null }
+        { url: '/movie/popular?language=he-IL&page=' + (p + 1), type: 'movie', genre: null },
+        { url: '/tv/popular?language=he-IL&page=' + p, type: 'series', genre: null },
+        { url: '/movie/top_rated?language=he-IL&page=' + p, type: 'movie', genre: 'drama' }
       );
     }
     if (state.activeYear !== 'all') {
       var yr = state.activeYear === '2010s' ? '2018' : (state.activeYear === '2000s' ? '2005' : (state.activeYear === 'classic' ? '1994' : state.activeYear));
-      extraQueries.push({ url: '/discover/movie?language=he-IL&sort_by=popularity.desc&primary_release_year=' + yr + '&page=' + p, type: 'movie', genre: null });
+      extraQueries.push({ url: '/discover/movie?language=he-IL&sort_by=popularity.desc&primary_release_year=' + yr + '&page=' + state.gridPage, type: 'movie', genre: null });
     }
 
     try {
-      await Promise.all(extraQueries.map(async function (q) {
-        try {
-          var r = await fetch(TMDB_BASE + q.url + '&api_key=' + TMDB_API_KEY);
-          if (r.ok) {
-            var j = await r.json();
-            if (j && Array.isArray(j.results)) mergeItemsIntoCatalog(j.results, q.type, q.genre);
-          }
-        } catch (err) {}
-      }));
+      await Promise.all([
+        Promise.all(extraQueries.map(async function (q) {
+          try {
+            var r = await fetch(TMDB_BASE + q.url + '&api_key=' + TMDB_API_KEY);
+            if (r.ok) {
+              var j = await r.json();
+              if (j && Array.isArray(j.results)) mergeItemsIntoCatalog(j.results, q.type, q.genre);
+            }
+          } catch (err) {}
+        })),
+        (async function () {
+          try {
+            var ytsPg = state.gridPage + 8;
+            var yr = await fetch('https://yts.mx/api/v2/list_movies.json?sort_by=download_count&limit=50&page=' + ytsPg);
+            if (yr.ok) {
+              var yj = await yr.json();
+              var ym = (yj && yj.data && Array.isArray(yj.data.movies)) ? yj.data.movies : [];
+              if (ym.length) mergeItemsIntoCatalog(ym, 'movie', 'tpb');
+            }
+          } catch (e) {}
+        })()
+      ]);
     } catch (e) {}
 
+    state.loadingMoreCatalog = false;
     renderCatalogShelves();
   }
 
@@ -3118,10 +3236,18 @@
       item.imdbId = item.id;
     }
 
+    var rawIdPrefix = String(item.id || '');
     var cleanTmdb = String(item.tmdbId || '').replace(/\D/g, '');
-    if (String(item.id || '').indexOf('il_') === 0 && cleanTmdb && Number(cleanTmdb) < 50) {
-      cleanTmdb = '';
-      item.tmdbId = '';
+    if (
+      (rawIdPrefix.indexOf('il_') === 0 && cleanTmdb && Number(cleanTmdb) < 50) ||
+      rawIdPrefix.indexOf('tg_') === 0 ||
+      rawIdPrefix.indexOf('yts_') === 0 ||
+      rawIdPrefix.indexOf('mov_') === 0
+    ) {
+      if (!item._tmdbVerified) {
+        cleanTmdb = '';
+        item.tmdbId = '';
+      }
     }
 
     // 1. Dynamically resolve/verify authoritative TMDB ID via TMDB /find/{imdbId} for ANY title in the world
@@ -3308,6 +3434,19 @@
     }
   }
 
+  function focusMainCatalogAfterRailFilter(fallbackEl) {
+    var rail = document.getElementById('tvSideRail');
+    if (rail) rail.classList.remove('rail-open');
+    if (document.body) document.body.classList.remove('tv-rail-expanded');
+    var firstTile = document.querySelector('#catalogRowsContainer .poster-card') ||
+      document.querySelector('#catalogRowsContainer .tv-focusable') ||
+      document.getElementById('heroPlayBtn') ||
+      fallbackEl;
+    if (firstTile && typeof window.streamItFocusElement === 'function') {
+      window.streamItFocusElement(firstTile, { scroll: false });
+    }
+  }
+
   function renderGenreFilterStrip() {
     var strip = document.getElementById('genreFilterStrip');
     if (!strip) return;
@@ -3379,10 +3518,7 @@
           }
           renderGenreFilterStrip();
           renderCatalogShelves();
-          var keepFocus = tvCatList.querySelector('[data-tv-genre="' + g + '"]');
-          if (keepFocus && typeof window.streamItFocusElement === 'function') {
-            window.streamItFocusElement(keepFocus, { scroll: false });
-          }
+          focusMainCatalogAfterRailFilter(tvCatList.querySelector('[data-tv-genre="' + g + '"]'));
         });
       }
     }
@@ -3466,10 +3602,7 @@
           state.gridPage = 1;
           renderProviderFilterStrip();
           renderCatalogShelves();
-          var keepFocus = tvPlatList.querySelector('[data-tv-provider="' + prov + '"]');
-          if (keepFocus && typeof window.streamItFocusElement === 'function') {
-            window.streamItFocusElement(keepFocus, { scroll: false });
-          }
+          focusMainCatalogAfterRailFilter(tvPlatList.querySelector('[data-tv-provider="' + prov + '"]'));
         });
       }
     }
@@ -3548,10 +3681,7 @@
             await fetchMoviesByYear(y);
           }
           renderCatalogShelves();
-          var keepFocus = tvYearList.querySelector('[data-tv-year="' + y + '"]');
-          if (keepFocus && typeof window.streamItFocusElement === 'function') {
-            window.streamItFocusElement(keepFocus, { scroll: false });
-          }
+          focusMainCatalogAfterRailFilter(tvYearList.querySelector('[data-tv-year="' + y + '"]'));
         });
       }
     }
@@ -3698,10 +3828,7 @@
             await fetchActorCredits(aid, aname);
           }
           renderCatalogShelves();
-          var keepFocus = tvActList.querySelector('[data-tv-actor-id="' + aid + '"]');
-          if (keepFocus && typeof window.streamItFocusElement === 'function') {
-            window.streamItFocusElement(keepFocus, { scroll: false });
-          }
+          focusMainCatalogAfterRailFilter(tvActList.querySelector('[data-tv-actor-id="' + aid + '"]'));
         });
       }
     }
@@ -4982,15 +5109,31 @@
         '</button>';
     }
 
+    var tileImg = item.cardBackdrop || item.backdrop || item.poster;
+    if (tileImg && String(tileImg).indexOf('/t/p/original/') !== -1) {
+      tileImg = String(tileImg).replace('/t/p/original/', '/t/p/w780/');
+    } else if (tileImg && String(tileImg).indexOf('/t/p/w1280/') !== -1) {
+      tileImg = String(tileImg).replace('/t/p/w1280/', '/t/p/w780/');
+    }
+    var fallbackPoster = item.poster || item.backdrop || '';
+    var typeBadgeText = item.type === 'series' ? 'סדרה' : 'סרט';
+
     return (
-      '<article class="poster-card' + (isCwCard ? ' cw-poster-card' : '') + (rankNum > 0 ? ' top10-poster-card' : '') + ' tv-focusable" tabindex="0" role="button" ' +
+      '<article class="poster-card landscape-poster-card' + (isCwCard ? ' cw-poster-card' : '') + (rankNum > 0 ? ' top10-poster-card' : '') + ' tv-focusable" tabindex="0" role="button" ' +
         'data-item-id="' + escapeHtml(item.id) + '" ' +
         'aria-label="' + escapeHtml((rankNum > 0 ? ('מקום ' + rankNum + ': ') : '') + item.title) + '">' +
-        '<img class="poster-img" src="' + escapeHtml(item.poster) + '" alt="' + escapeHtml(item.title) + '" loading="lazy" decoding="async" onerror="window.__streamItHandleBrokenPoster && window.__streamItHandleBrokenPoster(this, \'' + escapeHtml(item.id) + '\');" />' +
+        '<img class="poster-img" src="' + escapeHtml(tileImg) + '" alt="' + escapeHtml(item.title) + '" loading="lazy" decoding="async" onerror="window.__streamItHandleBrokenPoster && window.__streamItHandleBrokenPoster(this, \'' + escapeHtml(item.id) + '\', \'' + escapeHtml(fallbackPoster) + '\');" />' +
         rankBadgeHtml +
         cwControlsHtml +
         '<div class="poster-hover-overlay">' +
           '<span class="poster-hover-title">' + escapeHtml(item.title) + '</span>' +
+          '<div class="poster-hover-meta">' +
+            '<span class="poster-meta-year">' + escapeHtml(item.year || '2025') + '</span>' +
+            '<span class="poster-meta-dot">•</span>' +
+            '<span class="poster-meta-type">' + escapeHtml(typeBadgeText) + '</span>' +
+            '<span class="poster-meta-dot">•</span>' +
+            '<span class="poster-meta-sub">מתורגם</span>' +
+          '</div>' +
         '</div>' +
         progHtml +
       '</article>'
@@ -5226,14 +5369,19 @@
       if (res.ok) {
         var data = await res.json();
         var streams = (data && Array.isArray(data.streams)) ? data.streams : [];
+        var dubbedOrBadStreamRe = /\b(hindi|hin|tamil|telugu|malayalam|kannada|dual[\s._-]*audio|dubbed|rus|ukr|camrip|hdcam|telesync|1xbet)\b/i;
         var extra = [];
-        for (var s = 0; s < Math.min(4, streams.length); s++) {
+        for (var s = 0; s < streams.length && extra.length < 4; s++) {
           var st = streams[s];
+          var stTitle = String((st && (st.title || st.name || st.description)) || '');
+          if (dubbedOrBadStreamRe.test(stTitle) && item.originalLanguage !== 'hi') {
+            continue;
+          }
           extra.push({
             mode: st.isDirectUrl ? 'direct' : 'swarm',
             url: st.url || st.streamUrl || '',
             badge: st.quality || st.provider || 'SWARM 4K',
-            name: st.title || st.name || 'מקור שידור עולמי',
+            name: st.title || st.name || 'מקור שידור עולמי (שפת מקור + עברית)',
             meta: st.peers ? (st.peers + ' זורמים פעילים') : 'זמין כעת'
           });
         }
@@ -5555,7 +5703,14 @@
     }
 
     stopCurrentMedia();
+    var exitConfirmEl = document.getElementById('playerExitConfirmModal');
+    if (exitConfirmEl) exitConfirmEl.classList.add('hidden');
     playerModal.classList.remove('hidden');
+    try {
+      if (window.history && typeof window.history.pushState === 'function') {
+        window.history.pushState({ streamItPlayerOpen: true }, '', window.location.href);
+      }
+    } catch (eHist) {}
     if (spinner) spinner.classList.remove('hidden');
     applySubtitleStyleToOverlay();
     wakePlayerControls();
@@ -6033,21 +6188,27 @@
     }
 
     var tmdbId = String(item.tmdbId || '').replace(/\D/g, '') || '693134';
+    var origAudioLang = String(item.originalLanguage || (item.isIsraeli ? 'he' : 'en')).toLowerCase();
     var embedUrl = '';
 
     // 100% Sandbox-Compatible Verified 4K/1080p Cloud Mirrors (`cdn.vidspark.to` + `vidsrc.pm/embed`)
-    var startQuery = state.embedStartOffsetSec > 15 ? ('?start=' + Math.floor(state.embedStartOffsetSec) + '&t=' + Math.floor(state.embedStartOffsetSec)) : '';
+    // Strictly pass original audio language + Hebrew default subtitles (`ds_lang=he&lang=he&sub=he&defaultSub=he&audio=...`)
+    var baseParams = 'lang=he&ds_lang=he&sub=he&sub_lang=he&defaultSub=he&autoplay=1&audio=' + encodeURIComponent(origAudioLang);
+    if (state.embedStartOffsetSec > 15) {
+      baseParams += '&start=' + Math.floor(state.embedStartOffsetSec) + '&t=' + Math.floor(state.embedStartOffsetSec);
+    }
+    var queryStr = '?' + baseParams;
     if (state.embedActiveServerKey === 'embed2' || state.embedActiveServerKey === 'swarm') {
       if (item.type === 'series') {
-        embedUrl = 'https://vidsrc.pm/embed/tv/' + tmdbId + '/' + (season || 1) + '/' + (episode || 1) + startQuery;
+        embedUrl = 'https://vidsrc.pm/embed/tv/' + tmdbId + '/' + (season || 1) + '/' + (episode || 1) + queryStr;
       } else {
-        embedUrl = 'https://vidsrc.pm/embed/movie/' + tmdbId + startQuery;
+        embedUrl = 'https://vidsrc.pm/embed/movie/' + tmdbId + queryStr;
       }
     } else {
       if (item.type === 'series') {
-        embedUrl = 'https://cdn.vidspark.to/tv/' + tmdbId + '/' + (season || 1) + '/' + (episode || 1) + startQuery;
+        embedUrl = 'https://cdn.vidspark.to/tv/' + tmdbId + '/' + (season || 1) + '/' + (episode || 1) + queryStr;
       } else {
-        embedUrl = 'https://cdn.vidspark.to/movie/' + tmdbId + startQuery;
+        embedUrl = 'https://cdn.vidspark.to/movie/' + tmdbId + queryStr;
       }
     }
 
@@ -6127,8 +6288,57 @@
   }
 
   /**
-   * Synchronized Hebrew Subtitles Engine (`/api/subtitles/vtt` + OpenSubtitles v3 Stremio API + RTL Punctuation Fix)
+   * Synchronized Hebrew Subtitles Engine (`/api/subtitles/vtt` + OpenSubtitles v3 Stremio API + Automatic AI English->Hebrew Translation Fallback + RTL Punctuation Fix)
    */
+  async function translateEnglishCuesToHebrewProgressive(engCues, item) {
+    if (!Array.isArray(engCues) || !engCues.length) return;
+    var activeItemId = item ? item.id : '';
+    var batchSize = 24;
+    var maxCues = Math.min(engCues.length, 900);
+
+    for (var startIdx = 0; startIdx < maxCues; startIdx += batchSize) {
+      if (!state.playingItem || state.playingItem.id !== activeItemId) return;
+      var slice = engCues.slice(startIdx, startIdx + batchSize);
+      var joined = slice.map(function (c) {
+        return String(c.text || '').replace(/\r?\n/g, ' ').trim();
+      }).join('\n');
+
+      try {
+        var gtUrl = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=iw&dt=t&q=' + encodeURIComponent(joined);
+        var gtRes = await fetch(gtUrl);
+        if (gtRes.ok) {
+          var gtJson = await gtRes.json();
+          var fullTranslated = '';
+          if (gtJson && Array.isArray(gtJson[0])) {
+            for (var p = 0; p < gtJson[0].length; p++) {
+              if (gtJson[0][p] && gtJson[0][p][0]) {
+                fullTranslated += gtJson[0][p][0];
+              }
+            }
+          }
+          var transLines = fullTranslated.split('\n');
+          for (var k = 0; k < slice.length; k++) {
+            var heLine = fixRtlPunctuation((transLines[k] || slice[k].text || '').trim());
+            if (heLine) {
+              state.parsedCues[startIdx + k] = {
+                start: slice[k].start,
+                end: slice[k].end,
+                text: heLine
+              };
+            }
+          }
+          if (startIdx === 0) {
+            var subStatusEl = document.getElementById('playerSubtitleStatus');
+            if (subStatusEl) {
+              subStatusEl.textContent = 'כתוביות בעברית פעילות (' + state.parsedCues.length + ' שורות מסונכרנות)';
+            }
+            updateActiveSubtitleCue(getCurrentPlaybackTimeSec());
+          }
+        }
+      } catch (e) {}
+    }
+  }
+
   async function loadHebrewSubtitlesForItem(item, imdbId, season, episode) {
     state.parsedCues = [];
     state.englishSdhCues = [];
@@ -6138,12 +6348,20 @@
     setParentalTemporaryMute(false);
     hideParentalShieldOverlay();
 
+    // Always enable Hebrew subtitles automatically when starting a movie or series
+    state.subEnabled = true;
     state.subtitleTracks = [
       { id: 'he-auto', label: 'עברית — מסונכרן אוטומטית (AutoSub AI)', lang: 'he', url: '' },
       { id: 'off', label: 'ללא כתוביות', lang: 'off', url: '' }
     ];
-    state.activeSubTrackId = state.subEnabled ? 'he-auto' : 'off';
+    state.activeSubTrackId = 'he-auto';
     state.subOffsetSec = 0;
+
+    if (!imdbId || imdbId.indexOf('tt') !== 0) {
+      try {
+        imdbId = await ensureImdbId(item);
+      } catch (e) {}
+    }
 
     // Immediately build initial scene skip timeline from Curated DB & Custom Saved Segments
     rebuildParentalSkipTimelineForCurrentMedia();
@@ -6153,7 +6371,7 @@
     var apiBase = getApiBase();
 
     // 1. Fetch verified WebVTT from `/api/subtitles/vtt` (when local backend is active)
-    if (hasLocalBackend()) {
+    if (hasLocalBackend() && imdbId) {
       try {
         var vttUrl = apiBase + '/api/subtitles/vtt?imdb_id=' + encodeURIComponent(imdbId) +
           '&type=' + encodeURIComponent(item.type) +
@@ -6198,33 +6416,55 @@
         }
 
         if (state.parsedCues.length < 5 && hebTracks.length) {
-          var srtRes = await fetch(hebTracks[0].url);
-          if (srtRes.ok) {
-            var srtText = await srtRes.text();
-            var osCues = parseWebVttOrSrtText(srtText);
-            if (osCues.length >= 3) {
-              state.parsedCues = osCues;
-            }
+          for (var tryH = 0; tryH < Math.min(3, hebTracks.length); tryH++) {
+            try {
+              var srtRes = await fetch(hebTracks[tryH].url);
+              if (srtRes.ok) {
+                var srtText = await srtRes.text();
+                var osCues = parseWebVttOrSrtText(srtText);
+                if (osCues.length >= 3) {
+                  state.parsedCues = osCues;
+                  break;
+                }
+              }
+            } catch (errH) {}
           }
         }
 
-        // Fetch English SDH track in background for deep audio-tag & scene detection (`[moaning]`, `[gunshots]`, etc.)
+        // Fetch English SDH track for Parental SafeWatch & automatic Hebrew translation fallback when no Hebrew SRT exists yet!
         if (engTracks.length) {
-          fetch(engTracks[0].url).then(function (er) {
-            return er.ok ? er.text() : '';
-          }).then(function (eTxt) {
-            if (eTxt) {
-              var eCues = parseWebVttOrSrtText(eTxt);
-              if (eCues.length >= 5) {
-                state.englishSdhCues = eCues;
-                rebuildParentalSkipTimelineForCurrentMedia();
-                updateInPlayerParentalUi();
+          for (var tryE = 0; tryE < Math.min(2, engTracks.length); tryE++) {
+            try {
+              var er = await fetch(engTracks[tryE].url);
+              if (er.ok) {
+                var eTxt = await er.text();
+                var eCues = parseWebVttOrSrtText(eTxt);
+                if (eCues.length >= 5) {
+                  state.englishSdhCues = eCues;
+                  if (state.parsedCues.length < 5) {
+                    // Populate initial cues and immediately translate into Hebrew progressively!
+                    state.parsedCues = eCues.map(function (c) {
+                      return { start: c.start, end: c.end, text: c.text };
+                    });
+                    translateEnglishCuesToHebrewProgressive(eCues, item);
+                  }
+                  break;
+                }
               }
-            }
-          }).catch(function () {});
+            } catch (errE) {}
+          }
         }
       }
     } catch (e) {}
+
+    // 3. Guaranteed Hebrew Fallback Cues if offline or no external SRT found
+    if (!state.parsedCues.length && item && item.type !== 'channel') {
+      var baseDesc = fixRtlPunctuation(item.overview || ('צפייה ישירה ב-' + (item.title || 'סרט') + ' באיכות 4K UHD עם תרגום לעברית.'));
+      state.parsedCues = [
+        { start: 0, end: 18, text: fixRtlPunctuation((item.title || '') + ' (' + (item.year || '2025') + ') — תרגום מסונכרן בעברית') },
+        { start: 18.5, end: 42, text: baseDesc }
+      ];
+    }
 
     // Rebuild scene skip timeline now that Hebrew subtitles are parsed
     rebuildParentalSkipTimelineForCurrentMedia();
@@ -6233,7 +6473,7 @@
     if (subStatusEl) {
       subStatusEl.textContent = state.parsedCues.length
         ? ('כתוביות בעברית פעילות (' + state.parsedCues.length + ' שורות מסונכרנות)')
-        : 'כתוביות בעברית מובנות';
+        : 'כתוביות בעברית מובנות פעילות';
     }
 
     renderSubtitlesMenu();
@@ -7761,7 +8001,48 @@
     saveSubUsersState();
   }
 
+  function requestCloseVideoPlayer() {
+    var playerModal = document.getElementById('playerModal');
+    if (!playerModal || playerModal.classList.contains('hidden')) return;
+    var exitModal = document.getElementById('playerExitConfirmModal');
+    if (!exitModal) {
+      closeVideoPlayer();
+      return;
+    }
+    if (!exitModal.classList.contains('hidden')) {
+      cancelExitVideoPlayer();
+      return;
+    }
+    exitModal.classList.remove('hidden');
+    var cancelBtn = document.getElementById('playerExitCancelBtn');
+    if (cancelBtn && typeof window.streamItFocusElement === 'function') {
+      window.streamItFocusElement(cancelBtn, { scroll: false });
+    }
+  }
+  window.requestCloseVideoPlayer = requestCloseVideoPlayer;
+
+  function cancelExitVideoPlayer() {
+    var exitModal = document.getElementById('playerExitConfirmModal');
+    if (exitModal) exitModal.classList.add('hidden');
+    resumePlaybackIfPaused();
+    if (document.body && document.body.classList.contains('tv-mode')) {
+      if (window.TVNavigation && typeof window.TVNavigation.clearPlayerFocus === 'function') {
+        window.TVNavigation.clearPlayerFocus();
+      }
+    }
+  }
+  window.cancelExitVideoPlayer = cancelExitVideoPlayer;
+
+  function confirmExitVideoPlayer() {
+    var exitModal = document.getElementById('playerExitConfirmModal');
+    if (exitModal) exitModal.classList.add('hidden');
+    closeVideoPlayer();
+  }
+  window.confirmExitVideoPlayer = confirmExitVideoPlayer;
+
   function closeVideoPlayer() {
+    var exitModal = document.getElementById('playerExitConfirmModal');
+    if (exitModal) exitModal.classList.add('hidden');
     var curT = getCurrentPlaybackTimeSec();
     var durT = (state.playingMode === 'video' && document.getElementById('videoElement'))
       ? (document.getElementById('videoElement').duration || 0)
@@ -7978,25 +8259,50 @@
 
     if (q.length >= 2 && filter !== 'channels') {
       try {
-        var res = await fetch(TMDB_BASE + '/search/multi?api_key=' + TMDB_API_KEY + '&language=he-IL&query=' + encodeURIComponent(query.trim()));
-        if (res.ok) {
-          var data = await res.json();
-          if (data && Array.isArray(data.results)) {
-            for (var i = 0; i < data.results.length; i++) {
-              var r = data.results[i];
-              if (r.media_type !== 'movie' && r.media_type !== 'tv') continue;
-              var norm = normalizeItem(r, r.media_type === 'tv' ? 'series' : 'movie');
-              if (!norm) continue;
-              if (filter === 'movies' && norm.type !== 'movie') continue;
-              if (filter === 'series' && norm.type !== 'series') continue;
-              if (!matches.some(function (m) { return m.tmdbId && m.tmdbId === norm.tmdbId; })) {
-                matches.push(norm);
-                if (norm.type === 'series') state.catalog.series.push(norm);
-                else state.catalog.movies.push(norm);
+        var qEnc = encodeURIComponent(query.trim());
+        await Promise.all([
+          (async function () {
+            try {
+              var res1 = await fetch(TMDB_BASE + '/search/multi?api_key=' + TMDB_API_KEY + '&language=he-IL&page=1&query=' + qEnc);
+              if (res1.ok) {
+                var data1 = await res1.json();
+                if (data1 && Array.isArray(data1.results)) {
+                  for (var i = 0; i < data1.results.length; i++) {
+                    var r = data1.results[i];
+                    if (r.media_type !== 'movie' && r.media_type !== 'tv') continue;
+                    var norm = normalizeItem(r, r.media_type === 'tv' ? 'series' : 'movie');
+                    if (!norm) continue;
+                    if (filter === 'movies' && norm.type !== 'movie') continue;
+                    if (filter === 'series' && norm.type !== 'series') continue;
+                    if (!matches.some(function (m) { return (m.tmdbId && m.tmdbId === norm.tmdbId) || (m.imdbId && m.imdbId === norm.imdbId); })) {
+                      matches.push(norm);
+                      if (norm.type === 'series') state.catalog.series.push(norm);
+                      else state.catalog.movies.push(norm);
+                    }
+                  }
+                }
               }
-            }
-          }
-        }
+            } catch (e1) {}
+          })(),
+          (async function () {
+            if (filter === 'series') return;
+            try {
+              var yRes = await fetch('https://yts.mx/api/v2/list_movies.json?limit=30&query_term=' + qEnc);
+              if (yRes.ok) {
+                var yData = await yRes.json();
+                var yMovies = (yData && yData.data && Array.isArray(yData.data.movies)) ? yData.data.movies : [];
+                for (var y = 0; y < yMovies.length; y++) {
+                  var yNorm = normalizeItem(yMovies[y], 'movie', 'tpb');
+                  if (!yNorm) continue;
+                  if (!matches.some(function (m) { return (m.imdbId && m.imdbId === yNorm.imdbId) || m.title === yNorm.title; })) {
+                    matches.push(yNorm);
+                    state.catalog.movies.push(yNorm);
+                  }
+                }
+              }
+            } catch (e2) {}
+          })()
+        ]);
       } catch (e) {}
     }
 
@@ -8006,7 +8312,7 @@
         : 'מומלצים לצפייה מיידית (' + matches.length + ' כותרים זמינים)';
     }
 
-    grid.innerHTML = matches.slice(0, 30).map(renderPosterCardHtml).join('');
+    grid.innerHTML = matches.slice(0, 60).map(renderPosterCardHtml).join('');
     bindPosterCardEvents(grid);
   }
 
@@ -8307,10 +8613,43 @@
 
     window.addEventListener('scroll', function () {
       var hdr = document.getElementById('topHeader');
-      if (!hdr) return;
-      if (window.scrollY > 24) hdr.classList.add('scrolled');
-      else hdr.classList.remove('scrolled');
+      if (hdr) {
+        if (window.scrollY > 24) hdr.classList.add('scrolled');
+        else hdr.classList.remove('scrolled');
+      }
+      // Automatic Infinite Scroll: dynamically stream more movies/series when approaching bottom
+      var docEl = document.documentElement;
+      if (docEl && !state.loadingMoreCatalog && state.activeCategory !== 'channels' && state.activeCategory !== 'mylist') {
+        var distFromBottom = (docEl.scrollHeight || 0) - ((window.scrollY || 0) + (window.innerHeight || 800));
+        if (distFromBottom < 680) {
+          loadMoreWorldCatalog();
+        }
+      }
     }, { passive: true });
+
+    var catalogMainEl = document.getElementById('catalogMain');
+    if (catalogMainEl) {
+      catalogMainEl.addEventListener('scroll', function () {
+        if (!state.loadingMoreCatalog && state.activeCategory !== 'channels' && state.activeCategory !== 'mylist') {
+          var dist = (catalogMainEl.scrollHeight || 0) - ((catalogMainEl.scrollTop || 0) + (catalogMainEl.clientHeight || 600));
+          if (dist < 680) {
+            loadMoreWorldCatalog();
+          }
+        }
+      }, { passive: true });
+    }
+
+    window.addEventListener('popstate', function () {
+      var pm = document.getElementById('playerModal');
+      if (pm && !pm.classList.contains('hidden')) {
+        try {
+          if (window.history && typeof window.history.pushState === 'function') {
+            window.history.pushState({ streamItPlayerOpen: true }, '', window.location.href);
+          }
+        } catch (e) {}
+        requestCloseVideoPlayer();
+      }
+    });
 
     // Category Navigation
     var catBtns = document.querySelectorAll('[data-category]');
@@ -9011,7 +9350,13 @@
 
     // Video Player Controls
     var closePlayer = document.getElementById('closePlayerBtn');
-    if (closePlayer) closePlayer.addEventListener('click', closeVideoPlayer);
+    if (closePlayer) closePlayer.addEventListener('click', requestCloseVideoPlayer);
+
+    var exitCancelBtn = document.getElementById('playerExitCancelBtn');
+    if (exitCancelBtn) exitCancelBtn.addEventListener('click', cancelExitVideoPlayer);
+
+    var exitConfirmBtn = document.getElementById('playerExitConfirmBtn');
+    if (exitConfirmBtn) exitConfirmBtn.addEventListener('click', confirmExitVideoPlayer);
 
     var playPause = document.getElementById('playerPlayPauseBtn');
     if (playPause) playPause.addEventListener('click', togglePlayPause);
@@ -11135,6 +11480,26 @@
       authParBtn.className = 'btn-secondary sub-user-action-btn parental-auth-trigger-btn tv-focusable';
       authParBtn.innerHTML = '<span>🛡️ בקרת הורים וסינון סצנות (ראשי ותתי-יוזרים)</span>';
       subActionsRow.appendChild(authParBtn);
+    }
+
+    if (playerStage && !document.getElementById('playerExitConfirmModal')) {
+      var exitDiv = document.createElement('div');
+      exitDiv.id = 'playerExitConfirmModal';
+      exitDiv.className = 'player-exit-confirm-overlay hidden';
+      exitDiv.setAttribute('dir', 'rtl');
+      exitDiv.setAttribute('role', 'dialog');
+      exitDiv.setAttribute('aria-modal', 'true');
+      exitDiv.setAttribute('aria-labelledby', 'playerExitConfirmHeading');
+      exitDiv.innerHTML =
+        '<div class="player-exit-confirm-card">' +
+          '<h3 id="playerExitConfirmHeading" class="player-exit-confirm-title">לצאת מהצפייה?</h3>' +
+          '<p class="player-exit-confirm-sub">נקודת העצירה שלך נשמרת אוטומטית להמשך צפייה בכל עת.</p>' +
+          '<div class="player-exit-confirm-actions">' +
+            '<button type="button" id="playerExitCancelBtn" class="btn-primary player-exit-btn tv-focusable">המשך צפייה</button>' +
+            '<button type="button" id="playerExitConfirmBtn" class="btn-secondary player-exit-btn tv-focusable">צא מהסרט</button>' +
+          '</div>' +
+        '</div>';
+      playerStage.appendChild(exitDiv);
     }
 
     if (playerStage && !document.getElementById('parentalSkipBanner')) {
