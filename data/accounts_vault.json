@@ -134,8 +134,8 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794432225027,
-      "activeSubUserId": "prof-main",
+      "updatedTs": 1794432884604,
+      "activeSubUserId": "prof-living",
       "subUsers": [
         {
           "id": "prof-main",
@@ -360,7 +360,6 @@
               "seasonsCount": 4
             }
           },
-          "watchlistUpdatedAt": 0,
           "deletedProgressIds": {
             "27": 1794432189831,
             "10580": 1794432196249,
@@ -390,7 +389,8 @@
             "movie-103913": 1794432225027,
             "series-103913": 1794432225027
           },
-          "progressClearedAt": 1794432225027
+          "progressClearedAt": 1794432225027,
+          "watchlistUpdatedAt": 0
         },
         "prof-living": {
           "watchlist": [],
