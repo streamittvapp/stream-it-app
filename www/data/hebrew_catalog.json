@@ -655,7 +655,7 @@
       "audio": "עברית 5.1",
       "seeders": 490,
       "is_israeli": true,
-      "trailer_yt_id": "SWyW-M2_xU4",
+      "trailer_yt_id": "MQhnpja57RE",
       "director_he": "יוסף סידר",
       "cast_he": "אושרי כהן, איתי טיראן, אלי אלטוניו, אוהד קנולר",
       "genres": [
@@ -729,7 +729,7 @@
       "seeders": 2150,
       "top10_rank": 3,
       "featured_hero": true,
-      "trailer_yt_id": "69ffwl-8pCU",
+      "trailer_yt_id": "OpThntO9ixc",
       "director_he": "זאק קרגר",
       "cast_he": "ג'וש ברולין, ג'וליה גארנר, אלדן אהרנרייך",
       "genres": [
@@ -907,7 +907,7 @@
       "quality": "4K UHD",
       "audio": "Dolby 5.1",
       "seeders": 1320,
-      "trailer_yt_id": "6RsK8_6aHkY",
+      "trailer_yt_id": "6RsKwn_Je1k",
       "director_he": "טים ברטון",
       "cast_he": "ג'וני דפ, כריסטינה ריצ'י, מירנדה ריצ'רדסון, כריסטופר ווקן",
       "genres": [
@@ -1146,7 +1146,7 @@
       "audio": "עברית 5.1",
       "seeders": 1320,
       "is_israeli": true,
-      "trailer_yt_id": "abkeb93s9CE",
+      "trailer_yt_id": "_2rm_4e3iYQ",
       "director_he": "ליאור רז, אבי יששכרוף",
       "cast_he": "ליאור רז, איציק כהן, רונה-לי שמעון, עידן עמדי",
       "genres": [
@@ -1225,7 +1225,7 @@
       "audio": "Dolby Atmos",
       "seeders": 980,
       "is_israeli": true,
-      "trailer_yt_id": "Hm_v0i12X3g",
+      "trailer_yt_id": "bGIpjra410I",
       "director_he": "משה זונדר, דני סירקין",
       "cast_he": "ניב סולטן, שון טאוב, מנשה נוי, לירז צ'רכי, יו לורי",
       "genres": [
@@ -1280,7 +1280,7 @@
       "audio": "Dolby Atmos",
       "seeders": 1240,
       "is_israeli": true,
-      "trailer_yt_id": "2T8U2bL6B6I",
+      "trailer_yt_id": "sIhARrqKSbo",
       "director_he": "ירון זילברמן, רון לשם",
       "cast_he": "ליאור אשכנזי, אביב אלוש, עופר חיון, אימרי ביטון, ג'וי ריגר",
       "genres": [
@@ -1335,7 +1335,7 @@
       "audio": "עברית מקורית",
       "seeders": 1150,
       "is_israeli": true,
-      "trailer_yt_id": "B4Q9p9y6V2k",
+      "trailer_yt_id": "VXtZ3ziPvvo",
       "director_he": "אלון זינגמן, אורי אלון",
       "cast_he": "דבל'ה גליקמן, מיכאל אלוני, שירה האס, נטע ריסקין",
       "genres": [
@@ -1374,22 +1374,23 @@
       ]
     },
     {
-      "id": "tt9140560",
-      "imdb_id": "tt9140560",
+      "id": "tt8796226",
+      "imdb_id": "tt8796226",
       "tmdb_id": 97177,
-      "direct_yt_id": "c7tOAGY59uQ",
+      "direct_yt_id": "xcXpKgjBxVE",
       "type": "series",
       "title_he": "קופה ראשית",
       "title_en": "Checkout (Kupa Rashit)",
       "year": 2018,
       "imdb_rating": 8.8,
       "age_rating": "לכל המשפחה",
-      "runtime_he": "5 עונות • 95 פרקים",
+      "runtime_he": "5 עונות • 102 פרקים",
+      "total_seasons": 5,
       "quality": "4K UHD",
       "audio": "עברית מקורית",
       "seeders": 1120,
       "is_israeli": true,
-      "trailer_yt_id": "c7tOAGY59uQ",
+      "trailer_yt_id": "I7RBkjYFuU8",
       "director_he": "נדב פרישמן, יניב זוהר",
       "cast_he": "קרן מור, נועה קולר, דב נבון, אמיר שורוש, יניב סוויסה",
       "genres": [
@@ -1401,11 +1402,18 @@
         "קומדיה"
       ],
       "overview_he": "קומדיה מוקומנטרית ישראלית קורעת מצחוק המלווה את העובדים והלקוחות הצבעוניים בסניף יבנה של רשת המרכולים 'שפע יששכר'.",
-      "poster": "https://images.metahub.space/poster/medium/tt9140560/img",
-      "backdrop": "https://images.metahub.space/background/medium/tt9140560/img",
+      "poster": "https://image.tmdb.org/t/p/w500/e28CIGgNlfxUO2b6dq6wHZY3XRm.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/jrUhKORA13PslES38kJRRncqzlH.jpg",
       "gallery": [
-        "https://images.metahub.space/background/medium/tt9140560/img"
+        "https://image.tmdb.org/t/p/w1280/jrUhKORA13PslES38kJRRncqzlH.jpg"
       ],
+      "yt_episodes_by_season": {
+        "1": ["xcXpKgjBxVE", "S5LWUnuJ6HY", "D2BClPCAZ3M", "k9NevIGM8To", "-oJYZpYzxOg", "vim9BabC6cA", "rIziOWvoPFk", "F2zhYgwNElQ", "p5_B-W6bxa4", "yu3XjhkTrlk", "OI5TMh5C04M", "M3glzgR5NTw", "CnX9c2FlPIk", "xr7Cp6kuJVE", "IjColYfsthQ", "GXLGVYEd5kk", "xesT_Yj2dLU", "FfB6wDVyjjU", "eEfzI2lwveE", "vzcinCqpN9k"],
+        "2": ["cOgDVvpz-Ww", "83PqTMga2oM", "PBQZz1xuYK8", "eyAMuGeZ9RA", "bQzstRIfghQ", "sMR_--zYApg", "-itB3hpl7gQ", "ATx7nzqP-E4", "X_EbFZ_UZBc", "yiIcldovEwI", "bHDB2916l_g", "m-OzT2AKQ7k", "pBWlYbHmkJ4", "QgAmuR_jabE", "XsVVGpb-X5E", "xF7oMsU5des", "JB2IySKvXfc", "wauwpe0FxEU", "CF48yUSGFj8", "Y6XR7sIvlzE", "sUk3HfSllFc", "Gxus5hWj2ko"],
+        "3": ["vPHTo9NsnNI", "Er030BPnVl0", "NsjeEt1ZpqQ", "SJhz7KFE3Hg", "gnAyOSwMjEw", "3_p3Q293u44", "82jdHBw1pEE", "fwIN1UESTcc", "ii_P3Hc8AJo", "3RkC309_Ako", "FMk5wxwdkQc", "cUfwFKT4DvA", "q8Nq-xNxUjo", "iceLA7lhoEI", "b_cJIoOQCSw", "zf_bnvCIzeM", "ShyPwmDHUd0", "FOfV6mUDlfI", "H19Wp_kO6XQ", "bKd7dnnuNLo", "sKWgGUVW000", "OLjSvY_MKC4", "7YRO_uOiwCQ", "2kShI3LqMNc", "h6cKDxHfV3Y", "4_wWSTJ4FEY", "QMPokM7RoBQ"],
+        "4": ["1czhcHL-YwA", "EaMcZYTxaDU", "GGBXF3mMrj4", "SQw9PRlZ60Q", "zyP0st9aW6w", "KK4zLYp_O6E", "lFvrjguieo0", "mxDzbynZTMU", "sYLlJjdKNS0", "bB-1vs2XBo8", "fbhM6mV2DGE", "gRrIBT6EVCI", "JUfVRoaHvDg", "6MRvKxhiJmg", "4T2lUsxZc50", "NSBysaSZ3jg", "dFg16e0vhuU", "9Ab0ieHY9rg", "GL2KeRhl5YY", "kUgwDdxQ2i0", "XjjhvXBLZiM", "TwWZSW2GkXY", "N1QtAXj9y48"],
+        "5": ["iL686rbf82M", "UKww1xabTNQ", "ihH9gucGRS4", "OWUaTKTQ-bo", "hqyK0VQVsPQ", "9m-aRG2DHYk", "KMR00mcwuHw", "Pqp5r24VXHI", "YvxVA7sxdks", "Np6j5oLwLts", "f_DGjoiaGVM", "3Pn6rOarD9w", "sV_prJK6TV4", "woGDLM3Tdr0", "4eJGg635cGs", "BWZ9_y3ldK4", "dB9KFZWOmhw", "erfGJAvedjg", "Ssy21RjZjyg", "FfaGNnDC3fY", "Gpl22YoFpk0", "r3ny3GjuvZM", "7lsWf4zhLyI"]
+      },
       "seasons": [
         {
           "season": 1,
@@ -1413,25 +1421,24 @@
           "episodes": [
             {
               "episode": 1,
-              "title_he": "שירה נכנסת לתפקיד",
+              "title_he": "שלי מהבית",
               "duration_he": "28 דק'",
-              "overview_he": "שירה שטיינבוך מנסה להנהיג סטנדרטים של ניהול מודרני בסניף יבנה."
+              "overview_he": "לקוח נלחם על זכותו לנשנש בסופר. שירה מתחילה להתחרט על יוזמת קופת האמון שלה."
             },
             {
               "episode": 2,
-              "title_he": "ראמזי והעגלות",
+              "title_he": "נס בקצבייה",
               "duration_he": "27 דק'",
-              "overview_he": "ראמזי יוצא למבצע מיוחד להשבת עגלות סופר אבודות ברחבי העיר."
+              "overview_he": "גילוי מרעיש בקצבייה הופך את הסופר למוקד עלייה לרגל."
             }
           ]
         }
       ]
     },
     {
-      "id": "tt1339634",
-      "imdb_id": "tt1339634",
+      "id": "tt0904106",
+      "imdb_id": "tt0904106",
       "tmdb_id": 27604,
-      "direct_yt_id": "r6Z8y3M5X0k",
       "type": "series",
       "title_he": "הבורר",
       "title_en": "Ha-Borer (The Arbitrator)",
@@ -1439,11 +1446,12 @@
       "imdb_rating": 8.4,
       "age_rating": "16+",
       "runtime_he": "4 עונות • 45 פרקים",
+      "total_seasons": 4,
       "quality": "4K UHD",
       "audio": "עברית מקורית",
       "seeders": 870,
       "is_israeli": true,
-      "trailer_yt_id": "r6Z8y3M5X0k",
+      "trailer_yt_id": "-6tWrj2f9ZA",
       "director_he": "שי כנות, רשף לוי",
       "cast_he": "משה איבגי, יהודה לוי, שלום מיכאלשווילי, חנה אזולאי-הספרי",
       "genres": [
@@ -1457,10 +1465,10 @@
         "דרמה"
       ],
       "overview_he": "עובד סוציאלי צעיר ושומר חוק מגלה שהוא בנו המאומץ של ברוך אסולין — 'הבורר' — ראש משפחת הפשע החזקה בישראל, ונשאב אל תוך העולם התחתון.",
-      "poster": "https://images.metahub.space/poster/medium/tt1339634/img",
-      "backdrop": "https://images.metahub.space/background/medium/tt1339634/img",
+      "poster": "https://image.tmdb.org/t/p/w500/4vi3PpnpLDr095dkMfrMFCK7nhQ.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/nM641NJZ7YgkCT6DVKVFtIW7lJS.jpg",
       "gallery": [
-        "https://images.metahub.space/background/medium/tt1339634/img"
+        "https://image.tmdb.org/t/p/w1280/nM641NJZ7YgkCT6DVKVFtIW7lJS.jpg"
       ],
       "seasons": [
         {

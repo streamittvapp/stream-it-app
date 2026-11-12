@@ -529,6 +529,13 @@
     }
 
     if (direction === 'down') {
+      if (activeEl && activeEl.classList && activeEl.classList.contains('sub-user-card')) {
+        var wrapDown = activeEl.closest('.sub-user-card-wrap');
+        var ownDelBtn = wrapDown ? wrapDown.querySelector('.sub-user-delete-btn') : null;
+        if (ownDelBtn && isElementVisible(ownDelBtn)) {
+          return setFocus(ownDelBtn);
+        }
+      }
       if (curRow < rows.length - 1) {
         var nextRowD = rows[curRow + 1];
         var nextColD = Math.min(curCol, nextRowD.length - 1);
@@ -538,6 +545,13 @@
     }
 
     if (direction === 'up') {
+      if (activeEl && activeEl.classList && activeEl.classList.contains('sub-user-delete-btn')) {
+        var wrapUp = activeEl.closest('.sub-user-card-wrap');
+        var ownCardBtn = wrapUp ? wrapUp.querySelector('.sub-user-card') : null;
+        if (ownCardBtn && isElementVisible(ownCardBtn)) {
+          return setFocus(ownCardBtn);
+        }
+      }
       if (curRow > 0) {
         var nextRowU = rows[curRow - 1];
         var nextColU = Math.min(curCol, nextRowU.length - 1);
@@ -884,7 +898,7 @@
     var triggerBtn = document.getElementById('userSettingsMenuBtn');
     if (!panel || panel.classList.contains('hidden')) return false;
 
-    var profileChips = Array.prototype.slice.call(panel.querySelectorAll('.user-menu-prof-chip, .user-menu-profile-chip')).filter(isElementVisible);
+    var profileChips = Array.prototype.slice.call(panel.querySelectorAll('.user-menu-prof-chip, .user-menu-profile-chip, .user-menu-prof-del-btn')).filter(isElementVisible);
     var menuItems = Array.prototype.slice.call(panel.querySelectorAll('.user-menu-item')).filter(isElementVisible);
 
     if (!currentFocused || !panel.contains(currentFocused) || !isElementVisible(currentFocused)) {
@@ -1045,7 +1059,12 @@
     function focusMainStageFromRail() {
       if (sideRail) sideRail.classList.remove('rail-open');
       if (document.body) document.body.classList.remove('tv-rail-expanded');
-      if (lastMainFocus && isElementVisible(lastMainFocus)) {
+      var mVkClose = document.getElementById('tvRailMiniKeyboard');
+      if (mVkClose) mVkClose.classList.add('hidden');
+      if (document.activeElement && sideRail && sideRail.contains(document.activeElement)) {
+        try { document.activeElement.blur(); } catch (e) {}
+      }
+      if (lastMainFocus && isElementVisible(lastMainFocus) && (!sideRail || !sideRail.contains(lastMainFocus))) {
         return setFocus(lastMainFocus);
       }
       if (rows.length) {
@@ -1057,6 +1076,7 @@
         if (wc && isElementVisible(wc)) return setFocus(wc);
       }
       if (heroBtns.length) return setFocus(heroBtns[0]);
+      if (headerItems.length) return setFocus(headerItems[0], { scroll: false });
       return true;
     }
 
@@ -1178,8 +1198,8 @@
           return true;
         }
         if (direction === 'up') {
-          if (focusTopHeaderNav(false)) return true;
-          return true;
+          // Stay clamped at the top of #tvSideRail — NEVER jump out to #topHeader when pressing Up!
+          return setFocus(currentFocused, { scroll: false });
         }
         if (direction === 'down') {
           if (miniVkOpen) {
@@ -1354,8 +1374,8 @@
             if (vkActs.length) return setFocus(vkActs[0], { scroll: false });
           }
           if (railSearchBtn && isElementVisible(railSearchBtn)) return setFocus(railSearchBtn, { scroll: false });
-          if (focusTopHeaderNav(false)) return true;
-          return true;
+          // Stay clamped at the top of #tvSideRail — NEVER jump out to #topHeader!
+          return setFocus(currentFocused, { scroll: false });
         }
         if (direction === 'left') {
           return focusMainStageFromRail();
@@ -1592,8 +1612,8 @@
       }
     }
 
-    // E. Inside Multi-Row & Multi-Column Poster Wall Grid (.catalog-poster-grid), Live TV Hub Banner, Telegram Banner, #clearActorFilterBtn, or #loadMoreCatalogBtn
-    var clearActorBtn = document.getElementById('clearActorFilterBtn');
+    // E. Inside Multi-Row & Multi-Column Poster Wall Grid (.catalog-poster-grid), Live TV Hub Banner, Telegram Banner, #clearActorFilterBtn, #clearActiveCatalogFiltersBtn, or #loadMoreCatalogBtn
+    var clearActorBtn = document.getElementById('clearActorFilterBtn') || document.getElementById('clearActiveCatalogFiltersBtn');
     if (wallGrid && wallGrid.contains(currentFocused) && currentFocused.classList.contains('poster-card')) {
       var wallCards = Array.prototype.slice.call(wallGrid.querySelectorAll('.poster-card')).filter(isElementVisible);
       var wIdx = wallCards.indexOf(currentFocused);
@@ -1666,7 +1686,7 @@
       var gridCandidates = catalogMain
         ? Array.prototype.slice.call(
             catalogMain.querySelectorAll(
-              '.catalog-poster-grid .poster-card, #clearActorFilterBtn, #loadMoreCatalogBtn, .youtube-hub-bar .tv-focusable, .live-hub-banner .tv-focusable, #liveM3uImporterPanel .tv-focusable, .tg-category-banner .tv-focusable'
+              '.catalog-poster-grid .poster-card, #clearActorFilterBtn, #clearActiveCatalogFiltersBtn, #loadMoreCatalogBtn, .youtube-hub-bar .tv-focusable, .live-hub-banner .tv-focusable, #liveM3uImporterPanel .tv-focusable, .tg-category-banner .tv-focusable'
             )
           ).filter(isElementVisible)
         : [];
@@ -2649,13 +2669,23 @@
     if (sideRail && (sideRail.classList.contains('rail-open') || (currentFocused && sideRail.contains(currentFocused)))) {
       sideRail.classList.remove('rail-open');
       if (document.body) document.body.classList.remove('tv-rail-expanded');
-      if (lastMainFocus && isElementVisible(lastMainFocus)) {
+      var mVkBack = document.getElementById('tvRailMiniKeyboard');
+      if (mVkBack) mVkBack.classList.add('hidden');
+      if (document.activeElement && sideRail.contains(document.activeElement)) {
+        try { document.activeElement.blur(); } catch (e) {}
+      }
+      if (lastMainFocus && isElementVisible(lastMainFocus) && !sideRail.contains(lastMainFocus)) {
         return setFocus(lastMainFocus);
       }
       var firstTile = document.querySelector('#catalogMain .poster-card');
       if (firstTile && isElementVisible(firstTile)) {
         return setFocus(firstTile);
       }
+      var heroPlay = document.getElementById('heroPlayBtn');
+      if (heroPlay && isElementVisible(heroPlay)) {
+        return setFocus(heroPlay);
+      }
+      return true;
     }
 
     // On Home Stage: if scrolled down or not inside #topHeader, Back scrolls to top & focuses Top Header!

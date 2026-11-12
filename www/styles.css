@@ -6932,8 +6932,7 @@ body.tv-mode #tvSideRail {
   border-left: 1px solid rgba(255, 255, 255, 0.16) !important;
 }
 
-body.tv-mode #tvSideRail.rail-open,
-body.tv-mode #tvSideRail:focus-within {
+body.tv-mode #tvSideRail.rail-open {
   transform: translate3d(0, 0, 0) !important;
   box-shadow: -24px 0 60px rgba(0, 0, 0, 0.94) !important;
 }
@@ -7018,14 +7017,14 @@ body.tv-mode .row-track > .poster-card.top10-poster-card {
   min-width: 185px !important;
 }
 
-/* Exactly 6 columns in Category Wall Grids & Search Results Grid */
+/* 5 Spacious Columns in Category Wall Grids & Search Results Grid (Removed extra 6th column so tiles match Home screen size) */
 .catalog-poster-grid,
 body.tv-mode .catalog-poster-grid,
 #searchResultsGrid,
 body.tv-mode #searchResultsGrid {
   display: grid !important;
-  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
-  gap: 14px !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: 16px !important;
   padding: 10px 4px 20px 4px !important;
 }
 
@@ -7037,7 +7036,7 @@ body.tv-mode #searchResultsGrid {
   flex: none !important;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1280px) {
   body:not(.tv-mode) .row-track > .poster-card,
   body:not(.tv-mode) .row-track > .poster-card.top10-poster-card {
     flex: 0 0 calc((100% - 42px) / 4) !important;
@@ -7064,7 +7063,7 @@ body.tv-mode #searchResultsGrid {
   }
 }
 
-/* Permanent Readable Bottom Title & Metadata Overlay on Landscape Cards */
+/* Compact, Unobtrusive Bottom Title & Metadata Strip on Landscape Cards (Never covers tile artwork) */
 .poster-card .poster-hover-overlay,
 body.tv-mode .poster-card .poster-hover-overlay {
   display: flex !important;
@@ -7072,22 +7071,22 @@ body.tv-mode .poster-card .poster-hover-overlay {
   justify-content: flex-end !important;
   align-items: flex-start !important;
   opacity: 1 !important;
-  padding: 10px 12px !important;
+  padding: 6px 10px !important;
   background: linear-gradient(
     to top,
-    rgba(6, 8, 14, 0.96) 0%,
-    rgba(6, 8, 14, 0.72) 45%,
-    rgba(6, 8, 14, 0.15) 78%,
-    transparent 100%
+    rgba(6, 8, 14, 0.94) 0%,
+    rgba(6, 8, 14, 0.56) 30%,
+    rgba(6, 8, 14, 0.08) 48%,
+    transparent 62%
   ) !important;
   pointer-events: none !important;
 }
 
 .poster-card .poster-hover-title,
 body.tv-mode .poster-card .poster-hover-title {
-  font-size: 1.02rem !important;
+  font-size: 0.9rem !important;
   font-weight: 600 !important;
-  line-height: 1.22 !important;
+  line-height: 1.15 !important;
   color: #ffffff !important;
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.95) !important;
   display: -webkit-box !important;
@@ -7101,10 +7100,11 @@ body.tv-mode .poster-card .poster-hover-title {
 body.tv-mode .poster-card .poster-hover-meta {
   display: flex !important;
   align-items: center !important;
-  gap: 8px !important;
-  margin-top: 3px !important;
-  font-size: 0.8rem !important;
+  gap: 6px !important;
+  margin-top: 2px !important;
+  font-size: 0.72rem !important;
   font-weight: 500 !important;
+  line-height: 1.1 !important;
   color: #cbd5e1 !important;
 }
 
@@ -7727,4 +7727,133 @@ body.tv-mode .poster-card:not(.tv-focused) {
 
 .seek-thumb-canvas.hidden {
   display: none !important;
+}
+
+/* =========================================================================
+   v9.8.7: SUB-USER DIRECT DELETE BUTTONS & ACTIVE CATALOG FILTER BAR
+   ========================================================================= */
+.sub-user-card-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+}
+
+.sub-user-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 30px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(239, 68, 68, 0.42);
+  background: rgba(127, 29, 29, 0.28);
+  color: #fca5a5;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.sub-user-delete-btn:hover,
+.sub-user-delete-btn:focus,
+.sub-user-delete-btn.tv-focused {
+  background: #dc2626 !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+  transform: scale(1.03);
+}
+
+.sub-user-primary-lock {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: #94a3b8;
+  font-size: 0.74rem;
+  font-weight: 500;
+}
+
+.user-menu-prof-chip-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.user-menu-prof-del-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 5px;
+  border: 1px solid rgba(239, 68, 68, 0.38);
+  background: rgba(127, 29, 29, 0.3);
+  color: #fca5a5;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.user-menu-prof-del-btn:hover,
+.user-menu-prof-del-btn:focus,
+.user-menu-prof-del-btn.tv-focused {
+  background: #dc2626 !important;
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+}
+
+.active-filters-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  background: rgba(15, 23, 42, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+}
+
+.active-filters-pills {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.active-filters-label {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.active-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 5px;
+  background: rgba(229, 9, 20, 0.18);
+  border: 1px solid rgba(229, 9, 20, 0.45);
+  color: #f8fafc;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.active-filters-clear-btn {
+  height: 34px !important;
+  padding: 0 12px !important;
+  font-size: 0.82rem !important;
+  border-radius: 5px !important;
 }
