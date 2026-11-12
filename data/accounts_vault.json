@@ -134,7 +134,11 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794434864507,
+      "updatedTs": 1794494892846,
+      "subUsersUpdatedAt": 1794494892846,
+      "deletedSubUserIds": {
+        "prof-living": 1794494892845
+      },
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -258,26 +262,6 @@
           }
         },
         {
-          "id": "prof-living",
-          "name": "סלון",
-          "color": "#334155",
-          "isKids": false,
-          "isPrimary": false,
-          "parentalControl": {
-            "enabled": false,
-            "actionMode": "skip",
-            "profanityMode": "mute_censor",
-            "sensitivity": "balanced",
-            "categories": {
-              "sex": true,
-              "violence": true,
-              "profanity": true,
-              "drugs": true,
-              "horror": false
-            }
-          }
-        },
-        {
           "id": "prof-bedroom",
           "name": "חדר שינה",
           "color": "#3f3f46",
@@ -329,6 +313,37 @@
             "1339713",
             "tt10577736"
           ],
+          "watchlistSnapshots": {
+            "tt10577736": {
+              "id": "tt10577736",
+              "imdbId": "tt10577736",
+              "tmdbId": "103913",
+              "type": "series",
+              "title": "טהרן",
+              "originalTitle": "Tehran",
+              "year": "2020",
+              "rating": "7.6",
+              "runtimeHe": "3 עונות • 24 פרקים",
+              "ageRating": "16+",
+              "overview": "תמר רביניאן, האקרית ולוחמת סייבר צעירה במוסד, מוחדרת בזהות בדויה לבירת איראן למשימה מסוכנת של השבתת מערכות המכ\"ם.",
+              "poster": "https://images.metahub.space/poster/medium/tt10577736/img",
+              "backdrop": "https://images.metahub.space/background/medium/tt10577736/img",
+              "cardBackdrop": "https://images.metahub.space/background/medium/tt10577736/img",
+              "genres": [
+                "israeli",
+                "drama",
+                "action",
+                "telegram"
+              ],
+              "genresHe": [
+                "יצירה ישראלית",
+                "מתח וריגול",
+                "דרמה"
+              ],
+              "seasonsCount": 4
+            }
+          },
+          "watchlistUpdatedAt": 0,
           "progress": {
             "1283515": {
               "id": "1283515",
@@ -368,36 +383,6 @@
               }
             }
           },
-          "watchlistSnapshots": {
-            "tt10577736": {
-              "id": "tt10577736",
-              "imdbId": "tt10577736",
-              "tmdbId": "103913",
-              "type": "series",
-              "title": "טהרן",
-              "originalTitle": "Tehran",
-              "year": "2020",
-              "rating": "7.6",
-              "runtimeHe": "3 עונות • 24 פרקים",
-              "ageRating": "16+",
-              "overview": "תמר רביניאן, האקרית ולוחמת סייבר צעירה במוסד, מוחדרת בזהות בדויה לבירת איראן למשימה מסוכנת של השבתת מערכות המכ\"ם.",
-              "poster": "https://images.metahub.space/poster/medium/tt10577736/img",
-              "backdrop": "https://images.metahub.space/background/medium/tt10577736/img",
-              "cardBackdrop": "https://images.metahub.space/background/medium/tt10577736/img",
-              "genres": [
-                "israeli",
-                "drama",
-                "action",
-                "telegram"
-              ],
-              "genresHe": [
-                "יצירה ישראלית",
-                "מתח וריגול",
-                "דרמה"
-              ],
-              "seasonsCount": 4
-            }
-          },
           "deletedProgressIds": {
             "27": 1794432189831,
             "10580": 1794432196249,
@@ -427,51 +412,44 @@
             "movie-103913": 1794432225027,
             "series-103913": 1794432225027
           },
-          "progressClearedAt": 1794432225027,
-          "watchlistUpdatedAt": 0
-        },
-        "prof-living": {
-          "watchlist": [],
-          "progress": {},
-          "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0,
-          "deletedProgressIds": {},
-          "progressClearedAt": 0
+          "progressClearedAt": 1794432225027
         },
         "prof-1794166536010": {
           "watchlist": [],
-          "progress": {},
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
+          "progress": {},
           "deletedProgressIds": {},
           "progressClearedAt": 0
         },
         "prof-1794166543582": {
           "watchlist": [],
-          "progress": {},
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
+          "progress": {},
           "deletedProgressIds": {},
           "progressClearedAt": 0
         },
         "prof-1794166553435": {
           "watchlist": [],
-          "progress": {},
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
+          "progress": {},
           "deletedProgressIds": {},
           "progressClearedAt": 0
         },
         "prof-1794166559616": {
           "watchlist": [],
-          "progress": {},
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
+          "progress": {},
           "deletedProgressIds": {},
           "progressClearedAt": 0
         },
         "prof-1794166564722": {
           "watchlist": [],
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0,
           "progress": {
             "27": {
               "id": "27",
@@ -633,8 +611,6 @@
               }
             }
           },
-          "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0,
           "deletedProgressIds": {},
           "progressClearedAt": 0
         }
