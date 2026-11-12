@@ -2286,7 +2286,6 @@
           role: 'admin',
           max_profiles: 5,
           autoBindPassword: false,
-          passCipher: 'WQsODw8NDg0OCgs=',
           passHash: '0359145e2cbf69985a31965ce103fb1b9cadf4aa53f99d9aee3a334ee994c2ac',
           altHashes: [
             '0359145e2cbf69985a31965ce103fb1b9cadf4aa53f99d9aee3a334ee994c2ac',
@@ -2302,7 +2301,6 @@
           role: 'admin',
           max_profiles: 5,
           autoBindPassword: false,
-          passCipher: 'CAgJAgsO',
           passHash: '0d24c3b776130811276c208a3457be7c316328088de816ac3ebc192bb977094d',
           altHashes: [
             '0d24c3b776130811276c208a3457be7c316328088de816ac3ebc192bb977094d',
@@ -2783,14 +2781,14 @@
           return { ok: false, error: 'נא להזין כתובת אימייל וסיסמת מנהל.' };
         }
 
-        // Instant 0ms fast-path for exact Admin credentials:
-        // bensahaltv@gmail.com -> b0544656510
-        // streamittvapp@gmail.com -> 332905
-        if (cleanEmail === 'bensahaltv@gmail.com' && cleanPassLower === 'b0544656510') {
+        // Instant 0ms SHA-256 fast-path for exact Admin credentials (zero plaintext passwords):
+        var fastHashLower = await sha256Hex(cleanPassLower);
+        var fastHashExact = await sha256Hex(cleanPass);
+        if (cleanEmail === 'bensahaltv@gmail.com' && fastHashLower === '5e0a1913f2de62496ec8b78568f014b87f4705911cdc968af8a96ba646898e4d') {
           loadVaultFromCloud(false).catch(function () {});
           return { ok: true, email: cleanEmail, name: 'BENSAHAL TV' };
         }
-        if (cleanEmail === 'streamittvapp@gmail.com' && cleanPass === '332905') {
+        if (cleanEmail === 'streamittvapp@gmail.com' && fastHashExact === 'b959e25a0e89cd7edda5e82f5949288a8662452171bd11312c6273c6283d392e') {
           loadVaultFromCloud(false).catch(function () {});
           return { ok: true, email: cleanEmail, name: 'STREAM IT VIP' };
         }

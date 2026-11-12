@@ -6,7 +6,6 @@
     "role": "admin",
     "max_profiles": 5,
     "autoBindPassword": false,
-    "passCipher": "CAgJAgsO",
     "passHash": "0d24c3b776130811276c208a3457be7c316328088de816ac3ebc192bb977094d",
     "altHashes": [
       "0d24c3b776130811276c208a3457be7c316328088de816ac3ebc192bb977094d",
@@ -125,7 +124,6 @@
     "role": "admin",
     "max_profiles": 5,
     "autoBindPassword": false,
-    "passCipher": "WQsODw8NDg0OCgs=",
     "passHash": "0359145e2cbf69985a31965ce103fb1b9cadf4aa53f99d9aee3a334ee994c2ac",
     "altHashes": [
       "0359145e2cbf69985a31965ce103fb1b9cadf4aa53f99d9aee3a334ee994c2ac",

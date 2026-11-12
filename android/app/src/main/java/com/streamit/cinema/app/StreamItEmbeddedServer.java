@@ -172,216 +172,82 @@ public class StreamItEmbeddedServer {
             return cached.value;
         }
 
-        // Primary Fast Direct HLS Extractor via cdn.vidspark.to (vjej -> direct CORS-enabled .m3u8 in ~0.3s)
+        // Fast Direct 4K/1080p HLS Multi-Server Resolver via cdn.vidspark.to & vidsrc.pm (vjej -> b4tz -> w7dn)
         if (!tmdbId.isEmpty()) {
-            try {
-                String vpPath = ("series".equalsIgnoreCase(itemType) || "tv".equalsIgnoreCase(itemType))
-                        ? ("/api/vidora/v1/tv/" + tmdbId + "/" + season + "/" + episode + "?source=vjej")
-                        : ("/api/vidora/v1/movie/" + tmdbId + "?source=vjej");
-                Map<String, String> hVp = new HashMap<>();
-                hVp.put("User-Agent", USER_AGENT);
-                hVp.put("Referer", "https://cdn.vidspark.to/");
-                hVp.put("x-player-key", "f3b72e73c80c9a996574379798703796a1936efa3516a7105cb0e43048b46b5a");
-                String vpRaw = new String(httpGetBytes("https://cdn.vidspark.to" + vpPath, hVp, 5000), StandardCharsets.UTF_8);
-                JSONObject vpObj = new JSONObject(vpRaw);
-                JSONArray sources = vpObj.optJSONArray("sources");
-                if (sources != null && sources.length() > 0) {
-                    String directM3u8 = sources.getJSONObject(0).optString("url", "");
-                    if (directM3u8.startsWith("http")) {
-                        JSONObject fb = new JSONObject();
-                        fb.put("ok", true);
-                        fb.put("imdb_id", imdbId);
-                        fb.put("streamUrl", directM3u8);
-                        String fbStr = fb.toString();
-                        directStreamCache.put(cacheKey, new CachedItem(now, fbStr));
-                        return fbStr;
-                    }
-                }
-            } catch (Exception ignored) {
-            }
-        }
-
-        try {
-            String vsUrl;
-            String refUrl;
-            if ("series".equalsIgnoreCase(itemType) || "tv".equalsIgnoreCase(itemType)) {
-                vsUrl = "https://vidsrc.sh/vs_src.php?type=tv&id=" + URLEncoder.encode(imdbId, "UTF-8")
-                        + "&season=" + URLEncoder.encode(season, "UTF-8")
-                        + "&episode=" + URLEncoder.encode(episode, "UTF-8");
-                refUrl = "https://vidsrc.sh/embed/tv/" + URLEncoder.encode(imdbId, "UTF-8")
-                        + "/" + season + "-" + episode;
-            } else {
-                vsUrl = "https://vidsrc.sh/vs_src.php?type=movie&id=" + URLEncoder.encode(imdbId, "UTF-8");
-                refUrl = "https://vidsrc.sh/embed/movie/" + URLEncoder.encode(imdbId, "UTF-8") + "/";
-            }
-
-            Map<String, String> h1 = new HashMap<>();
-            h1.put("User-Agent", USER_AGENT);
-            h1.put("Referer", refUrl);
-            String step1Json = new String(httpGetBytes(vsUrl, h1, 7000), StandardCharsets.UTF_8);
-            JSONObject srcData = new JSONObject(step1Json);
-            String landingSrc = srcData.optString("src", "");
-            if (landingSrc.isEmpty()) {
-                throw new Exception("Missing landing src");
-            }
-
-            Map<String, String> h2 = new HashMap<>();
-            h2.put("User-Agent", USER_AGENT);
-            h2.put("Referer", "https://vidsrc.sh/");
-            String landingHtml = new String(httpGetBytes(landingSrc, h2, 7000), StandardCharsets.UTF_8);
-            Matcher mCfg = Pattern.compile("window\\.CFG\\s*=\\s*(\\{.*?\\});", Pattern.DOTALL).matcher(landingHtml);
-            if (!mCfg.find()) {
-                throw new Exception("Missing window.CFG");
-            }
-            JSONObject cfgObj = new JSONObject(mCfg.group(1));
-            String playerUrl = resolveRelativeUrl(landingSrc, cfgObj.optString("playerUrl", ""));
-
-            Map<String, String> h3 = new HashMap<>();
-            h3.put("User-Agent", USER_AGENT);
-            h3.put("Referer", landingSrc);
-            String playerHtml = new String(httpGetBytes(playerUrl, h3, 7000), StandardCharsets.UTF_8);
-            Matcher mPcfg = Pattern.compile("window\\.CONFIG\\s*=\\s*(\\{.*?\\});", Pattern.DOTALL).matcher(playerHtml);
-            if (!mPcfg.find()) {
-                throw new Exception("Missing window.CONFIG");
-            }
-            JSONObject pcfg = new JSONObject(mPcfg.group(1));
-
-            String apiToken = pcfg.optString("apiToken", "");
-            String streamApi = pcfg.optString("api", "");
-            if (streamApi.isEmpty()) {
-                streamApi = pcfg.optString("streamBase", "") + "&season=" + season + "&episode=" + episode + "&stream_urls";
-            }
-            String fullApiUrl = streamApi + "&api_token=" + URLEncoder.encode(apiToken, "UTF-8");
-
-            URI parsedPlayerUri = new URI(playerUrl);
-            String playerOrigin = parsedPlayerUri.getScheme() + "://" + parsedPlayerUri.getAuthority();
-
-            Map<String, String> h4 = new HashMap<>();
-            h4.put("User-Agent", USER_AGENT);
-            h4.put("Referer", playerOrigin + "/");
-            h4.put("Origin", playerOrigin);
-            String apiJsonStr = new String(httpGetBytes(fullApiUrl, h4, 7000), StandardCharsets.UTF_8);
-            JSONObject apiJson = new JSONObject(apiJsonStr);
-
-            JSONObject vsInfo = apiJson.optJSONObject("vs");
-            if (vsInfo == null) vsInfo = new JSONObject();
-            String wKey = String.valueOf(vsInfo.optInt("w", 1));
-            String wasmB64 = vsInfo.optString("wasm", "");
-            if (wasmB64.isEmpty()) {
-                wasmB64 = getOrDefault(wasmCache, wKey, "");
-            }
-            if (wasmB64.isEmpty() && !vsInfo.optString("wasm_url", "").isEmpty()) {
-                String wasmFull = resolveRelativeUrl(playerOrigin + "/", vsInfo.optString("wasm_url", ""));
-                Map<String, String> h5 = new HashMap<>();
-                h5.put("User-Agent", USER_AGENT);
-                h5.put("Referer", playerOrigin + "/");
-                byte[] wasmBytes = httpGetBytes(wasmFull, h5, 7000);
-                wasmB64 = Base64.encodeToString(wasmBytes, Base64.NO_WRAP);
-                if (!wasmB64.isEmpty()) {
-                    wasmCache.put(wKey, wasmB64);
-                }
-            }
-
-            JSONObject dataBlock = apiJson.optJSONObject("data");
-            if (dataBlock == null) dataBlock = new JSONObject();
-
-            JSONObject payload = new JSONObject();
-            payload.put("ok", true);
-            payload.put("imdb_id", imdbId);
-            payload.put("type", itemType);
-            payload.put("season", Integer.parseInt(season));
-            payload.put("episode", Integer.parseInt(episode));
-            payload.put("title", dataBlock.optString("title", ""));
-            payload.put("file_name", dataBlock.optString("file_name", imdbId + ".1080p.WEB-DL.H264.mp4"));
-            payload.put("backdrop", dataBlock.optString("backdrop", ""));
-            payload.put("api_token", apiToken);
-            payload.put("player_origin", playerOrigin);
-            payload.put("enc_stream_urls", dataBlock.optString("stream_urls", ""));
-            payload.put("wasm_b64", wasmB64);
-            payload.put("wasm_w", vsInfo.optInt("w", 1));
-
-            String payloadStr = payload.toString();
-            directStreamCache.put(cacheKey, new CachedItem(now, payloadStr));
-            return payloadStr;
-        } catch (Exception e) {
-            // Secondary Direct 4K/1080p HLS Multi-Server Resolver via cdn.vidspark.to & vidsrc.pm (b4tz 1080p/4K -> w7dn 1080p -> vjej)
-            if (!tmdbId.isEmpty()) {
-                String[] vidoraHosts = new String[]{"https://cdn.vidspark.to", "https://vidsrc.pm"};
-                String[] vidoraSources = new String[]{"b4tz", "w7dn", "vjej"};
-                for (String host : vidoraHosts) {
-                    for (String srcKey : vidoraSources) {
-                        try {
-                            String vpPath = ("series".equalsIgnoreCase(itemType) || "tv".equalsIgnoreCase(itemType))
-                                    ? ("/api/vidora/v1/tv/" + tmdbId + "/" + season + "/" + episode + "?source=" + srcKey)
-                                    : ("/api/vidora/v1/movie/" + tmdbId + "?source=" + srcKey);
-                            Map<String, String> hVp = new HashMap<>();
-                            hVp.put("User-Agent", USER_AGENT);
-                            hVp.put("Referer", host + "/");
-                            hVp.put("x-player-key", "f3b72e73c80c9a996574379798703796a1936efa3516a7105cb0e43048b46b5a");
-                            String vpRaw = new String(httpGetBytes(host + vpPath, hVp, 4500), StandardCharsets.UTF_8);
-                            JSONObject vpObj = new JSONObject(vpRaw);
-                            JSONArray sources = vpObj.optJSONArray("sources");
-                            if (sources != null && sources.length() > 0) {
-                                String rawStreamUrl = sources.getJSONObject(0).optString("url", "");
-                                if (rawStreamUrl.startsWith("http")) {
-                                    String finalStreamUrl = rawStreamUrl;
-                                    // Unwrap proxy URLs (?url=https%3A%2F%2F...&data=base64) to stream 1080p/4K directly via local /api/hls-proxy
-                                    if (rawStreamUrl.contains("url=")) {
-                                        try {
-                                            String innerM3u8 = "";
-                                            String innerOrigin = "https://cloudnestra.com";
-                                            URI uWrap = new URI(rawStreamUrl);
-                                            String qWrap = uWrap.getRawQuery();
-                                            if (qWrap != null) {
-                                                for (String pair : qWrap.split("&")) {
-                                                    int idx = pair.indexOf('=');
-                                                    if (idx > 0) {
-                                                        String k = pair.substring(0, idx);
-                                                        String v = URLDecoder.decode(pair.substring(idx + 1), "UTF-8");
-                                                        if ("url".equals(k)) {
-                                                            innerM3u8 = v;
-                                                        } else if ("data".equals(k)) {
-                                                            String decData = new String(Base64.decode(v, Base64.DEFAULT), StandardCharsets.UTF_8);
-                                                            for (String dPart : decData.split("\\|")) {
-                                                                if (dPart.startsWith("Origin=")) {
-                                                                    innerOrigin = dPart.substring("Origin=".length()).trim();
-                                                                }
+            String[] vidoraHosts = new String[]{"https://cdn.vidspark.to", "https://vidsrc.pm"};
+            String[] vidoraSources = new String[]{"vjej", "b4tz", "w7dn"};
+            for (String host : vidoraHosts) {
+                for (String srcKey : vidoraSources) {
+                    try {
+                        String vpPath = ("series".equalsIgnoreCase(itemType) || "tv".equalsIgnoreCase(itemType))
+                                ? ("/api/vidora/v1/tv/" + tmdbId + "/" + season + "/" + episode + "?source=" + srcKey)
+                                : ("/api/vidora/v1/movie/" + tmdbId + "?source=" + srcKey);
+                        Map<String, String> hVp = new HashMap<>();
+                        hVp.put("User-Agent", USER_AGENT);
+                        hVp.put("Referer", host + "/");
+                        hVp.put("x-player-key", "f3b72e73c80c9a996574379798703796a1936efa3516a7105cb0e43048b46b5a");
+                        String vpRaw = new String(httpGetBytes(host + vpPath, hVp, 2200), StandardCharsets.UTF_8);
+                        JSONObject vpObj = new JSONObject(vpRaw);
+                        JSONArray sources = vpObj.optJSONArray("sources");
+                        if (sources != null && sources.length() > 0) {
+                            String rawStreamUrl = sources.getJSONObject(0).optString("url", "");
+                            if (rawStreamUrl.startsWith("http")) {
+                                String finalStreamUrl = rawStreamUrl;
+                                if (rawStreamUrl.contains("url=")) {
+                                    try {
+                                        String innerM3u8 = "";
+                                        String innerOrigin = "https://cloudnestra.com";
+                                        URI uWrap = new URI(rawStreamUrl);
+                                        String qWrap = uWrap.getRawQuery();
+                                        if (qWrap != null) {
+                                            for (String pair : qWrap.split("&")) {
+                                                int idx = pair.indexOf('=');
+                                                if (idx > 0) {
+                                                    String k = pair.substring(0, idx);
+                                                    String v = URLDecoder.decode(pair.substring(idx + 1), "UTF-8");
+                                                    if ("url".equals(k)) {
+                                                        innerM3u8 = v;
+                                                    } else if ("data".equals(k)) {
+                                                        String decData = new String(Base64.decode(v, Base64.DEFAULT), StandardCharsets.UTF_8);
+                                                        for (String dPart : decData.split("\\|")) {
+                                                            if (dPart.startsWith("Origin=")) {
+                                                                innerOrigin = dPart.substring("Origin=".length()).trim();
                                                             }
                                                         }
                                                     }
                                                 }
                                             }
-                                            if (innerM3u8.startsWith("http")) {
-                                                finalStreamUrl = "http://127.0.0.1:" + PORT + "/api/hls-proxy?url="
-                                                        + URLEncoder.encode(innerM3u8, "UTF-8")
-                                                        + "&origin=" + URLEncoder.encode(innerOrigin, "UTF-8");
-                                            }
-                                        } catch (Exception ignoredUnwrap) {
                                         }
+                                        if (innerM3u8.startsWith("http")) {
+                                            finalStreamUrl = "http://127.0.0.1:" + PORT + "/api/hls-proxy?url="
+                                                    + URLEncoder.encode(innerM3u8, "UTF-8")
+                                                    + "&origin=" + URLEncoder.encode(innerOrigin, "UTF-8");
+                                        }
+                                    } catch (Exception ignoredUnwrap) {
                                     }
-                                    JSONObject fb = new JSONObject();
-                                    fb.put("ok", true);
-                                    fb.put("imdb_id", imdbId);
-                                    fb.put("streamUrl", finalStreamUrl);
-                                    String fbStr = fb.toString();
-                                    directStreamCache.put(cacheKey, new CachedItem(now, fbStr));
-                                    return fbStr;
                                 }
+                                JSONObject fb = new JSONObject();
+                                fb.put("ok", true);
+                                fb.put("imdb_id", imdbId);
+                                fb.put("streamUrl", finalStreamUrl);
+                                String fbStr = fb.toString();
+                                directStreamCache.put(cacheKey, new CachedItem(now, fbStr));
+                                return fbStr;
                             }
-                        } catch (Exception ignored) {
                         }
+                    } catch (Exception ignored) {
                     }
                 }
             }
-            try {
-                JSONObject err = new JSONObject();
-                err.put("ok", false);
-                err.put("error", e.getMessage() != null ? e.getMessage() : "Stream resolution error");
-                err.put("imdb_id", imdbId);
-                return err.toString();
-            } catch (Exception ignored) {
-                return "{\"ok\":false}";
-            }
+        }
+        try {
+            JSONObject err = new JSONObject();
+            err.put("ok", false);
+            err.put("error", "Direct stream unavailable, falling back to multi-server player");
+            err.put("imdb_id", imdbId);
+            return err.toString();
+        } catch (Exception ignored) {
+            return "{\"ok\":false}";
         }
     }
 

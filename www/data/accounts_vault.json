@@ -6,7 +6,6 @@
     "role": "admin",
     "max_profiles": 5,
     "autoBindPassword": false,
-    "passCipher": "CAgJAgsO",
     "passHash": "0d24c3b776130811276c208a3457be7c316328088de816ac3ebc192bb977094d",
     "altHashes": [
       "0d24c3b776130811276c208a3457be7c316328088de816ac3ebc192bb977094d",
@@ -125,7 +124,6 @@
     "role": "admin",
     "max_profiles": 5,
     "autoBindPassword": false,
-    "passCipher": "WQsODw8NDg0OCgs=",
     "passHash": "0359145e2cbf69985a31965ce103fb1b9cadf4aa53f99d9aee3a334ee994c2ac",
     "altHashes": [
       "0359145e2cbf69985a31965ce103fb1b9cadf4aa53f99d9aee3a334ee994c2ac",
@@ -134,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794416645742,
+      "updatedTs": 1794434864507,
       "activeSubUserId": "prof-main",
       "subUsers": [
         {
@@ -144,15 +142,15 @@
           "isKids": false,
           "isPrimary": true,
           "parentalControl": {
-            "enabled": true,
-            "actionMode": "skip",
+            "enabled": false,
+            "actionMode": "blur_mute",
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
             "categories": {
               "sex": true,
               "violence": false,
-              "profanity": true,
-              "drugs": true,
+              "profanity": false,
+              "drugs": false,
               "horror": false
             }
           }
@@ -330,252 +328,41 @@
             "tt10577736"
           ],
           "progress": {
-            "27": {
-              "id": "27",
-              "imdbId": "tt0411705",
-              "tmdbId": "27",
-              "title": "9 שירים",
-              "currentTime": 200,
-              "duration": 4179,
-              "percent": 5,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794402821800,
-              "snapshot": {
-                "id": "27",
-                "imdbId": "tt0411705",
-                "tmdbId": "27",
-                "type": "movie",
-                "title": "9 שירים",
-                "originalTitle": "9 Songs",
-                "year": "2004",
-                "rating": "5.5",
-                "runtimeHe": "שעתיים",
-                "ageRating": "12+",
-                "overview": "מתיו (קיראן אובריאן), צעיר לונדוני, עובד כמסקר לעיתון \"אטרטיקה\" הבריטי ואוהב לשמוע להקות אינדי. בעת שטס מעל הנוף הקוטבי הלא פורה, הוא נזכר במערכת יחסיו עם ליסה (מרגו סטילי), סטונדטית של מחלף אקדמאי אמריקאי. כאשר נפגש הזוג בטקס פרסי אקדמיה בבריטניה, הם נזכרים באהבתם הנשכחת ומביאים תשוקתם היישר למיטה. דרמה רומנטית אירוטית מגיל 18 המשלבת סצינות סקס נועזות ביחד עם מוזיקה בריטית עכשווית עם אומנים כמו \"פרנץ פרדיננד\", \"אלבו\", \"בלק רבל מוטורסייקל קלאב\", ניק מק'ארתי, בובי ג'ילפסי, יו בנפורד ועוד. האמת שחוץ משני השחקנים הצעירים הראשיים בסרט, כל שאר השחקנים הם בעצם הזמרים והלהקות המופיעות בסרט ונותנות הרבה רעש לסרט הנועז. ביים: מייקל ווינטרבוטום, הבמאי של \"אנשי המסיבות\" ו\"טריסטן שנדי: סיפור מצוץ מן האצבע\" החדש.",
-                "poster": "https://image.tmdb.org/t/p/w500/91O7z0vo7MiNWd5xD2BoivwbQsb.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/bybAHw5fenKXRFI4phanPhpljlT.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/bybAHw5fenKXRFI4phanPhpljlT.jpg",
-                "genres": [
-                  "drama",
-                  "music",
-                  "romance"
-                ],
-                "genresHe": [
-                  "דרמה",
-                  "מוזיקה והופעות",
-                  "רומנטיקה"
-                ],
-                "seasonsCount": 0
-              }
-            },
-            "10580": {
-              "id": "10580",
-              "imdbId": "tt0079118",
-              "tmdbId": "10580",
-              "title": "אסקימו לימון",
-              "currentTime": 4965,
-              "duration": 5538,
-              "percent": 90,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794403003191,
-              "snapshot": {
-                "id": "10580",
-                "imdbId": "tt0079118",
-                "tmdbId": "10580",
-                "type": "movie",
-                "title": "אסקימו לימון",
-                "originalTitle": "אסקימו לימון",
-                "year": "1978",
-                "rating": "6.2",
-                "runtimeHe": "שעתיים",
-                "ageRating": "12+",
-                "overview": "סיפורם של שלושה תיכוניסטים מיוחמים ומתבגרים המחפשים לאבד את בתוליהם. הזמן- סוף שנות ה- 50 שלושת החברים הקרובים- בנצי מומו ויודל'ה לומדים יחד בגימנסיה לא איכותית בת\"א, אך לא הלימודים מצויים בראש דאגותיהם, אלא העיסוק המתמיד במין כיאה לגיל ההתבגרות. בנצי שחש שהמין המזדמן אינו התשובה הנאותה לכמיהות ליבו מתאהב באחת המסיבות בנילי היפה, אלא שנילי דווקא בוחרת לעשות את זה עם מומו חברו הטוב ואף להיכנס להריון ממנו.",
-                "poster": "https://image.tmdb.org/t/p/w500/cRqAYpGZaO8Vp2SVXSssgML4iXu.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/A7lbu014Gfr5dhohXP79fg72VkO.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/A7lbu014Gfr5dhohXP79fg72VkO.jpg",
-                "genres": [
-                  "comedy",
-                  "romance",
-                  "israeli"
-                ],
-                "genresHe": [
-                  "קומדיה",
-                  "רומנטיקה",
-                  "יצירה ישראלית"
-                ],
-                "seasonsCount": 0
-              }
-            },
             "1283515": {
-              "currentTime": 1706,
+              "id": "1283515",
+              "imdbId": "tt32261958",
+              "tmdbId": "1283515",
+              "title": "תעתוע",
+              "currentTime": 3136,
               "duration": 7256,
-              "percent": 24,
+              "percent": 43,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794340722738
-            },
-            "1339713": {
-              "id": "1339713",
-              "imdbId": "tt37287335",
-              "tmdbId": "1339713",
-              "title": "אובססיה",
-              "currentTime": 143,
-              "duration": 6533,
-              "percent": 3,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794393142776,
+              "updatedAt": 1794434864507,
               "snapshot": {
-                "id": "1339713",
-                "imdbId": "tt37287335",
-                "tmdbId": "1339713",
+                "id": "1283515",
+                "imdbId": "tt32261958",
+                "tmdbId": "1283515",
                 "type": "movie",
-                "title": "אובססיה",
-                "originalTitle": "Obsession",
+                "title": "תעתוע",
+                "originalTitle": "Verity",
                 "year": "2026",
-                "rating": "8.2",
+                "rating": "7.0",
                 "runtimeHe": "שעתיים",
-                "ageRating": "16+",
-                "overview": "לאחר ששבר את \"ערבת המשאלה האחת\" המסתורית כדי לזכות בליבה של אהובת ליבו, רומנטיקן חסר תקנה מגלה שהוא מקבל בדיוק את מה שביקש, אך עד מהרה מגלה שחלק מהתשוקות מגיעות במחיר אפל ומרושע.",
-                "poster": "https://image.tmdb.org/t/p/w500/hhrWmkcGksuI3BsqSbiyFC3Lzk4.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/5lTZyuBTNOfawsfPT8Q0cIg6qAF.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/5lTZyuBTNOfawsfPT8Q0cIg6qAF.jpg",
+                "ageRating": "14+",
+                "overview": "סופרת מתקשה עוברת להתגורר באחוזת קרופורד המבודדת כדי לכתוב בשמה של וריטי. לאחר שלואן מגלה מה שנראה כרשימות אוטוביוגרפיות מצמררות של וריטי, היא מתמודדת עם וידויים מטרידים ומעוותים הנוגעים לבעלה של וריטי, ג'רמי ומתקשה להבחין בין דמיון למציאות, בין מניפולציה למשיכה, ובין הזדמנות לאובססיה.",
+                "poster": "https://image.tmdb.org/t/p/w500/fhkXXgxth4IxoplvQvQZ0BSo3F4.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
                 "genres": [
-                  "horror",
+                  "mystery",
                   "thriller"
                 ],
                 "genresHe": [
-                  "אימה",
+                  "מסתורין ובלשי",
                   "מותחנים"
                 ],
                 "seasonsCount": 0
-              }
-            },
-            "1381078": {
-              "currentTime": 5045,
-              "duration": 6678,
-              "percent": 76,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794323899601
-            },
-            "1568027": {
-              "id": "1568027",
-              "imdbId": "tt43612870",
-              "tmdbId": "1568027",
-              "title": "קופה ראשית: הסרט",
-              "currentTime": 35,
-              "duration": 7200,
-              "percent": 3,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794416645742,
-              "snapshot": {
-                "id": "1568027",
-                "imdbId": "tt43612870",
-                "tmdbId": "1568027",
-                "type": "movie",
-                "title": "קופה ראשית: הסרט",
-                "originalTitle": "קופה ראשית: הסרט",
-                "year": "2026",
-                "rating": "6.2",
-                "runtimeHe": "שעתיים",
-                "ageRating": "12+",
-                "overview": "כוכבה, ניסים, אנטולי, שירה, ראמזי ואמנון יוצאים להרפתקה של חייהם, כשאירוע בלתי צפוי מטלטל את ״שפע יששכר״ ולוקח את החבורה הכי מצחיקה במדינה רחוק מאוד מהקופה.",
-                "poster": "https://image.tmdb.org/t/p/w500/5fFgTGCuL9hcGNN5dhVzF37C75l.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/3mWDbDn7piiznyEDysEHMGeJldI.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/3mWDbDn7piiznyEDysEHMGeJldI.jpg",
-                "genres": [
-                  "comedy",
-                  "israeli"
-                ],
-                "genresHe": [
-                  "קומדיה",
-                  "יצירה ישראלית"
-                ],
-                "seasonsCount": 0
-              }
-            },
-            "1571955": {
-              "currentTime": 131,
-              "duration": 6381,
-              "percent": 3,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794386948593
-            },
-            "tt1745960": {
-              "currentTime": 18,
-              "duration": 7814,
-              "percent": 3,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794203030102
-            },
-            "tt6263850": {
-              "currentTime": 5886,
-              "duration": 7753,
-              "percent": 76,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794323631225
-            },
-            "tt4565380": {
-              "currentTime": 16,
-              "duration": 2500,
-              "percent": 3,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794174730171
-            },
-            "tt8190688": {
-              "currentTime": 71,
-              "duration": 2850,
-              "percent": 3,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794387260384
-            },
-            "tt10577736": {
-              "id": "tt10577736",
-              "imdbId": "tt10577736",
-              "tmdbId": "103913",
-              "title": "טהרן",
-              "currentTime": 1396,
-              "duration": 3014,
-              "percent": 46,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794404875425,
-              "snapshot": {
-                "id": "tt10577736",
-                "imdbId": "tt10577736",
-                "tmdbId": "103913",
-                "type": "series",
-                "title": "טהרן",
-                "originalTitle": "Tehran",
-                "year": "2020",
-                "rating": "7.6",
-                "runtimeHe": "3 עונות • 24 פרקים",
-                "ageRating": "16+",
-                "overview": "תמר רביניאן, האקרית ולוחמת סייבר צעירה במוסד, מוחדרת בזהות בדויה לבירת איראן למשימה מסוכנת של השבתת מערכות המכ\"ם.",
-                "poster": "https://images.metahub.space/poster/medium/tt10577736/img",
-                "backdrop": "https://images.metahub.space/background/medium/tt10577736/img",
-                "cardBackdrop": "https://images.metahub.space/background/medium/tt10577736/img",
-                "genres": [
-                  "israeli",
-                  "drama",
-                  "action",
-                  "telegram"
-                ],
-                "genresHe": [
-                  "יצירה ישראלית",
-                  "מתח וריגול",
-                  "דרמה"
-                ],
-                "seasonsCount": 4
               }
             }
           },
@@ -609,37 +396,77 @@
               "seasonsCount": 4
             }
           },
+          "deletedProgressIds": {
+            "27": 1794432189831,
+            "10580": 1794432196249,
+            "103913": 1794432225027,
+            "1283515": 1794432225027,
+            "1339713": 1794432202875,
+            "1381078": 1794432225027,
+            "1568027": 1794432217226,
+            "1571955": 1794432225027,
+            "tt0411705": 1794432189831,
+            "movie-27": 1794432189831,
+            "series-27": 1794432189831,
+            "tt0079118": 1794432196249,
+            "movie-10580": 1794432196249,
+            "series-10580": 1794432196249,
+            "tt37287335": 1794432202875,
+            "movie-1339713": 1794432202875,
+            "series-1339713": 1794432202875,
+            "tt43612870": 1794432217226,
+            "movie-1568027": 1794432217226,
+            "series-1568027": 1794432217226,
+            "tt4565380": 1794432225027,
+            "tt8190688": 1794432225027,
+            "tt1745960": 1794432225027,
+            "tt6263850": 1794432225027,
+            "tt10577736": 1794432225027,
+            "movie-103913": 1794432225027,
+            "series-103913": 1794432225027
+          },
+          "progressClearedAt": 1794432225027,
           "watchlistUpdatedAt": 0
         },
         "prof-living": {
           "watchlist": [],
           "progress": {},
           "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0
+          "watchlistUpdatedAt": 0,
+          "deletedProgressIds": {},
+          "progressClearedAt": 0
         },
         "prof-1794166536010": {
           "watchlist": [],
           "progress": {},
           "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0
+          "watchlistUpdatedAt": 0,
+          "deletedProgressIds": {},
+          "progressClearedAt": 0
         },
         "prof-1794166543582": {
           "watchlist": [],
           "progress": {},
           "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0
+          "watchlistUpdatedAt": 0,
+          "deletedProgressIds": {},
+          "progressClearedAt": 0
         },
         "prof-1794166553435": {
           "watchlist": [],
           "progress": {},
           "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0
+          "watchlistUpdatedAt": 0,
+          "deletedProgressIds": {},
+          "progressClearedAt": 0
         },
         "prof-1794166559616": {
           "watchlist": [],
           "progress": {},
           "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0
+          "watchlistUpdatedAt": 0,
+          "deletedProgressIds": {},
+          "progressClearedAt": 0
         },
         "prof-1794166564722": {
           "watchlist": [],
@@ -805,7 +632,9 @@
             }
           },
           "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0
+          "watchlistUpdatedAt": 0,
+          "deletedProgressIds": {},
+          "progressClearedAt": 0
         }
       },
       "parentalMaster": {
@@ -822,11 +651,11 @@
         }
       },
       "subPrefs": {
-        "size": "xlarge",
-        "fontPx": 52,
+        "size": "large",
+        "fontPx": 34,
         "color": "white",
         "bg": "none",
-        "bottomPct": 8
+        "bottomPct": 3.5
       }
     }
   },

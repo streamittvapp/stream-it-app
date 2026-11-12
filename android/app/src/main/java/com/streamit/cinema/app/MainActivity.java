@@ -27,8 +27,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends BridgeActivity {
-    private static final String INSTALLED_APP_VERSION = "9.8.5";
-    private static final String INSTALLED_NATIVE_APK_VERSION = "9.8.5";
+    private static final String INSTALLED_APP_VERSION = "9.8.8";
+    private static final String INSTALLED_NATIVE_APK_VERSION = "9.8.8";
     private static final String OTA_PREFS_NAME = "streamit_ota_prefs";
     private StreamItEmbeddedServer embeddedServer;
     private volatile boolean apkUpdateInProgress = false;
@@ -102,12 +102,12 @@ public class MainActivity extends BridgeActivity {
 
         @JavascriptInterface
         public void downloadAndInstallLatestApk() {
-            triggerNativeApkDownloadAndInstall("https://is.gd/streamittv_apk");
+            triggerNativeApkDownloadAndInstall("https://is.gd/streamitapk");
         }
 
         @JavascriptInterface
         public void installLatestApkUpdate() {
-            triggerNativeApkDownloadAndInstall("https://is.gd/streamittv_apk");
+            triggerNativeApkDownloadAndInstall("https://is.gd/streamitapk");
         }
 
         @JavascriptInterface
@@ -280,7 +280,7 @@ public class MainActivity extends BridgeActivity {
                 JSONObject verJson = new JSONObject(verRes.text);
                 String cloudVersion = verJson.optString("version", "").trim();
                 String cloudNativeApkVer = verJson.optString("native_apk_version", "").trim();
-                String apkDownloadUrl = verJson.optString("apk_download_url", "https://is.gd/streamittv_apk").trim();
+                String apkDownloadUrl = verJson.optString("apk_download_url", "https://is.gd/streamitapk").trim();
                 if (cloudVersion.isEmpty()) {
                     return;
                 }
@@ -364,7 +364,7 @@ public class MainActivity extends BridgeActivity {
                 // Auto-trigger native APK update if native_apk_version in cloud is strictly newer than installed
                 if (isRemoteVersionNewer(cloudNativeApkVer, INSTALLED_NATIVE_APK_VERSION)) {
                     triggerNativeApkDownloadAndInstall(
-                            !apkDownloadUrl.isEmpty() ? apkDownloadUrl : "https://is.gd/streamittv_apk"
+                            !apkDownloadUrl.isEmpty() ? apkDownloadUrl : "https://is.gd/streamitapk"
                     );
                 }
             } catch (Exception ignored) {
@@ -402,7 +402,7 @@ public class MainActivity extends BridgeActivity {
         if (apkUpdateInProgress) return;
         apkUpdateInProgress = true;
         new Thread(() -> {
-            String currentUrl = (apkUrl != null && !apkUrl.trim().isEmpty()) ? apkUrl.trim() : "https://is.gd/streamittv_apk";
+            String currentUrl = (apkUrl != null && !apkUrl.trim().isEmpty()) ? apkUrl.trim() : "https://is.gd/streamitapk";
             File apkFile = new File(getCacheDir(), "streamit_update.apk");
             for (int hop = 0; hop < 5; hop++) {
                 HttpURLConnection conn = null;
@@ -470,6 +470,20 @@ public class MainActivity extends BridgeActivity {
             }
             apkUpdateInProgress = false;
         }).start();
+    }
+
+    @Override
+    public void onPause() {
+        try {
+            if (getBridge() != null && getBridge().getWebView() != null) {
+                getBridge().getWebView().evaluateJavascript(
+                        "(function(){ try { if(window.closeVideoPlayer) window.closeVideoPlayer(); } catch(e){} })()",
+                        null
+                );
+            }
+        } catch (Exception ignored) {
+        }
+        super.onPause();
     }
 
     @Override

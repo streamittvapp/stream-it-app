@@ -12,6 +12,18 @@
 (function () {
   'use strict';
 
+  var NAV_VERSION = '9.8.8';
+  try {
+    var pendingOtaVer = localStorage.getItem('streamit_ota_version_v9') || '';
+    var pendingOtaNav = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
+    if (pendingOtaVer && pendingOtaVer > NAV_VERSION && pendingOtaNav.length > 500 && !window.__STREAMIT_OTA_INJECTED_RUNNING) {
+      return;
+    }
+  } catch (eSkipNavOta) {}
+
+  var myNavInstanceId = (Number(window.__streamItTvNavInstanceId) || 0) + 1;
+  window.__streamItTvNavInstanceId = myNavInstanceId;
+
   var currentFocused = null;
   var lastMainFocus = null;
   var activeVkInput = null;
@@ -2443,6 +2455,10 @@
         window.closeVideoPlayer();
       } else if (playerCheck) {
         playerCheck.classList.add('hidden');
+        var emb0 = document.getElementById('embedPlayerContainer');
+        if (emb0) emb0.innerHTML = '';
+        var vid0 = document.getElementById('videoElement');
+        if (vid0) { try { vid0.pause(); vid0.removeAttribute('src'); vid0.load(); } catch (e) {} }
       }
       if (lastMainFocus && isElementVisible(lastMainFocus)) setFocus(lastMainFocus);
       return true;
@@ -2547,6 +2563,10 @@
         } else {
           exitConfirmModal.classList.add('hidden');
           player.classList.add('hidden');
+          var emb1 = document.getElementById('embedPlayerContainer');
+          if (emb1) emb1.innerHTML = '';
+          var vid1 = document.getElementById('videoElement');
+          if (vid1) { try { vid1.pause(); vid1.removeAttribute('src'); vid1.load(); } catch (e) {} }
         }
         if (lastMainFocus && isElementVisible(lastMainFocus)) setFocus(lastMainFocus);
         return true;
@@ -2562,6 +2582,10 @@
         window.closeVideoPlayer();
       } else {
         player.classList.add('hidden');
+        var emb2 = document.getElementById('embedPlayerContainer');
+        if (emb2) emb2.innerHTML = '';
+        var vid2 = document.getElementById('videoElement');
+        if (vid2) { try { vid2.pause(); vid2.removeAttribute('src'); vid2.load(); } catch (e) {} }
       }
       if (lastMainFocus && isElementVisible(lastMainFocus)) setFocus(lastMainFocus);
       return true;
@@ -3051,11 +3075,16 @@
   window.addEventListener('keydown', window.__streamItTvKeydownHandler, true);
 
   function initTvNavigationEngine() {
+    if (window.__streamItTvNavInstanceId !== myNavInstanceId) return;
     applyTvModeClass();
     bindVirtualKeyboardActions();
     ensureInitialTvFocus();
-    setTimeout(ensureInitialTvFocus, 350);
-    setTimeout(ensureInitialTvFocus, 900);
+    setTimeout(function () {
+      if (window.__streamItTvNavInstanceId === myNavInstanceId) ensureInitialTvFocus();
+    }, 350);
+    setTimeout(function () {
+      if (window.__streamItTvNavInstanceId === myNavInstanceId) ensureInitialTvFocus();
+    }, 900);
   }
 
   if (document.readyState === 'loading') {

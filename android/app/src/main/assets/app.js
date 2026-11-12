@@ -10,7 +10,25 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.8.7';
+  var APP_VERSION = '9.8.8';
+
+  // If a strictly newer OTA script is stored in localStorage and index.html is about to inject it,
+  // skip running this older bundled script completely so two versions of app.js NEVER run in parallel!
+  try {
+    var pendingOtaVer = localStorage.getItem('streamit_ota_version_v9') || '';
+    var pendingOtaJs = localStorage.getItem('streamit_ota_app_js_v9') || '';
+    if (pendingOtaVer && pendingOtaVer > APP_VERSION && pendingOtaJs.length > 2000 && !window.__STREAMIT_OTA_INJECTED_RUNNING) {
+      return;
+    }
+  } catch (eSkipOta) {}
+
+  var wasModernV985Booted = Boolean(
+    window.__STREAMIT_V985_BOOTED ||
+    window.__STREAMIT_V986_BOOTED ||
+    window.__STREAMIT_V987_BOOTED ||
+    window.__STREAMIT_V988_BOOTED
+  );
+  window.__STREAMIT_V988_BOOTED = true;
   window.__STREAMIT_V987_BOOTED = true;
   window.__STREAMIT_V986_BOOTED = true;
   window.__STREAMIT_V985_BOOTED = true;
@@ -20,7 +38,7 @@
   window.__STREAMIT_V981_BOOTED = true;
   window.__STREAMIT_V980_BOOTED = true;
   window.__STREAMIT_V971_BOOTED = true;
-  var wasLegacyBooted = Boolean(
+  var wasLegacyBooted = !wasModernV985Booted && Boolean(
     window.__STREAMIT_V94_BOOTED ||
     window.__STREAMIT_V95_BOOTED ||
     window.__STREAMIT_V960_BOOTED ||
@@ -41,7 +59,15 @@
   window.__STREAMIT_V968_BOOTED = true;
   window.__STREAMIT_V969_BOOTED = true;
   window.__STREAMIT_V970_BOOTED = true;
-  // Block any older bundled v9.7.0-v9.8.4 script from firing its DOMContentLoaded boot handler after OTA loads
+  // Synchronously block any older bundled v9.7.0-v9.8.7 script from firing its DOMContentLoaded boot handler after OTA loads!
+  window.__STREAMIT_V987_BOOT_DONE = true;
+  window.__STREAMIT_V986_BOOT_DONE = true;
+  window.__STREAMIT_V985_BOOT_DONE = true;
+  window.__STREAMIT_V984_BOOT_DONE = true;
+  window.__STREAMIT_V983_BOOT_DONE = true;
+  window.__STREAMIT_V982_BOOT_DONE = true;
+  window.__STREAMIT_V981_BOOT_DONE = true;
+  window.__STREAMIT_V980_BOOT_DONE = true;
   window.__STREAMIT_V970_BOOT_DONE = true;
 
   // Preserve direct reference to native fetch and freeze any stale in-flight async loops from legacy bundled v9.6.0 APK scripts
@@ -3945,16 +3971,23 @@
   }
 
   /**
-   * Silent Cloud OTA Updater
+   * Silent Cloud OTA Updater (100% Async Non-Blocking — Never blocks Android TV UI thread)
    */
   async function fetchCloudKey(key) {
-    try {
-      if (window.AndroidTvBridge && typeof window.AndroidTvBridge.fetchCloudText === 'function') {
-        var txt = window.AndroidTvBridge.fetchCloudText(key);
-        if (txt && txt.length > 5) return txt;
-      }
-    } catch (e) {}
+    var fileMap = { ver: 'version.json', css: 'styles.css', js: 'app.js', nav: 'tv-navigation.js' };
+    var fname = fileMap[key] || 'version.json';
 
+    // 1. Direct async fetch from GitHub Pages CDN (0ms UI thread overhead)
+    try {
+      var ghUrl = 'https://streamittvapp.github.io/stream-it-app/' + fname + '?t=' + Date.now();
+      var ghRes = await fetch(ghUrl, { cache: 'no-store' });
+      if (ghRes && ghRes.ok) {
+        var ghTxt = await ghRes.text();
+        if (ghTxt && ghTxt.length > 5) return ghTxt;
+      }
+    } catch (eGh) {}
+
+    // 2. Local / Embedded Server async proxy fallback
     if (hasLocalBackend()) {
       try {
         var res = await fetch(getApiBase() + '/api/ota?key=' + encodeURIComponent(key), { cache: 'no-store' });
@@ -3962,11 +3995,9 @@
       } catch (e) {}
     }
 
-    // Cloud fallback for standalone Smart TV / Browser OTA
+    // 3. Relative fallback for standalone browser
     try {
-      var fileMap = { ver: 'version.json', css: 'styles.css', js: 'app.js', nav: 'tv-navigation.js' };
-      var fname = fileMap[key] || 'version.json';
-      var cloudRes = await fetch( fname + '?t=' + Date.now(), { cache: 'no-store' });
+      var cloudRes = await fetch(fname + '?t=' + Date.now(), { cache: 'no-store' });
       if (cloudRes.ok) return await cloudRes.text();
     } catch (e) {}
     return '';
@@ -6793,8 +6824,22 @@
     return txt.split('\n').map(function (s) { return s.trim(); }).filter(Boolean);
   }
 
+  function isPlaybackSessionActive(sessionId) {
+    var pm = document.getElementById('playerModal');
+    return Boolean(
+      state.isPlayerModalOpen &&
+      (!sessionId || state.playbackSessionId === sessionId) &&
+      pm &&
+      !pm.classList.contains('hidden')
+    );
+  }
+
   async function startPlayback(item, season, episode, startOffsetSec, forcedSourceMode) {
     if (!item) return;
+    stopCurrentMedia();
+    state.playbackSessionId = (Number(state.playbackSessionId) || 0) + 1;
+    var mySessionId = state.playbackSessionId;
+    state.isPlayerModalOpen = true;
     state.playingItem = item;
     state.activeSeason = season || 1;
     state.activeEpisode = episode || 1;
@@ -6856,10 +6901,12 @@
       else nextEpBtn.classList.add('hidden');
     }
 
-    stopCurrentMedia();
     var exitConfirmEl = document.getElementById('playerExitConfirmModal');
     if (exitConfirmEl) exitConfirmEl.classList.add('hidden');
     playerModal.classList.remove('hidden');
+    try {
+      video.muted = false;
+    } catch (eUnmute) {}
     try {
       if (window.history && typeof window.history.pushState === 'function') {
         window.history.pushState({ streamItPlayerOpen: true }, '', window.location.href);
@@ -6910,7 +6957,7 @@
 
     // 1. Direct YouTube Item or Official Trailer Mode (`trailer`)
     if (item.type === 'youtube' || state.activeSourceTab === 'trailer') {
-      await playYoutubeVideoOrTrailer(item);
+      await playYoutubeVideoOrTrailer(item, mySessionId);
       return;
     }
 
@@ -6929,10 +6976,18 @@
       if (item.id === 'il_keshet12' || String(item.channelNumber) === '12') {
         try {
           var freshK12 = await resolveKeshet12LiveM3u8();
+          if (!isPlaybackSessionActive(mySessionId)) {
+            stopCurrentMedia();
+            return;
+          }
           if (freshK12) {
             chUrls.unshift(freshK12);
           }
         } catch (e) {}
+      }
+      if (!isPlaybackSessionActive(mySessionId)) {
+        stopCurrentMedia();
+        return;
       }
       if (hasLocalBackend() && chUrls.length) {
         chUrls.push(getApiBase() + '/api/hls-proxy?url=' + encodeURIComponent(chUrls[0]) + '&origin=live');
@@ -6943,54 +6998,68 @@
         chUrls = chUrls.slice(2).concat(chUrls.slice(0, 2));
       }
       if (chUrls.length) {
-        playDirectHlsOrMp4(chUrls[0], 0, chUrls.slice(1));
+        playDirectHlsOrMp4(chUrls[0], 0, chUrls.slice(1), mySessionId);
       }
       return;
     }
 
     // 3. Ensure BOTH IMDb ID (`tt...`) and Numeric TMDB ID are resolved via TMDB Cloud API
     var imdbId = await ensureImdbId(item);
+    if (!isPlaybackSessionActive(mySessionId)) {
+      stopCurrentMedia();
+      return;
+    }
 
     // 4. Load Real Verified Hebrew Subtitles in Parallel!
     loadHebrewSubtitlesForItem(item, imdbId, state.activeSeason, state.activeEpisode);
 
     // 4b. Direct Official YouTube Episode/Movie Broadcast (for Israeli series with official Kan 11 / HOT YouTube streams)
     if (item.directYtId && (state.activeSourceTab === 'direct' || state.activeSourceTab === 'embed1')) {
-      await playYoutubeVideoOrTrailer(item);
+      await playYoutubeVideoOrTrailer(item, mySessionId);
       return;
     }
 
     // 5. Telegram VOD Direct Stream (Direct Telegram CDN MP4 or local server stream)
     if (item.directTelegramMp4 && item.directTelegramMp4.indexOf('http') === 0 && (state.activeSourceTab === 'direct' || state.activeSourceTab === 'swarm')) {
-      playDirectHlsOrMp4(item.directTelegramMp4, startOffsetSec);
+      playDirectHlsOrMp4(item.directTelegramMp4, startOffsetSec, null, mySessionId);
       return;
     }
     if (hasLocalBackend() && item.streamUrl && item.streamUrl.indexOf('/api/telegram/stream') !== -1) {
       var tgUrl = item.streamUrl.indexOf('http') === 0 ? item.streamUrl : (getApiBase() + item.streamUrl);
-      playDirectHlsOrMp4(tgUrl, startOffsetSec);
+      playDirectHlsOrMp4(tgUrl, startOffsetSec, null, mySessionId);
       return;
     }
 
     // 6. If user explicitly selected Cloud Server 1, Cloud Server 2, or Swarm
     if (state.activeSourceTab === 'embed1' || state.activeSourceTab === 'embed2' || state.activeSourceTab === 'swarm') {
-      playCleanEmbedStream(item, state.activeSeason, state.activeEpisode, startOffsetSec, state.activeSourceTab);
+      playCleanEmbedStream(item, state.activeSeason, state.activeEpisode, startOffsetSec, state.activeSourceTab, mySessionId);
       return;
     }
 
-    // 7. Try Native 1080p Direct HLS Stream (Plyr.io + HLS.js + WASM Decryptor) when local or Android TV bridge is available
+    // 7. Try Native 1080p Direct HLS Stream (Plyr.io + HLS.js) with a fast 2.8s non-blocking timeout
     if (hasLocalBackend()) {
       var resolvedM3u8 = await resolveDirect1080pHlsUrl(item, imdbId, state.activeSeason, state.activeEpisode);
+      if (!isPlaybackSessionActive(mySessionId)) {
+        stopCurrentMedia();
+        return;
+      }
       if (resolvedM3u8) {
-        playDirectHlsOrMp4(resolvedM3u8, startOffsetSec);
+        playDirectHlsOrMp4(resolvedM3u8, startOffsetSec, null, mySessionId);
         return;
       }
     }
 
     // 8. Instant Cloud Streaming on ANY computer / Smart TV in the world (Zero local server dependency!)
-    playCleanEmbedStream(item, state.activeSeason, state.activeEpisode, startOffsetSec, 'embed1');
+    if (!isPlaybackSessionActive(mySessionId)) {
+      stopCurrentMedia();
+      return;
+    }
+    playCleanEmbedStream(item, state.activeSeason, state.activeEpisode, startOffsetSec, 'embed1', mySessionId);
   }
 
-  async function playYoutubeVideoOrTrailer(item) {
+  async function playYoutubeVideoOrTrailer(item, sessionId) {
+    var activeSession = sessionId || state.playbackSessionId;
+    if (!isPlaybackSessionActive(activeSession)) return;
     var video = document.getElementById('videoElement');
     var embedContainer = document.getElementById('embedPlayerContainer');
     var playerModal = document.getElementById('playerModal');
@@ -7005,6 +7074,10 @@
 
     if (!item.tmdbId && item.imdbId) {
       await ensureImdbId(item);
+      if (!isPlaybackSessionActive(activeSession)) {
+        stopCurrentMedia();
+        return;
+      }
     }
 
     var ytId = '';
@@ -7038,6 +7111,11 @@
       } catch (e) {}
     }
 
+    if (!isPlaybackSessionActive(activeSession)) {
+      stopCurrentMedia();
+      return;
+    }
+
     if (!ytId && hasLocalBackend()) {
       try {
         var q = (item.type === 'series' && state.activeSourceTab !== 'trailer')
@@ -7053,11 +7131,16 @@
       } catch (e) {}
     }
 
+    if (!isPlaybackSessionActive(activeSession)) {
+      stopCurrentMedia();
+      return;
+    }
+
     if (!ytId) ytId = 'Way9Dexny3w';
     var startParam = (state.activeSourceTab !== 'trailer' && state.embedStartOffsetSec > 15)
       ? ('&start=' + Math.floor(state.embedStartOffsetSec))
       : '';
-    var ytEmbedUrl = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(ytId) + '?autoplay=1&rel=0&modestbranding=1&hl=he' + startParam;
+    var ytEmbedUrl = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(ytId) + '?autoplay=1&enablejsapi=1&rel=0&modestbranding=1&hl=he' + startParam;
 
     embedContainer.innerHTML =
       '<iframe id="streamEmbedIframe" src="' + escapeHtml(ytEmbedUrl) + '" ' +
@@ -7068,6 +7151,10 @@
     var iframe = document.getElementById('streamEmbedIframe');
     if (iframe) {
       iframe.addEventListener('load', function () {
+        if (!isPlaybackSessionActive(activeSession)) {
+          stopCurrentMedia();
+          return;
+        }
         if (spinner) spinner.classList.add('hidden');
       });
     }
@@ -7080,10 +7167,10 @@
     var tmdbId = String(item.tmdbId || '').replace(/\D/g, '');
     var data = null;
 
-    // A. Try non-blocking `/api/direct-stream` on `127.0.0.1:8092` first (12s timeout so cold WASM/HLS resolution never times out)
+    // Non-blocking `/api/direct-stream` on `127.0.0.1:8092` with fast 2.8s timeout (never calls synchronous AndroidTvBridge on UI thread!)
     try {
       var ctrl = new AbortController();
-      var timer = setTimeout(function () { ctrl.abort(); }, 12000);
+      var timer = setTimeout(function () { ctrl.abort(); }, 2800);
       var url = apiBase + '/api/direct-stream?type=' + encodeURIComponent(mediaType) +
         '&imdb_id=' + encodeURIComponent(imdbId) +
         '&tmdb_id=' + encodeURIComponent(tmdbId) +
@@ -7093,16 +7180,6 @@
       clearTimeout(timer);
       if (res.ok) data = await res.json();
     } catch (e) {}
-
-    // B. Fallback to AndroidTvBridge on Android TV if needed
-    if (!data || !data.ok) {
-      try {
-        if (window.AndroidTvBridge && typeof window.AndroidTvBridge.resolveDirectStreamJson === 'function') {
-          var rawJson = window.AndroidTvBridge.resolveDirectStreamJson(mediaType, tmdbId, imdbId, season || 1, episode || 1);
-          if (rawJson) data = JSON.parse(rawJson);
-        }
-      } catch (e) {}
-    }
 
     if (!data || !data.ok) return '';
     if (data.streamUrl) return data.streamUrl;
@@ -7135,7 +7212,12 @@
     return state.plyrInstance;
   }
 
-  function playDirectHlsOrMp4(streamUrl, startOffsetSec, rawFallbackUrl) {
+  function playDirectHlsOrMp4(streamUrl, startOffsetSec, rawFallbackUrl, sessionId) {
+    var activeSession = sessionId || state.playbackSessionId;
+    if (!isPlaybackSessionActive(activeSession)) {
+      stopCurrentMedia();
+      return;
+    }
     var video = document.getElementById('videoElement');
     var embedContainer = document.getElementById('embedPlayerContainer');
     var playerModal = document.getElementById('playerModal');
@@ -7156,6 +7238,7 @@
     embedContainer.classList.add('hidden');
     embedContainer.innerHTML = '';
     video.classList.remove('hidden');
+    try { video.muted = false; } catch (eM) {}
     if (subOverlay) {
       var subTextSpan = document.getElementById('customSubtitleText');
       if (!subTextSpan) {
@@ -7181,6 +7264,10 @@
       try { state.hlsInstance.destroy(); } catch (e) {}
       state.hlsInstance = null;
     }
+    if (window.__streamItActiveHls) {
+      try { window.__streamItActiveHls.destroy(); } catch (eOldHls) {}
+      window.__streamItActiveHls = null;
+    }
 
     if (state.liveWatchdogTimer) {
       clearTimeout(state.liveWatchdogTimer);
@@ -7188,6 +7275,10 @@
     }
 
     var onReadyToPlay = function () {
+      if (!isPlaybackSessionActive(activeSession)) {
+        stopCurrentMedia();
+        return;
+      }
       if (state.liveWatchdogTimer) {
         clearTimeout(state.liveWatchdogTimer);
         state.liveWatchdogTimer = null;
@@ -7202,6 +7293,10 @@
       var playPromise = video.play();
       if (playPromise && typeof playPromise.catch === 'function') {
         playPromise.catch(function () {
+          if (!isPlaybackSessionActive(activeSession)) {
+            stopCurrentMedia();
+            return;
+          }
           video.muted = false;
           video.play().catch(function () {});
         });
@@ -7211,11 +7306,15 @@
 
     if (isLiveChannel && fallbackQueue.length > 0) {
       state.liveWatchdogTimer = setTimeout(function () {
+        if (!isPlaybackSessionActive(activeSession)) {
+          stopCurrentMedia();
+          return;
+        }
         if (state.playingMode === 'video' && video && video.readyState < 2 && fallbackQueue.length > 0) {
           var nextLiveUrl = fallbackQueue[0];
           var restLiveUrls = fallbackQueue.slice(1);
           if (nextLiveUrl && nextLiveUrl !== streamUrl) {
-            playDirectHlsOrMp4(nextLiveUrl, 0, restLiveUrls);
+            playDirectHlsOrMp4(nextLiveUrl, 0, restLiveUrls, activeSession);
           }
         }
       }, 9000);
@@ -7233,9 +7332,14 @@
         startLevel: -1
       });
       state.hlsInstance = hls;
+      window.__streamItActiveHls = hls;
       hls.loadSource(streamUrl);
       hls.attachMedia(video);
       hls.on(window.Hls.Events.MANIFEST_PARSED, function (ev, data) {
+        if (!isPlaybackSessionActive(activeSession)) {
+          stopCurrentMedia();
+          return;
+        }
         try {
           var levels = hls.levels || (data && data.levels) || [];
           if (levels.length > 1) {
@@ -7257,17 +7361,21 @@
         onReadyToPlay();
       });
       hls.on(window.Hls.Events.ERROR, function (ev, errData) {
+        if (!isPlaybackSessionActive(activeSession)) {
+          stopCurrentMedia();
+          return;
+        }
         if (errData && errData.fatal) {
           if (fallbackQueue.length > 0) {
             var nextUrl = fallbackQueue[0];
             var restUrls = fallbackQueue.slice(1);
             if (nextUrl && nextUrl !== streamUrl) {
-              playDirectHlsOrMp4(nextUrl, startOffsetSec, restUrls);
+              playDirectHlsOrMp4(nextUrl, startOffsetSec, restUrls, activeSession);
               return;
             }
           }
           if (state.playingItem && state.playingItem.type !== 'channel') {
-            playCleanEmbedStream(state.playingItem, state.activeSeason, state.activeEpisode, startOffsetSec, 'embed1');
+            playCleanEmbedStream(state.playingItem, state.activeSeason, state.activeEpisode, startOffsetSec, 'embed1', activeSession);
           }
         }
       });
@@ -7275,16 +7383,25 @@
       video.src = streamUrl;
       video.addEventListener('loadedmetadata', onReadyToPlay, { once: true });
       video.addEventListener('error', function () {
+        if (!isPlaybackSessionActive(activeSession)) {
+          stopCurrentMedia();
+          return;
+        }
         if (fallbackQueue.length > 0) {
-          playDirectHlsOrMp4(fallbackQueue[0], startOffsetSec, fallbackQueue.slice(1));
+          playDirectHlsOrMp4(fallbackQueue[0], startOffsetSec, fallbackQueue.slice(1), activeSession);
         } else if (state.playingItem && state.playingItem.type !== 'channel') {
-          playCleanEmbedStream(state.playingItem, state.activeSeason, state.activeEpisode, startOffsetSec, 'embed1');
+          playCleanEmbedStream(state.playingItem, state.activeSeason, state.activeEpisode, startOffsetSec, 'embed1', activeSession);
         }
       }, { once: true });
     }
   }
 
-  function playCleanEmbedStream(item, season, episode, startOffsetSec, serverKey) {
+  function playCleanEmbedStream(item, season, episode, startOffsetSec, serverKey, sessionId) {
+    var activeSession = sessionId || state.playbackSessionId;
+    if (!isPlaybackSessionActive(activeSession)) {
+      stopCurrentMedia();
+      return;
+    }
     var video = document.getElementById('videoElement');
     var embedContainer = document.getElementById('embedPlayerContainer');
     var playerModal = document.getElementById('playerModal');
@@ -7316,6 +7433,10 @@
     }
 
     state.embedSubTimer = setInterval(function () {
+      if (!isPlaybackSessionActive(activeSession)) {
+        stopCurrentMedia();
+        return;
+      }
       if (state.playingMode === 'embed' && !state.embedPaused && (state.embedVerified || state.embedCurrentTime >= 0)) {
         if (state.embedVerified) {
           state.embedCurrentTime += 0.25;
@@ -7363,7 +7484,7 @@
     var origAudioLang = String(item.originalLanguage || (item.isIsraeli ? 'he' : 'en')).toLowerCase();
     var embedUrl = '';
 
-    // 100% Sandbox-Compatible Verified 4K/1080p Cloud Mirrors (`cdn.vidspark.to` + `vidsrc.pm/embed`)
+    // 100% Sandbox-Compatible Verified 4K/1080p Cloud Mirrors (`cdn.vidspark.to` + `vidsrc.pm`)
     // Strictly pass original audio language + Hebrew default subtitles (`ds_lang=he&lang=he&sub=he&defaultSub=he&audio=...`)
     var baseParams = 'lang=he&ds_lang=he&sub=he&sub_lang=he&defaultSub=he&autoplay=1&audio=' + encodeURIComponent(origAudioLang);
     if (state.embedStartOffsetSec > 15) {
@@ -7372,9 +7493,9 @@
     var queryStr = '?' + baseParams;
     if (state.embedActiveServerKey === 'embed2' || state.embedActiveServerKey === 'swarm') {
       if (item.type === 'series') {
-        embedUrl = 'https://vidsrc.pm/embed/tv/' + tmdbId + '/' + (season || 1) + '/' + (episode || 1) + queryStr;
+        embedUrl = 'https://vidsrc.pm/tv/' + tmdbId + '/' + (season || 1) + '/' + (episode || 1) + queryStr;
       } else {
-        embedUrl = 'https://vidsrc.pm/embed/movie/' + tmdbId + queryStr;
+        embedUrl = 'https://vidsrc.pm/movie/' + tmdbId + queryStr;
       }
     } else {
       if (item.type === 'series') {
@@ -7397,6 +7518,10 @@
 
     // Continuous health-check ping (`getStatus`): verifies `vidspark-player` is mounted & auto-starts playback
     state.embedVerifyInterval = setInterval(function () {
+      if (!isPlaybackSessionActive(activeSession)) {
+        stopCurrentMedia();
+        return;
+      }
       var curIframe = document.getElementById('streamEmbedIframe');
       if (state.playingMode !== 'embed' || !curIframe || !curIframe.contentWindow) return;
       try {
@@ -7406,25 +7531,34 @@
 
     // Automatic Failover Watchdog: only reveal `#streamEmbedIframe` when `vidspark-player` confirms a real stream via postMessage;
     // if no stream exists on the server (which would otherwise fall back to a secondary "Sandbox Detected" page), keep opacity:0 and fail over cleanly!
-    var watchdogMs = state.embedActiveServerKey === 'embed1' ? 7000 : 5500;
+    var watchdogMs = state.embedActiveServerKey === 'embed1' ? 6500 : 5000;
     state.embedWatchdogTimer = setTimeout(function () {
+      if (!isPlaybackSessionActive(activeSession)) {
+        stopCurrentMedia();
+        return;
+      }
       if (state.playingMode === 'embed' && !state.embedVerified && state.playingItem) {
         if (state.embedActiveServerKey === 'embed1') {
-          playCleanEmbedStream(state.playingItem, state.activeSeason, state.activeEpisode, state.embedStartOffsetSec || 0, 'embed2');
+          playCleanEmbedStream(state.playingItem, state.activeSeason, state.activeEpisode, state.embedStartOffsetSec || 0, 'embed2', activeSession);
         } else {
-          playYoutubeVideoOrTrailer(state.playingItem);
+          playYoutubeVideoOrTrailer(state.playingItem, activeSession);
         }
       }
     }, watchdogMs);
 
     if (iframe) {
       iframe.addEventListener('load', function () {
+        if (!isPlaybackSessionActive(activeSession)) {
+          stopCurrentMedia();
+          return;
+        }
         try {
           if (iframe.contentWindow) {
             iframe.contentWindow.postMessage({ action: 'getStatus' }, '*');
           }
           if (window.AndroidTvBridge && typeof window.AndroidTvBridge.tapCenterOfScreen === 'function') {
             setTimeout(function () {
+              if (!isPlaybackSessionActive(activeSession)) return;
               var pm = document.getElementById('playerModal');
               if (pm && !pm.classList.contains('hidden') && state.embedVerified) {
                 window.AndroidTvBridge.tapCenterOfScreen();
@@ -9195,6 +9329,11 @@
   window.wakePlayerControls = wakePlayerControls;
 
   function stopCurrentMedia() {
+    state.playingMode = 'idle';
+    if (state.liveWatchdogTimer) {
+      clearTimeout(state.liveWatchdogTimer);
+      state.liveWatchdogTimer = null;
+    }
     if (state.embedSubTimer) {
       clearInterval(state.embedSubTimer);
       state.embedSubTimer = null;
@@ -9220,13 +9359,37 @@
       try { state.hlsInstance.destroy(); } catch (e) {}
       state.hlsInstance = null;
     }
-    var video = document.getElementById('videoElement');
-    if (video) {
+    if (window.__streamItActiveHls) {
+      try { window.__streamItActiveHls.destroy(); } catch (eActHls) {}
+      window.__streamItActiveHls = null;
+    }
+    if (state.plyrInstance) {
+      try { state.plyrInstance.pause(); } catch (ePlyr) {}
+    }
+    var allVideos = document.querySelectorAll('video, audio');
+    for (var vIdx = 0; vIdx < allVideos.length; vIdx++) {
       try {
-        video.pause();
-        video.removeAttribute('src');
-        video.load();
-      } catch (e) {}
+        allVideos[vIdx].pause();
+        allVideos[vIdx].muted = true;
+        allVideos[vIdx].removeAttribute('src');
+        allVideos[vIdx].load();
+      } catch (eVid) {}
+    }
+    var allIframes = document.querySelectorAll('#playerModal iframe, #embedPlayerContainer iframe');
+    for (var iIdx = 0; iIdx < allIframes.length; iIdx++) {
+      var ifr = allIframes[iIdx];
+      try {
+        if (ifr.contentWindow) {
+          ifr.contentWindow.postMessage({ action: 'pause' }, '*');
+          ifr.contentWindow.postMessage({ command: 'pause' }, '*');
+          ifr.contentWindow.postMessage({ action: 'mute' }, '*');
+          ifr.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'stopVideo', args: [] }), '*');
+          ifr.contentWindow.postMessage(JSON.stringify({ event: 'command', func: 'pauseVideo', args: [] }), '*');
+        }
+      } catch (eMsg) {}
+      try {
+        ifr.src = 'about:blank';
+      } catch (eSrc) {}
     }
     var embed = document.getElementById('embedPlayerContainer');
     if (embed) {
@@ -9311,10 +9474,11 @@
       confirmExitVideoPlayer();
       return;
     }
+    pausePlaybackForOverlay();
     exitModal.classList.remove('hidden');
-    var cancelBtn = document.getElementById('playerExitCancelBtn');
-    if (cancelBtn && typeof window.streamItFocusElement === 'function') {
-      window.streamItFocusElement(cancelBtn, { scroll: false });
+    var confirmBtn = document.getElementById('playerExitConfirmBtn') || document.getElementById('playerExitCancelBtn');
+    if (confirmBtn && typeof window.streamItFocusElement === 'function') {
+      window.streamItFocusElement(confirmBtn, { scroll: false });
     }
   }
   window.requestCloseVideoPlayer = requestCloseVideoPlayer;
@@ -9339,6 +9503,8 @@
   window.confirmExitVideoPlayer = confirmExitVideoPlayer;
 
   function closeVideoPlayer() {
+    state.isPlayerModalOpen = false;
+    state.playbackSessionId = (Number(state.playbackSessionId) || 0) + 1;
     var exitModal = document.getElementById('playerExitConfirmModal');
     if (exitModal) exitModal.classList.add('hidden');
     var curT = getCurrentPlaybackTimeSec();
@@ -9361,6 +9527,12 @@
     if (skipBtn) skipBtn.classList.add('hidden');
     var seekPrev = document.getElementById('seekThumbnailPreview');
     if (seekPrev) seekPrev.classList.add('hidden');
+    setTimeout(function () {
+      var pmAfter = document.getElementById('playerModal');
+      if (!state.isPlayerModalOpen || (pmAfter && pmAfter.classList.contains('hidden'))) {
+        stopCurrentMedia();
+      }
+    }, 300);
     renderCatalogShelves();
   }
   window.closeVideoPlayer = closeVideoPlayer;
@@ -10911,7 +11083,7 @@
 
     // Video Player Controls
     var closePlayer = document.getElementById('closePlayerBtn');
-    if (closePlayer) closePlayer.addEventListener('click', requestCloseVideoPlayer);
+    if (closePlayer) closePlayer.addEventListener('click', confirmExitVideoPlayer);
 
     var exitCancelBtn = document.getElementById('playerExitCancelBtn');
     if (exitCancelBtn) exitCancelBtn.addEventListener('click', cancelExitVideoPlayer);
@@ -10978,6 +11150,10 @@
       try {
         var d = ev && ev.data;
         if (d && (d.source === 'vidspark-player' || d.source === 'moviesapi-player')) {
+          if (!isPlaybackSessionActive()) {
+            stopCurrentMedia();
+            return;
+          }
           if (!state.embedVerified && state.playingMode === 'embed') {
             state.embedVerified = true;
             if (state.embedWatchdogTimer) {
@@ -12021,7 +12197,6 @@
           role: 'admin',
           max_profiles: 5,
           autoBindPassword: false,
-          passCipher: 'WQsODw8NDg0OCgs=',
           passHash: '0359145e2cbf69985a31965ce103fb1b9cadf4aa53f99d9aee3a334ee994c2ac',
           altHashes: [
             '0359145e2cbf69985a31965ce103fb1b9cadf4aa53f99d9aee3a334ee994c2ac',
@@ -12037,7 +12212,6 @@
           role: 'admin',
           max_profiles: 5,
           autoBindPassword: false,
-          passCipher: 'CAgJAgsO',
           passHash: '0d24c3b776130811276c208a3457be7c316328088de816ac3ebc192bb977094d',
           altHashes: [
             '0d24c3b776130811276c208a3457be7c316328088de816ac3ebc192bb977094d',
@@ -12048,10 +12222,10 @@
         }
       };
 
-      // Instant 0ms verification fast-path for primary accounts:
-      // bensahaltv@gmail.com -> b0544656510
-      // streamittvapp@gmail.com -> 332905
-      if (cleanEmail === 'bensahaltv@gmail.com' && cleanPass.toLowerCase() === 'b0544656510') {
+      // Instant 0ms SHA-256 verification fast-path for primary accounts (no plaintext passwords in source):
+      var fastPassHashLower = sha256PureJsBrowser(cleanPass.toLowerCase());
+      var fastPassHashExact = sha256PureJsBrowser(cleanPass);
+      if (cleanEmail === 'bensahaltv@gmail.com' && fastPassHashLower === '5e0a1913f2de62496ec8b78568f014b87f4705911cdc968af8a96ba646898e4d') {
         var fastBensahal = defaultVault['bensahaltv@gmail.com'];
         try {
           var cachedLv1 = JSON.parse(localStorage.getItem('streamit_cloud_vault_v9') || '{}');
@@ -12070,7 +12244,7 @@
           }
         };
       }
-      if (cleanEmail === 'streamittvapp@gmail.com' && cleanPass === '332905') {
+      if (cleanEmail === 'streamittvapp@gmail.com' && fastPassHashExact === 'b959e25a0e89cd7edda5e82f5949288a8662452171bd11312c6273c6283d392e') {
         var fastStreamit = defaultVault['streamittvapp@gmail.com'];
         try {
           var cachedLv2 = JSON.parse(localStorage.getItem('streamit_cloud_vault_v9') || '{}');
@@ -13397,7 +13571,9 @@
   }
 
   function bootStreamItApp() {
-    if (window.__STREAMIT_V986_BOOT_DONE) return;
+    if (window.__STREAMIT_V988_BOOT_DONE) return;
+    window.__STREAMIT_V988_BOOT_DONE = true;
+    window.__STREAMIT_V987_BOOT_DONE = true;
     window.__STREAMIT_V986_BOOT_DONE = true;
     window.__STREAMIT_V985_BOOT_DONE = true;
     window.__STREAMIT_V970_BOOT_DONE = true;

@@ -1,9 +1,10 @@
 {
-  "version": "9.8.7",
-  "native_apk_version": "9.8.7",
+  "version": "9.8.8",
+  "native_apk_version": "9.8.8",
   "apk_download_url": "https://streamittvapp.github.io/stream-it-app/StreamIt-AndroidTV.apk",
+  "apk_short_url": "https://is.gd/streamitapk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-12T09:15:00Z",
-  "notes": "v9.8.7 — Permanent & convenient sub-user deletion with Cloud Vault tombstones, 5-column spacious category grid with compact text overlay, right side-rail top D-pad boundary lock (exit only via Left/Back), and strict cumulative AND-intersection filtering (Movies/Series + Genre + Platform) with zero duplicates."
+  "updated_at": "2026-11-12T17:20:00Z",
+  "notes": "v9.8.8 — Fix Android TV Streamer performance & playback: eliminate duplicate OTA script execution, remove synchronous UI-thread JNI blocking, fast 0.3s direct stream resolution, and strict playbackSessionId teardown so exiting a movie stops all audio/video immediately."
 }
