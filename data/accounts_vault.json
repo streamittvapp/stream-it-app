@@ -134,11 +134,12 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794494898604,
-      "subUsersUpdatedAt": 1794494898604,
+      "updatedTs": 1794494905106,
+      "subUsersUpdatedAt": 1794494905106,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
-        "prof-bedroom": 1794494898603
+        "prof-bedroom": 1794494898603,
+        "prof-kids": 1794494905106
       },
       "activeSubUserId": "prof-main",
       "subUsers": [
@@ -259,26 +260,6 @@
               "profanity": false,
               "drugs": false,
               "horror": false
-            }
-          }
-        },
-        {
-          "id": "prof-kids",
-          "name": "ילדים ונוער",
-          "color": "#475569",
-          "isKids": true,
-          "isPrimary": false,
-          "parentalControl": {
-            "enabled": true,
-            "actionMode": "skip",
-            "profanityMode": "mute_censor",
-            "sensitivity": "strict",
-            "categories": {
-              "sex": true,
-              "violence": true,
-              "profanity": true,
-              "drugs": true,
-              "horror": true
             }
           }
         }
