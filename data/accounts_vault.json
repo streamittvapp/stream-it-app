@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794565344469,
+      "updatedTs": 1794565362488,
       "subUsersUpdatedAt": 1794551843424,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -398,12 +398,12 @@
               "imdbId": "tt6263850",
               "tmdbId": "533535",
               "title": "דדפול ווולברין",
-              "currentTime": 255,
+              "currentTime": 650,
               "duration": 7674,
-              "percent": 3,
+              "percent": 8,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794565344469,
+              "updatedAt": 1794565362488,
               "snapshot": {
                 "id": "tt6263850",
                 "imdbId": "tt6263850",
