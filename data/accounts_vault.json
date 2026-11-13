@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794529228782,
+      "updatedTs": 1794551831278,
       "subUsersUpdatedAt": 1794494905106,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -353,6 +353,45 @@
                   "מותחנים"
                 ],
                 "seasonsCount": 13
+              }
+            },
+            "tt0903747": {
+              "id": "tt0903747",
+              "imdbId": "tt0903747",
+              "tmdbId": "1396",
+              "title": "שובר שורות",
+              "currentTime": 10,
+              "duration": 3479,
+              "percent": 3,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794551831278,
+              "snapshot": {
+                "id": "tt0903747",
+                "imdbId": "tt0903747",
+                "tmdbId": "1396",
+                "type": "series",
+                "title": "שובר שורות",
+                "originalTitle": "Breaking Bad",
+                "year": "2008",
+                "rating": "9.5",
+                "runtimeHe": "5 עונות • 62 פרקים",
+                "ageRating": "18+",
+                "overview": "מורה לכימיה בתיכון המאובחן בסרטן ריאות מתקדם חובר לתלמיד לשעבר כדי לייצר ולהפיץ מתאמפטמין טהור במטרה להבטיח את עתידה הכלכלי של משפחתו.",
+                "poster": "https://images.metahub.space/poster/medium/tt0903747/img",
+                "backdrop": "https://images.metahub.space/background/medium/tt0903747/img",
+                "cardBackdrop": "https://images.metahub.space/background/medium/tt0903747/img",
+                "genres": [
+                  "crime",
+                  "drama",
+                  "thriller",
+                  "telegram"
+                ],
+                "genresHe": [
+                  "פשע",
+                  "דרמה ומתח"
+                ],
+                "seasonsCount": 5
               }
             }
           },
