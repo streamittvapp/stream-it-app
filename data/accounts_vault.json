@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794528316365,
+      "updatedTs": 1794528460026,
       "subUsersUpdatedAt": 1794494905106,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -310,6 +310,49 @@
                   "מותחנים"
                 ],
                 "seasonsCount": 0
+              }
+            },
+            "series-1413": {
+              "id": "series-1413",
+              "imdbId": "tt1844624",
+              "tmdbId": "1413",
+              "title": "אימה אמריקאית",
+              "currentTime": 14,
+              "duration": 1484,
+              "percent": 3,
+              "season": 13,
+              "episode": 6,
+              "updatedAt": 1794528460025,
+              "snapshot": {
+                "id": "series-1413",
+                "imdbId": "tt1844624",
+                "tmdbId": "1413",
+                "type": "series",
+                "title": "אימה אמריקאית",
+                "originalTitle": "American Horror Story",
+                "year": "2011",
+                "rating": "8.1",
+                "runtimeHe": "45 דק׳ לפרק",
+                "ageRating": "16+",
+                "overview": "סדרת דרמה-אימה אשר בה כל עונה היא סיפור בפני עצמו המתקיים במקומות שונים; בבית רדוף רוחות, במוסד לחולי רוח ובמסדר מכשפות. הסדרה היא אנתולוגית וכל עונה נתפסת כמיני-סדרה עצמאית בעקבות קבוצה נבדלת של דמויות ורקעים, ועלילה ייחודית עם התחלה, אמצע וסוף. עם זאת,יוצר הסדרה הצהיר כי עד סוף הסדרה הצופים יבינו את הקשר שבין העונות השונות.",
+                "poster": "https://image.tmdb.org/t/p/w500/dpzNasY2sAzRjeoLAarrLkcUeBg.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/5G4Bnc4Q0YUK1bwLEUYmIsmm2Ib.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/5G4Bnc4Q0YUK1bwLEUYmIsmm2Ib.jpg",
+                "genres": [
+                  "drama",
+                  "mystery",
+                  "scifi",
+                  "horror",
+                  "thriller"
+                ],
+                "genresHe": [
+                  "דרמה",
+                  "מסתורין ובלשי",
+                  "מדע בדיוני ופנטזיה",
+                  "אימה",
+                  "מותחנים"
+                ],
+                "seasonsCount": 13
               }
             }
           },
@@ -656,7 +699,7 @@
         "fontPx": 34,
         "color": "white",
         "bg": "none",
-        "bottomPct": 3.5
+        "bottomPct": 5
       }
     }
   },
