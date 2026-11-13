@@ -132,8 +132,8 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794551843424,
-      "subUsersUpdatedAt": 1794494905106,
+      "updatedTs": 1794565306314,
+      "subUsersUpdatedAt": 1794551843424,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
         "prof-bedroom": 1794494898603,
@@ -361,11 +361,11 @@
               "tmdbId": "1396",
               "title": "שובר שורות",
               "currentTime": 22,
-              "duration": 3479,
+              "duration": 7200,
               "percent": 3,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794551843423,
+              "updatedAt": 1794565306312,
               "snapshot": {
                 "id": "tt0903747",
                 "imdbId": "tt0903747",
@@ -384,14 +384,13 @@
                 "genres": [
                   "crime",
                   "drama",
-                  "thriller",
-                  "telegram"
+                  "thriller"
                 ],
                 "genresHe": [
                   "פשע",
                   "דרמה ומתח"
                 ],
-                "seasonsCount": 5
+                "seasonsCount": 1
               }
             }
           },
@@ -487,7 +486,6 @@
               "seasonsCount": 13
             }
           },
-          "watchlistUpdatedAt": 1794528316365,
           "deletedProgressIds": {
             "27": 1794432189831,
             "10580": 1794432196249,
@@ -517,7 +515,8 @@
             "movie-103913": 1794432225027,
             "series-103913": 1794432225027
           },
-          "progressClearedAt": 1794432225027
+          "progressClearedAt": 1794432225027,
+          "watchlistUpdatedAt": 1794528316365
         },
         "prof-1794166536010": {
           "watchlist": [],
