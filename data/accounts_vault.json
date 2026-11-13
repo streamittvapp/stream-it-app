@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794551831278,
+      "updatedTs": 1794551843424,
       "subUsersUpdatedAt": 1794494905106,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -360,12 +360,12 @@
               "imdbId": "tt0903747",
               "tmdbId": "1396",
               "title": "שובר שורות",
-              "currentTime": 10,
+              "currentTime": 22,
               "duration": 3479,
               "percent": 3,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794551831278,
+              "updatedAt": 1794551843423,
               "snapshot": {
                 "id": "tt0903747",
                 "imdbId": "tt0903747",
