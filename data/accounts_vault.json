@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794565306314,
+      "updatedTs": 1794565344469,
       "subUsersUpdatedAt": 1794551843424,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -392,6 +392,45 @@
                 ],
                 "seasonsCount": 1
               }
+            },
+            "tt6263850": {
+              "id": "tt6263850",
+              "imdbId": "tt6263850",
+              "tmdbId": "533535",
+              "title": "דדפול ווולברין",
+              "currentTime": 255,
+              "duration": 7674,
+              "percent": 3,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794565344469,
+              "snapshot": {
+                "id": "tt6263850",
+                "imdbId": "tt6263850",
+                "tmdbId": "533535",
+                "type": "movie",
+                "title": "דדפול ווולברין",
+                "originalTitle": "Deadpool & Wolverine",
+                "year": "2024",
+                "rating": "7.9",
+                "runtimeHe": "2 שעות ו-08 דק'",
+                "ageRating": "16+",
+                "overview": "וייד וילסון נאלץ לעזוב את חייו השקטים כאשר רשות הזמן מאיימת למחוק את עולמו. הוא מגייס וולברין סרבן מיקום מקביל למסע פרוע שישנה את פני היקום הקולנועי.",
+                "poster": "https://images.metahub.space/poster/medium/tt6263850/img",
+                "backdrop": "https://images.metahub.space/background/medium/tt6263850/img",
+                "cardBackdrop": "https://images.metahub.space/background/medium/tt6263850/img",
+                "genres": [
+                  "action",
+                  "comedy",
+                  "scifi"
+                ],
+                "genresHe": [
+                  "אקשן",
+                  "קומדיה",
+                  "מדע בדיוני"
+                ],
+                "seasonsCount": 0
+              }
             }
           },
           "watchlistSnapshots": {
@@ -510,10 +549,10 @@
             "tt4565380": 1794432225027,
             "tt8190688": 1794432225027,
             "tt1745960": 1794432225027,
-            "tt6263850": 1794432225027,
             "tt10577736": 1794432225027,
             "movie-103913": 1794432225027,
-            "series-103913": 1794432225027
+            "series-103913": 1794432225027,
+            "tt6263850": 1794432225027
           },
           "progressClearedAt": 1794432225027,
           "watchlistUpdatedAt": 1794528316365
