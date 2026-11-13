@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794528639157,
+      "updatedTs": 1794528659139,
       "subUsersUpdatedAt": 1794494905106,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -317,12 +317,12 @@
               "imdbId": "tt1844624",
               "tmdbId": "1413",
               "title": "אימה אמריקאית",
-              "currentTime": 125,
+              "currentTime": 145,
               "duration": 1484,
-              "percent": 8,
+              "percent": 10,
               "season": 13,
               "episode": 6,
-              "updatedAt": 1794528639157,
+              "updatedAt": 1794528659139,
               "snapshot": {
                 "id": "series-1413",
                 "imdbId": "tt1844624",
