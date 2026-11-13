@@ -7857,3 +7857,232 @@ body.tv-mode .poster-card:not(.tv-focused) {
   font-size: 0.82rem !important;
   border-radius: 5px !important;
 }
+
+/* =========================================================================
+   v9.8.9: FULL-WINDOW 150% STREAMER ZOOM ONLY ON ?tv=1 TAB & EXACT 6-COLUMN FIT
+   Makes the ?tv=1 tab at 100% browser zoom look 100% identical to 150% browser zoom
+   (1280px logical width filling the entire window edge-to-edge) without affecting other tabs.
+   ========================================================================= */
+:root {
+  --tv-zoom: 1;
+}
+
+html.tv-desktop-simulator {
+  --tv-zoom: 1.5;
+  overflow: hidden !important;
+}
+
+body.tv-mode {
+  width: calc(100vw / var(--tv-zoom, 1)) !important;
+  height: calc(100vh / var(--tv-zoom, 1)) !important;
+  max-height: calc(100vh / var(--tv-zoom, 1)) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background-color: var(--bg-oled) !important;
+}
+
+html.tv-desktop-simulator body.tv-mode {
+  zoom: var(--tv-zoom, 1.5);
+}
+
+body.tv-mode #appBootLoader {
+  width: calc(100vw / var(--tv-zoom, 1)) !important;
+  height: calc(100vh / var(--tv-zoom, 1)) !important;
+}
+
+body.tv-mode #topHeader {
+  width: calc(100vw / var(--tv-zoom, 1)) !important;
+  height: 48px !important;
+  top: 0 !important;
+  right: 0 !important;
+  left: 0 !important;
+}
+
+body.tv-mode #topHeader .header-inner {
+  height: 48px !important;
+  padding: 0 calc((100vw / var(--tv-zoom, 1)) * 0.024) !important;
+}
+
+body.tv-mode #mainStage {
+  width: calc(100vw / var(--tv-zoom, 1)) !important;
+  height: calc(100vh / var(--tv-zoom, 1)) !important;
+  padding-top: 48px !important;
+  margin: 0 !important;
+}
+
+body.tv-mode #heroBillboard,
+body.tv-mode.tv-browsing-tiles #heroBillboard {
+  flex: 0 0 calc((100vh / var(--tv-zoom, 1)) * 0.36) !important;
+  height: calc((100vh / var(--tv-zoom, 1)) * 0.36) !important;
+  min-height: 215px !important;
+  max-height: 345px !important;
+  padding: 14px calc((100vw / var(--tv-zoom, 1)) * 0.026) 12px calc((100vw / var(--tv-zoom, 1)) * 0.026) !important;
+}
+
+body.tv-mode #heroBillboard .hero-content {
+  max-width: calc((100vw / var(--tv-zoom, 1)) * 0.64) !important;
+}
+
+body.tv-mode .hero-title,
+body.tv-mode.tv-browsing-tiles .hero-title {
+  font-size: 1.75rem !important;
+}
+
+body.tv-mode .hero-overview,
+body.tv-mode.tv-browsing-tiles .hero-overview {
+  max-width: calc((100vw / var(--tv-zoom, 1)) * 0.58) !important;
+}
+
+body.tv-mode #catalogMain,
+body.tv-mode.tv-browsing-tiles #catalogMain {
+  height: calc((100vh / var(--tv-zoom, 1)) * 0.64 - 48px) !important;
+  max-height: calc((100vh / var(--tv-zoom, 1)) * 0.64 - 48px) !important;
+}
+
+body.tv-mode #continueWatchingSection {
+  padding: 0 calc((100vw / var(--tv-zoom, 1)) * 0.024) !important;
+}
+
+body.tv-mode #catalogRowsContainer {
+  padding: 0 calc((100vw / var(--tv-zoom, 1)) * 0.024) calc((100vh / var(--tv-zoom, 1)) * 0.04) calc((100vw / var(--tv-zoom, 1)) * 0.024) !important;
+}
+
+/* Exact 6-Column Fit in Horizontal Shelves (5 gaps × 10px = 50px, zero 7th-card peeking) */
+.row-track > .poster-card,
+.row-track > .poster-card.top10-poster-card,
+body.tv-mode .row-track > .poster-card,
+body.tv-mode .row-track > .poster-card.top10-poster-card {
+  flex: 0 0 calc((100% - 50px) / 6) !important;
+  width: calc((100% - 50px) / 6) !important;
+  max-width: calc((100% - 50px) / 6) !important;
+  min-width: 0 !important;
+}
+
+@media (max-width: 1280px) {
+  body:not(.tv-mode) .row-track > .poster-card,
+  body:not(.tv-mode) .row-track > .poster-card.top10-poster-card {
+    flex: 0 0 calc((100% - 30px) / 4) !important;
+    width: calc((100% - 30px) / 4) !important;
+    max-width: calc((100% - 30px) / 4) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  body:not(.tv-mode) .row-track > .poster-card,
+  body:not(.tv-mode) .row-track > .poster-card.top10-poster-card {
+    flex: 0 0 calc((100% - 10px) / 2) !important;
+    width: calc((100% - 10px) / 2) !important;
+    max-width: calc((100% - 10px) / 2) !important;
+  }
+}
+
+/* Modals, Overlays, Player & Virtual Keyboard Scaled to 150% Streamer Viewport */
+body.tv-mode .modal-overlay {
+  width: calc(100vw / var(--tv-zoom, 1)) !important;
+  height: calc(100vh / var(--tv-zoom, 1)) !important;
+  padding: calc((100vh / var(--tv-zoom, 1)) * 0.03) calc((100vw / var(--tv-zoom, 1)) * 0.04) !important;
+}
+
+body.tv-mode #detailsModal .details-modal-sheet {
+  width: calc((100vw / var(--tv-zoom, 1)) * 0.82) !important;
+  max-width: 1060px !important;
+  max-height: calc((100vh / var(--tv-zoom, 1)) * 0.88) !important;
+}
+
+body.tv-mode .details-sources-dropdown-panel {
+  width: min(640px, calc((100vw / var(--tv-zoom, 1)) * 0.86)) !important;
+  max-height: calc((100vh / var(--tv-zoom, 1)) * 0.60) !important;
+}
+
+body.tv-mode .search-modal-sheet {
+  min-height: calc((100vh / var(--tv-zoom, 1)) * 0.86) !important;
+  max-height: calc((100vh / var(--tv-zoom, 1)) * 0.92) !important;
+}
+
+body.tv-mode .auth-modal-card {
+  max-height: calc((100vh / var(--tv-zoom, 1)) * 0.92) !important;
+}
+
+body.tv-mode.vk-open .auth-modal-card {
+  max-height: calc((100vh / var(--tv-zoom, 1)) * 0.54) !important;
+}
+
+body.tv-mode .tv-more-modal-card {
+  width: min(920px, calc((100vw / var(--tv-zoom, 1)) * 0.92)) !important;
+  max-width: min(920px, calc((100vw / var(--tv-zoom, 1)) * 0.92)) !important;
+  max-height: calc((100vh / var(--tv-zoom, 1)) * 0.88) !important;
+}
+
+body.tv-mode .tv-more-actors-grid {
+  max-height: calc((100vh / var(--tv-zoom, 1)) * 0.46) !important;
+}
+
+body.tv-mode .parental-modal-card {
+  width: calc((100vw / var(--tv-zoom, 1)) * 0.95) !important;
+  max-width: 1020px !important;
+  max-height: calc((100vh / var(--tv-zoom, 1)) * 0.94) !important;
+}
+
+body.tv-mode #playerModal,
+body.tv-mode .player-modal,
+body.tv-mode .player-stage {
+  width: calc(100vw / var(--tv-zoom, 1)) !important;
+  height: calc(100vh / var(--tv-zoom, 1)) !important;
+  padding: 0 !important;
+}
+
+body.tv-mode #playerModal .player-subs-menu {
+  max-width: calc((100vw / var(--tv-zoom, 1)) * 0.90) !important;
+  max-height: calc((100vh / var(--tv-zoom, 1)) - 58px) !important;
+}
+
+body.tv-mode #tvVirtualKeyboard,
+body.tv-mode .tv-virtual-keyboard {
+  width: calc(100vw / var(--tv-zoom, 1)) !important;
+  padding: 12px calc((100vw / var(--tv-zoom, 1)) * 0.03) 16px calc((100vw / var(--tv-zoom, 1)) * 0.03) !important;
+}
+
+/* =========================================================================
+   NETFLIX ROCKET GPU & COMPOSITOR ENGINE FOR ANDROID TV STREAMERS (v9.8.9)
+   - Off-screen row culling via content-visibility: auto
+   - Hardware-only translate3d/scale card transitions (0ms CPU rasterization)
+   - Zero Gaussian blur / brightness filters on budget Mali/Adreno TV GPUs
+   ========================================================================= */
+
+body.tv-mode #catalogRowsContainer > .netflix-row {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 150px;
+  contain: layout style;
+}
+
+body.tv-mode .poster-card {
+  transition: transform 0.09s cubic-bezier(0.2, 0, 0, 1) !important;
+  box-shadow: none !important;
+  filter: none !important;
+  backface-visibility: hidden;
+}
+
+body.tv-mode .poster-card.tv-focused,
+body.tv-mode .poster-card:focus {
+  outline: 2px solid #ffffff !important;
+  outline-offset: 0px !important;
+  border: 1px solid #e50914 !important;
+  box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.85) !important;
+  filter: none !important;
+  transform: translate3d(0, -3px, 0) scale(1.04) !important;
+  z-index: 35 !important;
+}
+
+body.tv-mode #topHeader,
+body.tv-mode #tvSideRail,
+body.tv-mode .modal-overlay,
+body.tv-mode .details-modal-sheet,
+body.tv-mode .search-modal-sheet,
+body.tv-mode .auth-modal-card,
+body.tv-mode .parental-modal-card,
+body.tv-mode .tv-virtual-keyboard {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+

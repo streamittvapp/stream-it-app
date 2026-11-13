@@ -12,7 +12,7 @@
 (function () {
   'use strict';
 
-  var NAV_VERSION = '9.8.8';
+  var NAV_VERSION = '9.8.9';
   try {
     var pendingOtaVer = localStorage.getItem('streamit_ota_version_v9') || '';
     var pendingOtaNav = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
@@ -65,11 +65,10 @@
     ]
   };
 
-  function detectTvEnvironment() {
+  var tvViewportListenerBound = false;
+
+  function isNativeTvDevice() {
     var ua = (navigator.userAgent || '').toLowerCase();
-    var params = new URLSearchParams(window.location.search);
-    if (params.get('tv') === '1') return true;
-    if (params.get('tv') === '0') return false;
     try {
       if (window.AndroidTvBridge && typeof window.AndroidTvBridge.isAndroidTv === 'function') {
         if (window.AndroidTvBridge.isAndroidTv()) return true;
@@ -78,17 +77,63 @@
     return /android tv|smarttv|smart-tv|googletv|bravia|aft|shield|mibox|chromecast|leanback|tizen|web0s|webos|netcast|vidaa|hisense|viera|aquos|wv/i.test(ua);
   }
 
+  function detectTvEnvironment() {
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('tv') === '1') return true;
+    if (params.get('tv') === '0') return false;
+    return isNativeTvDevice();
+  }
+
+  function getTvCanvasScale() {
+    if (!document.body || !document.body.classList.contains('tv-mode')) return 1;
+    var z = parseFloat(document.documentElement.style.getPropertyValue('--tv-zoom'));
+    return (z > 0.1 && isFinite(z)) ? z : 1;
+  }
+
+  function syncTvCanvasViewport() {
+    if (!document.body || !document.body.classList.contains('tv-mode')) return;
+    var existing = document.getElementById('tvSimulatorViewportBar');
+    if (existing && existing.parentNode) {
+      existing.parentNode.removeChild(existing);
+    }
+    var nativeTv = isNativeTvDevice();
+    var vw = window.innerWidth || 1920;
+    var zoomFactor = 1;
+    if (!nativeTv) {
+      // Automatically scale the ?tv=1 tab to 1280px logical Streamer width (150% on a 1920px desktop browser at 100% browser zoom)
+      zoomFactor = Math.max(1, vw / 1280);
+    }
+    document.documentElement.style.setProperty('--tv-zoom', zoomFactor.toFixed(4));
+    document.body.style.zoom = zoomFactor !== 1 ? zoomFactor.toFixed(4) : '';
+  }
+
   function applyTvModeClass() {
     if (!document.body) return;
     if (detectTvEnvironment()) {
+      document.documentElement.classList.add('tv-mode-html');
+      if (!isNativeTvDevice()) {
+        document.documentElement.classList.add('tv-desktop-simulator');
+      }
       document.body.classList.add('tv-mode');
+      syncTvCanvasViewport();
+      if (!tvViewportListenerBound) {
+        tvViewportListenerBound = true;
+        window.addEventListener('resize', syncTvCanvasViewport);
+      }
+    } else {
+      document.documentElement.classList.remove('tv-mode-html', 'tv-desktop-simulator');
+      document.body.classList.remove('tv-mode');
+      document.documentElement.style.removeProperty('--tv-zoom');
+      document.body.style.zoom = '';
     }
   }
 
   function isElementVisible(el) {
     if (!el || !el.isConnected || el.disabled) return false;
     if (el.classList.contains('hidden')) return false;
-    if (el.classList.contains('poster-card')) {
+    if (el.classList.contains('poster-card') || el.classList.contains('netflix-row')) {
+      var hiddenAncestor = el.closest('.hidden');
+      if (hiddenAncestor) return false;
       var modalParent = el.closest('.modal-overlay');
       return !modalParent || !modalParent.classList.contains('hidden');
     }
@@ -159,6 +204,61 @@
     options = options || {};
 
     var prevFocused = currentFocused;
+    var isTv = Boolean(document.body && document.body.classList.contains('tv-mode'));
+    var pRow = el.closest('.netflix-row');
+    var tvScale = getTvCanvasScale();
+
+    // 1. READ PHASE FIRST (Zero Forced Synchronous Layout Reflow!):
+    // Read all bounding rects BEFORE mutating .tv-focused or .rail-open classes so Chromium uses the cached layout frame in <0.02ms.
+    var stripOrTrack = (options.scroll !== false) ? el.closest('.row-track, .genre-filter-strip') : null;
+    var shiftX = 0;
+    if (stripOrTrack) {
+      var itemRect = el.getBoundingClientRect();
+      var trackRect = stripOrTrack.getBoundingClientRect();
+      var edgePad = 10 * tvScale;
+      if (itemRect.left < trackRect.left + edgePad) {
+        shiftX = itemRect.left - (trackRect.left + edgePad);
+      } else if (itemRect.right > trackRect.right - edgePad) {
+        shiftX = itemRect.right - (trackRect.right - edgePad);
+      }
+    }
+
+    var prevRow = prevFocused ? prevFocused.closest('.netflix-row') : null;
+    var curRow = pRow;
+    var sameNetflixRow = Boolean(prevRow && curRow && prevRow === curRow);
+    var scrollContainer = null;
+    var nextScrollTop = null;
+    var resetMainScrollTop = false;
+
+    if (options.scroll !== false && !sameNetflixRow) {
+      var scrollTarget = curRow || el;
+      scrollContainer = el.closest('#tvRailListsScroll, #catalogMain, .details-modal-sheet, .search-modal-sheet, .auth-modal-card, .parental-modal-card, #parentalControlModal, #searchModal, #tvMoreModal, .explorer-dropdown-panel');
+      if (scrollContainer) {
+        var cRect = scrollContainer.getBoundingClientRect();
+        var tRect = scrollTarget.getBoundingClientRect();
+        var pad = 20 * tvScale;
+        var cwSecEl = document.getElementById('continueWatchingSection');
+        var cwVisible = Boolean(cwSecEl && !cwSecEl.classList.contains('hidden'));
+        var isTopFirstRow = Boolean(
+          curRow &&
+          (curRow.id === 'continueWatchingSection' ||
+            (!cwVisible && !curRow.previousElementSibling && curRow.parentElement && curRow.parentElement.id === 'catalogRowsContainer'))
+        );
+        if (scrollContainer.id === 'catalogMain' && (el.closest('#heroBillboard') || isTopFirstRow)) {
+          if (scrollContainer.scrollTop > 0) {
+            nextScrollTop = 0;
+          }
+        } else if (tRect.bottom > cRect.bottom - pad) {
+          nextScrollTop = scrollContainer.scrollTop + (tRect.bottom - (cRect.bottom - pad)) / tvScale;
+        } else if (tRect.top < cRect.top + pad) {
+          nextScrollTop = Math.max(0, scrollContainer.scrollTop - ((cRect.top + pad) - tRect.top) / tvScale);
+        }
+      } else if (el.closest('#heroBillboard') || el.closest('#topHeader')) {
+        resetMainScrollTop = true;
+      }
+    }
+
+    // 2. WRITE PHASE (Mutate classes & scroll positions together in a single batch)
     if (prevFocused && prevFocused !== el) {
       prevFocused.classList.remove('tv-focused');
     }
@@ -169,12 +269,14 @@
       el.setAttribute('tabindex', '0');
     }
 
-    var isTv = Boolean(document.body && document.body.classList.contains('tv-mode'));
     var sideRailEl = document.getElementById('tvSideRail');
     var inRailNow = Boolean(sideRailEl && sideRailEl.contains(el));
     if (sideRailEl) {
-      sideRailEl.classList.toggle('rail-open', inRailNow);
-      if (document.body) {
+      var wasRailOpen = sideRailEl.classList.contains('rail-open');
+      if (wasRailOpen !== inRailNow) {
+        sideRailEl.classList.toggle('rail-open', inRailNow);
+      }
+      if (document.body && document.body.classList.contains('tv-rail-expanded')) {
         document.body.classList.remove('tv-rail-expanded');
       }
     }
@@ -207,7 +309,6 @@
     }
 
     // Record lightweight O(1) descriptor without querying full DOM on every key press
-    var pRow = el.closest('.netflix-row');
     lastFocusedDescriptor = {
       id: el.id || '',
       itemId: el.getAttribute('data-item-id') || '',
@@ -225,52 +326,16 @@
       inHero: Boolean(el.closest('#heroBillboard'))
     };
 
-    // Horizontal strip or row scrolling — only scroll when the focused card is actually clipped at the left/right edge!
-    // Never shift the track when moving among the 6 already-visible cards on screen.
-    var stripOrTrack = el.closest('.row-track, .genre-filter-strip');
-    if (stripOrTrack && options.scroll !== false) {
-      var itemRect = el.getBoundingClientRect();
-      var trackRect = stripOrTrack.getBoundingClientRect();
-      var edgePad = 10;
-      var shiftX = 0;
-      if (itemRect.left < trackRect.left + edgePad) {
-        shiftX = itemRect.left - (trackRect.left + edgePad);
-      } else if (itemRect.right > trackRect.right - edgePad) {
-        shiftX = itemRect.right - (trackRect.right - edgePad);
-      }
-      if (Math.abs(shiftX) > 2) {
-        stripOrTrack.scrollLeft += shiftX;
-      }
+    if (stripOrTrack && Math.abs(shiftX) > 2) {
+      stripOrTrack.scrollLeft += shiftX / tvScale;
     }
 
-    // Vertical scrolling — clean, non-jerky viewport alignment
-    if (options.scroll !== false) {
-      var prevRow = prevFocused ? prevFocused.closest('.netflix-row') : null;
-      var curRow = pRow;
-      var sameNetflixRow = Boolean(prevRow && curRow && prevRow === curRow);
-      if (!sameNetflixRow) {
-        var scrollTarget = curRow || el;
-        var scrollContainer = el.closest('#tvRailListsScroll, #catalogMain, .details-modal-sheet, .search-modal-sheet, .auth-modal-card, .parental-modal-card, #parentalControlModal, #searchModal, #tvMoreModal, .explorer-dropdown-panel');
-        if (scrollContainer) {
-          var cRect = scrollContainer.getBoundingClientRect();
-          var tRect = scrollTarget.getBoundingClientRect();
-          var pad = 20;
-          var isTopFirstRow = Boolean(curRow && !curRow.previousElementSibling && curRow.parentElement && curRow.parentElement.id === 'catalogRowsContainer');
-          if (scrollContainer.id === 'catalogMain' && (el.closest('#heroBillboard') || isTopFirstRow)) {
-            if (scrollContainer.scrollTop > 0) {
-              scrollContainer.scrollTop = 0;
-            }
-          } else if (tRect.bottom > cRect.bottom - pad) {
-            scrollContainer.scrollTop += (tRect.bottom - (cRect.bottom - pad));
-          } else if (tRect.top < cRect.top + pad) {
-            scrollContainer.scrollTop = Math.max(0, scrollContainer.scrollTop - ((cRect.top + pad) - tRect.top));
-          }
-        } else if (el.closest('#heroBillboard') || el.closest('#topHeader')) {
-          var catMainEl = document.getElementById('catalogMain');
-          if (catMainEl && catMainEl.scrollTop > 0) catMainEl.scrollTop = 0;
-          if (window.scrollY > 0) window.scrollTo(0, 0);
-        }
-      }
+    if (scrollContainer && nextScrollTop !== null) {
+      scrollContainer.scrollTop = nextScrollTop;
+    } else if (resetMainScrollTop) {
+      var catMainEl = document.getElementById('catalogMain');
+      if (catMainEl && catMainEl.scrollTop > 0) catMainEl.scrollTop = 0;
+      if (window.scrollY > 0) window.scrollTo(0, 0);
     }
 
     // Debounced Live Hero Stage update when focusing a poster card on Smart TV (prevents backdrop decode stutter!)
@@ -280,7 +345,7 @@
         if (currentFocused === el) {
           window.previewCardInHero(el);
         }
-      }, isTv ? 650 : 280);
+      }, isTv ? 520 : 260);
     }
 
     return true;
@@ -988,66 +1053,7 @@
    * Handles: Top Header, Side Rail, Hero Stage, Explorer Bar, Continue Watching Actions, Horizontal Rows, and Poster Grid
    */
   function navigateHomeStage(direction) {
-    // Ultra-fast O(1) sibling shortcut when moving horizontally or vertically between shelf rows
-    if (currentFocused && currentFocused.classList.contains('poster-card') && currentFocused.parentElement && currentFocused.parentElement.classList.contains('row-track')) {
-      var parentTrack = currentFocused.parentElement;
-      if (direction === 'left') {
-        var nextSiblingCard = currentFocused.nextElementSibling;
-        if (nextSiblingCard && nextSiblingCard.classList.contains('poster-card')) {
-          return setFocus(nextSiblingCard);
-        }
-        return true;
-      }
-      if (direction === 'right') {
-        var prevSiblingCard = currentFocused.previousElementSibling;
-        if (prevSiblingCard && prevSiblingCard.classList.contains('poster-card')) {
-          return setFocus(prevSiblingCard);
-        }
-      }
-      var parentRowFast = parentTrack.closest('.netflix-row');
-      if (parentRowFast && !currentFocused.classList.contains('cw-poster-card')) {
-        if (direction === 'down') {
-          var nextRowFast = parentRowFast.nextElementSibling;
-          if (nextRowFast && nextRowFast.classList.contains('netflix-row')) {
-            var curIdxDown = Array.prototype.indexOf.call(parentTrack.children, currentFocused);
-            var nextTrackCards = nextRowFast.querySelectorAll('.poster-card');
-            if (nextTrackCards.length) {
-              return setFocus(nextTrackCards[Math.min(Math.max(0, curIdxDown), nextTrackCards.length - 1)]);
-            }
-          }
-        } else if (direction === 'up') {
-          var prevRowFast = parentRowFast.previousElementSibling;
-          if (prevRowFast && prevRowFast.classList.contains('netflix-row')) {
-            var curIdxUp = Array.prototype.indexOf.call(parentTrack.children, currentFocused);
-            var prevTrackCards = prevRowFast.querySelectorAll('.poster-card');
-            if (prevTrackCards.length) {
-              return setFocus(prevTrackCards[Math.min(Math.max(0, curIdxUp), prevTrackCards.length - 1)]);
-            }
-          }
-        }
-      }
-    }
-
-    var topHeader = document.getElementById('topHeader');
     var sideRail = document.getElementById('tvSideRail');
-    var heroStage = document.getElementById('heroBillboard');
-    var explorerBar = document.getElementById('catalogExplorerBar');
-    var catalogMain = document.getElementById('catalogMain');
-
-    var isTvMode = Boolean(document.body && document.body.classList.contains('tv-mode'));
-    var headerSelector = isTvMode
-      ? '.main-nav .nav-link, #headerQuickSearchInput, #openSearchBtn, #userSettingsMenuBtn'
-      : '#brandLogo, .main-nav .nav-link, #headerQuickSearchInput, #openSearchBtn, #userSettingsMenuBtn';
-    var headerItems = topHeader
-      ? Array.prototype.slice.call(
-          topHeader.querySelectorAll(headerSelector)
-        ).filter(isElementVisible)
-      : [];
-    var railBtns = sideRail ? Array.prototype.slice.call(sideRail.querySelectorAll('.tv-focusable')).filter(isElementVisible) : [];
-    var heroBtns = heroStage ? Array.prototype.slice.call(heroStage.querySelectorAll('.tv-focusable')).filter(isElementVisible) : [];
-    var rows = catalogMain ? Array.prototype.slice.call(catalogMain.querySelectorAll('.netflix-row')).filter(isElementVisible) : [];
-    var wallGrid = catalogMain ? catalogMain.querySelector('.catalog-poster-grid') : null;
-    var loadMoreBtn = document.getElementById('loadMoreCatalogBtn');
 
     function focusPreferredRailItem() {
       if (!sideRail) return false;
@@ -1067,6 +1073,85 @@
       }
       return false;
     }
+
+    // Ultra-fast O(1) sibling shortcut when moving horizontally or vertically between shelf rows (including Continue Watching!)
+    if (currentFocused && currentFocused.classList.contains('poster-card') && currentFocused.parentElement && currentFocused.parentElement.classList.contains('row-track')) {
+      var parentTrack = currentFocused.parentElement;
+      if (direction === 'left') {
+        var nextSiblingCard = currentFocused.nextElementSibling;
+        if (nextSiblingCard && nextSiblingCard.classList.contains('poster-card')) {
+          return setFocus(nextSiblingCard);
+        }
+        return true;
+      }
+      if (direction === 'right') {
+        var prevSiblingCard = currentFocused.previousElementSibling;
+        if (prevSiblingCard && prevSiblingCard.classList.contains('poster-card')) {
+          return setFocus(prevSiblingCard);
+        }
+        if (focusPreferredRailItem()) return true;
+        return true;
+      }
+      var parentRowFast = parentTrack.closest('.netflix-row');
+      if (parentRowFast) {
+        var curCardIdx = Array.prototype.indexOf.call(parentTrack.children, currentFocused);
+        if (direction === 'down') {
+          var nextRowFast = parentRowFast.nextElementSibling;
+          if (!nextRowFast && parentRowFast.id === 'continueWatchingSection') {
+            var catRowsWrap = document.getElementById('catalogRowsContainer');
+            nextRowFast = catRowsWrap ? catRowsWrap.querySelector('.netflix-row:not(.hidden)') : null;
+          }
+          if (nextRowFast && nextRowFast.classList.contains('netflix-row') && !nextRowFast.classList.contains('hidden')) {
+            var nextTrackCards = nextRowFast.querySelectorAll('.poster-card');
+            if (nextTrackCards.length) {
+              return setFocus(nextTrackCards[Math.min(Math.max(0, curCardIdx), nextTrackCards.length - 1)]);
+            }
+          }
+        } else if (direction === 'up') {
+          if (currentFocused.classList.contains('cw-poster-card')) {
+            var cwInfoFast = currentFocused.querySelector('.cw-card-info-btn');
+            var cwRemFast = currentFocused.querySelector('.cw-card-remove-btn');
+            var clearCwFast = document.getElementById('clearContinueWatchingBtn');
+            if (cwInfoFast && isElementVisible(cwInfoFast)) return setFocus(cwInfoFast);
+            if (cwRemFast && isElementVisible(cwRemFast)) return setFocus(cwRemFast);
+            if (clearCwFast && isElementVisible(clearCwFast)) return setFocus(clearCwFast);
+          } else {
+            var prevRowFast = parentRowFast.previousElementSibling;
+            if (!prevRowFast && parentRowFast.parentElement && parentRowFast.parentElement.id === 'catalogRowsContainer') {
+              var cwSecUp = document.getElementById('continueWatchingSection');
+              if (cwSecUp && !cwSecUp.classList.contains('hidden')) {
+                prevRowFast = cwSecUp;
+              }
+            }
+            if (prevRowFast && prevRowFast.classList.contains('netflix-row') && !prevRowFast.classList.contains('hidden')) {
+              var prevTrackCards = prevRowFast.querySelectorAll('.poster-card');
+              if (prevTrackCards.length) {
+                return setFocus(prevTrackCards[Math.min(Math.max(0, curCardIdx), prevTrackCards.length - 1)]);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    var topHeader = document.getElementById('topHeader');
+    var heroStage = document.getElementById('heroBillboard');
+    var explorerBar = document.getElementById('catalogExplorerBar');
+    var catalogMain = document.getElementById('catalogMain');
+
+    var isTvMode = Boolean(document.body && document.body.classList.contains('tv-mode'));
+    var headerSelector = isTvMode
+      ? '.main-nav .nav-link, #headerQuickSearchInput, #openSearchBtn, #userSettingsMenuBtn'
+      : '#brandLogo, .main-nav .nav-link, #headerQuickSearchInput, #openSearchBtn, #userSettingsMenuBtn';
+    var headerItems = topHeader
+      ? Array.prototype.slice.call(
+          topHeader.querySelectorAll(headerSelector)
+        ).filter(isElementVisible)
+      : [];
+    var heroBtns = heroStage ? Array.prototype.slice.call(heroStage.querySelectorAll('.tv-focusable')).filter(isElementVisible) : [];
+    var rows = catalogMain ? Array.prototype.slice.call(catalogMain.querySelectorAll('.netflix-row')).filter(isElementVisible) : [];
+    var wallGrid = catalogMain ? catalogMain.querySelector('.catalog-poster-grid') : null;
+    var loadMoreBtn = document.getElementById('loadMoreCatalogBtn');
 
     function focusMainStageFromRail() {
       if (sideRail) sideRail.classList.remove('rail-open');

@@ -1,10 +1,10 @@
 {
-  "version": "9.8.8",
+  "version": "9.8.9",
   "native_apk_version": "9.8.8",
   "apk_download_url": "https://streamittvapp.github.io/stream-it-app/StreamIt-AndroidTV.apk",
   "apk_short_url": "https://is.gd/streamitapk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-12T17:20:00Z",
-  "notes": "v9.8.8 — Fix Android TV Streamer performance & playback: eliminate duplicate OTA script execution, remove synchronous UI-thread JNI blocking, fast 0.3s direct stream resolution, and strict playbackSessionId teardown so exiting a movie stops all audio/video immediately."
+  "updated_at": "2026-11-13T11:50:00Z",
+  "notes": "v9.8.9 — Netflix Rocket Performance Engine for Android TV Streamers: O(1) D-Pad navigation with zero forced layout reflows, SHA-gated Cloud Vault sync (eliminating 25s DOM rebuilds), w300/w780 GPU texture optimization, off-screen row culling, and automatic 150% full-window Streamer simulation on ?tv=1."
 }

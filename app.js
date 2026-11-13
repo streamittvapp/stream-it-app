@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.8.8';
+  var APP_VERSION = '9.8.9';
 
   // If a strictly newer OTA script is stored in localStorage and index.html is about to inject it,
   // skip running this older bundled script completely so two versions of app.js NEVER run in parallel!
@@ -26,8 +26,10 @@
     window.__STREAMIT_V985_BOOTED ||
     window.__STREAMIT_V986_BOOTED ||
     window.__STREAMIT_V987_BOOTED ||
-    window.__STREAMIT_V988_BOOTED
+    window.__STREAMIT_V988_BOOTED ||
+    window.__STREAMIT_V989_BOOTED
   );
+  window.__STREAMIT_V989_BOOTED = true;
   window.__STREAMIT_V988_BOOTED = true;
   window.__STREAMIT_V987_BOOTED = true;
   window.__STREAMIT_V986_BOOTED = true;
@@ -59,7 +61,8 @@
   window.__STREAMIT_V968_BOOTED = true;
   window.__STREAMIT_V969_BOOTED = true;
   window.__STREAMIT_V970_BOOTED = true;
-  // Synchronously block any older bundled v9.7.0-v9.8.7 script from firing its DOMContentLoaded boot handler after OTA loads!
+  // Synchronously block any older bundled v9.7.0-v9.8.8 script from firing its DOMContentLoaded boot handler after OTA loads!
+  window.__STREAMIT_V988_BOOT_DONE = true;
   window.__STREAMIT_V987_BOOT_DONE = true;
   window.__STREAMIT_V986_BOOT_DONE = true;
   window.__STREAMIT_V985_BOOT_DONE = true;
@@ -2357,6 +2360,8 @@
 
   async function syncAccountStateFromCloudVault() {
     if (!state.user || !state.user.email) return false;
+    var pModal = document.getElementById('playerModal');
+    if (pModal && !pModal.classList.contains('hidden')) return false;
     var cleanEmail = String(state.user.email).trim().toLowerCase();
     try {
       var tk = getCloudVaultSyncToken();
@@ -2368,14 +2373,21 @@
       });
       if (ghRes.ok) {
         var ghMeta = await ghRes.json();
+        if (ghMeta && ghMeta.sha && state.lastSyncedVaultSha === ghMeta.sha && state.lastSyncedVaultEmail === cleanEmail) {
+          return false;
+        }
         if (ghMeta && ghMeta.content) {
+          if (ghMeta.sha) {
+            state.lastSyncedVaultSha = ghMeta.sha;
+            state.lastSyncedVaultEmail = cleanEmail;
+          }
           var rawJson = decodeURIComponent(escape(atob(String(ghMeta.content).replace(/\s/g, ''))));
           var ghVault = JSON.parse(rawJson);
           if (ghVault && typeof ghVault === 'object') {
             if (ghVault._system_config && typeof ghVault._system_config === 'object') {
               var localSysTs = (state.systemConfig && state.systemConfig.updatedTs) ? Number(state.systemConfig.updatedTs) : 0;
               var cloudSysTs = Number(ghVault._system_config.updatedTs || 0);
-              if (cloudSysTs >= localSysTs) {
+              if (cloudSysTs > localSysTs) {
                 try {
                   localStorage.setItem('streamit_system_config_v9', JSON.stringify(ghVault._system_config));
                 } catch (e) {}
@@ -2389,10 +2401,16 @@
                 try { localStorage.setItem('streamit_user_v9', JSON.stringify(state.user)); } catch (e) {}
               }
               if (rec.accountState && typeof rec.accountState === 'object') {
+                var incomingTs = Number(rec.accountState.updatedTs || 0);
+                var prevAppliedTs = Number(state.lastAppliedCloudAccountTs || 0);
+                var shouldReRender = (prevAppliedTs === 0) || (incomingTs > prevAppliedTs);
                 applyCloudAccountStateToLocal(rec.accountState);
+                state.lastAppliedCloudAccountTs = Math.max(prevAppliedTs, incomingTs, 1);
                 updateAuthUi();
                 applySubtitleStyleToOverlay();
-                renderCatalogShelves();
+                if (shouldReRender) {
+                  renderCatalogShelves();
+                }
                 return true;
               } else {
                 // First time this account connects from a device with local state -> push local state to Cloud Vault!
@@ -2464,7 +2482,7 @@
 
       var contentStr = JSON.stringify(remoteVault, null, 2);
       var b64Content = btoa(unescape(encodeURIComponent(contentStr)));
-      await fetch(apiUrl, {
+      var putRes = await fetch(apiUrl, {
         method: 'PUT',
         headers: {
           'Authorization': 'token ' + tk,
@@ -2477,6 +2495,22 @@
           sha: sha
         })
       });
+      if (putRes && putRes.ok) {
+        try {
+          var putJson = await putRes.json();
+          if (putJson && putJson.content && putJson.content.sha) {
+            state.lastSyncedVaultSha = putJson.content.sha;
+            state.lastSyncedVaultEmail = cleanEmail;
+          }
+        } catch (ePut) {}
+      }
+      if (remoteVault[cleanEmail] && remoteVault[cleanEmail].accountState) {
+        state.lastAppliedCloudAccountTs = Math.max(
+          Number(state.lastAppliedCloudAccountTs || 0),
+          Number(remoteVault[cleanEmail].accountState.updatedTs || 0),
+          1
+        );
+      }
       state.accountCloudSyncInFlight = false;
       return true;
     } catch (e) {
@@ -3213,13 +3247,16 @@
     ];
 
     var saveCatalogCacheSnapshot = function () {
-      try {
-        localStorage.setItem('streamit_enriched_catalog_cache_v987', JSON.stringify({
-          ts: Date.now(),
-          movies: (state.catalog.movies || []).slice(0, 1200),
-          series: (state.catalog.series || []).slice(0, 650)
-        }));
-      } catch (e) {}
+      var isTvCache = Boolean(document.body && document.body.classList.contains('tv-mode'));
+      setTimeout(function () {
+        try {
+          localStorage.setItem('streamit_enriched_catalog_cache_v987', JSON.stringify({
+            ts: Date.now(),
+            movies: (state.catalog.movies || []).slice(0, isTvCache ? 260 : 1200),
+            series: (state.catalog.series || []).slice(0, isTvCache ? 160 : 650)
+          }));
+        } catch (e) {}
+      }, 60);
     };
 
     try {
@@ -3247,11 +3284,18 @@
       ready: 'done'
     });
 
-    // 5. Deferred Background Enrichment — runs quietly in small non-blocking chunks and NEVER wipes the DOM while the user is navigating on the Streamer!
+    // 5. Deferred Background Enrichment — runs quietly in small non-blocking chunks and NEVER starves the Streamer CPU/GPU while navigating!
     setTimeout(async function () {
+      var isTv = Boolean(document.body && document.body.classList.contains('tv-mode'));
+      if (isTv && (hadCachedEnriched || (state.catalog.movies && state.catalog.movies.length >= 160))) {
+        checkCloudOtaUpdates();
+        return;
+      }
+      var queriesToRun = isTv ? secondaryTmdbQueries.slice(0, 12) : secondaryTmdbQueries;
+      var chunkSize = isTv ? 3 : 6;
       try {
-        for (var bIdx = 0; bIdx < secondaryTmdbQueries.length; bIdx += 6) {
-          var chunk = secondaryTmdbQueries.slice(bIdx, bIdx + 6);
+        for (var bIdx = 0; bIdx < queriesToRun.length; bIdx += chunkSize) {
+          var chunk = queriesToRun.slice(bIdx, bIdx + chunkSize);
           await Promise.all(chunk.map(async function (q) {
             try {
               var r = await fetch(TMDB_BASE + q.url + '&api_key=' + TMDB_API_KEY);
@@ -3262,14 +3306,18 @@
               }
             } catch (err) {}
           }));
+          if (isTv) {
+            await new Promise(function (res) { setTimeout(res, 180); });
+          }
         }
         saveCatalogCacheSnapshot();
-        var isTv = Boolean(document.body && document.body.classList.contains('tv-mode'));
         if (!isTv || !state.initialStageRendered || state.activeCategory !== 'all') {
           scheduleRenderCatalogShelves(250);
         }
       } catch (e) {}
-      fetchWorldSwarmCatalogs();
+      if (!isTv) {
+        fetchWorldSwarmCatalogs();
+      }
       checkCloudOtaUpdates();
     }, 1800);
   }
@@ -5042,9 +5090,11 @@
     } catch (e) {}
   }
 
-  function updateHeroBillboard(item) {
+  function updateHeroBillboard(item, options) {
     if (!item) return;
+    options = options || {};
     state.heroItem = item;
+    var isTvHero = Boolean(document.body && document.body.classList.contains('tv-mode'));
 
     var backdropEl = document.getElementById('heroBackdrop');
     var catTagEl = document.getElementById('heroCategoryTag');
@@ -5055,8 +5105,11 @@
 
     if (backdropEl) {
       var bgUrl = item.backdrop || item.poster || '';
-      if (document.body && document.body.classList.contains('tv-mode')) {
-        if (backdropEl.getAttribute('data-bg-url') !== bgUrl && bgUrl) {
+      if (isTvHero && bgUrl) {
+        bgUrl = String(bgUrl)
+          .replace('/t/p/original/', '/t/p/w780/')
+          .replace('/t/p/w1280/', '/t/p/w780/');
+        if (backdropEl.getAttribute('data-bg-url') !== bgUrl) {
           backdropEl.setAttribute('data-bg-url', bgUrl);
           var preImg = new Image();
           preImg.onload = function () {
@@ -5112,6 +5165,11 @@
         '<span id="heroWatchlistText">' + (inWl ? 'ברשימה שלי' : 'הרשימה שלי') + '</span>';
     }
 
+    // In TV mode card-focus preview, skip background TMDB/OpenSubtitles network calls so D-Pad navigation stays 100% network-free
+    if (isTvHero && options.fromCardPreview) {
+      return;
+    }
+
     // Live Series Seasons Resolver for Hero Banner: fetch exact `number_of_seasons` from TMDB `/tv/{id}`
     if (item.type === 'series' && !item._realSeasonsLoaded && !item._seasonsFetchInFlight) {
       item._seasonsFetchInFlight = true;
@@ -5140,7 +5198,7 @@
     if (!cardEl) return;
     var itemId = cardEl.getAttribute('data-item-id');
     var item = findItemById(itemId);
-    if (item) updateHeroBillboard(item);
+    if (item) updateHeroBillboard(item, { fromCardPreview: true });
   };
 
   function findItemById(id) {
@@ -6282,15 +6340,26 @@
         '</button>';
     }
 
+    var isTvCard = Boolean(document.body && document.body.classList.contains('tv-mode'));
+    var targetTmdbSize = isTvCard ? '/t/p/w300/' : '/t/p/w500/';
     var tileImg = item.cardBackdrop || item.backdrop || item.poster;
-    if (tileImg && String(tileImg).indexOf('/t/p/original/') !== -1) {
-      tileImg = String(tileImg).replace('/t/p/original/', '/t/p/w500/');
-    } else if (tileImg && String(tileImg).indexOf('/t/p/w1280/') !== -1) {
-      tileImg = String(tileImg).replace('/t/p/w1280/', '/t/p/w500/');
-    } else if (tileImg && String(tileImg).indexOf('/t/p/w780/') !== -1) {
-      tileImg = String(tileImg).replace('/t/p/w780/', '/t/p/w500/');
+    if (tileImg) {
+      tileImg = String(tileImg)
+        .replace('/t/p/original/', targetTmdbSize)
+        .replace('/t/p/w1280/', targetTmdbSize)
+        .replace('/t/p/w780/', targetTmdbSize);
+      if (isTvCard) {
+        tileImg = tileImg.replace('/t/p/w500/', '/t/p/w300/');
+      }
     }
     var fallbackPoster = item.poster || item.backdrop || '';
+    if (fallbackPoster && isTvCard) {
+      fallbackPoster = String(fallbackPoster)
+        .replace('/t/p/original/', '/t/p/w300/')
+        .replace('/t/p/w1280/', '/t/p/w300/')
+        .replace('/t/p/w780/', '/t/p/w300/')
+        .replace('/t/p/w500/', '/t/p/w300/');
+    }
     var leadingGenresText = getItemLeadingGenresText(item, 2, ' / ');
 
     return (
@@ -6399,7 +6468,15 @@
     var wlBtn = document.getElementById('detailsWatchlistBtn');
     var epSection = document.getElementById('detailsEpisodesSection');
 
-    if (backdrop) backdrop.style.backgroundImage = 'url("' + (item.backdrop || item.poster) + '")';
+    if (backdrop) {
+      var detBg = item.backdrop || item.poster || '';
+      if (detBg && document.body && document.body.classList.contains('tv-mode')) {
+        detBg = String(detBg)
+          .replace('/t/p/original/', '/t/p/w780/')
+          .replace('/t/p/w1280/', '/t/p/w780/');
+      }
+      backdrop.style.backgroundImage = 'url("' + detBg + '")';
+    }
     if (catTag) catTag.textContent = item.type === 'series' ? 'סדרת טלוויזיה' : 'סרט קולנוע';
     if (title) title.textContent = item.title;
     if (origTitle) {
@@ -9805,8 +9882,16 @@
       cueEl.textContent = cueTxt ? cueTxt.replace(/\n/g, ' ') : (state.playingItem ? state.playingItem.title : '');
     }
 
-    var vw = window.innerWidth || 1280;
-    var clampedX = Math.max(150, Math.min(vw - 150, clientX || Math.round(vw / 2)));
+    var isTv = Boolean(document.body && document.body.classList.contains('tv-mode'));
+    var vw = isTv ? 1280 : (window.innerWidth || 1280);
+    var localX = clientX || Math.round(vw / 2);
+    if (isTv && clientX && document.body) {
+      var bRect = document.body.getBoundingClientRect();
+      if (bRect && bRect.width > 0) {
+        localX = Math.round(((clientX - bRect.left) / bRect.width) * 1280);
+      }
+    }
+    var clampedX = Math.max(150, Math.min(vw - 150, localX));
     previewEl.style.left = clampedX + 'px';
     previewEl.classList.remove('hidden');
 
@@ -13571,7 +13656,8 @@
   }
 
   function bootStreamItApp() {
-    if (window.__STREAMIT_V988_BOOT_DONE) return;
+    if (window.__STREAMIT_V989_BOOT_DONE) return;
+    window.__STREAMIT_V989_BOOT_DONE = true;
     window.__STREAMIT_V988_BOOT_DONE = true;
     window.__STREAMIT_V987_BOOT_DONE = true;
     window.__STREAMIT_V986_BOOT_DONE = true;
