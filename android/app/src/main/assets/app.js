@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.8.9';
+  var APP_VERSION = '9.9.0';
 
   // If a strictly newer OTA script is stored in localStorage and index.html is about to inject it,
   // skip running this older bundled script completely so two versions of app.js NEVER run in parallel!
@@ -27,8 +27,10 @@
     window.__STREAMIT_V986_BOOTED ||
     window.__STREAMIT_V987_BOOTED ||
     window.__STREAMIT_V988_BOOTED ||
-    window.__STREAMIT_V989_BOOTED
+    window.__STREAMIT_V989_BOOTED ||
+    window.__STREAMIT_V990_BOOTED
   );
+  window.__STREAMIT_V990_BOOTED = true;
   window.__STREAMIT_V989_BOOTED = true;
   window.__STREAMIT_V988_BOOTED = true;
   window.__STREAMIT_V987_BOOTED = true;
@@ -10258,11 +10260,29 @@
     renderSubUsersGrid();
     renderUserSettingsQuickProfiles();
 
+    var urlQrCode = '';
+    try {
+      urlQrCode = String(new URLSearchParams(window.location.search || '').get('qr_pair') || '').replace(/[^0-9A-Za-z]/g, '').slice(0, 8);
+    } catch (e) {}
+
+    if (urlQrCode && !window.__qrPairDismissedByUser) {
+      document.body.classList.add('auth-gate-locked');
+      var qrBootLoader = document.getElementById('appBootLoader');
+      if (qrBootLoader) qrBootLoader.classList.add('boot-complete');
+      if (authModal) authModal.classList.remove('hidden');
+      if (typeof window.initStreamItQrPairing === 'function') {
+        window.initStreamItQrPairing();
+      }
+      return;
+    }
+
     if (state.user && state.user.name) {
       document.body.classList.remove('auth-gate-locked');
       if (label) label.textContent = activeProf ? activeProf.name : state.user.name;
       if (form) form.classList.add('hidden');
       if (accountBox) accountBox.classList.remove('hidden');
+      var pairedBox = document.getElementById('qrMobilePairedSuccessBox');
+      if (pairedBox) pairedBox.classList.add('hidden');
       if (userDisplay) {
         userDisplay.textContent = 'מחובר: ' + state.user.name + ' • פרופיל פעיל: ' + (activeProf ? activeProf.name : 'ראשי');
       }
@@ -10277,6 +10297,8 @@
       if (label) label.textContent = 'התחברות';
       if (form) form.classList.remove('hidden');
       if (accountBox) accountBox.classList.add('hidden');
+      var pairedBoxOut = document.getElementById('qrMobilePairedSuccessBox');
+      if (pairedBoxOut) pairedBoxOut.classList.add('hidden');
       var emailIn = document.getElementById('authEmailInput');
       var passIn = document.getElementById('authPasswordInput');
       if (emailIn) {
@@ -12569,6 +12591,49 @@
       }
     }
 
+    var forceMobileLoginForm = false;
+
+    function showMobileQrPairedConfirmation(pairCode, accountUser, isConnecting) {
+      var authModal = document.getElementById('authModal');
+      var form = document.getElementById('authForm');
+      var accountBox = document.getElementById('authAccountBox');
+      var subSec = document.getElementById('subUsersSection');
+      var authDiv = document.querySelector('#authModal .auth-divider');
+      var heading = document.getElementById('authModalHeading');
+      var pairedBox = document.getElementById('qrMobilePairedSuccessBox');
+      var pIcon = document.getElementById('qrMobilePairedIcon');
+      var pTitle = document.getElementById('qrMobilePairedTitle');
+      var pDesc = document.getElementById('qrMobilePairedDesc');
+      var pCode = document.getElementById('qrMobilePairedCodeVal');
+      var bootLoader = document.getElementById('appBootLoader');
+
+      if (bootLoader) bootLoader.classList.add('boot-complete');
+      document.body.classList.add('auth-gate-locked');
+      if (authModal) authModal.classList.remove('hidden');
+      if (form) form.classList.add('hidden');
+      if (accountBox) accountBox.classList.add('hidden');
+      if (subSec) subSec.classList.add('hidden');
+      if (authDiv) authDiv.classList.add('hidden');
+      if (heading) heading.textContent = 'חיבור מהיר לסטרימר באמצעות QR';
+      if (pairedBox) pairedBox.classList.remove('hidden');
+      if (pCode) pCode.textContent = pairCode || '----';
+
+      var uName = (accountUser && (accountUser.name || accountUser.email)) || 'המשתמש שלך';
+      if (isConnecting) {
+        if (pIcon) pIcon.textContent = '⏳';
+        if (pTitle) pTitle.textContent = 'מחבר את הסטרימר שלך כעת...';
+        if (pDesc) {
+          pDesc.innerHTML = 'מאמת ומחבר אוטומטית את המסך (קוד <strong>' + escapeHtml(pairCode) + '</strong>) לחשבון של <strong>' + escapeHtml(uName) + '</strong>...';
+        }
+      } else {
+        if (pIcon) pIcon.textContent = '✅';
+        if (pTitle) pTitle.textContent = 'התחברת בהצלחה! הטלוויזיה שלך מחוברת כעת';
+        if (pDesc) {
+          pDesc.innerHTML = 'הסטרימר (קוד מסך <strong>' + escapeHtml(pairCode) + '</strong>) חובר לחשבון של <strong>' + escapeHtml(uName) + '</strong> וייכנס אוטומטית למסך הראשי תוך שניות ספורות.';
+        }
+      }
+    }
+
     function completeLoginWithVerifiedAccount(verifiedAccount) {
       var emailIn = document.getElementById('authEmailInput');
       var passIn = document.getElementById('authPasswordInput');
@@ -12591,10 +12656,17 @@
       if (verifiedAccount.accountState && typeof verifiedAccount.accountState === 'object') {
         applyCloudAccountStateToLocal(verifiedAccount.accountState);
       }
-      updateAuthUi();
       renderInitialStage();
       syncAccountStateFromCloudVault().catch(function () {});
       if (typeof window.closeStreamItKeyboard === 'function') window.closeStreamItKeyboard();
+
+      if (incomingMobileQrCode && !window.__qrPairDismissedByUser) {
+        forceMobileLoginForm = false;
+        showMobileQrPairedConfirmation(incomingMobileQrCode, state.user, false);
+        return;
+      }
+
+      updateAuthUi();
       var am = document.getElementById('authModal');
       if (am) am.classList.add('hidden');
       var heroPlay = document.getElementById('heroPlayBtn');
@@ -12609,28 +12681,50 @@
       var mobileDesc = document.getElementById('qrMobileApproveDesc');
       var qrBox = document.getElementById('authQrPairBox');
       var submitBtnText = document.getElementById('authSubmitBtnText');
+      var pairedBox = document.getElementById('qrMobilePairedSuccessBox');
+      var form = document.getElementById('authForm');
+      var accountBox = document.getElementById('authAccountBox');
+      var subSec = document.getElementById('subUsersSection');
+      var authDiv = document.querySelector('#authModal .auth-divider');
+      var heading = document.getElementById('authModalHeading');
 
-      if (scannedCode) {
+      if (scannedCode && !window.__qrPairDismissedByUser) {
         incomingMobileQrCode = scannedCode;
         if (qrBox) qrBox.classList.add('hidden');
-        if (mobileBanner) {
-          mobileBanner.classList.remove('hidden');
-          if (mobileDesc) {
-            mobileDesc.innerHTML = 'סרקת קוד מסך <strong>' + scannedCode + '</strong>. הזן את פרטי המנוי שלך ולחץ על <strong>"אשר וחבר את המסך"</strong> כדי לחבר את הטלוויזיה/המחשב באופן אוטומטי.';
-          }
-        }
-        if (submitBtnText) submitBtnText.textContent = 'אשר וחבר את המסך (' + scannedCode + ')';
+        if (subSec) subSec.classList.add('hidden');
+        if (authDiv) authDiv.classList.add('hidden');
+        if (heading) heading.textContent = 'חיבור מהיר לסטרימר באמצעות QR';
 
-        // If the phone is already logged into an account, approve the screen immediately!
-        if (state.user && state.user.email) {
-          approveQrPairOnCloudVault(scannedCode, state.user).then(function (ok) {
-            if (ok && typeof showCinemaToast === 'function') {
+        // Case 1: Phone is ALREADY logged into a STREAM IT account (and didn't request account switch)
+        if (state.user && state.user.email && !forceMobileLoginForm) {
+          showMobileQrPairedConfirmation(scannedCode, state.user, true);
+          approveQrPairOnCloudVault(scannedCode, state.user).then(function () {
+            showMobileQrPairedConfirmation(scannedCode, state.user, false);
+            if (typeof showCinemaToast === 'function') {
               showCinemaToast('📱 המסך (קוד ' + scannedCode + ') חובר בהצלחה לחשבון שלך!');
             }
           });
+          return;
         }
+
+        // Case 2: Phone needs login (or clicked "Switch Account")
+        if (pairedBox) pairedBox.classList.add('hidden');
+        if (accountBox) accountBox.classList.add('hidden');
+        if (form) form.classList.remove('hidden');
+        if (mobileBanner) {
+          mobileBanner.classList.remove('hidden');
+          if (mobileDesc) {
+            mobileDesc.innerHTML = 'סרקת קוד מסך <strong>' + escapeHtml(scannedCode) + '</strong>. הזן את האימייל והסיסמה שלך ולחץ על <strong>"אשר וחבר את הטלוויזיה"</strong> כדי לחבר את הסטרימר באופן אוטומטי.';
+          }
+        }
+        if (submitBtnText) submitBtnText.textContent = 'אשר וחבר את הטלוויזיה (קוד ' + scannedCode + ')';
         return;
       }
+
+      if (pairedBox) pairedBox.classList.add('hidden');
+      if (mobileBanner) mobileBanner.classList.add('hidden');
+      if (qrBox) qrBox.classList.remove('hidden');
+      if (submitBtnText) submitBtnText.textContent = 'התחבר לחשבון';
 
       if (!activeQrPairCode) {
         try {
@@ -12649,8 +12743,14 @@
       if (codeLabel) codeLabel.textContent = activeQrPairCode;
       if (qrImg) {
         var pairTargetUrl = 'https://streamittvapp.github.io/stream-it-app/?qr_pair=' + encodeURIComponent(activeQrPairCode);
-        var qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=6&data=' + encodeURIComponent(pairTargetUrl);
-        if (qrImg.getAttribute('src') !== qrApiUrl) {
+        var qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=6&data=' + encodeURIComponent(pairTargetUrl);
+        var qrFallbackUrl = 'https://quickchart.io/qr?size=200&margin=1&text=' + encodeURIComponent(pairTargetUrl);
+        qrImg.onerror = function () {
+          if (qrImg.getAttribute('src') !== qrFallbackUrl) {
+            qrImg.setAttribute('src', qrFallbackUrl);
+          }
+        };
+        if (qrImg.getAttribute('src') !== qrApiUrl && qrImg.getAttribute('src') !== qrFallbackUrl) {
           qrImg.setAttribute('src', qrApiUrl);
         }
       }
@@ -12695,6 +12795,39 @@
       }, 3000);
     }
     window.initStreamItQrPairing = initStreamItQrPairing;
+
+    var qrContinueBtn = document.getElementById('qrMobileContinueToAppBtn');
+    if (qrContinueBtn) {
+      qrContinueBtn.addEventListener('click', function () {
+        window.__qrPairDismissedByUser = true;
+        incomingMobileQrCode = '';
+        try {
+          var cleanUrl = window.location.pathname + window.location.hash;
+          window.history.replaceState({}, document.title, cleanUrl);
+        } catch (e) {}
+        var subSec = document.getElementById('subUsersSection');
+        var authDiv = document.querySelector('#authModal .auth-divider');
+        var heading = document.getElementById('authModalHeading');
+        if (subSec) subSec.classList.remove('hidden');
+        if (authDiv) authDiv.classList.remove('hidden');
+        if (heading) heading.textContent = 'פרופילים וחשבון STREAM IT';
+        updateAuthUi();
+        var am = document.getElementById('authModal');
+        if (am && state.user && state.user.name) {
+          am.classList.add('hidden');
+        }
+      });
+    }
+
+    var qrSwitchBtn = document.getElementById('qrMobileSwitchAccountBtn');
+    if (qrSwitchBtn) {
+      qrSwitchBtn.addEventListener('click', function () {
+        forceMobileLoginForm = true;
+        initStreamItQrPairing();
+        var emailIn = document.getElementById('authEmailInput');
+        if (emailIn) emailIn.focus();
+      });
+    }
 
     var isSubmittingAuthForm = false;
     async function submitAuthLoginForm(e) {
@@ -13333,6 +13466,60 @@
       subActionsRow.appendChild(authParBtn);
     }
 
+    // Ensure QR Pairing Box & Mobile Confirmation Screen exist inside #authModal even on older Streamer APK DOMs
+    var authFormEl = document.getElementById('authForm');
+    if (authFormEl) {
+      if (!document.getElementById('qrMobileApproveBanner')) {
+        var qrBanner = document.createElement('div');
+        qrBanner.id = 'qrMobileApproveBanner';
+        qrBanner.className = 'qr-mobile-approve-banner hidden';
+        qrBanner.innerHTML =
+          '<div class="qr-mobile-approve-badge">📱 חיבור מהיר של מסך באמצעות QR</div>' +
+          '<p id="qrMobileApproveDesc" class="qr-mobile-approve-desc">הזן את פרטי המנוי שלך בטלפון ולחץ על <strong>"התחבר לחשבון"</strong> כדי לחבר את המסך שסרקת באופן אוטומטי.</p>';
+        authFormEl.insertBefore(qrBanner, authFormEl.firstChild);
+      }
+      var submitBtnEl = document.getElementById('authSubmitBtn');
+      if (submitBtnEl && !document.getElementById('authSubmitBtnText')) {
+        submitBtnEl.innerHTML = '<span id="authSubmitBtnText">התחבר לחשבון</span>';
+      }
+      if (!document.getElementById('authQrPairBox')) {
+        var qrPairDiv = document.createElement('div');
+        qrPairDiv.id = 'authQrPairBox';
+        qrPairDiv.className = 'auth-qr-pair-box';
+        qrPairDiv.innerHTML =
+          '<div class="auth-qr-img-wrap">' +
+            '<img id="authQrCodeImg" class="auth-qr-img" src="" alt="קוד QR להתחברות מהירה מהטלפון" />' +
+          '</div>' +
+          '<div class="auth-qr-info">' +
+            '<div class="auth-qr-title">התחברות מהירה באמצעות QR מהטלפון</div>' +
+            '<p class="auth-qr-sub">סרוק את קוד ה-QR עם מצלמת הטלפון והתחבר מהנייד — המסך בסטרימר יתחבר אוטומטית תוך שניות.</p>' +
+            '<div class="auth-qr-code-pill">קוד צימוד מסך: <strong id="authQrPairCodeLabel" dir="ltr">----</strong></div>' +
+          '</div>';
+        authFormEl.appendChild(qrPairDiv);
+      }
+    }
+    var authCardEl = document.querySelector('#authModal .auth-modal-card');
+    if (authCardEl && !document.getElementById('qrMobilePairedSuccessBox')) {
+      var qrSuccessDiv = document.createElement('div');
+      qrSuccessDiv.id = 'qrMobilePairedSuccessBox';
+      qrSuccessDiv.className = 'qr-mobile-paired-success-box hidden';
+      qrSuccessDiv.innerHTML =
+        '<div id="qrMobilePairedIcon" class="qr-mobile-paired-icon">⏳</div>' +
+        '<h3 id="qrMobilePairedTitle" class="qr-mobile-paired-title">מחבר את הטלוויזיה שלך...</h3>' +
+        '<p id="qrMobilePairedDesc" class="qr-mobile-paired-desc">מאמת את חיבור המסך מול שרת הענן של STREAM IT, נא להמתין שנייה...</p>' +
+        '<div class="qr-mobile-paired-code-badge">קוד צימוד מסך: <strong id="qrMobilePairedCodeVal" dir="ltr">----</strong></div>' +
+        '<div class="qr-mobile-paired-actions">' +
+          '<button type="button" id="qrMobileContinueToAppBtn" class="btn-primary qr-mobile-action-btn tv-focusable"><span>המשך לאפליקציה בטלפון</span></button>' +
+          '<button type="button" id="qrMobileSwitchAccountBtn" class="btn-secondary qr-mobile-action-btn tv-focusable"><span>התחבר עם חשבון אחר</span></button>' +
+        '</div>';
+      var statusMsgEl = document.getElementById('authStatusMsg');
+      if (statusMsgEl && statusMsgEl.parentNode === authCardEl) {
+        authCardEl.insertBefore(qrSuccessDiv, statusMsgEl);
+      } else {
+        authCardEl.appendChild(qrSuccessDiv);
+      }
+    }
+
     if (playerStage && !document.getElementById('playerExitConfirmModal')) {
       var exitDiv = document.createElement('div');
       exitDiv.id = 'playerExitConfirmModal';
@@ -13656,7 +13843,8 @@
   }
 
   function bootStreamItApp() {
-    if (window.__STREAMIT_V989_BOOT_DONE) return;
+    if (window.__STREAMIT_V990_BOOT_DONE) return;
+    window.__STREAMIT_V990_BOOT_DONE = true;
     window.__STREAMIT_V989_BOOT_DONE = true;
     window.__STREAMIT_V988_BOOT_DONE = true;
     window.__STREAMIT_V987_BOOT_DONE = true;
@@ -13685,9 +13873,9 @@
     initTvTopClock();
     updateVersionBadgesUi();
     loadLocalStorageState();
+    bindUiEvents();
     updateAuthUi();
     updateVersionBadgesUi();
-    bindUiEvents();
     initLiveNewsTicker();
     loadCatalog();
     syncAccountStateFromCloudVault().catch(function () {});

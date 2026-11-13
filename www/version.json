@@ -1,10 +1,10 @@
 {
-  "version": "9.8.9",
+  "version": "9.9.0",
   "native_apk_version": "9.8.8",
   "apk_download_url": "https://streamittvapp.github.io/stream-it-app/StreamIt-AndroidTV.apk",
   "apk_short_url": "https://is.gd/streamitapk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-13T11:50:00Z",
-  "notes": "v9.8.9 — Netflix Rocket Performance Engine for Android TV Streamers: O(1) D-Pad navigation with zero forced layout reflows, SHA-gated Cloud Vault sync (eliminating 25s DOM rebuilds), w300/w780 GPU texture optimization, off-screen row culling, and automatic 150% full-window Streamer simulation on ?tv=1."
+  "updated_at": "2026-11-13T12:28:00Z",
+  "notes": "v9.9.0 — 1px Remote Focus Borders (Red on grey buttons / White on red buttons) + Streamer QR Code DOM Injection & Dedicated Mobile Phone QR Pairing Confirmation Screen."
 }

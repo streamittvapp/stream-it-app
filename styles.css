@@ -3476,10 +3476,10 @@ body.tv-mode #detailsModal .ep-desc {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-top: 8px;
+  margin-top: 6px;
   padding: 12px 14px;
   background-color: #0d1017;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-right: 3px solid #e50914;
 }
 
@@ -3561,6 +3561,70 @@ body.tv-mode #detailsModal .ep-desc {
   font-weight: 300;
   color: #d4d4d8;
   line-height: 1.45;
+}
+
+.qr-mobile-paired-success-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 22px 18px;
+  background-color: #11151f;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-top: 3px solid #e50914;
+}
+
+.qr-mobile-paired-icon {
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.qr-mobile-paired-title {
+  font-size: 1.18rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.qr-mobile-paired-desc {
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: #cbd5e1;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 440px;
+}
+
+.qr-mobile-paired-code-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background-color: #181d2b;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  font-size: 0.88rem;
+  color: #e4e4e7;
+}
+
+.qr-mobile-paired-code-badge strong {
+  color: #ffffff;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  font-size: 1rem;
+}
+
+.qr-mobile-paired-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin-top: 6px;
+}
+
+.qr-mobile-action-btn {
+  width: 100%;
+  height: 44px;
 }
 
 body.vk-open .auth-qr-pair-box {
@@ -8085,4 +8149,208 @@ body.tv-mode .tv-virtual-keyboard {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
+
+/* =========================================================================
+   UNIFIED 1PX REMOTE FOCUS BORDER SYSTEM FOR ALL SYSTEM BUTTONS
+   - Grey / Dark System Buttons: 1px solid Red (#e50914) border on focus
+   - Red System Buttons: 1px solid White (#ffffff) border on focus
+   ========================================================================= */
+
+/* Reserve 1px transparent border on borderless buttons so focus never shifts layout by 1px */
+body.tv-mode #topHeader .nav-link,
+body.tv-mode #topHeader .brand-logo,
+body.tv-mode .hero-actions .btn-primary,
+body.tv-mode .hero-actions .btn-secondary,
+body.tv-mode #tvSideRail .tv-rail-search-btn,
+body.tv-mode #tvSideRail .tv-rail-search-clear-btn,
+body.tv-mode #tvSideRail .tv-rail-sec-header,
+body.tv-mode #tvSideRail .tv-rail-item,
+.nav-link,
+.btn-primary,
+.btn-secondary,
+.icon-btn,
+.modal-close-btn,
+.genre-chip-btn,
+.provider-chip-btn,
+.year-chip-btn,
+.actor-chip-btn,
+.actor-photo-card,
+.explorer-dropdown-btn,
+.season-tab-btn,
+.source-tab-btn,
+.player-btn,
+.subs-chip-btn,
+.sub-track-btn,
+.sub-track-item,
+#playerModal .subs-list-container button {
+  border: 1px solid transparent;
+  box-sizing: border-box;
+}
+
+/* 1. ALL GREY / DARK SYSTEM BUTTONS -> 1PX RED BORDER (#e50914) ON FOCUS */
+button.tv-focused:not(.poster-card),
+.tv-focusable.tv-focused:not(.poster-card):not(.channel-tile-card):not(.episode-card):not(.tg-post-card):not(.player-seek-slider),
+body.tv-mode button.tv-focused:not(.poster-card),
+body.tv-mode .tv-focusable.tv-focused:not(.poster-card):not(.channel-tile-card):not(.episode-card):not(.tg-post-card):not(.player-seek-slider),
+body.tv-mode #topHeader .nav-link.tv-focused,
+body.tv-mode #topHeader .brand-logo.tv-focused,
+body.tv-mode #brandLogo.tv-focused,
+#topHeader .nav-link.tv-focused,
+#topHeader .header-auth-btn.tv-focused,
+#topHeader .header-icon-btn.tv-focused,
+#userSettingsMenuBtn.tv-focused,
+#headerQuickSearchInput.tv-focused,
+body.tv-mode .hero-actions .btn-primary.tv-focused,
+body.tv-mode .hero-actions .btn-secondary.tv-focused,
+#heroBillboard .btn-primary.tv-focused,
+#heroBillboard .btn-secondary.tv-focused,
+#heroPlayBtn.tv-focused,
+#heroInfoBtn.tv-focused,
+#heroWatchlistBtn.tv-focused,
+body.tv-mode #tvSideRail .tv-rail-search-btn.tv-focused,
+body.tv-mode #tvSideRail .tv-rail-search-clear-btn.tv-focused,
+body.tv-mode #tvSideRail .tv-mini-vk-key.tv-focused,
+body.tv-mode #tvSideRail .tv-mini-vk-act.tv-focused,
+body.tv-mode #tvSideRail .tv-rail-sec-header.tv-focused,
+body.tv-mode #tvSideRail .tv-rail-item.tv-focused:not(.tv-rail-platform-card),
+body.tv-mode #tvSideRail .tv-rail-platform-card.tv-focused:not(.active),
+body.tv-mode #tvSideRail .tv-rail-bottom-btn.tv-focused,
+#clearContinueWatchingBtn.tv-focused,
+.cw-clear-all-btn.tv-focused,
+.cw-card-info-btn.tv-focused,
+.cw-card-remove-btn.tv-focused,
+.explorer-dropdown-btn.tv-focused:not(.open),
+.genre-chip-btn.tv-focused:not(.active),
+.provider-chip-btn.tv-focused:not(.active),
+.year-chip-btn.tv-focused:not(.active),
+.actor-chip-btn.tv-focused:not(.active),
+.actor-photo-card.tv-focused:not(.active),
+.filter-tab.tv-focused:not(.active),
+#loadMoreCatalogBtn.tv-focused,
+.catalog-load-more-btn.tv-focused,
+.modal-close-btn.tv-focused,
+#detailsModal .modal-close-btn.tv-focused,
+#detailsModal .btn-secondary.tv-focused,
+#detailsModal .details-sources-btn.tv-focused:not(.open),
+#detailsModal .season-tab-btn.tv-focused:not(.active),
+.stream-source-card.tv-focused,
+#playerModal .player-top-actions > button.tv-focused:not(#closePlayerBtn):not(.shield-active),
+#playerModal .player-top-actions .details-sources-btn.tv-focused:not(.open),
+#playerModal .player-btn.tv-focused:not(.player-primary-btn),
+#playerModal .source-tab-btn.tv-focused:not(.active),
+#playerModal .subs-chip-btn.tv-focused:not(.active),
+#playerModal .sub-track-item.tv-focused:not(.active),
+#playerModal .sub-track-btn.tv-focused:not(.active),
+#playerModal .subs-list-container button.tv-focused:not(.active),
+#playerExitConfirmModal .player-exit-btn.tv-focused,
+#clearCwConfirmModal .player-exit-btn.tv-focused,
+.player-exit-btn.tv-focused,
+.user-menu-item.tv-focused,
+.user-menu-item.user-menu-tg-btn.tv-focused,
+.user-menu-prof-chip.tv-focused,
+.user-menu-profile-chip.tv-focused,
+.sub-user-card.tv-focused,
+.sub-user-action-btn.tv-focused,
+.kids-toggle-btn.tv-focused:not(.active):not([aria-pressed="true"]),
+.btn-quick-login.tv-focused,
+.auth-quick-account-btn.tv-focused,
+.form-inline-btn.tv-focused,
+.form-input.tv-focused,
+.tv-more-tab-btn.tv-focused,
+.tv-more-action-card.tv-focused,
+.tv-more-action-tile.tv-focused,
+.tv-more-actor-input.tv-focused,
+.tv-more-actors-grid .actor-photo-card.tv-focused:not(.active),
+.parental-bulk-btn.tv-focused,
+.parental-profile-tab.tv-focused,
+.parental-prof-tab.tv-focused,
+.parental-switch-btn.tv-focused:not(.active):not([aria-checked="true"]),
+.parental-master-switch-btn.tv-focused:not([aria-pressed="true"]),
+.parental-cat-card.tv-focused,
+.parental-seg-btn.tv-focused:not(.active),
+.parental-pin-btn.tv-focused,
+.parental-pin-save-btn.tv-focused,
+.parental-pin-clear-btn.tv-focused,
+.player-parental-quick-chip.tv-focused,
+#tvVirtualKeyboard .vk-key.tv-focused,
+#tvVirtualKeyboard .vk-action-btn.tv-focused:not(.vk-done-btn),
+#tvVirtualKeyboard .vk-top-act-btn.tv-focused,
+#tvVirtualKeyboard .vk-quick-btn.tv-focused:not(.vk-quick-submit-btn) {
+  border: 1px solid #e50914 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background-color: #222736 !important;
+  color: #ffffff !important;
+}
+
+#playerExitConfirmModal .player-exit-btn.tv-focused span,
+#clearCwConfirmModal .player-exit-btn.tv-focused span,
+.player-exit-btn.tv-focused span,
+.explorer-dropdown-btn.tv-focused .icon-svg,
+.explorer-dropdown-btn.tv-focused .dropdown-prefix,
+.explorer-dropdown-btn.tv-focused .dropdown-value,
+.user-menu-item.tv-focused .icon-svg,
+.user-menu-item.tv-focused .user-menu-item-sub {
+  color: #ffffff !important;
+}
+
+/* 2. ALL RED SYSTEM BUTTONS -> STAY RED + 1PX WHITE BORDER (#ffffff) ON FOCUS */
+body.tv-mode #detailsModal .details-actions .btn-primary.tv-focused,
+#detailsModal .details-actions .btn-primary.tv-focused,
+#detailsPlayBtn.tv-focused,
+#openSearchBtn.tv-focused,
+.header-search-submit-btn.tv-focused,
+.actor-search-submit-btn.tv-focused,
+.tv-more-actor-btn.tv-focused,
+#tvMoreActorSearchBtn.tv-focused,
+.auth-submit-btn.tv-focused,
+#authSubmitBtn.tv-focused,
+#tvVirtualKeyboard .vk-done-btn.tv-focused,
+#vkDoneBtn.tv-focused,
+.vk-quick-submit-btn.tv-focused,
+#playerModal #closePlayerBtn.tv-focused,
+#closePlayerBtn.tv-focused,
+#playerModal .player-primary-btn.tv-focused,
+.player-primary-btn.tv-focused,
+.resume-restart-btn.tv-focused,
+#resumeRestartFromZeroBtn.tv-focused,
+#parentalShieldSkipNowBtn.tv-focused,
+.parental-shield-skip-btn.tv-focused,
+.sub-user-delete-btn.tv-focused,
+.user-menu-prof-del-btn.tv-focused,
+.tg-channel-remove-btn.tv-focused,
+.details-remove-cw-btn.tv-focused,
+.parental-mark-skip-btn.tv-focused,
+body.tv-mode #tvSideRail .tv-rail-platform-card.active.tv-focused,
+#tvSideRail .tv-rail-platform-card.active.tv-focused,
+.genre-chip-btn.active.tv-focused,
+.provider-chip-btn.active.tv-focused,
+.year-chip-btn.active.tv-focused,
+.actor-chip-btn.active.tv-focused,
+.actor-photo-card.active.tv-focused,
+.filter-tab.active.tv-focused,
+#detailsModal .season-tab-btn.active.tv-focused,
+.season-tab-btn.active.tv-focused,
+.details-sources-btn.open.tv-focused,
+#playerModal .source-tab-btn.active.tv-focused,
+.source-tab-btn.active.tv-focused,
+#playerModal .subs-chip-btn.active.tv-focused,
+#playerModal .sub-track-item.active.tv-focused,
+#playerModal .sub-track-btn.active.tv-focused,
+#playerModal .subs-list-container button.active.tv-focused,
+.kids-toggle-btn.active.tv-focused,
+.kids-toggle-btn[aria-pressed="true"].tv-focused,
+.parental-switch-btn.active.tv-focused,
+.parental-switch-btn[aria-checked="true"].tv-focused,
+.parental-master-switch-btn[aria-pressed="true"].tv-focused,
+.parental-seg-btn.active.tv-focused,
+#playerTopParentalBtn.shield-active.tv-focused,
+.player-parental-pill-btn.parental-active.tv-focused {
+  background-color: #e50914 !important;
+  color: #ffffff !important;
+  border: 1px solid #ffffff !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 
