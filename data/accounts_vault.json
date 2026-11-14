@@ -822,12 +822,12 @@
     "disabledTelegramChannels": {}
   },
   "__qr_pairings": {
-    "4633": {
+    "5005": {
       "email": "bensahaltv@gmail.com",
       "name": "BENSAHAL TV",
       "role": "admin",
       "max_profiles": 5,
-      "ts": 1794678849495
+      "ts": 1794690221954
     }
   }
 }
