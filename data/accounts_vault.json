@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794684685036,
+      "updatedTs": 1794684704061,
       "subUsersUpdatedAt": 1794551843424,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -514,12 +514,12 @@
               "imdbId": "tt0111161",
               "tmdbId": "278",
               "title": "חומות של תקווה",
-              "currentTime": 18,
+              "currentTime": 35,
               "duration": 8553,
               "percent": 3,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794684685032,
+              "updatedAt": 1794684704061,
               "snapshot": {
                 "id": "tt0111161",
                 "imdbId": "tt0111161",
