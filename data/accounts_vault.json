@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794691373250,
+      "updatedTs": 1794691391159,
       "subUsersUpdatedAt": 1794551843424,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -354,12 +354,12 @@
               "imdbId": "tt15398776",
               "tmdbId": "872585",
               "title": "אופנהיימר",
-              "currentTime": 24,
+              "currentTime": 130,
               "duration": 10786,
               "percent": 3,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794691373249,
+              "updatedAt": 1794691391159,
               "snapshot": {
                 "id": "tt15398776",
                 "imdbId": "tt15398776",
