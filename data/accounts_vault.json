@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794694813957,
+      "updatedTs": 1794694824157,
       "subUsersUpdatedAt": 1794551843424,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -472,12 +472,12 @@
               "imdbId": "tt1431045",
               "tmdbId": "293660",
               "title": "דדפול",
-              "currentTime": 1915,
+              "currentTime": 1925,
               "duration": 6486,
               "percent": 30,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794694813957,
+              "updatedAt": 1794694824157,
               "snapshot": {
                 "id": "movie-293660",
                 "imdbId": "tt1431045",
@@ -919,8 +919,8 @@
         }
       },
       "subPrefs": {
-        "size": "normal",
-        "fontPx": 28,
+        "size": "large",
+        "fontPx": 32,
         "color": "white",
         "bg": "none",
         "bottomPct": 9.5
