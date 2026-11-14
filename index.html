@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
-  <link rel="stylesheet" href="styles.css?v=9.9.0" />
+  <link rel="stylesheet" href="styles.css?v=9.9.1" />
   <script>
     (function () {
       try {
@@ -34,13 +34,13 @@
           });
         }
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (!otaVer || otaVer <= '9.8.8') {
+        if (!otaVer || otaVer <= '9.9.0') {
           localStorage.removeItem('streamit_ota_css_v9');
           localStorage.removeItem('streamit_ota_app_js_v9');
           localStorage.removeItem('streamit_ota_tv_nav_v9');
         }
         var otaCss = localStorage.getItem('streamit_ota_css_v9') || '';
-        if (otaVer && otaVer > '9.9.0' && otaCss.length > 500) {
+        if (otaVer && otaVer > '9.9.1' && otaCss.length > 500) {
           var st = document.createElement('style');
           st.id = 'streamit-ota-live-style-v9';
           st.textContent = otaCss;
@@ -134,12 +134,13 @@
           <button type="button" class="nav-link active tv-focusable" data-category="all" aria-label="ראשי">ראשי</button>
           <button type="button" class="nav-link tv-focusable" data-category="movies" aria-label="סרטים">סרטים</button>
           <button type="button" class="nav-link tv-focusable" data-category="series" aria-label="סדרות">סדרות</button>
+          <button type="button" class="nav-link tv-focusable" data-category="viva" aria-label="ויוה, דרמות טורקיות וטלנובלות">ויוה וטורקיות</button>
           <button type="button" class="nav-link tv-focusable" data-category="telegram" aria-label="סרטים וסדרות מטלגרם">טלגרם VOD</button>
           <button type="button" class="nav-link tv-focusable" data-category="channels" aria-label="ערוצים">ערוצים</button>
           <button type="button" class="nav-link tv-focusable" data-category="youtube" aria-label="יוטיוב">יוטיוב</button>
           <button type="button" class="nav-link tv-focusable" data-category="mylist" aria-label="הרשימה שלי">הרשימה שלי</button>
           <span id="tvTopClock" class="tv-top-clock" dir="ltr" aria-label="שעה נוכחית"></span>
-          <span id="appVersionBadge" class="app-version-badge" dir="ltr" aria-label="גרסת מערכת">v9.9.0</span>
+          <span id="appVersionBadge" class="app-version-badge" dir="ltr" aria-label="גרסת מערכת">v9.9.1</span>
         </nav>
       </div>
 
@@ -355,7 +356,7 @@
         </svg>
         <span id="tvRailProfileName" class="tv-rail-profile-name">ראשי</span>
       </button>
-      <span id="tvRailVersionBadge" class="tv-rail-version-badge" dir="ltr">v9.9.0</span>
+      <span id="tvRailVersionBadge" class="tv-rail-version-badge" dir="ltr">v9.9.1</span>
       <button type="button" id="tvRailSettingsBtn" class="tv-rail-bottom-btn tv-rail-settings-btn tv-focusable" aria-label="הגדרות">
         <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
           <circle cx="12" cy="12" r="3" />
@@ -1668,17 +1669,32 @@
     </div>
   </div>
 
+  <!-- ===================================================================== -->
+  <!-- APP EXIT CONFIRMATION MODAL (#appExitConfirmModal)                    -->
+  <!-- Prevents Back button at Home root from abruptly killing the app       -->
+  <!-- ===================================================================== -->
+  <div id="appExitConfirmModal" class="player-exit-confirm-overlay app-exit-confirm-overlay hidden" dir="rtl" role="dialog" aria-modal="true" aria-labelledby="appExitConfirmHeading">
+    <div class="player-exit-confirm-card">
+      <h3 id="appExitConfirmHeading" class="player-exit-confirm-title">לצאת מ-STREAM IT?</h3>
+      <p class="player-exit-confirm-sub">אתה נמצא במסך הראשי של STREAM IT. האם ברצונך להישאר באפליקציה או לצאת למסך הראשי של הסטרימר?</p>
+      <div class="player-exit-confirm-actions">
+        <button type="button" id="appExitCancelBtn" class="btn-primary player-exit-btn tv-focusable">הישאר באפליקציה</button>
+        <button type="button" id="appExitConfirmBtn" class="btn-secondary player-exit-btn tv-focusable">צא למסך הסטרימר</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notifications Container -->
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Core Application & Smart TV Navigation Scripts -->
-  <script src="tv-navigation.js?v=9.9.0"></script>
-  <script src="app.js?v=9.9.0"></script>
+  <script src="tv-navigation.js?v=9.9.1"></script>
+  <script src="app.js?v=9.9.1"></script>
   <script>
     (function () {
       try {
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (otaVer && otaVer > '9.9.0') {
+        if (otaVer && otaVer > '9.9.1') {
           window.__STREAMIT_OTA_INJECTED_RUNNING = true;
           var navCode = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
           if (navCode.length > 500) {

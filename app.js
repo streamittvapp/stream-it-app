@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.9.0';
+  var APP_VERSION = '9.9.1';
 
   // If a strictly newer OTA script is stored in localStorage and index.html is about to inject it,
   // skip running this older bundled script completely so two versions of app.js NEVER run in parallel!
@@ -28,8 +28,10 @@
     window.__STREAMIT_V987_BOOTED ||
     window.__STREAMIT_V988_BOOTED ||
     window.__STREAMIT_V989_BOOTED ||
-    window.__STREAMIT_V990_BOOTED
+    window.__STREAMIT_V990_BOOTED ||
+    window.__STREAMIT_V991_BOOTED
   );
+  window.__STREAMIT_V991_BOOTED = true;
   window.__STREAMIT_V990_BOOTED = true;
   window.__STREAMIT_V989_BOOTED = true;
   window.__STREAMIT_V988_BOOTED = true;
@@ -63,7 +65,9 @@
   window.__STREAMIT_V968_BOOTED = true;
   window.__STREAMIT_V969_BOOTED = true;
   window.__STREAMIT_V970_BOOTED = true;
-  // Synchronously block any older bundled v9.7.0-v9.8.8 script from firing its DOMContentLoaded boot handler after OTA loads!
+  // Synchronously block any older bundled v9.7.0-v9.9.0 script from firing its DOMContentLoaded boot handler after OTA loads!
+  window.__STREAMIT_V990_BOOT_DONE = true;
+  window.__STREAMIT_V989_BOOT_DONE = true;
   window.__STREAMIT_V988_BOOT_DONE = true;
   window.__STREAMIT_V987_BOOT_DONE = true;
   window.__STREAMIT_V986_BOOT_DONE = true;
@@ -149,6 +153,7 @@
     { id: 'animation', label: 'אנימציה ומשפחה' },
     { id: 'docu', label: 'דוקומנטרי וביוגרפיה' },
     { id: 'israeli', label: 'יצירה ישראלית' },
+    { id: 'viva', label: 'ויוה ודרמות טורקיות' },
     { id: 'channels', label: 'ערוצים חיים (ישראל וארה״ב)' }
   ];
 
@@ -290,6 +295,7 @@
     16: 'animation',
     10751: 'animation',
     10762: 'animation',
+    10766: 'viva',
     99: 'docu'
   };
 
@@ -310,6 +316,7 @@
     war: 'מלחמה והיסטוריה',
     mystery: 'מסתורין ובלשי',
     israeli: 'יצירה ישראלית',
+    viva: 'ויוה, דרמות טורקיות וטלנובלות',
     animation: 'אנימציה ומשפחה',
     docu: 'דוקומנטרי וביוגרפיה',
     western: 'מערבונים',
@@ -817,23 +824,135 @@
       type: 'channel',
       channelNumber: '27',
       logoText: 'ויוה פרימיום',
-      subLabel: 'דרמות וטלנובלות • yes / HOT / NEXT',
-      liveGroup: 'cinema',
+      subLabel: 'דרמות וטלנובלות 24/7 • Viva HD',
+      liveGroup: 'viva',
       brandAccent: '#DB2777',
-      title: 'ערוץ ויוה פרימיום — דרמות וטלנובלות חי (אפיק 27)',
-      originalTitle: 'Viva Premium Israel Live',
+      title: 'ערוץ ויוה פרימיום — טלנובלות ודרמות רומנטיות חי (אפיק 27)',
+      originalTitle: 'Viva Novelas Live HD',
       year: 'LIVE',
       rating: 'אפיק 27',
-      overview: 'ערוץ ויוה פרימיום (yes / HOT / NEXT TV / סלקום TV): דרמות, סדרות רומנטיות וטלנובלות בשידור חי.',
+      overview: 'ערוץ ויוה פרימיום (אפיק 27): טלנובלות, דרמות רומנטיות וסדרות לטיניות וספרדיות בשידור חי 24/7 ב-1080p HD.',
       poster: createChannelBrandedPosterSvg('27', 'VIVA HD', 'ויוה פרימיום בשידור חי', '#300720', '#590D3B', '#DB2777'),
       backdrop: createChannelBrandedPosterSvg('27', 'VIVA HD', 'ויוה פרימיום בשידור חי', '#300720', '#590D3B', '#DB2777'),
-      streamUrl: 'https://d2dffl3588mvfk.cloudfront.net/out/v1/d8e15050ca4148aab0ee387a5e2eb46b/index.m3u8',
+      streamUrl: 'https://d20oth1416y9a1.cloudfront.net/playlist/amg00711-zylofast-frequencenovelas-rakutenus/playlist.m3u8',
       fallbackStreams: [
-        'http://stream.mcquack.net/309/index.m3u8',
-        'https://d1yd8hohnldm33.cloudfront.net/out/v1/19dee23c2cc24f689bd4e1288661ee0c/index.m3u8'
+        'https://amg00793-amg00793c40-rakuten-es-5444.playouts.now.amagi.tv/playlist.m3u8',
+        'https://d2dffl3588mvfk.cloudfront.net/out/v1/d8e15050ca4148aab0ee387a5e2eb46b/index.m3u8'
       ],
-      genres: ['live', 'drama', 'romance'],
-      genresHe: ['קולנוע ובידור', 'אפיק 27']
+      genres: ['live', 'viva', 'drama', 'romance'],
+      genresHe: ['ויוה וטורקיות', 'אפיק 27']
+    },
+    {
+      id: 'viva_istanbul_hd',
+      type: 'channel',
+      channelNumber: '271',
+      logoText: 'ויוה איסטנבול',
+      subLabel: 'דרמות טורקיות מובילות • Kanal D 1080p',
+      liveGroup: 'viva',
+      brandAccent: '#E11D48',
+      title: 'ויוה איסטנבול — ערוץ הדרמות הטורקיות Kanal D HD (אפיק 271)',
+      originalTitle: 'Kanal D Turkiye Dramas HD',
+      year: 'LIVE',
+      rating: 'אפיק 271',
+      overview: 'ערוץ הדרמות הטורקיות המוביל מאיסטנבול (Kanal D 1080p HD): סדרות דרמה, רומנטיקה ומתח טורקיות בשידור חי בשפת המקור.',
+      poster: createChannelBrandedPosterSvg('271', 'VIVA TURK', 'ויוה איסטנבול • Kanal D', '#3B0718', '#6D0F2E', '#E11D48'),
+      backdrop: createChannelBrandedPosterSvg('271', 'VIVA TURK', 'ויוה איסטנבול • Kanal D', '#3B0718', '#6D0F2E', '#E11D48'),
+      streamUrl: 'https://demiroren.daioncdn.net/kanald/kanald.m3u8?app=kanald_web&ce=3',
+      fallbackStreams: [
+        'https://tv-trt1.medya.trt.com.tr/master.m3u8',
+        'https://livetv.radyotvonline.net/kanal7live/kanal7avr/playlist.m3u8'
+      ],
+      genres: ['live', 'viva', 'drama', 'romance'],
+      genresHe: ['ויוה וטורקיות', 'אפיק 271']
+    },
+    {
+      id: 'viva_plus_star',
+      type: 'channel',
+      channelNumber: '272',
+      logoText: 'ויוה פלוס STAR',
+      subLabel: 'הכלה מאיסטנבול והשלדג • Star TV HD',
+      liveGroup: 'viva',
+      brandAccent: '#EC4899',
+      title: 'ויוה פלוס טורקיה — Star TV Dramas HD (אפיק 272)',
+      originalTitle: 'Star TV Turkiye Live HD',
+      year: 'LIVE',
+      rating: 'אפיק 272',
+      overview: 'בית הלהיטים הטורקיים (Star TV HD — הכלה מאיסטנבול, השלדג, חלומות בהקיץ ואהבה אפלה) בשידור חי 24/7.',
+      poster: createChannelBrandedPosterSvg('272', 'VIVA+ STAR', 'ויוה פלוס • Star TV HD', '#2E0829', '#5A104F', '#EC4899'),
+      backdrop: createChannelBrandedPosterSvg('272', 'VIVA+ STAR', 'ויוה פלוס • Star TV HD', '#2E0829', '#5A104F', '#EC4899'),
+      streamUrl: 'https://dogus.daioncdn.net/startv/startv_720p.m3u8?app=a20ac41e-bdc3-4aa1-934d-26b484480ac9&ce=3&sid=8l4w3lst4co5',
+      fallbackStreams: [
+        'https://demiroren.daioncdn.net/kanald/kanald.m3u8?app=kanald_web&ce=3',
+        'https://livetv.radyotvonline.net/kanal7live/kanal7avr/playlist.m3u8'
+      ],
+      genres: ['live', 'viva', 'drama', 'romance'],
+      genresHe: ['ויוה וטורקיות', 'אפיק 272']
+    },
+    {
+      id: 'viva_trt_drama',
+      type: 'channel',
+      channelNumber: '273',
+      logoText: 'טורקיה TRT 1',
+      subLabel: 'דרמות ואפוסים טורקיים • TRT 1 UHD',
+      liveGroup: 'viva',
+      brandAccent: '#BE123C',
+      title: 'ערוץ הדרמות הטורקי הרשמי — TRT 1 UHD (אפיק 273)',
+      originalTitle: 'TRT 1 Turkiye UHD Live',
+      year: 'LIVE',
+      rating: 'אפיק 273',
+      overview: 'שידור חי באיכות Ultra HD של ערוץ TRT 1: דרמות משפחתיות, רומנטיקה ואפוסים היסטוריים מטורקיה.',
+      poster: createChannelBrandedPosterSvg('273', 'TRT 1 UHD', 'דרמות טורקיות • UHD', '#2B0912', '#561124', '#BE123C'),
+      backdrop: createChannelBrandedPosterSvg('273', 'TRT 1 UHD', 'דרמות טורקיות • UHD', '#2B0912', '#561124', '#BE123C'),
+      streamUrl: 'https://tv-trt1.medya.trt.com.tr/master.m3u8',
+      fallbackStreams: [
+        'https://demiroren.daioncdn.net/kanald/kanald.m3u8?app=kanald_web&ce=3'
+      ],
+      genres: ['live', 'viva', 'drama'],
+      genresHe: ['ויוה וטורקיות', 'אפיק 273']
+    },
+    {
+      id: 'viva_kanal7_soaps',
+      type: 'channel',
+      channelNumber: '274',
+      logoText: 'טלנובלות KANAL 7',
+      subLabel: 'סדרות יומיות וטלנובלות • Kanal 7 HD',
+      liveGroup: 'viva',
+      brandAccent: '#D946EF',
+      title: 'טלנובלות וסדרות יומיות מטורקיה — Kanal 7 HD (אפיק 274)',
+      originalTitle: 'Kanal 7 Daily Turkish Dramas',
+      year: 'LIVE',
+      rating: 'אפיק 274',
+      overview: 'שידור רציף של טלנובלות טורקיות יומיות, סיפורי אהבה ודרמות משפחתיות בשידור חי.',
+      poster: createChannelBrandedPosterSvg('274', 'KANAL 7', 'טלנובלות טורקיות יומיות', '#2A0836', '#511168', '#D946EF'),
+      backdrop: createChannelBrandedPosterSvg('274', 'KANAL 7', 'טלנובלות טורקיות יומיות', '#2A0836', '#511168', '#D946EF'),
+      streamUrl: 'https://livetv.radyotvonline.net/kanal7live/kanal7avr/playlist.m3u8',
+      fallbackStreams: [
+        'https://tv-trt1.medya.trt.com.tr/master.m3u8'
+      ],
+      genres: ['live', 'viva', 'drama', 'romance'],
+      genresHe: ['ויוה וטורקיות', 'אפיק 274']
+    },
+    {
+      id: 'viva_spanish_novelas',
+      type: 'channel',
+      channelNumber: '275',
+      logoText: 'ויוה ספרדית',
+      subLabel: 'דרמות וטלנובלות בספרדית • 1080p HD',
+      liveGroup: 'viva',
+      brandAccent: '#F43F5E',
+      title: 'ויוה ספרדית ולטינית — Rakuten Drama Español HD (אפיק 275)',
+      originalTitle: 'Rakuten Drama Espanol Novelas HD',
+      year: 'LIVE',
+      rating: 'אפיק 275',
+      overview: 'ערוץ דרמות וטלנובלות בספרדית 24/7 ב-Full HD 1080p: סיפורי אהבה, מתח ודרמות לטיניות וספרדיות בשפת המקור.',
+      poster: createChannelBrandedPosterSvg('275', 'VIVA ESP', 'דרמות וטלנובלות בספרדית', '#330815', '#640F2A', '#F43F5E'),
+      backdrop: createChannelBrandedPosterSvg('275', 'VIVA ESP', 'דרמות וטלנובלות בספרדית', '#330815', '#640F2A', '#F43F5E'),
+      streamUrl: 'https://amg00793-amg00793c40-rakuten-es-5444.playouts.now.amagi.tv/playlist.m3u8',
+      fallbackStreams: [
+        'https://d20oth1416y9a1.cloudfront.net/playlist/amg00711-zylofast-frequencenovelas-rakutenus/playlist.m3u8'
+      ],
+      genres: ['live', 'viva', 'drama', 'romance'],
+      genresHe: ['ויוה וטורקיות', 'אפיק 275']
     },
     {
       id: 'il_goodlife28',
@@ -1379,9 +1498,12 @@
     activeActorId: 'all',
     activeActorName: '',
     activeActorPhoto: '',
-    activeLiveGroup: 'all', // 'all' | 'israeli' | 'cinema' | 'sports' | 'news' | 'imported'
+    activeLiveGroup: 'all', // 'all' | 'israeli' | 'viva' | 'cinema' | 'sports' | 'news' | 'imported'
     liveSearchQuery: '',
     liveImportOpen: false,
+    navHistoryStack: [],
+    playerOpenedFromDetails: false,
+    playerReturnDetailsItem: null,
     actorMoviesCache: {},
     actorPhotosCache: {},
     actorResults: [],
@@ -1514,6 +1636,27 @@
     return 'http://127.0.0.1:8092';
   }
 
+  async function probeLocalPythonBackend() {
+    if (window.AndroidTvBridge && typeof window.AndroidTvBridge.isAndroidTv === 'function') {
+      state.pythonApiConfirmed = true;
+      return true;
+    }
+    try {
+      var ctrl = new AbortController();
+      var t = setTimeout(function () { ctrl.abort(); }, 1200);
+      var res = await fetch(getApiBase() + '/api/health', { signal: ctrl.signal });
+      clearTimeout(t);
+      if (res && res.ok) {
+        var data = await res.json();
+        if (data && data.ok) {
+          state.pythonApiConfirmed = true;
+          return true;
+        }
+      }
+    } catch (e) {}
+    return false;
+  }
+
   function updateBootLoaderProgress(percent, statusText, stepStates) {
     var loader = document.getElementById('appBootLoader');
     if (!loader) return;
@@ -1578,6 +1721,7 @@
       tpb_yts_4k: true,
       telegram_vod: true,
       israeli_live: true,
+      viva_live: true,
       cinema_live: true,
       sports_live: true,
       news_live: true,
@@ -1593,6 +1737,7 @@
       movies: true,
       series: true,
       israeli: true,
+      viva: true,
       channels: true,
       telegram: true,
       netflix: true,
@@ -1671,6 +1816,7 @@
       movies: 'movies',
       series: 'series',
       israeli: 'israeli',
+      viva: 'viva',
       channels: 'channels',
       telegram: 'telegram',
       youtube: 'youtube'
@@ -2755,6 +2901,20 @@
     if (!isTrulyIsraeli && genreKeys.indexOf('israeli') !== -1) {
       genreKeys = genreKeys.filter(function (gk) { return gk !== 'israeli'; });
     }
+    var isVivaOrTurkish = type !== 'channel' && (
+      origLang === 'tr' ||
+      origCountries.indexOf('TR') !== -1 ||
+      forcedGenreKey === 'viva' ||
+      (origLang === 'es' && type === 'series' && (
+        genreKeys.indexOf('viva') !== -1 ||
+        genreKeys.indexOf('romance') !== -1 ||
+        (Array.isArray(raw.genre_ids) && raw.genre_ids.indexOf(10766) !== -1) ||
+        /טלנובל|ויוה|אהבה|תשוק|בטי|המורדים|מלאכים|בובה|רומנט/.test(heTitle + ' ' + overview)
+      ))
+    );
+    if (isVivaOrTurkish && genreKeys.indexOf('viva') === -1) {
+      genreKeys.push('viva');
+    }
     if (isRealTelegramItem && genreKeys.indexOf('telegram') === -1) {
       genreKeys.push('telegram');
     }
@@ -2875,7 +3035,8 @@
     history: 'היסטוריה',
     western: 'מערבון',
     music: 'מוזיקה',
-    israeli: 'ישראלי'
+    israeli: 'ישראלי',
+    viva: 'ויוה / טורקיות'
   };
 
   function getItemLeadingGenresText(item, maxCount, sep) {
@@ -3115,7 +3276,7 @@
     mergeCustomChannelsIntoState();
     state.catalog.youtube = BUILTIN_YOUTUBE_ITEMS.slice();
 
-    // 1. Restore cached enriched catalog from localStorage for instant 0ms repeat boot (strictly Hebrew-verified & platform-deduplicated v987)
+    // 1. Restore cached enriched catalog from localStorage for instant 0ms repeat boot (strictly Hebrew-verified & ID-isolated v991)
     var hadCachedEnriched = false;
     try {
       localStorage.removeItem('streamit_enriched_catalog_cache_v980');
@@ -3123,7 +3284,8 @@
       localStorage.removeItem('streamit_enriched_catalog_cache_v983');
       localStorage.removeItem('streamit_enriched_catalog_cache_v985');
       localStorage.removeItem('streamit_enriched_catalog_cache_v986');
-      var cachedRaw = localStorage.getItem('streamit_enriched_catalog_cache_v987');
+      localStorage.removeItem('streamit_enriched_catalog_cache_v987');
+      var cachedRaw = localStorage.getItem('streamit_enriched_catalog_cache_v991');
       if (cachedRaw) {
         var cachedObj = JSON.parse(cachedRaw);
         var heRe = /[\u0590-\u05FF]/;
@@ -3141,7 +3303,7 @@
       }
     } catch (e) {}
 
-    // 2. Load bundled `data/hebrew_catalog.json` immediately
+    // 2. Load bundled `data/hebrew_catalog.json` immediately (+ live GitHub Pages catalog sync for Cloud OTA streamers)
     try {
       var localRes = await fetch('data/hebrew_catalog.json');
       if (localRes.ok) {
@@ -3149,6 +3311,15 @@
         ingestCatalogPayload(localData);
       }
     } catch (e) {}
+    if (window.AndroidTvBridge || window.__STREAMIT_OTA_INJECTED_RUNNING) {
+      try {
+        var cloudCatRes = await fetch('https://streamittvapp.github.io/stream-it-app/data/hebrew_catalog.json?v=' + encodeURIComponent(APP_VERSION));
+        if (cloudCatRes && cloudCatRes.ok) {
+          var cloudCatData = await cloudCatRes.json();
+          ingestCatalogPayload(cloudCatData);
+        }
+      } catch (eCloudCat) {}
+    }
 
     // 3. Only query `/api/catalog` if a real Python/Node backend is confirmed
     if (hasLocalBackend()) {
@@ -3201,7 +3372,9 @@
       { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_networks=2552&page=1', type: 'series', genre: 'apple' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=28&page=1', type: 'movie', genre: 'action' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_original_language=he&page=1', type: 'movie', genre: 'israeli' },
-      { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_original_language=he&page=1', type: 'series', genre: 'israeli' }
+      { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_original_language=he&page=1', type: 'series', genre: 'israeli' },
+      { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_original_language=tr&page=1', type: 'series', genre: 'viva' },
+      { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_original_language=es&with_genres=18|10766&page=1', type: 'series', genre: 'viva' }
     ];
 
     var secondaryTmdbQueries = [
@@ -3245,14 +3418,17 @@
       { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_networks=2552&with_genres=9648|10765&page=1', type: 'series', genre: 'horror' },
       { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_networks=213&with_genres=9648|10765&page=1', type: 'series', genre: 'horror' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_original_language=he&page=2', type: 'movie', genre: 'israeli' },
-      { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_original_language=he&page=2', type: 'series', genre: 'israeli' }
+      { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_original_language=he&page=2', type: 'series', genre: 'israeli' },
+      { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_original_language=tr&page=2', type: 'series', genre: 'viva' },
+      { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_original_language=tr&page=1', type: 'movie', genre: 'viva' },
+      { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_original_language=es&with_genres=18|10766&page=2', type: 'series', genre: 'viva' }
     ];
 
     var saveCatalogCacheSnapshot = function () {
       var isTvCache = Boolean(document.body && document.body.classList.contains('tv-mode'));
       setTimeout(function () {
         try {
-          localStorage.setItem('streamit_enriched_catalog_cache_v987', JSON.stringify({
+          localStorage.setItem('streamit_enriched_catalog_cache_v991', JSON.stringify({
             ts: Date.now(),
             movies: (state.catalog.movies || []).slice(0, isTvCache ? 260 : 1200),
             series: (state.catalog.series || []).slice(0, isTvCache ? 160 : 650)
@@ -3822,6 +3998,17 @@
     for (var j = 0; j < sList.length; j++) indexCatalogItemInMap(sList[j]);
   }
 
+  function canMergeByTitleFallback(existing, norm) {
+    if (!existing || !norm) return false;
+    if (existing.tmdbId && norm.tmdbId && String(existing.tmdbId) !== String(norm.tmdbId)) return false;
+    if (existing.imdbId && norm.imdbId && String(existing.imdbId) !== String(norm.imdbId)) return false;
+    var y1 = parseInt(String(existing.year || '').slice(0, 4), 10);
+    var y2 = parseInt(String(norm.year || '').slice(0, 4), 10);
+    if (y1 >= 1900 && y2 >= 1900 && Math.abs(y1 - y2) > 1) return false;
+    if (existing.originalLanguage && norm.originalLanguage && existing.originalLanguage !== norm.originalLanguage) return false;
+    return true;
+  }
+
   function mergeItemsIntoCatalog(rawArray, type, forcedGenre, extraGenreTag, forceProviderTag) {
     if (!Array.isArray(rawArray) || !rawArray.length) return;
     if (!state.catalogLookupMap) rebuildCatalogLookupMap();
@@ -3842,11 +4029,21 @@
         (norm.imdbId && map['imdb:' + tPrefix + norm.imdbId]) ||
         (norm.tmdbId && map['tmdb:' + tPrefix + norm.tmdbId]) ||
         (norm.id && map['id:' + tPrefix + norm.id]) ||
-        (norm.title && map['title:' + tPrefix + String(norm.title).trim()]) ||
-        (norm.originalTitle && map['orig:' + tPrefix + String(norm.originalTitle).trim().toLowerCase()]) ||
         null;
+      if (!existing) {
+        var titleCand = (norm.title && map['title:' + tPrefix + String(norm.title).trim()]) ||
+          (norm.originalTitle && map['orig:' + tPrefix + String(norm.originalTitle).trim().toLowerCase()]) ||
+          null;
+        if (titleCand && canMergeByTitleFallback(titleCand, norm)) {
+          existing = titleCand;
+        }
+      }
 
       if (existing) {
+        if (norm.originalLanguage && (!existing.originalLanguage || (existing.originalLanguage === 'en' && norm.originalLanguage !== 'en'))) {
+          existing.originalLanguage = norm.originalLanguage;
+          mutated = true;
+        }
         var existingHasGiant = existing.genres.some(function (gk) {
           return STREAMING_GIANTS_LIST.indexOf(gk) !== -1;
         });
@@ -3918,6 +4115,54 @@
     }
   }
 
+  function pickBestTmdbSearchResult(results, item) {
+    if (!Array.isArray(results) || !results.length || !item) return null;
+    var targetYear = parseInt(String(item.year || '').slice(0, 4), 10);
+    var targetOrig = String(item.originalTitle || '').trim().toLowerCase();
+    var targetHe = String(item.title || '').trim().toLowerCase();
+    var targetLang = String(item.originalLanguage || '').trim().toLowerCase();
+    var best = null;
+    var bestScore = -999;
+
+    for (var i = 0; i < results.length; i++) {
+      var c = results[i];
+      if (!c || !c.id) continue;
+      var score = 0;
+      var cOrig = String(c.original_title || c.original_name || '').trim().toLowerCase();
+      var cLoc = String(c.title || c.name || '').trim().toLowerCase();
+      var cYear = parseInt(String(c.release_date || c.first_air_date || '').slice(0, 4), 10);
+      var cLang = String(c.original_language || '').trim().toLowerCase();
+
+      if (targetOrig && (cOrig === targetOrig || cLoc === targetOrig)) score += 55;
+      else if (targetHe && (cLoc === targetHe || cOrig === targetHe)) score += 50;
+      else if (targetOrig && cOrig && (cOrig.indexOf(targetOrig) === 0 || targetOrig.indexOf(cOrig) === 0)) score += 28;
+      else if (targetHe && cLoc && (cLoc.indexOf(targetHe) === 0 || targetHe.indexOf(cLoc) === 0)) score += 25;
+
+      if (targetYear >= 1900 && cYear >= 1900) {
+        var diff = Math.abs(targetYear - cYear);
+        if (diff === 0) score += 45;
+        else if (diff === 1) score += 26;
+        else if (diff === 2) score += 5;
+        else score -= 65;
+      }
+
+      if (item.isIsraeli) {
+        if (cLang === 'he') score += 45;
+        else if (cLang) score -= 80;
+      } else if (targetLang && cLang) {
+        if (cLang === targetLang) score += 30;
+        else if (targetLang !== 'en') score -= 35;
+      }
+
+      score += Math.min(14, (Number(c.vote_count) || 0) / 150);
+      if (score > bestScore) {
+        bestScore = score;
+        best = c;
+      }
+    }
+    return bestScore >= 15 ? best : null;
+  }
+
   /**
    * Resolve BOTH IMDb ID (`tt...`) and Numeric TMDB ID on-demand via TMDB Cloud API
    * Guarantees 100% Cloud-Autonomous playback on ANY computer or Smart TV without local server!
@@ -3959,13 +4204,14 @@
           if (hit && hit.id) {
             cleanTmdb = String(hit.id);
             item.tmdbId = cleanTmdb;
+            if (hit.original_language) item.originalLanguage = String(hit.original_language).toLowerCase();
             item._tmdbVerified = true;
           }
         }
       } catch (e) {}
     }
 
-    // 2. If still no TMDB ID, dynamically search TMDB by title (`originalTitle` or `title`)
+    // 2. If still no TMDB ID, dynamically search TMDB by title (`originalTitle` or `title`) with strict year & language verification
     if (!cleanTmdb) {
       var qTitle = item.originalTitle || item.title || '';
       if (qTitle) {
@@ -3974,9 +4220,11 @@
           var sRes = await fetch(TMDB_BASE + sPath);
           if (sRes.ok) {
             var sData = await sRes.json();
-            if (sData && Array.isArray(sData.results) && sData.results[0] && sData.results[0].id) {
-              cleanTmdb = String(sData.results[0].id);
+            var bestHit = pickBestTmdbSearchResult(sData && sData.results, item);
+            if (bestHit && bestHit.id) {
+              cleanTmdb = String(bestHit.id);
               item.tmdbId = cleanTmdb;
+              if (bestHit.original_language) item.originalLanguage = String(bestHit.original_language).toLowerCase();
               item._tmdbVerified = true;
             }
           }
@@ -3999,7 +4247,7 @@
       } catch (e) {}
     }
 
-    // 4. Fallback: Query Stremio Cinemeta by title if TMDB external_ids lacked an IMDb ID
+    // 4. Fallback: Query Stremio Cinemeta by title if TMDB external_ids lacked an IMDb ID (with strict year check)
     if (!item.imdbId || item.imdbId.indexOf('tt') !== 0) {
       var cmSearchTitle = item.originalTitle || item.title || '';
       if (cmSearchTitle) {
@@ -4008,9 +4256,16 @@
           var cmRes = await fetch('https://v3-cinemeta.strem.io/catalog/' + cmType + '/top/search=' + encodeURIComponent(cmSearchTitle) + '.json');
           if (cmRes.ok) {
             var cmData = await cmRes.json();
-            if (cmData && Array.isArray(cmData.metas) && cmData.metas[0] && cmData.metas[0].imdb_id) {
-              item.imdbId = cmData.metas[0].imdb_id;
+            var metas = (cmData && Array.isArray(cmData.metas)) ? cmData.metas : [];
+            var itemYr = parseInt(String(item.year || '').slice(0, 4), 10);
+            for (var mIdx = 0; mIdx < metas.length; mIdx++) {
+              var meta = metas[mIdx];
+              if (!meta || !meta.imdb_id) continue;
+              var metaYr = parseInt(String(meta.releaseInfo || meta.year || '').slice(0, 4), 10);
+              if (itemYr >= 1900 && metaYr >= 1900 && Math.abs(itemYr - metaYr) > 1) continue;
+              item.imdbId = meta.imdb_id;
               indexCatalogItemInMap(item);
+              break;
             }
           }
         } catch (eCm) {}
@@ -4264,7 +4519,8 @@
   };
 
   async function ensureCombinedFilterCatalogLoaded(cat, genre, provider) {
-    var g = (genre && genre !== 'all' && genre !== 'channels' && genre !== 'youtube') ? genre : '';
+    var effectiveGenre = (cat === 'viva' && (!genre || genre === 'all')) ? 'viva' : genre;
+    var g = (effectiveGenre && effectiveGenre !== 'all' && effectiveGenre !== 'channels' && effectiveGenre !== 'youtube') ? effectiveGenre : '';
     var p = (provider && provider !== 'all' && provider !== 'telegram') ? provider : '';
     if (!g && !p) return;
 
@@ -4277,22 +4533,42 @@
     var needMovies = (cat !== 'series');
     var needSeries = (cat !== 'movies');
 
-    if (needMovies) {
-      var mUrl = '/discover/movie?language=he-IL&sort_by=popularity.desc';
-      if (p && MOVIE_PROVIDER_PARAM[p]) mUrl += MOVIE_PROVIDER_PARAM[p];
-      if (g === 'israeli') mUrl += '&with_original_language=he';
-      else if (g && MOVIE_TMDB_GENRE_PARAM[g]) mUrl += '&with_genres=' + MOVIE_TMDB_GENRE_PARAM[g];
-      queries.push({ url: mUrl + '&page=1', type: 'movie', forced: p || g, extra: (p && g) ? g : null });
-      queries.push({ url: mUrl + '&page=2', type: 'movie', forced: p || g, extra: (p && g) ? g : null });
-    }
+    if (g === 'viva') {
+      if (needSeries && p !== 'tpb') {
+        var trTvBase = '/discover/tv?language=he-IL&sort_by=popularity.desc&with_original_language=tr';
+        var esTvBase = '/discover/tv?language=he-IL&sort_by=popularity.desc&with_original_language=es&with_genres=18|10766';
+        if (p && SERIES_PROVIDER_PARAM[p]) {
+          trTvBase += SERIES_PROVIDER_PARAM[p];
+          esTvBase += SERIES_PROVIDER_PARAM[p];
+        }
+        queries.push({ url: trTvBase + '&page=1', type: 'series', forced: p || 'viva', extra: 'viva' });
+        queries.push({ url: trTvBase + '&page=2', type: 'series', forced: p || 'viva', extra: 'viva' });
+        queries.push({ url: esTvBase + '&page=1', type: 'series', forced: p || 'viva', extra: 'viva' });
+        queries.push({ url: esTvBase + '&page=2', type: 'series', forced: p || 'viva', extra: 'viva' });
+      }
+      if (needMovies) {
+        var trMovBase = '/discover/movie?language=he-IL&sort_by=popularity.desc&with_original_language=tr';
+        if (p && MOVIE_PROVIDER_PARAM[p]) trMovBase += MOVIE_PROVIDER_PARAM[p];
+        queries.push({ url: trMovBase + '&page=1', type: 'movie', forced: p || 'viva', extra: 'viva' });
+      }
+    } else {
+      if (needMovies) {
+        var mUrl = '/discover/movie?language=he-IL&sort_by=popularity.desc';
+        if (p && MOVIE_PROVIDER_PARAM[p]) mUrl += MOVIE_PROVIDER_PARAM[p];
+        if (g === 'israeli') mUrl += '&with_original_language=he';
+        else if (g && MOVIE_TMDB_GENRE_PARAM[g]) mUrl += '&with_genres=' + MOVIE_TMDB_GENRE_PARAM[g];
+        queries.push({ url: mUrl + '&page=1', type: 'movie', forced: p || g, extra: (p && g) ? g : null });
+        queries.push({ url: mUrl + '&page=2', type: 'movie', forced: p || g, extra: (p && g) ? g : null });
+      }
 
-    if (needSeries && p !== 'tpb') {
-      var sUrl = '/discover/tv?language=he-IL&sort_by=popularity.desc';
-      if (p && SERIES_PROVIDER_PARAM[p]) sUrl += SERIES_PROVIDER_PARAM[p];
-      if (g === 'israeli') sUrl += '&with_original_language=he';
-      else if (g && SERIES_TMDB_GENRE_PARAM[g]) sUrl += '&with_genres=' + SERIES_TMDB_GENRE_PARAM[g];
-      queries.push({ url: sUrl + '&page=1', type: 'series', forced: p || g, extra: (p && g) ? g : null });
-      queries.push({ url: sUrl + '&page=2', type: 'series', forced: p || g, extra: (p && g) ? g : null });
+      if (needSeries && p !== 'tpb') {
+        var sUrl = '/discover/tv?language=he-IL&sort_by=popularity.desc';
+        if (p && SERIES_PROVIDER_PARAM[p]) sUrl += SERIES_PROVIDER_PARAM[p];
+        if (g === 'israeli') sUrl += '&with_original_language=he';
+        else if (g && SERIES_TMDB_GENRE_PARAM[g]) sUrl += '&with_genres=' + SERIES_TMDB_GENRE_PARAM[g];
+        queries.push({ url: sUrl + '&page=1', type: 'series', forced: p || g, extra: (p && g) ? g : null });
+        queries.push({ url: sUrl + '&page=2', type: 'series', forced: p || g, extra: (p && g) ? g : null });
+      }
     }
 
     if (!queries.length) return;
@@ -4314,6 +4590,181 @@
       renderCatalogShelves();
     }
   }
+
+  function getCatalogNavSnapshot() {
+    return {
+      activeCategory: state.activeCategory || 'all',
+      activeGenre: state.activeGenre || 'all',
+      activeProvider: state.activeProvider || 'all',
+      activeYear: state.activeYear || 'all',
+      activeActorId: state.activeActorId || 'all',
+      activeActorName: state.activeActorName || '',
+      activeActorPhoto: state.activeActorPhoto || '',
+      tvInlineSearchQuery: String(state.tvInlineSearchQuery || ''),
+      activeLiveGroup: state.activeLiveGroup || 'all'
+    };
+  }
+
+  function isSameCatalogNavSnapshot(a, b) {
+    if (!a || !b) return false;
+    return (
+      a.activeCategory === b.activeCategory &&
+      a.activeGenre === b.activeGenre &&
+      a.activeProvider === b.activeProvider &&
+      a.activeYear === b.activeYear &&
+      String(a.activeActorId) === String(b.activeActorId) &&
+      String(a.tvInlineSearchQuery || '') === String(b.tvInlineSearchQuery || '') &&
+      a.activeLiveGroup === b.activeLiveGroup
+    );
+  }
+
+  function isAtHomeRootCatalogState(snap) {
+    var s = snap || getCatalogNavSnapshot();
+    return (
+      s.activeCategory === 'all' &&
+      s.activeGenre === 'all' &&
+      s.activeProvider === 'all' &&
+      s.activeYear === 'all' &&
+      String(s.activeActorId) === 'all' &&
+      !String(s.tvInlineSearchQuery || '').trim()
+    );
+  }
+
+  function pushCatalogNavHistory() {
+    if (!Array.isArray(state.navHistoryStack)) state.navHistoryStack = [];
+    var cur = getCatalogNavSnapshot();
+    var last = state.navHistoryStack.length ? state.navHistoryStack[state.navHistoryStack.length - 1] : null;
+    if (!last || !isSameCatalogNavSnapshot(last, cur)) {
+      state.navHistoryStack.push(cur);
+      if (state.navHistoryStack.length > 25) {
+        state.navHistoryStack.shift();
+      }
+      try {
+        if (window.history && typeof window.history.pushState === 'function') {
+          window.history.pushState({ streamItNavStep: true }, '', window.location.href);
+        }
+      } catch (eHistNav) {}
+    }
+  }
+
+  function applyCatalogNavSnapshot(snap) {
+    if (!snap) return;
+    state.activeCategory = snap.activeCategory || 'all';
+    state.activeGenre = snap.activeGenre || 'all';
+    state.activeProvider = snap.activeProvider || 'all';
+    state.activeYear = snap.activeYear || 'all';
+    state.activeActorId = snap.activeActorId || 'all';
+    state.activeActorName = snap.activeActorName || '';
+    state.activeActorPhoto = snap.activeActorPhoto || '';
+    state.tvInlineSearchQuery = String(snap.tvInlineSearchQuery || '');
+    state.activeLiveGroup = snap.activeLiveGroup || 'all';
+    state.gridPage = 1;
+    state.catalogWallLimit = 0;
+
+    var sTxt = document.getElementById('tvRailSearchText');
+    if (sTxt) sTxt.textContent = state.tvInlineSearchQuery ? state.tvInlineSearchQuery : 'חיפוש...';
+    var sClr = document.getElementById('tvRailSearchClearBtn');
+    if (sClr) sClr.classList.toggle('hidden', !state.tvInlineSearchQuery);
+    var mVk = document.getElementById('tvRailMiniKeyboard');
+    if (mVk) mVk.classList.add('hidden');
+
+    var allBtns = document.querySelectorAll('[data-category]');
+    for (var j = 0; j < allBtns.length; j++) {
+      allBtns[j].classList.toggle('active', allBtns[j].getAttribute('data-category') === state.activeCategory);
+    }
+
+    closeAllExplorerDropdowns();
+    renderGenreFilterStrip();
+    renderProviderFilterStrip();
+    renderYearFilterStrip();
+    renderActorFilterStrip();
+    renderCatalogShelves();
+
+    var focusEl = document.querySelector('#catalogRowsContainer .poster-card') ||
+      document.getElementById('heroPlayBtn') ||
+      document.querySelector('#topHeader [data-category="' + state.activeCategory + '"]');
+    if (focusEl && typeof window.streamItFocusElement === 'function') {
+      window.streamItFocusElement(focusEl, { scroll: false });
+    }
+  }
+
+  function stepBackCatalogNavigation() {
+    var cur = getCatalogNavSnapshot();
+    if (Array.isArray(state.navHistoryStack)) {
+      while (state.navHistoryStack.length > 0) {
+        var prev = state.navHistoryStack.pop();
+        if (prev && !isSameCatalogNavSnapshot(prev, cur)) {
+          applyCatalogNavSnapshot(prev);
+          return true;
+        }
+      }
+    }
+    if (!isAtHomeRootCatalogState(cur)) {
+      applyCatalogNavSnapshot({
+        activeCategory: 'all',
+        activeGenre: 'all',
+        activeProvider: 'all',
+        activeYear: 'all',
+        activeActorId: 'all',
+        activeActorName: '',
+        activeActorPhoto: '',
+        tvInlineSearchQuery: '',
+        activeLiveGroup: 'all'
+      });
+      return true;
+    }
+    return false;
+  }
+  window.stepBackCatalogNavigation = stepBackCatalogNavigation;
+
+  function openAppExitConfirmModal() {
+    window.__streamItAllowNativeBackExit = false;
+    var modal = document.getElementById('appExitConfirmModal');
+    if (!modal) return false;
+    var subEl = modal.querySelector('.player-exit-confirm-sub');
+    if (subEl) subEl.textContent = 'האם ברצונך לצאת מהאפליקציה למסך הראשי של הסטרימר?';
+    modal.classList.remove('hidden');
+    var stayBtn = document.getElementById('appExitCancelBtn');
+    if (stayBtn && typeof window.streamItFocusElement === 'function') {
+      window.streamItFocusElement(stayBtn, { scroll: false });
+    }
+    return true;
+  }
+  window.openAppExitConfirmModal = openAppExitConfirmModal;
+
+  function cancelAppExitConfirm() {
+    window.__streamItAllowNativeBackExit = false;
+    var modal = document.getElementById('appExitConfirmModal');
+    if (modal) modal.classList.add('hidden');
+    var target = document.querySelector('#catalogRowsContainer .poster-card') || document.getElementById('heroPlayBtn');
+    if (target && typeof window.streamItFocusElement === 'function') {
+      window.streamItFocusElement(target, { scroll: false });
+    }
+  }
+  window.cancelAppExitConfirm = cancelAppExitConfirm;
+
+  function confirmAppExit() {
+    var modal = document.getElementById('appExitConfirmModal');
+    try {
+      if (window.AndroidTvBridge && typeof window.AndroidTvBridge.exitApp === 'function') {
+        if (modal) modal.classList.add('hidden');
+        window.AndroidTvBridge.exitApp();
+        return;
+      }
+    } catch (eExit) {}
+    // Fallback for Cloud OTA on older v9.8.8 APK (where native exit happens when handleAndroidBackButton returns false):
+    if (window.AndroidTvBridge) {
+      window.__streamItAllowNativeBackExit = true;
+      if (modal) {
+        var subEl = modal.querySelector('.player-exit-confirm-sub');
+        if (subEl) subEl.textContent = 'לחץ כעת שוב על כפתור Back בשלט ליציאה למסך הסטרימר.';
+      }
+      return;
+    }
+    if (modal) modal.classList.add('hidden');
+    try { window.close(); } catch (eClose) {}
+  }
+  window.confirmAppExit = confirmAppExit;
 
   function focusMainCatalogAfterRailFilter(fallbackEl) {
     var rail = document.getElementById('tvSideRail');
@@ -4354,6 +4805,7 @@
     for (var i = 0; i < btns.length; i++) {
       btns[i].addEventListener('click', function () {
         var g = this.getAttribute('data-genre') || 'all';
+        if (state.activeGenre !== g) pushCatalogNavHistory();
         state.activeGenre = g;
         state.gridPage = 1;
         state.catalogWallLimit = 0;
@@ -4385,6 +4837,7 @@
       for (var t = 0; t < tvBtns.length; t++) {
         tvBtns[t].addEventListener('click', function () {
           var g = this.getAttribute('data-tv-genre') || 'all';
+          if (state.activeGenre !== g || state.tvInlineSearchQuery) pushCatalogNavHistory();
           state.activeGenre = g;
           state.tvInlineSearchQuery = '';
           var sTxt = document.getElementById('tvRailSearchText');
@@ -4441,6 +4894,7 @@
     for (var i = 0; i < btns.length; i++) {
       btns[i].addEventListener('click', function () {
         var prov = this.getAttribute('data-provider') || 'all';
+        if (state.activeProvider !== prov) pushCatalogNavHistory();
         state.activeProvider = prov;
         state.gridPage = 1;
         state.catalogWallLimit = 0;
@@ -4483,6 +4937,7 @@
       for (var tp = 0; tp < tvPBtns.length; tp++) {
         tvPBtns[tp].addEventListener('click', function () {
           var prov = this.getAttribute('data-tv-provider') || 'all';
+          if (state.activeProvider !== prov || state.tvInlineSearchQuery) pushCatalogNavHistory();
           state.activeProvider = prov;
           state.tvInlineSearchQuery = '';
           var sTxt = document.getElementById('tvRailSearchText');
@@ -4535,6 +4990,7 @@
     for (var i = 0; i < btns.length; i++) {
       btns[i].addEventListener('click', async function () {
         var y = this.getAttribute('data-year') || 'all';
+        if (state.activeYear !== y) pushCatalogNavHistory();
         state.activeYear = y;
         state.gridPage = 1;
         closeAllExplorerDropdowns();
@@ -4564,6 +5020,7 @@
       for (var ty = 0; ty < tvYBtns.length; ty++) {
         tvYBtns[ty].addEventListener('click', async function () {
           var y = this.getAttribute('data-tv-year') || 'all';
+          if (state.activeYear !== y || state.tvInlineSearchQuery) pushCatalogNavHistory();
           state.activeYear = y;
           state.tvInlineSearchQuery = '';
           var sTxt = document.getElementById('tvRailSearchText');
@@ -4660,6 +5117,7 @@
           var aid = this.getAttribute('data-actor-id') || 'all';
           var aname = this.getAttribute('data-actor-name') || '';
           var aphoto = this.getAttribute('data-actor-photo') || '';
+          if (String(state.activeActorId) !== String(aid)) pushCatalogNavHistory();
           state.activeActorId = aid;
           state.activeActorName = aid === 'all' ? '' : aname;
           state.activeActorPhoto = aid === 'all' ? '' : aphoto;
@@ -5479,6 +5937,7 @@
       var countByGrp = {
         all: sortedChannels.length,
         israeli: sortedChannels.filter(function (c) { return (c.liveGroup || 'israeli') === 'israeli'; }).length,
+        viva: sortedChannels.filter(function (c) { return c.liveGroup === 'viva'; }).length,
         cinema: sortedChannels.filter(function (c) { return c.liveGroup === 'cinema'; }).length,
         sports: sortedChannels.filter(function (c) { return c.liveGroup === 'sports'; }).length,
         news: sortedChannels.filter(function (c) { return c.liveGroup === 'news'; }).length,
@@ -5488,6 +5947,7 @@
       var liveGroups = [
         { id: 'all', label: 'כל השידורים החיים (' + countByGrp.all + ')' },
         { id: 'israeli', label: 'עידן+ וישראל — 11, 12, 13, 14, 23 (' + countByGrp.israeli + ')' },
+        { id: 'viva', label: 'ויוה, דרמות טורקיות וטלנובלות (' + countByGrp.viva + ')' },
         { id: 'cinema', label: 'yes / HOT / NEXT TV / סלקום TV (' + countByGrp.cinema + ')' },
         { id: 'sports', label: 'ספורט חי HD (' + countByGrp.sports + ')' },
         { id: 'news', label: 'חדשות ארה״ב והעולם 24/7 (' + countByGrp.news + ')' },
@@ -5561,7 +6021,9 @@
       var grpBtns = container.querySelectorAll('[data-live-group]');
       for (var gb = 0; gb < grpBtns.length; gb++) {
         grpBtns[gb].addEventListener('click', function () {
-          state.activeLiveGroup = this.getAttribute('data-live-group') || 'all';
+          var nextGrp = this.getAttribute('data-live-group') || 'all';
+          if (state.activeLiveGroup !== nextGrp) pushCatalogNavHistory();
+          state.activeLiveGroup = nextGrp;
           renderCatalogShelves();
         });
       }
@@ -5704,6 +6166,64 @@
       gridWallTitle = 'כל הסרטים והסדרות של ' + (state.activeActorName || 'השחקן הנבחר') + ' (' + actorList.length + ' כותרים)';
       gridWallItems = actorList;
     }
+    // 3b. Dedicated Viva, Turkish Dramas & Spanish/Latin Telenovelas Hub (`cat === 'viva'`)
+    else if (cat === 'viva') {
+      var vivaLiveChannels = allChannels.filter(function (ch) {
+        return ch && (ch.liveGroup === 'viva' || (Array.isArray(ch.genres) && ch.genres.indexOf('viva') !== -1));
+      });
+      var vivaBasePool = deduplicateCatalogItems(
+        filterByGenre(allSeries, 'viva').concat(filterByGenre(allMovies, 'viva'))
+      );
+      if (hasGenreFilter && genre !== 'viva') {
+        vivaBasePool = filterByGenre(vivaBasePool, genre);
+      }
+      if (hasProviderFilter) {
+        vivaBasePool = filterByGenre(vivaBasePool, provider);
+      }
+      if (hasYearFilter) {
+        vivaBasePool = filterByYear(vivaBasePool, yearKey);
+      }
+
+      var turkishVodItems = vivaBasePool.filter(function (it) {
+        return it && String(it.originalLanguage || '').toLowerCase() === 'tr';
+      });
+      var spanishVodItems = vivaBasePool.filter(function (it) {
+        return it && String(it.originalLanguage || '').toLowerCase() !== 'tr';
+      });
+
+      if (vivaBasePool.length && vivaBasePool[0].type !== 'channel') {
+        updateHeroBillboard(vivaBasePool[0]);
+      }
+
+      actorShowcaseHtml =
+        '<div class="tg-category-banner" style="border-color:rgba(219,39,119,0.45);background:linear-gradient(135deg,rgba(80,7,36,0.75),rgba(17,24,39,0.92));">' +
+          '<div>' +
+            '<strong style="font-size:1.08rem;color:#fff;display:block;">ויוה, דרמות טורקיות וטלנובלות — שידורים חיים + ספריית VOD מלאה (' + vivaBasePool.length + ' כותרים + ' + vivaLiveChannels.length + ' ערוצים חיים)</strong>' +
+            '<span style="font-size:0.85rem;color:#f9a8d4;">כל הדרמות הטורקיות, הטלנובלות הספרדיות והלטיניות בשפת המקור (טורקית / ספרדית) עם כתוביות מסונכרנות בעברית + ערוצי ויוה ואיסטנבול 24/7</span>' +
+          '</div>' +
+        '</div>';
+
+      if (vivaLiveChannels.length) {
+        shelves.push({
+          title: 'ערוצי ויוה ודרמות טורקיות בשידור חי 24/7 (LIVE HD)',
+          items: vivaLiveChannels
+        });
+      }
+      if (turkishVodItems.length) {
+        shelves.push({
+          title: 'דרמות טורקיות מובילות לצפייה ישירה (שפת מקור + תרגום לעברית)',
+          items: turkishVodItems
+        });
+      }
+      if (spanishVodItems.length) {
+        shelves.push({
+          title: 'ויוה ספרדית ולטינית — טלנובלות ודרמות רומנטיות (Viva VOD)',
+          items: spanishVodItems
+        });
+      }
+      gridWallTitle = 'כל סדרות וסרטי ויוה ודרמות טורקיות (' + vivaBasePool.length + ' כותרים לצפייה ישירה)';
+      gridWallItems = vivaBasePool;
+    }
     // 4. Strict Cumulative AND-Intersection Filtering (`movies` / `series` / `all` + `genre` + `provider` + `year`) with ZERO duplicates
     else if (cat === 'movies' || cat === 'series' || (cat === 'all' && hasAnySubFilter)) {
       var basePool = (cat === 'movies')
@@ -5718,6 +6238,18 @@
       }
       if (hasYearFilter) {
         basePool = filterByYear(basePool, yearKey);
+      }
+
+      if (genre === 'viva' && cat !== 'movies') {
+        var vivaGenreChannels = allChannels.filter(function (ch) {
+          return ch && (ch.liveGroup === 'viva' || (Array.isArray(ch.genres) && ch.genres.indexOf('viva') !== -1));
+        });
+        if (vivaGenreChannels.length) {
+          shelves.push({
+            title: 'ערוצי ויוה ודרמות טורקיות בשידור חי 24/7 (LIVE HD)',
+            items: vivaGenreChannels
+          });
+        }
       }
 
       gridWallItems = deduplicateCatalogItems(basePool);
@@ -5924,6 +6456,14 @@
         }
       }
 
+      // Row 13b: ויוה, דרמות טורקיות וטלנובלות (Viva & Turkish VOD)
+      if (catVis.viva !== false) {
+        var vivaHomeItems = takeUniqueHomeItems(filterByGenre(allSeries, 'viva').concat(filterByGenre(allMovies, 'viva')), 20);
+        if (vivaHomeItems.length) {
+          shelves.push({ title: 'ויוה, דרמות טורקיות וטלנובלות (Viva & Turkish VOD)', items: vivaHomeItems });
+        }
+      }
+
       // Row 14: קומדיות ורומנטיקה
       if (catVis.comedy !== false) {
         var comedyItems = takeUniqueHomeItems(filterByGenre(allMovies, 'comedy').concat(filterByGenre(allMovies, 'romance')), 18);
@@ -6010,6 +6550,7 @@
     var clearActiveFiltersBtn = document.getElementById('clearActiveCatalogFiltersBtn');
     if (clearActiveFiltersBtn) {
       clearActiveFiltersBtn.addEventListener('click', function () {
+        pushCatalogNavHistory();
         state.activeGenre = 'all';
         state.activeProvider = 'all';
         state.activeYear = 'all';
@@ -6030,6 +6571,7 @@
     var clearActorBtn = document.getElementById('clearActorFilterBtn');
     if (clearActorBtn) {
       clearActorBtn.addEventListener('click', function () {
+        if (state.activeActorId !== 'all') pushCatalogNavHistory();
         state.activeActorId = 'all';
         state.activeActorName = '';
         state.activeActorPhoto = '';
@@ -6682,9 +7224,11 @@
           var sRes = await fetch(TMDB_BASE + '/search/tv?api_key=' + TMDB_API_KEY + '&language=he-IL&query=' + encodeURIComponent(qTitle));
           if (sRes.ok) {
             var sData = await sRes.json();
-            if (sData && Array.isArray(sData.results) && sData.results[0] && sData.results[0].id) {
-              cleanTmdb = String(sData.results[0].id);
+            var bestTvHit = pickBestTmdbSearchResult(sData && sData.results, item);
+            if (bestTvHit && bestTvHit.id) {
+              cleanTmdb = String(bestTvHit.id);
               item.tmdbId = cleanTmdb;
+              if (bestTvHit.original_language) item.originalLanguage = String(bestTvHit.original_language).toLowerCase();
             }
           }
         }
@@ -6940,6 +7484,9 @@
     state.embedStartOffsetSec = startOffsetSec;
 
     var detailsModal = document.getElementById('detailsModal');
+    var wasDetailsOpen = Boolean(detailsModal && !detailsModal.classList.contains('hidden') && state.detailsItem);
+    state.playerOpenedFromDetails = wasDetailsOpen;
+    state.playerReturnDetailsItem = wasDetailsOpen ? state.detailsItem : null;
     if (detailsModal) detailsModal.classList.add('hidden');
 
     var playerModal = document.getElementById('playerModal');
@@ -7215,7 +7762,12 @@
       return;
     }
 
-    if (!ytId) ytId = 'Way9Dexny3w';
+    if (!ytId) {
+      var loadingTextYt = document.getElementById('playerLoadingText');
+      if (loadingTextYt) loadingTextYt.textContent = 'לא נמצא סרטון יוטיוב תואם לכותר זה.';
+      if (spinner) spinner.classList.add('hidden');
+      return;
+    }
     var startParam = (state.activeSourceTab !== 'trailer' && state.embedStartOffsetSec > 15)
       ? ('&start=' + Math.floor(state.embedStartOffsetSec))
       : '';
@@ -7244,24 +7796,39 @@
     var apiBase = getApiBase();
     var mediaType = item.type === 'series' ? 'series' : 'movie';
     var tmdbId = String(item.tmdbId || '').replace(/\D/g, '');
+    var origLang = String(item.originalLanguage || (item.isIsraeli ? 'he' : 'en')).toLowerCase();
+    var expectedTitle = String(item.originalTitle || item.title || '').trim();
+    var expectedYear = String(item.year || '').slice(0, 4);
     var data = null;
 
-    // Non-blocking `/api/direct-stream` on `127.0.0.1:8092` with fast 2.8s timeout (never calls synchronous AndroidTvBridge on UI thread!)
+    // Non-blocking `/api/direct-stream` on `127.0.0.1:8092` (prioritizing `w7dn` 1080p Original-Language HLS + title/year verification)
     try {
       var ctrl = new AbortController();
-      var timer = setTimeout(function () { ctrl.abort(); }, 2800);
+      var timer = setTimeout(function () { ctrl.abort(); }, 4600);
       var url = apiBase + '/api/direct-stream?type=' + encodeURIComponent(mediaType) +
-        '&imdb_id=' + encodeURIComponent(imdbId) +
+        '&imdb_id=' + encodeURIComponent(imdbId || '') +
         '&tmdb_id=' + encodeURIComponent(tmdbId) +
         '&season=' + (season || 1) +
-        '&episode=' + (episode || 1);
+        '&episode=' + (episode || 1) +
+        '&orig_lang=' + encodeURIComponent(origLang) +
+        '&expected_title=' + encodeURIComponent(expectedTitle) +
+        '&expected_year=' + encodeURIComponent(expectedYear);
       var res = await fetch(url, { signal: ctrl.signal });
       clearTimeout(timer);
       if (res.ok) data = await res.json();
     } catch (e) {}
 
     if (!data || !data.ok) return '';
-    if (data.streamUrl) return data.streamUrl;
+    // Reject legacy (< v9.9.1) embedded server responses that lack `data.source` or point to `vjej` (Russian/foreign-dubbed mirror)
+    if (!data.source) return '';
+    if (origLang !== 'en' && String(data.source).toLowerCase() === 'vjej') return '';
+    if (/hscow|fcxmb/i.test(String(data.streamUrl || ''))) return '';
+    if (data.streamUrl) {
+      if (data.streamUrl.indexOf('/') === 0 && apiBase) {
+        return apiBase + data.streamUrl;
+      }
+      return data.streamUrl;
+    }
 
     if (data.enc_stream_urls && data.wasm_b64) {
       try {
@@ -7289,6 +7856,68 @@
       } catch (e) {}
     }
     return state.plyrInstance;
+  }
+
+  function selectPreferredHlsAudioTrack(hls, item) {
+    if (!hls || !Array.isArray(hls.audioTracks) || hls.audioTracks.length <= 1) return;
+    var orig = String((item && item.originalLanguage) || (item && item.isIsraeli ? 'he' : 'en')).toLowerCase();
+    var langAliases = {
+      he: ['he', 'heb', 'iw', 'hebrew', 'עברית', 'israel'],
+      en: ['en', 'eng', 'english'],
+      tr: ['tr', 'tur', 'turkish', 'türkçe', 'turkce'],
+      es: ['es', 'spa', 'spanish', 'español', 'espanol', 'latino'],
+      ko: ['ko', 'kor', 'korean'],
+      ja: ['ja', 'jpn', 'japanese'],
+      fr: ['fr', 'fre', 'fra', 'french'],
+      de: ['de', 'ger', 'deu', 'german'],
+      it: ['it', 'ita', 'italian']
+    };
+    var preferredTokens = langAliases[orig] || [orig];
+    var foreignDubPenaltyTokens = ['dub', 'dubbed', 'rus', 'russian', 'рус', 'ukr', 'ukrainian', 'hin', 'hindi', 'tam', 'tel', 'tha', 'vie', 'pol', 'polish', 'por', 'portuguese', 'dublado', 'ita', 'italian', 'ger', 'german', 'fre', 'french'];
+
+    var bestIdx = -1;
+    var bestScore = -999;
+    for (var i = 0; i < hls.audioTracks.length; i++) {
+      var trk = hls.audioTracks[i];
+      if (!trk) continue;
+      var tLang = String(trk.lang || '').trim().toLowerCase();
+      var tName = String(trk.name || '').trim().toLowerCase();
+      var blob = tLang + ' ' + tName;
+      var score = 0;
+
+      for (var p = 0; p < preferredTokens.length; p++) {
+        var tok = preferredTokens[p];
+        if (tLang === tok || tLang.indexOf(tok + '-') === 0 || blob.indexOf(tok) !== -1) {
+          score += 100;
+          break;
+        }
+      }
+      if (blob.indexOf('orig') !== -1 || blob.indexOf('מקור') !== -1) {
+        score += 35;
+      }
+      if (orig !== 'en' && (tLang === 'en' || tLang === 'eng' || tName.indexOf('english') !== -1)) {
+        score += 18;
+      }
+      if (score < 90) {
+        for (var f = 0; f < foreignDubPenaltyTokens.length; f++) {
+          var badTok = foreignDubPenaltyTokens[f];
+          if (blob.indexOf(badTok) !== -1) {
+            score -= 75;
+            break;
+          }
+        }
+      }
+      if (trk.default && score >= 0) score += 5;
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestIdx = i;
+      }
+    }
+
+    if (bestIdx >= 0 && hls.audioTrack !== bestIdx) {
+      try { hls.audioTrack = bestIdx; } catch (eAud) {}
+    }
   }
 
   function playDirectHlsOrMp4(streamUrl, startOffsetSec, rawFallbackUrl, sessionId) {
@@ -7414,11 +8043,16 @@
       window.__streamItActiveHls = hls;
       hls.loadSource(streamUrl);
       hls.attachMedia(video);
+      hls.on(window.Hls.Events.AUDIO_TRACKS_UPDATED, function () {
+        if (!isPlaybackSessionActive(activeSession)) return;
+        selectPreferredHlsAudioTrack(hls, state.playingItem);
+      });
       hls.on(window.Hls.Events.MANIFEST_PARSED, function (ev, data) {
         if (!isPlaybackSessionActive(activeSession)) {
           stopCurrentMedia();
           return;
         }
+        selectPreferredHlsAudioTrack(hls, state.playingItem);
         try {
           var levels = hls.levels || (data && data.levels) || [];
           if (levels.length > 1) {
@@ -7559,39 +8193,55 @@
         : 'בודק ומחבר אוטומטית למקור השידור הטוב ביותר (4K UHD)...';
     }
 
-    var tmdbId = String(item.tmdbId || '').replace(/\D/g, '') || '693134';
+    var tmdbId = String(item.tmdbId || '').replace(/\D/g, '');
+    var imdbClean = String(item.imdbId || (String(item.id || '').indexOf('tt') === 0 ? item.id : '') || '').trim();
+    var mediaId = tmdbId || imdbClean;
+    if (!mediaId) {
+      if (loadingText) loadingText.textContent = 'לא נמצא מזהה תוכן מאומת לכותר זה.';
+      if (spinner) spinner.classList.add('hidden');
+      return;
+    }
     var origAudioLang = String(item.originalLanguage || (item.isIsraeli ? 'he' : 'en')).toLowerCase();
     var embedUrl = '';
 
-    // 100% Sandbox-Compatible Verified 4K/1080p Cloud Mirrors (`cdn.vidspark.to` + `vidsrc.pm`)
+    // 100% Verified Original-Language Cloud Mirrors (`cdn.vidspark.to` + `vidsrc.pm/embed/...` + `vidlink.pro`)
     // Strictly pass original audio language + Hebrew default subtitles (`ds_lang=he&lang=he&sub=he&defaultSub=he&audio=...`)
     var baseParams = 'lang=he&ds_lang=he&sub=he&sub_lang=he&defaultSub=he&autoplay=1&audio=' + encodeURIComponent(origAudioLang);
     if (state.embedStartOffsetSec > 15) {
       baseParams += '&start=' + Math.floor(state.embedStartOffsetSec) + '&t=' + Math.floor(state.embedStartOffsetSec);
     }
     var queryStr = '?' + baseParams;
-    if (state.embedActiveServerKey === 'embed2' || state.embedActiveServerKey === 'swarm') {
+    if (state.embedActiveServerKey === 'embed2') {
       if (item.type === 'series') {
-        embedUrl = 'https://vidsrc.pm/tv/' + tmdbId + '/' + (season || 1) + '/' + (episode || 1) + queryStr;
+        embedUrl = 'https://vidsrc.pm/embed/tv/' + encodeURIComponent(mediaId) + '/' + (season || 1) + '/' + (episode || 1) + queryStr;
       } else {
-        embedUrl = 'https://vidsrc.pm/movie/' + tmdbId + queryStr;
+        embedUrl = 'https://vidsrc.pm/embed/movie/' + encodeURIComponent(mediaId) + queryStr;
+      }
+    } else if (state.embedActiveServerKey === 'swarm') {
+      var vlParams = '?autoplay=true&primaryColor=e50914&sub_file=&ds_lang=he';
+      if (state.embedStartOffsetSec > 15) vlParams += '&startAt=' + Math.floor(state.embedStartOffsetSec);
+      if (item.type === 'series') {
+        embedUrl = 'https://vidlink.pro/tv/' + encodeURIComponent(tmdbId || mediaId) + '/' + (season || 1) + '/' + (episode || 1) + vlParams;
+      } else {
+        embedUrl = 'https://vidlink.pro/movie/' + encodeURIComponent(tmdbId || mediaId) + vlParams;
       }
     } else {
       if (item.type === 'series') {
-        embedUrl = 'https://cdn.vidspark.to/tv/' + tmdbId + '/' + (season || 1) + '/' + (episode || 1) + queryStr;
+        embedUrl = 'https://cdn.vidspark.to/tv/' + encodeURIComponent(mediaId) + '/' + (season || 1) + '/' + (episode || 1) + queryStr;
       } else {
-        embedUrl = 'https://cdn.vidspark.to/movie/' + tmdbId + queryStr;
+        embedUrl = 'https://cdn.vidspark.to/movie/' + encodeURIComponent(mediaId) + queryStr;
       }
     }
 
     state.embedResumeSeekDone = !(state.embedStartOffsetSec > 15);
+    var startVisible = (state.embedActiveServerKey === 'swarm');
 
     embedContainer.innerHTML =
       '<iframe id="streamEmbedIframe" src="' + escapeHtml(embedUrl) + '" ' +
       'sandbox="allow-scripts allow-same-origin allow-forms allow-presentation" ' +
       'referrerpolicy="origin" ' +
       'allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen ' +
-      'style="width:100%;height:100%;border:none;background:#000;opacity:0;pointer-events:auto;transition:opacity 0.25s ease;"></iframe>';
+      'style="width:100%;height:100%;border:none;background:#000;opacity:' + (startVisible ? '1' : '0') + ';pointer-events:auto;transition:opacity 0.25s ease;"></iframe>';
 
     var iframe = document.getElementById('streamEmbedIframe');
 
@@ -7608,9 +8258,8 @@
       } catch (e) {}
     }, 600);
 
-    // Automatic Failover Watchdog: only reveal `#streamEmbedIframe` when `vidspark-player` confirms a real stream via postMessage;
-    // if no stream exists on the server (which would otherwise fall back to a secondary "Sandbox Detected" page), keep opacity:0 and fail over cleanly!
-    var watchdogMs = state.embedActiveServerKey === 'embed1' ? 6500 : 5000;
+    // Automatic Failover Watchdog: NEVER fall back to random YouTube trailers when watching a movie or series!
+    var watchdogMs = state.embedActiveServerKey === 'embed1' ? 9000 : 8500;
     state.embedWatchdogTimer = setTimeout(function () {
       if (!isPlaybackSessionActive(activeSession)) {
         stopCurrentMedia();
@@ -7619,8 +8268,12 @@
       if (state.playingMode === 'embed' && !state.embedVerified && state.playingItem) {
         if (state.embedActiveServerKey === 'embed1') {
           playCleanEmbedStream(state.playingItem, state.activeSeason, state.activeEpisode, state.embedStartOffsetSec || 0, 'embed2', activeSession);
+        } else if (state.embedActiveServerKey === 'embed2') {
+          playCleanEmbedStream(state.playingItem, state.activeSeason, state.activeEpisode, state.embedStartOffsetSec || 0, 'swarm', activeSession);
         } else {
-          playYoutubeVideoOrTrailer(state.playingItem, activeSession);
+          var curFrame = document.getElementById('streamEmbedIframe');
+          if (curFrame) curFrame.style.opacity = '1';
+          if (spinner) spinner.classList.add('hidden');
         }
       }
     }, watchdogMs);
@@ -9612,7 +10265,14 @@
         stopCurrentMedia();
       }
     }, 300);
+    var shouldReopenDetails = Boolean(state.playerOpenedFromDetails && state.playerReturnDetailsItem);
+    var returnDetailsItem = state.playerReturnDetailsItem;
+    state.playerOpenedFromDetails = false;
+    state.playerReturnDetailsItem = null;
     renderCatalogShelves();
+    if (shouldReopenDetails && returnDetailsItem) {
+      openDetailsModal(returnDetailsItem);
+    }
   }
   window.closeVideoPlayer = closeVideoPlayer;
 
@@ -10437,24 +11097,41 @@
     }
 
     window.addEventListener('popstate', function () {
+      try {
+        if (window.history && typeof window.history.pushState === 'function') {
+          window.history.pushState({ streamItGuard: true }, '', window.location.href);
+        }
+      } catch (e) {}
+      if (window.TVNavigation && typeof window.TVNavigation.handleAndroidBackButton === 'function') {
+        window.TVNavigation.handleAndroidBackButton();
+        return;
+      }
       var pm = document.getElementById('playerModal');
       if (pm && !pm.classList.contains('hidden')) {
-        try {
-          if (window.history && typeof window.history.pushState === 'function') {
-            window.history.pushState({ streamItPlayerOpen: true }, '', window.location.href);
-          }
-        } catch (e) {}
         requestCloseVideoPlayer();
       }
     });
+
+    var appExitCancelBtn = document.getElementById('appExitCancelBtn');
+    if (appExitCancelBtn) {
+      appExitCancelBtn.addEventListener('click', cancelAppExitConfirm);
+    }
+    var appExitConfirmBtn = document.getElementById('appExitConfirmBtn');
+    if (appExitConfirmBtn) {
+      appExitConfirmBtn.addEventListener('click', confirmAppExit);
+    }
 
     // Category Navigation
     var catBtns = document.querySelectorAll('[data-category]');
     for (var i = 0; i < catBtns.length; i++) {
       catBtns[i].addEventListener('click', function () {
         var cat = this.getAttribute('data-category') || 'all';
+        var nextGenre = cat === 'channels' ? 'channels' : (cat === 'youtube' ? 'youtube' : (cat === 'viva' ? 'viva' : 'all'));
+        if (state.activeCategory !== cat || state.activeGenre !== nextGenre || state.activeProvider !== 'all' || state.activeYear !== 'all' || state.activeActorId !== 'all' || state.tvInlineSearchQuery) {
+          pushCatalogNavHistory();
+        }
         state.activeCategory = cat;
-        state.activeGenre = cat === 'channels' ? 'channels' : (cat === 'youtube' ? 'youtube' : 'all');
+        state.activeGenre = nextGenre;
         state.activeProvider = 'all';
         state.activeYear = 'all';
         state.activeActorId = 'all';
@@ -10479,6 +11156,9 @@
         renderYearFilterStrip();
         renderActorFilterStrip();
         renderCatalogShelves();
+        if (cat === 'viva' || cat === 'israeli') {
+          ensureCombinedFilterCatalogLoaded(state.activeCategory, state.activeGenre, state.activeProvider);
+        }
       });
     }
 
@@ -10524,7 +11204,11 @@
     var miniVkLang = 'HE';
 
     var applyInlineTvSearch = function (nextQ) {
-      state.tvInlineSearchQuery = String(nextQ || '');
+      var nextStr = String(nextQ || '');
+      if (!state.tvInlineSearchQuery && nextStr) {
+        pushCatalogNavHistory();
+      }
+      state.tvInlineSearchQuery = nextStr;
       if (tvRailSearchText) {
         tvRailSearchText.textContent = state.tvInlineSearchQuery ? state.tvInlineSearchQuery : 'חיפוש...';
       }
@@ -13142,8 +13826,22 @@
       cwHeader.appendChild(clrBtn);
     }
 
-    // Ensure Telegram VOD nav link exists in #topHeader .main-nav on older APK DOMs
+    // Ensure Telegram VOD and Viva / Turkish Dramas nav links exist in #topHeader .main-nav on older APK DOMs
     var mainNav = document.querySelector('#topHeader .main-nav');
+    if (mainNav && !mainNav.querySelector('[data-category="viva"]')) {
+      var vivaNavBtn = document.createElement('button');
+      vivaNavBtn.type = 'button';
+      vivaNavBtn.className = 'nav-link tv-focusable';
+      vivaNavBtn.setAttribute('data-category', 'viva');
+      vivaNavBtn.setAttribute('aria-label', 'ויוה, דרמות טורקיות וטלנובלות');
+      vivaNavBtn.textContent = 'ויוה וטורקיות';
+      var isrNavBtn = mainNav.querySelector('[data-category="israeli"]') || mainNav.querySelector('[data-category="series"]');
+      if (isrNavBtn && isrNavBtn.nextSibling) {
+        mainNav.insertBefore(vivaNavBtn, isrNavBtn.nextSibling);
+      } else {
+        mainNav.appendChild(vivaNavBtn);
+      }
+    }
     if (mainNav && !mainNav.querySelector('[data-category="telegram"]')) {
       var tgNavBtn = document.createElement('button');
       tgNavBtn.type = 'button';
@@ -13157,6 +13855,27 @@
       } else {
         mainNav.appendChild(tgNavBtn);
       }
+    }
+
+    // Ensure #appExitConfirmModal exists in document.body on older APK DOMs updated via Cloud OTA
+    if (document.body && !document.getElementById('appExitConfirmModal')) {
+      var appExitDiv = document.createElement('div');
+      appExitDiv.id = 'appExitConfirmModal';
+      appExitDiv.className = 'player-exit-confirm-overlay clear-cw-confirm-overlay hidden';
+      appExitDiv.setAttribute('dir', 'rtl');
+      appExitDiv.setAttribute('role', 'dialog');
+      appExitDiv.setAttribute('aria-modal', 'true');
+      appExitDiv.setAttribute('aria-labelledby', 'appExitConfirmHeading');
+      appExitDiv.innerHTML =
+        '<div class="player-exit-confirm-card">' +
+          '<h3 id="appExitConfirmHeading" class="player-exit-confirm-title">לצאת מ-STREAM IT?</h3>' +
+          '<p class="player-exit-confirm-sub">האם ברצונך לצאת מהאפליקציה למסך הראשי של הסטרימר?</p>' +
+          '<div class="player-exit-confirm-actions">' +
+            '<button type="button" id="appExitCancelBtn" class="btn-primary player-exit-btn tv-focusable">הישאר באפליקציה</button>' +
+            '<button type="button" id="appExitConfirmBtn" class="btn-secondary player-exit-btn tv-focusable">צא למסך הסטרימר</button>' +
+          '</div>' +
+        '</div>';
+      document.body.appendChild(appExitDiv);
     }
 
     // Ensure #liveNewsTickerBar exists inside #explorerDropdownsBar even when #explorerDropdownsBar already existed on older APK DOMs
@@ -13843,7 +14562,8 @@
   }
 
   function bootStreamItApp() {
-    if (window.__STREAMIT_V990_BOOT_DONE) return;
+    if (window.__STREAMIT_V991_BOOT_DONE) return;
+    window.__STREAMIT_V991_BOOT_DONE = true;
     window.__STREAMIT_V990_BOOT_DONE = true;
     window.__STREAMIT_V989_BOOT_DONE = true;
     window.__STREAMIT_V988_BOOT_DONE = true;
@@ -13863,6 +14583,12 @@
       }
     }
 
+    try {
+      if (window.history && typeof window.history.pushState === 'function') {
+        window.history.pushState({ streamItGuard: true }, '', window.location.href);
+      }
+    } catch (eInitHist) {}
+
     upgradeDomFromV93ToV94IfNeeded();
     if (window.TVNavigation && typeof window.TVNavigation.rebindAll === 'function') {
       window.TVNavigation.rebindAll();
@@ -13877,7 +14603,9 @@
     updateAuthUi();
     updateVersionBadgesUi();
     initLiveNewsTicker();
-    loadCatalog();
+    probeLocalPythonBackend().then(function () {
+      loadCatalog();
+    });
     syncAccountStateFromCloudVault().catch(function () {});
     // Continuous Cross-Device Cloud Sync: pull latest Resume Playback & Watchlist when switching devices or returning to the app
     if (!state.cloudPeriodicSyncInterval) {

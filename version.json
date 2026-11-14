@@ -1,10 +1,10 @@
 {
-  "version": "9.9.0",
+  "version": "9.9.1",
   "native_apk_version": "9.8.8",
   "apk_download_url": "https://streamittvapp.github.io/stream-it-app/StreamIt-AndroidTV.apk",
   "apk_short_url": "https://is.gd/streamitapk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-13T12:28:00Z",
-  "notes": "v9.9.0 — 1px Remote Focus Borders (Red on grey buttons / White on red buttons) + Streamer QR Code DOM Injection & Dedicated Mobile Phone QR Pairing Confirmation Screen."
+  "updated_at": "2026-11-14T22:15:00Z",
+  "notes": "v9.9.1 — Step-by-step Back navigation history + App Exit guard, Original-Language 1080p audio enforcement (no foreign dubs), exact title/year ID verification, and Viva / Turkish Dramas & Telenovelas VOD + Live channels."
 }

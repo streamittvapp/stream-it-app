@@ -12,7 +12,7 @@
 (function () {
   'use strict';
 
-  var NAV_VERSION = '9.8.9';
+  var NAV_VERSION = '9.9.1';
   try {
     var pendingOtaVer = localStorage.getItem('streamit_ota_version_v9') || '';
     var pendingOtaNav = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
@@ -145,6 +145,9 @@
   function getActiveScope() {
     var vk = document.getElementById('tvVirtualKeyboard');
     if (vk && !vk.classList.contains('hidden')) return vk;
+
+    var appExitModal = document.getElementById('appExitConfirmModal');
+    if (appExitModal && !appExitModal.classList.contains('hidden')) return appExitModal;
 
     var clearCwModal = document.getElementById('clearCwConfirmModal');
     if (clearCwModal && !clearCwModal.classList.contains('hidden')) return clearCwModal;
@@ -2545,13 +2548,33 @@
         var vid0 = document.getElementById('videoElement');
         if (vid0) { try { vid0.pause(); vid0.removeAttribute('src'); vid0.load(); } catch (e) {} }
       }
-      if (lastMainFocus && isElementVisible(lastMainFocus)) setFocus(lastMainFocus);
+      var detAfter0 = document.getElementById('detailsModal');
+      if ((!detAfter0 || detAfter0.classList.contains('hidden')) && lastMainFocus && isElementVisible(lastMainFocus)) {
+        setFocus(lastMainFocus);
+      }
       return true;
     }
 
     var vk = document.getElementById('tvVirtualKeyboard');
     if (vk && !vk.classList.contains('hidden')) {
-      return closeVirtualKeyboard();
+      closeVirtualKeyboard();
+      return true;
+    }
+
+    var appExitModal = document.getElementById('appExitConfirmModal');
+    if (appExitModal && !appExitModal.classList.contains('hidden')) {
+      if (window.__streamItAllowNativeBackExit) {
+        window.__streamItAllowNativeBackExit = false;
+        appExitModal.classList.add('hidden');
+        return false;
+      }
+      if (typeof window.cancelAppExitConfirm === 'function') {
+        window.cancelAppExitConfirm();
+      } else {
+        appExitModal.classList.add('hidden');
+        if (lastMainFocus && isElementVisible(lastMainFocus)) setFocus(lastMainFocus, { scroll: false });
+      }
+      return true;
     }
 
     var clearCwModal = document.getElementById('clearCwConfirmModal');
@@ -2653,7 +2676,10 @@
           var vid1 = document.getElementById('videoElement');
           if (vid1) { try { vid1.pause(); vid1.removeAttribute('src'); vid1.load(); } catch (e) {} }
         }
-        if (lastMainFocus && isElementVisible(lastMainFocus)) setFocus(lastMainFocus);
+        var detAfter1 = document.getElementById('detailsModal');
+        if ((!detAfter1 || detAfter1.classList.contains('hidden')) && lastMainFocus && isElementVisible(lastMainFocus)) {
+          setFocus(lastMainFocus);
+        }
         return true;
       }
 
@@ -2672,7 +2698,10 @@
         var vid2 = document.getElementById('videoElement');
         if (vid2) { try { vid2.pause(); vid2.removeAttribute('src'); vid2.load(); } catch (e) {} }
       }
-      if (lastMainFocus && isElementVisible(lastMainFocus)) setFocus(lastMainFocus);
+      var detAfter2 = document.getElementById('detailsModal');
+      if ((!detAfter2 || detAfter2.classList.contains('hidden')) && lastMainFocus && isElementVisible(lastMainFocus)) {
+        setFocus(lastMainFocus);
+      }
       return true;
     }
 
@@ -2765,10 +2794,10 @@
       return true;
     }
 
-    var liveImporter = document.getElementById('liveM3uImporterPanel');
+    var liveImporter = document.getElementById('liveImporterPanel') || document.getElementById('liveM3uImporterPanel');
     if (liveImporter && !liveImporter.classList.contains('hidden')) {
       liveImporter.classList.add('hidden');
-      var impBtn = document.getElementById('openLiveImporterBtn');
+      var impBtn = document.getElementById('toggleLiveImporterBtn') || document.getElementById('openLiveImporterBtn');
       if (impBtn && isElementVisible(impBtn)) setFocus(impBtn);
       return true;
     }
@@ -2784,31 +2813,61 @@
         try { document.activeElement.blur(); } catch (e) {}
       }
       if (lastMainFocus && isElementVisible(lastMainFocus) && !sideRail.contains(lastMainFocus)) {
-        return setFocus(lastMainFocus);
+        setFocus(lastMainFocus);
+        return true;
       }
       var firstTile = document.querySelector('#catalogMain .poster-card');
       if (firstTile && isElementVisible(firstTile)) {
-        return setFocus(firstTile);
+        setFocus(firstTile);
+        return true;
       }
       var heroPlay = document.getElementById('heroPlayBtn');
       if (heroPlay && isElementVisible(heroPlay)) {
-        return setFocus(heroPlay);
+        setFocus(heroPlay);
+        return true;
       }
       return true;
     }
 
-    // On Home Stage: if scrolled down or not inside #topHeader, Back scrolls to top & focuses Top Header!
+    // Step-by-step Catalog History Back: if user navigated into a category, genre, provider, year, actor, search, or live group, step back ONE screen!
+    if (typeof window.stepBackCatalogNavigation === 'function') {
+      if (window.stepBackCatalogNavigation()) {
+        return true;
+      }
+    }
+
+    // On Home Stage: if scrolled down, Back scrolls smoothly to top & focuses Hero / Top Header!
     var catalogMain = document.getElementById('catalogMain');
     var topHeader = document.getElementById('topHeader');
-    if (catalogMain && catalogMain.scrollTop > 60) {
-      catalogMain.scrollTop = 0;
-      if (focusTopHeaderNav(false)) return true;
+    if ((catalogMain && catalogMain.scrollTop > 60) || (window.scrollY && window.scrollY > 60)) {
+      if (catalogMain) catalogMain.scrollTop = 0;
+      try { window.scrollTo(0, 0); } catch (eScr) {}
+      if (!focusTopHeaderNav(false)) {
+        var topHeroPlay = document.getElementById('heroPlayBtn') || document.querySelector('#catalogMain .poster-card');
+        if (topHeroPlay && isElementVisible(topHeroPlay)) setFocus(topHeroPlay, { scroll: false });
+      }
+      return true;
     }
     if (topHeader && isElementVisible(topHeader) && (!currentFocused || !topHeader.contains(currentFocused))) {
       if (focusTopHeaderNav(false)) return true;
     }
 
-    return false;
+    // At Home Root: NEVER abruptly exit the app! In TV/Streamer mode, open the polite Exit Confirmation Dialog ("לצאת מ-STREAM IT?").
+    if (isTv || (window.AndroidTvBridge && typeof window.AndroidTvBridge.isAndroidTv === 'function')) {
+      if (typeof window.openAppExitConfirmModal === 'function') {
+        window.openAppExitConfirmModal();
+        return true;
+      }
+      var exitAppEl = document.getElementById('appExitConfirmModal');
+      if (exitAppEl) {
+        exitAppEl.classList.remove('hidden');
+        var stayBtn = document.getElementById('appExitCancelBtn');
+        if (stayBtn && isElementVisible(stayBtn)) setFocus(stayBtn, { scroll: false });
+        return true;
+      }
+    }
+
+    return true;
   }
 
   /**
@@ -2946,6 +3005,21 @@
     var vk = document.getElementById('tvVirtualKeyboard');
     if (vk && !vk.classList.contains('hidden')) {
       return navigateVirtualKeyboard(directionOrAction);
+    }
+
+    var appExitModalNav = document.getElementById('appExitConfirmModal');
+    if (appExitModalNav && !appExitModalNav.classList.contains('hidden')) {
+      var appStayBtn = document.getElementById('appExitCancelBtn');
+      var appLeaveBtn = document.getElementById('appExitConfirmBtn');
+      if (currentFocused === appStayBtn && appLeaveBtn && isElementVisible(appLeaveBtn)) {
+        setFocus(appLeaveBtn, { scroll: false });
+        return true;
+      }
+      if (appStayBtn && isElementVisible(appStayBtn)) {
+        setFocus(appStayBtn, { scroll: false });
+        return true;
+      }
+      return true;
     }
 
     var clearCwModalNav = document.getElementById('clearCwConfirmModal');

@@ -130,7 +130,7 @@ public class StreamItEmbeddedServer {
             Map<String, String> params = parseQuery(query);
 
             if ("/api/health".equals(path)) {
-                byte[] body = "{\"ok\":true,\"mode\":\"android_embedded_server\",\"version\":\"9.8.2\",\"ota_ver_url\":\"https://is.gd/streamittv_ver\",\"ota_apk_url\":\"https://is.gd/streamittv_apk\"}"
+                byte[] body = "{\"ok\":true,\"mode\":\"android_embedded_server\",\"version\":\"9.9.1\",\"ota_ver_url\":\"https://is.gd/streamittv_ver\",\"ota_apk_url\":\"https://is.gd/streamittv_apk\"}"
                         .getBytes(StandardCharsets.UTF_8);
                 sendResponse(out, 200, "application/json; charset=utf-8", body);
             } else if ("/api/ota".equals(path)) {
@@ -155,29 +155,79 @@ public class StreamItEmbeddedServer {
     }
 
     public String resolveDirectStreamSync(String rawType, String rawImdbId, String rawSeason, String rawEpisode) {
-        return resolveDirectStreamSync(rawType, rawImdbId, "", rawSeason, rawEpisode);
+        return resolveDirectStreamSync(rawType, rawImdbId, "", rawSeason, rawEpisode, "", "", "");
     }
 
     public String resolveDirectStreamSync(String rawType, String rawImdbId, String rawTmdbId, String rawSeason, String rawEpisode) {
+        return resolveDirectStreamSync(rawType, rawImdbId, rawTmdbId, rawSeason, rawEpisode, "", "", "");
+    }
+
+    private static String normalizeTitleForMatch(String s) {
+        if (s == null) return "";
+        return s.toLowerCase().replaceAll("[^a-z0-9\\u0590-\\u05ff]+", "");
+    }
+
+    private static boolean isReturnedTitlePlausible(String expectedTitle, String expectedYear, String returnedTitle, int returnedYear, String origLang) {
+        if (expectedYear != null && expectedYear.matches("\\d{4}") && returnedYear > 1900) {
+            int expYr = Integer.parseInt(expectedYear);
+            if (Math.abs(expYr - returnedYear) > 2) {
+                return false;
+            }
+        }
+        // Only compare Latin titles directly when original language is English (non-English titles have localized vs English names)
+        if ("en".equalsIgnoreCase(origLang)) {
+            String normExp = normalizeTitleForMatch(expectedTitle);
+            String normRet = normalizeTitleForMatch(returnedTitle);
+            if (!normExp.isEmpty() && !normRet.isEmpty() && normExp.matches("[a-z0-9]+") && normRet.matches("[a-z0-9]+")) {
+                if (!normExp.contains(normRet) && !normRet.contains(normExp)) {
+                    int minLen = Math.min(normExp.length(), normRet.length());
+                    if (minLen >= 4) {
+                        String prefix = normExp.substring(0, Math.min(4, normExp.length()));
+                        if (!normRet.contains(prefix)) {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    public String resolveDirectStreamSync(
+            String rawType,
+            String rawImdbId,
+            String rawTmdbId,
+            String rawSeason,
+            String rawEpisode,
+            String rawOrigLang,
+            String rawExpectedTitle,
+            String rawExpectedYear
+    ) {
         String itemType = (rawType != null && !rawType.trim().isEmpty()) ? rawType.trim() : "movie";
-        String imdbId = (rawImdbId != null && !rawImdbId.trim().isEmpty()) ? rawImdbId.split(":")[0].trim() : "tt15239678";
+        String imdbId = (rawImdbId != null && !rawImdbId.trim().isEmpty()) ? rawImdbId.split(":")[0].trim() : "";
         String tmdbId = (rawTmdbId != null) ? rawTmdbId.replaceAll("\\D", "") : "";
         String season = (rawSeason != null && !rawSeason.trim().isEmpty()) ? rawSeason.trim() : "1";
         String episode = (rawEpisode != null && !rawEpisode.trim().isEmpty()) ? rawEpisode.trim() : "1";
+        String origLang = (rawOrigLang != null && !rawOrigLang.trim().isEmpty()) ? rawOrigLang.trim().toLowerCase() : "en";
+        String expectedTitle = (rawExpectedTitle != null) ? rawExpectedTitle.trim() : "";
+        String expectedYear = (rawExpectedYear != null) ? rawExpectedYear.replaceAll("\\D", "") : "";
 
-        String cacheKey = itemType + ":" + imdbId + ":" + tmdbId + ":" + season + ":" + episode;
+        String cacheKey = itemType + ":" + imdbId + ":" + tmdbId + ":" + season + ":" + episode + ":" + origLang;
         long now = System.currentTimeMillis();
         CachedItem cached = directStreamCache.get(cacheKey);
         if (cached != null && (now - cached.timestampMs) < 900_000L) {
             return cached.value;
         }
 
-        // Fast Direct 4K/1080p HLS Multi-Server Resolver via cdn.vidspark.to & vidsrc.pm (vjej -> b4tz -> w7dn)
+        // Priority 1: Original-Language 1080p HLS source ("w7dn" = Nebula Original Audio) across verified hosts!
+        // Never allow "vjej" (Russian/foreign-dubbed mirror) on non-English titles (Israeli he, Turkish tr, Spanish es, Korean ko, etc.)!
         if (!tmdbId.isEmpty()) {
             String[] vidoraHosts = new String[]{"https://cdn.vidspark.to", "https://vidsrc.pm"};
-            String[] vidoraSources = new String[]{"vjej", "b4tz", "w7dn"};
-            for (String host : vidoraHosts) {
-                for (String srcKey : vidoraSources) {
+            String[] vidoraSources = "en".equals(origLang)
+                    ? new String[]{"w7dn", "vjej"}
+                    : new String[]{"w7dn"};
+            for (String srcKey : vidoraSources) {
+                for (String host : vidoraHosts) {
                     try {
                         String vpPath = ("series".equalsIgnoreCase(itemType) || "tv".equalsIgnoreCase(itemType))
                                 ? ("/api/vidora/v1/tv/" + tmdbId + "/" + season + "/" + episode + "?source=" + srcKey)
@@ -185,18 +235,34 @@ public class StreamItEmbeddedServer {
                         Map<String, String> hVp = new HashMap<>();
                         hVp.put("User-Agent", USER_AGENT);
                         hVp.put("Referer", host + "/");
+                        hVp.put("Origin", host);
                         hVp.put("x-player-key", "f3b72e73c80c9a996574379798703796a1936efa3516a7105cb0e43048b46b5a");
-                        String vpRaw = new String(httpGetBytes(host + vpPath, hVp, 2200), StandardCharsets.UTF_8);
+                        String vpRaw = new String(httpGetBytes(host + vpPath, hVp, 3200), StandardCharsets.UTF_8);
                         JSONObject vpObj = new JSONObject(vpRaw);
+                        if (!vpObj.optBoolean("result", true)) continue;
+                        String retTitle = vpObj.optString("title", "");
+                        int retYear = vpObj.optInt("year", 0);
+                        if (!isReturnedTitlePlausible(expectedTitle, expectedYear, retTitle, retYear, origLang)) {
+                            continue;
+                        }
                         JSONArray sources = vpObj.optJSONArray("sources");
                         if (sources != null && sources.length() > 0) {
-                            String rawStreamUrl = sources.getJSONObject(0).optString("url", "");
+                            JSONObject s0 = sources.getJSONObject(0);
+                            String actualSrc = s0.optString("source", srcKey);
+                            // Block silent backend fallback to dubbed "vjej" when requesting original audio!
+                            if (!"en".equals(origLang) && "vjej".equalsIgnoreCase(actualSrc)) {
+                                continue;
+                            }
+                            if ("w7dn".equals(srcKey) && !"w7dn".equalsIgnoreCase(actualSrc)) {
+                                continue;
+                            }
+                            String rawStreamUrl = s0.optString("url", "");
                             if (rawStreamUrl.startsWith("http")) {
                                 String finalStreamUrl = rawStreamUrl;
                                 if (rawStreamUrl.contains("url=")) {
                                     try {
                                         String innerM3u8 = "";
-                                        String innerOrigin = "https://cloudnestra.com";
+                                        String innerOrigin = "https://vidrock.to";
                                         URI uWrap = new URI(rawStreamUrl);
                                         String qWrap = uWrap.getRawQuery();
                                         if (qWrap != null) {
@@ -208,7 +274,9 @@ public class StreamItEmbeddedServer {
                                                     if ("url".equals(k)) {
                                                         innerM3u8 = v;
                                                     } else if ("data".equals(k)) {
-                                                        String decData = new String(Base64.decode(v, Base64.DEFAULT), StandardCharsets.UTF_8);
+                                                        String padded = v;
+                                                        while (padded.length() % 4 != 0) padded += "=";
+                                                        String decData = new String(Base64.decode(padded, Base64.DEFAULT), StandardCharsets.UTF_8);
                                                         for (String dPart : decData.split("\\|")) {
                                                             if (dPart.startsWith("Origin=")) {
                                                                 innerOrigin = dPart.substring("Origin=".length()).trim();
@@ -229,6 +297,8 @@ public class StreamItEmbeddedServer {
                                 JSONObject fb = new JSONObject();
                                 fb.put("ok", true);
                                 fb.put("imdb_id", imdbId);
+                                fb.put("source", actualSrc);
+                                fb.put("title", retTitle);
                                 fb.put("streamUrl", finalStreamUrl);
                                 String fbStr = fb.toString();
                                 directStreamCache.put(cacheKey, new CachedItem(now, fbStr));
@@ -294,11 +364,14 @@ public class StreamItEmbeddedServer {
 
     private void handleDirectStream(OutputStream out, Map<String, String> params) throws Exception {
         String itemType = getOrDefault(params, "type", "movie").trim();
-        String imdbId = getOrDefault(params, "imdb_id", getOrDefault(params, "id", "tt15239678")).split(":")[0].trim();
+        String imdbId = getOrDefault(params, "imdb_id", getOrDefault(params, "id", "")).split(":")[0].trim();
         String tmdbId = getOrDefault(params, "tmdb_id", "").trim();
         String season = getOrDefault(params, "season", "1").trim();
         String episode = getOrDefault(params, "episode", "1").trim();
-        String jsonStr = resolveDirectStreamSync(itemType, imdbId, tmdbId, season, episode);
+        String origLang = getOrDefault(params, "orig_lang", "en").trim();
+        String expectedTitle = getOrDefault(params, "expected_title", "").trim();
+        String expectedYear = getOrDefault(params, "expected_year", "").trim();
+        String jsonStr = resolveDirectStreamSync(itemType, imdbId, tmdbId, season, episode, origLang, expectedTitle, expectedYear);
         sendResponse(out, 200, "application/json; charset=utf-8", jsonStr.getBytes(StandardCharsets.UTF_8));
     }
 

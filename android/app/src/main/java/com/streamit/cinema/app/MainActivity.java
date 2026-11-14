@@ -15,6 +15,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import androidx.activity.OnBackPressedCallback;
 import androidx.core.content.FileProvider;
 import com.getcapacitor.BridgeActivity;
 import org.json.JSONObject;
@@ -27,8 +28,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends BridgeActivity {
-    private static final String INSTALLED_APP_VERSION = "9.9.0";
-    private static final String INSTALLED_NATIVE_APK_VERSION = "9.8.8";
+    private static final String INSTALLED_APP_VERSION = "9.9.1";
+    private static final String INSTALLED_NATIVE_APK_VERSION = "9.9.1";
     private static final String OTA_PREFS_NAME = "streamit_ota_prefs";
     private StreamItEmbeddedServer embeddedServer;
     private volatile boolean apkUpdateInProgress = false;
@@ -171,11 +172,44 @@ public class MainActivity extends BridgeActivity {
                 }
             });
         }
+
+        @JavascriptInterface
+        public void exitApp() {
+            runOnUiThread(() -> {
+                try {
+                    finishAffinity();
+                } catch (Exception e) {
+                    finish();
+                }
+            });
+        }
+    }
+
+    private void routeBackButtonToWebView() {
+        runOnUiThread(() -> {
+            try {
+                if (getBridge() != null && getBridge().getWebView() != null) {
+                    WebView webView = getBridge().getWebView();
+                    webView.evaluateJavascript(
+                        "(function(){ try { if(window.TVNavigation && window.TVNavigation.handleAndroidBackButton) { window.TVNavigation.handleAndroidBackButton(); return true; } if(window.streamItTvKey) { window.streamItTvKey('back'); return true; } if(window.openAppExitConfirmModal) { window.openAppExitConfirmModal(); return true; } } catch(e){} return true; })()",
+                        null
+                    );
+                }
+            } catch (Exception ignored) {
+            }
+        });
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Intercept Android 12/13/14+ Predictive Back & BridgeActivity Back so remote Back NEVER kills the app!
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                routeBackButtonToWebView();
+            }
+        });
         // Prevent Android TV / Streamer screensaver from dimming or turning off the TV during movies
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
@@ -495,13 +529,19 @@ public class MainActivity extends BridgeActivity {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
+    public void onBackPressed() {
+        routeBackButtonToWebView();
+    }
+
+    @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (getBridge() != null && getBridge().getWebView() != null) {
             WebView webView = getBridge().getWebView();
             int keyCode = event.getKeyCode();
             int action = event.getAction();
 
-            // Consume ACTION_UP for D-Pad Center & Arrows so WebView never double-fires or scrolls erratically
+            // Consume ACTION_UP for D-Pad Center, Arrows & Back/Escape so WebView/Android never double-fires or exits
             if (action == KeyEvent.ACTION_UP) {
                 if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER
                         || keyCode == KeyEvent.KEYCODE_ENTER
@@ -510,7 +550,9 @@ public class MainActivity extends BridgeActivity {
                         || keyCode == KeyEvent.KEYCODE_DPAD_DOWN
                         || keyCode == KeyEvent.KEYCODE_DPAD_LEFT
                         || keyCode == KeyEvent.KEYCODE_DPAD_RIGHT
-                        || keyCode == KeyEvent.KEYCODE_BACK) {
+                        || keyCode == KeyEvent.KEYCODE_BACK
+                        || keyCode == KeyEvent.KEYCODE_ESCAPE
+                        || keyCode == KeyEvent.KEYCODE_BUTTON_B) {
                     return true;
                 }
             }
@@ -557,16 +599,11 @@ public class MainActivity extends BridgeActivity {
                     return true;
                 }
 
-                // 3. Back Button
-                if (keyCode == KeyEvent.KEYCODE_BACK) {
-                    webView.evaluateJavascript(
-                        "(function(){ if(window.TVNavigation && window.TVNavigation.handleAndroidBackButton) return !!window.TVNavigation.handleAndroidBackButton(); if(window.streamItTvKey) return !!window.streamItTvKey('back'); return false; })()",
-                        result -> {
-                            if (!"true".equals(result)) {
-                                runOnUiThread(MainActivity.super::onBackPressed);
-                            }
-                        }
-                    );
+                // 3. Back / Escape / Gamepad B Button -> Step-by-step In-App Back (NEVER exits app abruptly!)
+                if (keyCode == KeyEvent.KEYCODE_BACK
+                        || keyCode == KeyEvent.KEYCODE_ESCAPE
+                        || keyCode == KeyEvent.KEYCODE_BUTTON_B) {
+                    routeBackButtonToWebView();
                     return true;
                 }
 

@@ -13,6 +13,10 @@
       "name_he": "אימה"
     },
     {
+      "id": "viva",
+      "label": "ויוה ודרמות טורקיות"
+    },
+    {
       "id": "scifi",
       "name_he": "מדע בדיוני ופנטזיה"
     },
@@ -81,7 +85,8 @@
         "https://images.metahub.space/background/medium/tt1160419/img"
       ],
       "default_release": "Dune.Part.Two.2024.1080p.WEBRip.x264.AAC5.1-[YTS.MX].mp4",
-      "fps": 23.976
+      "fps": 23.976,
+      "original_language": "en"
     },
     {
       "id": "tt15398776",
@@ -119,7 +124,8 @@
         "https://image.tmdb.org/t/p/w780/rLb2cwF3Pazuxaj0sRXQ037tGI1.jpg"
       ],
       "default_release": "Oppenheimer.2023.1080p.BluRay.x264.AAC5.1-[YTS.MX].mp4",
-      "fps": 23.976
+      "fps": 23.976,
+      "original_language": "en"
     },
     {
       "id": "tt6263850",
@@ -159,7 +165,8 @@
         "https://image.tmdb.org/t/p/w780/dvBCdCohwWbsP5qAaglOXagDMtk.jpg"
       ],
       "default_release": "Deadpool.and.Wolverine.2024.1080p.WEBRip.x264.AAC5.1-[YTS.MX].mp4",
-      "fps": 23.976
+      "fps": 23.976,
+      "original_language": "en"
     },
     {
       "id": "tt0816692",
@@ -199,7 +206,8 @@
         "https://image.tmdb.org/t/p/w780/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg"
       ],
       "default_release": "Interstellar.2014.1080p.BluRay.x264.AAC5.1-[YTS.MX].mp4",
-      "fps": 23.976
+      "fps": 23.976,
+      "original_language": "en"
     },
     {
       "id": "tt1745960",
@@ -236,7 +244,8 @@
         "https://image.tmdb.org/t/p/w780/628Dep6AxEtDxjZoGP78TsOxYbK.jpg"
       ],
       "default_release": "Top.Gun.Maverick.2022.1080p.BluRay.x264.AAC5.1-[YTS.MX].mp4",
-      "fps": 23.976
+      "fps": 23.976,
+      "original_language": "en"
     },
     {
       "id": "tt0468569",
@@ -275,7 +284,8 @@
         "https://image.tmdb.org/t/p/w780/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg"
       ],
       "default_release": "The.Dark.Knight.2008.1080p.BluRay.x264.AAC-[YTS.MX].mp4",
-      "fps": 23.976
+      "fps": 23.976,
+      "original_language": "en"
     },
     {
       "id": "tt9362722",
@@ -314,7 +324,8 @@
         "https://image.tmdb.org/t/p/w780/4HodYYKEIsGOdinkGi2Ucz6X9i0.jpg"
       ],
       "default_release": "Spider-Man.Across.the.Spider-Verse.2023.1080p.WEBRip.x264-[YTS.MX].mp4",
-      "fps": 23.976
+      "fps": 23.976,
+      "original_language": "en"
     },
     {
       "id": "tt1375666",
@@ -353,7 +364,8 @@
         "https://image.tmdb.org/t/p/w780/8ZTVqvKDQ8emSGUEMjsS4yHAwrp.jpg"
       ],
       "default_release": "Inception.2010.1080p.BluRay.x264.AAC-[YTS.MX].mp4",
-      "fps": 23.976
+      "fps": 23.976,
+      "original_language": "en"
     },
     {
       "id": "tt1877830",
@@ -390,7 +402,8 @@
         "https://image.tmdb.org/t/p/w780/b0PlSFdDwbyK0cf5RxwDpaOJQvQ.jpg"
       ],
       "default_release": "The.Batman.2022.1080p.WEBRip.x264.AAC5.1-[YTS.MX].mp4",
-      "fps": 23.976
+      "fps": 23.976,
+      "original_language": "en"
     },
     {
       "id": "tt6710474",
@@ -426,7 +439,8 @@
         "https://images.metahub.space/background/medium/tt6710474/img"
       ],
       "default_release": "Everything.Everywhere.All.at.Once.2022.1080p.BluRay.x264-[YTS.MX].mp4",
-      "fps": 23.976
+      "fps": 23.976,
+      "original_language": "en"
     },
     {
       "id": "tt22022452",
@@ -460,7 +474,8 @@
         "https://images.metahub.space/background/medium/tt22022452/img"
       ],
       "default_release": "Inside.Out.2.2024.1080p.WEBRip.x264.AAC5.1-[YTS.MX].mp4",
-      "fps": 23.976
+      "fps": 23.976,
+      "original_language": "en"
     },
     {
       "id": "tt9218128",
@@ -494,7 +509,8 @@
         "https://images.metahub.space/background/medium/tt9218128/img"
       ],
       "default_release": "Gladiator.II.2024.1080p.WEBRip.x264.AAC5.1-[YTS.MX].mp4",
-      "fps": 23.976
+      "fps": 23.976,
+      "original_language": "en"
     },
     {
       "id": "tt1160419",
@@ -530,7 +546,8 @@
         "https://images.metahub.space/background/medium/tt1160419/img"
       ],
       "default_release": "Dune.2021.1080p.BluRay.x264.AAC5.1-[YTS.MX].mp4",
-      "fps": 23.976
+      "fps": 23.976,
+      "original_language": "en"
     },
     {
       "id": "tt6751668",
@@ -566,7 +583,8 @@
         "https://images.metahub.space/background/medium/tt6751668/img"
       ],
       "default_release": "Parasite.2019.1080p.BluRay.x264.AAC5.1-[YTS.MX].mp4",
-      "fps": 23.976
+      "fps": 23.976,
+      "original_language": "ko"
     },
     {
       "id": "tt0111161",
@@ -600,7 +618,8 @@
         "https://images.metahub.space/background/medium/tt0111161/img"
       ],
       "default_release": "The.Shawshank.Redemption.1994.1080p.BluRay.x264-[YTS.MX].mp4",
-      "fps": 23.976
+      "fps": 23.976,
+      "original_language": "en"
     },
     {
       "id": "tt1185616",
@@ -638,7 +657,8 @@
         "https://images.metahub.space/background/medium/tt1185616/img"
       ],
       "default_release": "Waltz.with.Bashir.2008.1080p.BluRay.x264-[YTS.MX].mp4",
-      "fps": 23.976
+      "fps": 23.976,
+      "original_language": "he"
     },
     {
       "id": "tt0758732",
@@ -675,7 +695,8 @@
         "https://images.metahub.space/background/medium/tt0758732/img"
       ],
       "default_release": "Beaufort.2007.2160p.4K.WEB-DL.x265.HEBREW.mp4",
-      "fps": 25
+      "fps": 25,
+      "original_language": "he"
     },
     {
       "id": "tt3501632",
@@ -711,7 +732,8 @@
         "https://images.metahub.space/background/medium/tt3501632/img"
       ],
       "default_release": "Thor.Ragnarok.2017.1080p.BluRay.x264-[YTS.MX].mp4",
-      "fps": 23.976
+      "fps": 23.976,
+      "original_language": "en"
     },
     {
       "id": "tt26581740",
@@ -749,7 +771,8 @@
         "https://images.metahub.space/background/medium/tt26581740/img"
       ],
       "default_release": "Weapons.2025.1080p.WEBRip.x264.AAC5.1-[YTS.MX].mp4",
-      "fps": 23.976
+      "fps": 23.976,
+      "original_language": "en"
     },
     {
       "id": "tt17526714",
@@ -785,7 +808,8 @@
         "https://images.metahub.space/background/medium/tt17526714/img"
       ],
       "default_release": "The.Substance.2024.1080p.WEBRip.x264.AAC5.1-[YTS.MX].mp4",
-      "fps": 23.976
+      "fps": 23.976,
+      "original_language": "en"
     },
     {
       "id": "tt5040012",
@@ -820,7 +844,8 @@
         "https://images.metahub.space/background/medium/tt5040012/img"
       ],
       "default_release": "Nosferatu.2024.1080p.WEBRip.x264.AAC5.1-[YTS.MX].mp4",
-      "fps": 23.976
+      "fps": 23.976,
+      "original_language": "en"
     },
     {
       "id": "tt7784604",
@@ -856,7 +881,8 @@
         "https://images.metahub.space/background/medium/tt7784604/img"
       ],
       "default_release": "Hereditary.2018.1080p.BluRay.x264-[YTS.MX].mp4",
-      "fps": 23.976
+      "fps": 23.976,
+      "original_language": "en"
     },
     {
       "id": "tt1457767",
@@ -891,7 +917,8 @@
         "https://images.metahub.space/background/medium/tt1457767/img"
       ],
       "default_release": "The.Conjuring.2013.1080p.BluRay.x264-[YTS.MX].mp4",
-      "fps": 23.976
+      "fps": 23.976,
+      "original_language": "en"
     },
     {
       "id": "tt0162661",
@@ -927,7 +954,8 @@
         "https://images.metahub.space/background/medium/tt0162661/img"
       ],
       "default_release": "Sleepy.Hollow.1999.1080p.BluRay.x264-[YTS.MX].mp4",
-      "fps": 23.976
+      "fps": 23.976,
+      "original_language": "en"
     },
     {
       "id": "tt0117571",
@@ -962,7 +990,8 @@
         "https://images.metahub.space/background/medium/tt0117571/img"
       ],
       "default_release": "Scream.1996.1080p.BluRay.x264-[YTS.MX].mp4",
-      "fps": 23.976
+      "fps": 23.976,
+      "original_language": "en"
     }
   ],
   "series": [
@@ -1051,7 +1080,8 @@
             }
           ]
         }
-      ]
+      ],
+      "original_language": "en"
     },
     {
       "id": "tt0903747",
@@ -1129,7 +1159,8 @@
             }
           ]
         }
-      ]
+      ],
+      "original_language": "en"
     },
     {
       "id": "tt4565380",
@@ -1208,7 +1239,8 @@
             }
           ]
         }
-      ]
+      ],
+      "original_language": "he"
     },
     {
       "id": "tt10577736",
@@ -1263,7 +1295,8 @@
             }
           ]
         }
-      ]
+      ],
+      "original_language": "he"
     },
     {
       "id": "tt8190688",
@@ -1318,7 +1351,8 @@
             }
           ]
         }
-      ]
+      ],
+      "original_language": "he"
     },
     {
       "id": "tt3069894",
@@ -1371,7 +1405,8 @@
             }
           ]
         }
-      ]
+      ],
+      "original_language": "he"
     },
     {
       "id": "tt8796226",
@@ -1408,11 +1443,131 @@
         "https://image.tmdb.org/t/p/w1280/jrUhKORA13PslES38kJRRncqzlH.jpg"
       ],
       "yt_episodes_by_season": {
-        "1": ["xcXpKgjBxVE", "S5LWUnuJ6HY", "D2BClPCAZ3M", "k9NevIGM8To", "-oJYZpYzxOg", "vim9BabC6cA", "rIziOWvoPFk", "F2zhYgwNElQ", "p5_B-W6bxa4", "yu3XjhkTrlk", "OI5TMh5C04M", "M3glzgR5NTw", "CnX9c2FlPIk", "xr7Cp6kuJVE", "IjColYfsthQ", "GXLGVYEd5kk", "xesT_Yj2dLU", "FfB6wDVyjjU", "eEfzI2lwveE", "vzcinCqpN9k"],
-        "2": ["cOgDVvpz-Ww", "83PqTMga2oM", "PBQZz1xuYK8", "eyAMuGeZ9RA", "bQzstRIfghQ", "sMR_--zYApg", "-itB3hpl7gQ", "ATx7nzqP-E4", "X_EbFZ_UZBc", "yiIcldovEwI", "bHDB2916l_g", "m-OzT2AKQ7k", "pBWlYbHmkJ4", "QgAmuR_jabE", "XsVVGpb-X5E", "xF7oMsU5des", "JB2IySKvXfc", "wauwpe0FxEU", "CF48yUSGFj8", "Y6XR7sIvlzE", "sUk3HfSllFc", "Gxus5hWj2ko"],
-        "3": ["vPHTo9NsnNI", "Er030BPnVl0", "NsjeEt1ZpqQ", "SJhz7KFE3Hg", "gnAyOSwMjEw", "3_p3Q293u44", "82jdHBw1pEE", "fwIN1UESTcc", "ii_P3Hc8AJo", "3RkC309_Ako", "FMk5wxwdkQc", "cUfwFKT4DvA", "q8Nq-xNxUjo", "iceLA7lhoEI", "b_cJIoOQCSw", "zf_bnvCIzeM", "ShyPwmDHUd0", "FOfV6mUDlfI", "H19Wp_kO6XQ", "bKd7dnnuNLo", "sKWgGUVW000", "OLjSvY_MKC4", "7YRO_uOiwCQ", "2kShI3LqMNc", "h6cKDxHfV3Y", "4_wWSTJ4FEY", "QMPokM7RoBQ"],
-        "4": ["1czhcHL-YwA", "EaMcZYTxaDU", "GGBXF3mMrj4", "SQw9PRlZ60Q", "zyP0st9aW6w", "KK4zLYp_O6E", "lFvrjguieo0", "mxDzbynZTMU", "sYLlJjdKNS0", "bB-1vs2XBo8", "fbhM6mV2DGE", "gRrIBT6EVCI", "JUfVRoaHvDg", "6MRvKxhiJmg", "4T2lUsxZc50", "NSBysaSZ3jg", "dFg16e0vhuU", "9Ab0ieHY9rg", "GL2KeRhl5YY", "kUgwDdxQ2i0", "XjjhvXBLZiM", "TwWZSW2GkXY", "N1QtAXj9y48"],
-        "5": ["iL686rbf82M", "UKww1xabTNQ", "ihH9gucGRS4", "OWUaTKTQ-bo", "hqyK0VQVsPQ", "9m-aRG2DHYk", "KMR00mcwuHw", "Pqp5r24VXHI", "YvxVA7sxdks", "Np6j5oLwLts", "f_DGjoiaGVM", "3Pn6rOarD9w", "sV_prJK6TV4", "woGDLM3Tdr0", "4eJGg635cGs", "BWZ9_y3ldK4", "dB9KFZWOmhw", "erfGJAvedjg", "Ssy21RjZjyg", "FfaGNnDC3fY", "Gpl22YoFpk0", "r3ny3GjuvZM", "7lsWf4zhLyI"]
+        "1": [
+          "xcXpKgjBxVE",
+          "S5LWUnuJ6HY",
+          "D2BClPCAZ3M",
+          "k9NevIGM8To",
+          "-oJYZpYzxOg",
+          "vim9BabC6cA",
+          "rIziOWvoPFk",
+          "F2zhYgwNElQ",
+          "p5_B-W6bxa4",
+          "yu3XjhkTrlk",
+          "OI5TMh5C04M",
+          "M3glzgR5NTw",
+          "CnX9c2FlPIk",
+          "xr7Cp6kuJVE",
+          "IjColYfsthQ",
+          "GXLGVYEd5kk",
+          "xesT_Yj2dLU",
+          "FfB6wDVyjjU",
+          "eEfzI2lwveE",
+          "vzcinCqpN9k"
+        ],
+        "2": [
+          "cOgDVvpz-Ww",
+          "83PqTMga2oM",
+          "PBQZz1xuYK8",
+          "eyAMuGeZ9RA",
+          "bQzstRIfghQ",
+          "sMR_--zYApg",
+          "-itB3hpl7gQ",
+          "ATx7nzqP-E4",
+          "X_EbFZ_UZBc",
+          "yiIcldovEwI",
+          "bHDB2916l_g",
+          "m-OzT2AKQ7k",
+          "pBWlYbHmkJ4",
+          "QgAmuR_jabE",
+          "XsVVGpb-X5E",
+          "xF7oMsU5des",
+          "JB2IySKvXfc",
+          "wauwpe0FxEU",
+          "CF48yUSGFj8",
+          "Y6XR7sIvlzE",
+          "sUk3HfSllFc",
+          "Gxus5hWj2ko"
+        ],
+        "3": [
+          "vPHTo9NsnNI",
+          "Er030BPnVl0",
+          "NsjeEt1ZpqQ",
+          "SJhz7KFE3Hg",
+          "gnAyOSwMjEw",
+          "3_p3Q293u44",
+          "82jdHBw1pEE",
+          "fwIN1UESTcc",
+          "ii_P3Hc8AJo",
+          "3RkC309_Ako",
+          "FMk5wxwdkQc",
+          "cUfwFKT4DvA",
+          "q8Nq-xNxUjo",
+          "iceLA7lhoEI",
+          "b_cJIoOQCSw",
+          "zf_bnvCIzeM",
+          "ShyPwmDHUd0",
+          "FOfV6mUDlfI",
+          "H19Wp_kO6XQ",
+          "bKd7dnnuNLo",
+          "sKWgGUVW000",
+          "OLjSvY_MKC4",
+          "7YRO_uOiwCQ",
+          "2kShI3LqMNc",
+          "h6cKDxHfV3Y",
+          "4_wWSTJ4FEY",
+          "QMPokM7RoBQ"
+        ],
+        "4": [
+          "1czhcHL-YwA",
+          "EaMcZYTxaDU",
+          "GGBXF3mMrj4",
+          "SQw9PRlZ60Q",
+          "zyP0st9aW6w",
+          "KK4zLYp_O6E",
+          "lFvrjguieo0",
+          "mxDzbynZTMU",
+          "sYLlJjdKNS0",
+          "bB-1vs2XBo8",
+          "fbhM6mV2DGE",
+          "gRrIBT6EVCI",
+          "JUfVRoaHvDg",
+          "6MRvKxhiJmg",
+          "4T2lUsxZc50",
+          "NSBysaSZ3jg",
+          "dFg16e0vhuU",
+          "9Ab0ieHY9rg",
+          "GL2KeRhl5YY",
+          "kUgwDdxQ2i0",
+          "XjjhvXBLZiM",
+          "TwWZSW2GkXY",
+          "N1QtAXj9y48"
+        ],
+        "5": [
+          "iL686rbf82M",
+          "UKww1xabTNQ",
+          "ihH9gucGRS4",
+          "OWUaTKTQ-bo",
+          "hqyK0VQVsPQ",
+          "9m-aRG2DHYk",
+          "KMR00mcwuHw",
+          "Pqp5r24VXHI",
+          "YvxVA7sxdks",
+          "Np6j5oLwLts",
+          "f_DGjoiaGVM",
+          "3Pn6rOarD9w",
+          "sV_prJK6TV4",
+          "woGDLM3Tdr0",
+          "4eJGg635cGs",
+          "BWZ9_y3ldK4",
+          "dB9KFZWOmhw",
+          "erfGJAvedjg",
+          "Ssy21RjZjyg",
+          "FfaGNnDC3fY",
+          "Gpl22YoFpk0",
+          "r3ny3GjuvZM",
+          "7lsWf4zhLyI"
+        ]
       },
       "seasons": [
         {
@@ -1433,7 +1588,8 @@
             }
           ]
         }
-      ]
+      ],
+      "original_language": "he"
     },
     {
       "id": "tt0904106",
@@ -1489,7 +1645,8 @@
             }
           ]
         }
-      ]
+      ],
+      "original_language": "he"
     },
     {
       "id": "tt3581920",
@@ -1543,7 +1700,8 @@
             }
           ]
         }
-      ]
+      ],
+      "original_language": "en"
     },
     {
       "id": "tt11198330",
@@ -1597,7 +1755,8 @@
             }
           ]
         }
-      ]
+      ],
+      "original_language": "en"
     },
     {
       "id": "tt14688458",
@@ -1651,7 +1810,8 @@
             }
           ]
         }
-      ]
+      ],
+      "original_language": "en"
     },
     {
       "id": "tt4574334",
@@ -1705,7 +1865,476 @@
             }
           ]
         }
-      ]
+      ],
+      "original_language": "en"
+    },
+    {
+      "id": "tt6462806",
+      "imdb_id": "tt6462806",
+      "tmdb_id": 70798,
+      "type": "series",
+      "original_language": "tr",
+      "title_he": "הכלה מאיסטנבול",
+      "title_en": "İstanbullu Gelin",
+      "year": "2017",
+      "imdb_rating": "7.5",
+      "runtime_he": "45 דק׳ לפרק",
+      "total_seasons": 3,
+      "genres": [
+        "viva",
+        "drama",
+        "romance"
+      ],
+      "genres_he": [
+        "ויוה ודרמות טורקיות",
+        "דרמה",
+        "רומנטיקה"
+      ],
+      "poster": "https://image.tmdb.org/t/p/w500/alVrRNxDGOlULYdXgnOpPrVP7KL.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/raosbKSonz7ZkuZsfxHG5LgH0Wl.jpg",
+      "overview_he": "סורייה היא מוסיקאית מוכשרת, שעושה את צעדיה הראשונים בעולם המוסיקה ועובדת כזמרת ליווי. היא חיה בצניעות באיסטנבול עם דודתה, אך חייה משתנים כשהיא מתאהבת בפארוק בוראן, איש עסקים עשיר ונאה.  משפחת בוראן היא אחת מהמשפחות הוותיקות, העשירות והמכובדות בטורקיה. ראש המשפחה היא אסמה, אמו של פארוק ושלושת אחיו. פארוק הוא בנה המועדף ויש לה תכניות גדולות עבורו, כולל ארגון חתונה עם כלה שהיא בחרה עבורו. אבל פארוק מנהל חיים עצמאיים לגמרי ואינו מודע לתכניותיה של אמו. הוא מתאהב נואשות בסורייה, מציע לה נישואין והיא מסכימה מיד.  סורייה ופארוק המאושרים מגיעים לאחוזת משפחתו כדי להכריז על אירוסיהם. הודעתם מכה את אסמה בהלם, והיא מסרבת לקבל את הזרה שהביא פארוק אל ביתה. סורייה מקווה שאסמה תלמד להכיר אותה ולבסוף תקבל אותה ככלתה, אבל אסמה היא אישה קשה ועקשנית, שנחושה להשיג את רצונה . היא לא תהסס להשתמש באף תחבולה כדי להפריד בין בנה לאישה שהיא מחשיבה כלא ראויה לבנה ולמשפחתה.  \"הכלה מאיסטנבול\" היא סדרת דרמה רומנטית, מהמצליחות והנצפות ביותר בטורקיה בשנת 2017. בסדרה מככבים אוזג'אן דניז ואסלי אנבר (\"משחק השתיקה\")."
+    },
+    {
+      "id": "tt12439466",
+      "imdb_id": "tt12439466",
+      "tmdb_id": 104877,
+      "type": "series",
+      "original_language": "tr",
+      "title_he": "הקש על דלתי",
+      "title_en": "Sen Çal Kapımı",
+      "year": "2020",
+      "imdb_rating": "8.2",
+      "runtime_he": "45 דק׳ לפרק",
+      "total_seasons": 2,
+      "genres": [
+        "viva",
+        "drama",
+        "romance"
+      ],
+      "genres_he": [
+        "ויוה ודרמות טורקיות",
+        "דרמה",
+        "רומנטיקה"
+      ],
+      "poster": "https://image.tmdb.org/t/p/w500/iQhHRzQ3iBw4qX6nlNglnrrAbz6.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/9qq8LpOoBLYq8MxiMugn0gf9qJd.jpg",
+      "overview_he": "דרמה רומנטית בכיכובם של קרם בורסין והנדה ארצ`ל. אדה וסרקאן מעמידים פנים שהם מאורסים ויוצאים למערכת יחסים מאתגרת שתגרום להם לשכוח את כל מה שהם יודעים על אהבה."
+    },
+    {
+      "id": "tt8478162",
+      "imdb_id": "tt8478162",
+      "tmdb_id": 80411,
+      "type": "series",
+      "original_language": "tr",
+      "title_he": "חלומות בהקיץ (ציפור מקננת)",
+      "title_en": "Erkenci Kuş",
+      "year": "2018",
+      "imdb_rating": "8.2",
+      "runtime_he": "45 דק׳ לפרק",
+      "total_seasons": 1,
+      "genres": [
+        "viva",
+        "drama",
+        "romance"
+      ],
+      "genres_he": [
+        "ויוה ודרמות טורקיות",
+        "דרמה",
+        "רומנטיקה"
+      ],
+      "poster": "https://image.tmdb.org/t/p/w500/rGjYq9bi5jpAMZTJnou1UNpmKWj.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/uJ3HalVLkaOeH1lvDdrEmeqFxds.jpg",
+      "overview_he": "סאנם היא בחורה צעירה ומלאת חיים, שחולמת להיות סופרת. היא עוזרת להוריה במכולת המשפחתית, אבל להם זה לא מספיק - הם רוצים שתמצא עבודה מסודרת או שיחתנו אותה עם השכן מוזאפר. סאנם אינה רוצה בכך ואחותה משיגה לה עבודה במשרד הפרסום שבו היא עובדת.\n\nעזיז, בעליו של משרד הפרסום, רוצה לפרוש ועליו להחליט מי מבניו יירש את מקומו. הוא אינו סומך על אמרה, בנו הצעיר, ומפקיד את ניהול החברה בידי בנו הבכור ג'אן.\n\nאמרה זועם על החלטת אביו מחליט לחתור תחת ג'אן כדי שזה ייכשל בתפקידו. אמרה מנצל את תמימותה של העובדת החדשה סאנם ומציע לה לרגל אחרי ג'אן בתמורה לכיסוי חוב של אביה. סאנם עושה זאת ומתחילה כך להכיר את ג'אן יותר. היא מתאהבת בג'אן, וגם הוא בה, אבל מה יקרה כשהוא יגלה שהיא ריגלה נגדו?\n\n\"חלומות בהקיץ\" היא סדרה קומית רומנטית, שהפכה להצלחה הגדולה של עונת השידורים.\n\nבסדרה מגלמים את זוג האהבים ג'אן יאמאן ודמט אוזדמיר, שהפכו גם לזוג בחיים.\n\n2018-2019 בטורקיה."
+    },
+    {
+      "id": "tt5133998",
+      "imdb_id": "tt5133998",
+      "tmdb_id": 65555,
+      "type": "series",
+      "original_language": "tr",
+      "title_he": "אהבה אפלה (אהבה שחורה)",
+      "title_en": "Kara Sevda",
+      "year": "2015",
+      "imdb_rating": "7.9",
+      "runtime_he": "45 דק׳ לפרק",
+      "total_seasons": 2,
+      "genres": [
+        "viva",
+        "drama",
+        "romance"
+      ],
+      "genres_he": [
+        "ויוה ודרמות טורקיות",
+        "דרמה",
+        "רומנטיקה"
+      ],
+      "poster": "https://image.tmdb.org/t/p/w500/wCo8QUccl6hBkCzOrm4AaLgc87J.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/n0lQ50CfQhB8TfB9hzpeBrJBZ6L.jpg",
+      "overview_he": "כאמל סטודנט צעיר, שעובד במקביל במספנה ומנסה לעזור כלכלית למשפחתו. ניהאן צעירה שמגיעה ממשפחה עשירה. היא ציירת דיוקנאות של אנשים שונים. כשניהאן וכאמל מתנגשים במקרה אחד בשני, כשהם עולים לאוטובוס ניהאן מציירת בסתר את דיוקנו של כאמל בזמן שכאמל צופה בה בסתר.  שני הצעירים הללו מתאהבים זה בזה למרות שהם מגיעים מרקעים שונים, והם רוצים להתחתן בהקדם האפשרי. במקביל אמיר בן מעמדה של ניהאן המאוהב בה עושה הכל כדי לזכות באהבתה.  יום אחד, החיים מתהפכים וניהאן נאלצת להתחתן עם אמיר והיא נפרדת מכאמל בלי לתת לו הסברים.  חמש שנים מאוחר יותר, חייהם של כאמל וניהאן מצטלבים שוב."
+    },
+    {
+      "id": "tt21105088",
+      "imdb_id": "tt21105088",
+      "tmdb_id": 210865,
+      "type": "series",
+      "original_language": "tr",
+      "title_he": "השלדג",
+      "title_en": "Yalı Çapkını",
+      "year": "2022",
+      "imdb_rating": "8.4",
+      "runtime_he": "45 דק׳ לפרק",
+      "total_seasons": 3,
+      "genres": [
+        "viva",
+        "drama",
+        "romance"
+      ],
+      "genres_he": [
+        "ויוה ודרמות טורקיות",
+        "דרמה",
+        "רומנטיקה"
+      ],
+      "poster": "https://image.tmdb.org/t/p/w500/pzDHrbX7780TcNrV4P7j5xrgE6u.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/vDqCoaMU5FUAuUs0EvL4OAUCxJk.jpg",
+      "overview_he": "התפנית בעלילת הסדרה הטורקית מגיע רגע לפני טקס הנישואין. האהבה פנים רבות לה. פאריט מתאהב באחותה של הכלה המיועדת. מזכיר לכם סיפור ישן נושן?. חייהן של שתי האחיות משתנות לנצח כאשר פאריט מחליט להתחתן עם אחות הכלה ומכניס אותה למשפחתו המלאה בבגידות, שקרים וסודות. וכמו תמיד נוצר מארג של כסף, אהבה, שנאה ורצון לצבור עוד מכל אחד מהם."
+    },
+    {
+      "id": "tt7431994",
+      "imdb_id": "tt7431994",
+      "tmdb_id": 74823,
+      "type": "series",
+      "original_language": "tr",
+      "title_he": "הבור",
+      "title_en": "Çukur",
+      "year": "2017",
+      "imdb_rating": "7.5",
+      "runtime_he": "45 דק׳ לפרק",
+      "total_seasons": 4,
+      "genres": [
+        "viva",
+        "drama",
+        "romance"
+      ],
+      "genres_he": [
+        "ויוה ודרמות טורקיות",
+        "דרמה",
+        "רומנטיקה"
+      ],
+      "poster": "https://image.tmdb.org/t/p/w500/7aL9P5NLSgBjdChcwp4cH1OLdKf.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/xtCzLQOocIajjQ5Mhwp834BQhVX.jpg",
+      "overview_he": "\"הבור\" - דרמה טורקית בינלאומית, שהפכה לתופעה ושברה כל שיא צפייה אפשרי בטורקיה! צ'וקור (הבור) היא אחת השכונות המסוכנות ביותר באיסטנבול, נשלטת על-ידי משפחת קוצ'ובה. למרות שהם קשורים קשר הדוק לפשע, למשפחה יש כללים משלה. אחד הכללים הללו הוא איסור סמים בשכונה. לא ניתן לייצר, להשתמש או למכור תרופות בצ'וקור, עד שיום אחד מגיע מישהו לשכונה שנחוש בדעתו לשבור את האיסור. תחילה הוא מנסה לנהל משא ומתן עם אנשי משפחת קוצ'ובה, אך כאשר בקשתו נדחית הוא תוקף את השכונה ואת המשפחה בכל כוחו. בדיוק כאשר הוא חושב שהוא הצליח להכניע את המשפחה, קורה משהו בלתי צפוי. הקלפים נטרפים מחדש! יאמאץ' (אראס בולוט אינמלי), הבן הצעיר במשפחת קוצ'ובה חוזר לשכונה אחרי שניסה לעזוב אותה ולהתחיל חיים חדשים, עם אהובתו שהכיר מחוץ לשכונה סנא. ביום בו הם חוזרים לשכונה החיים שלהם מתהפכים וכבר לא יחזרו להיות זהים."
+    },
+    {
+      "id": "tt8045936",
+      "imdb_id": "tt8045936",
+      "tmdb_id": 52645,
+      "type": "series",
+      "original_language": "tr",
+      "title_he": "הפרי האסור",
+      "title_en": "Yasak Elma",
+      "year": "2018",
+      "imdb_rating": "6.9",
+      "runtime_he": "45 דק׳ לפרק",
+      "total_seasons": 6,
+      "genres": [
+        "viva",
+        "drama",
+        "romance"
+      ],
+      "genres_he": [
+        "ויוה ודרמות טורקיות",
+        "דרמה",
+        "רומנטיקה"
+      ],
+      "poster": "https://image.tmdb.org/t/p/w500/2OfYFJu0cNdFN9BaSwPOKcFiZAd.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/5i6HPy9lzfVnqQYNNz9LyqyaID1.jpg",
+      "overview_he": "סיפורן של שתי אחיות שגרות באיסטנבול ולמרות שהן אחיות הן שונות האחת מהשניה לחלוטין. זיינפ היא ילדה יפייפייה ותמימה שמתחילה לעבוד ביחד עם אליהן, איש עסקים צעיר ושחצן שלא נמנע מלפגוע באנשים. החל מיומה הראשון בחברה, הם מתחילים להילחם האחד בשני ואליהן מתחיל לפתח רגשות כלפיה. לעומת זאת, אחותה ילדיז חולמת על חיים עשירים, כדי להתקרב לעולם הזה היא עובדת כמלצרית במסעדה יוקרתית, ויוצאת עם גבר עשיר בכוונה להתחתן איתו ולחיות חיי נוחות, אך מתבדה בסופו של דבר מהאשליה כי אין בכוונתו של החבר שלה להתחתן איתה כלל. חייה של יילדיז משתנים כאשר היא מקבלת הצעת עבודה מאשת החברה הגבוהה, אנדר. אנדר מנצלת את התאווה של ילדיז כדי לפתות את בעלה, ממנו היא רוצה להתגרש מבלי לאבד את מעמדה החברתי והפיננסי בחברה."
+    },
+    {
+      "id": "tt11093718",
+      "imdb_id": "tt11093718",
+      "tmdb_id": 95603,
+      "type": "series",
+      "original_language": "tr",
+      "title_he": "אוסמאן",
+      "title_en": "Kuruluş Osman",
+      "year": "2019",
+      "imdb_rating": "8.0",
+      "runtime_he": "45 דק׳ לפרק",
+      "total_seasons": 6,
+      "genres": [
+        "viva",
+        "drama",
+        "romance"
+      ],
+      "genres_he": [
+        "ויוה ודרמות טורקיות",
+        "דרמה",
+        "רומנטיקה"
+      ],
+      "poster": "https://image.tmdb.org/t/p/w500/8B8hJyDkN7iH08ygw6dsahW7v0i.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/puLaqdcTRwFxwv9S3PO6jA3ep7J.jpg",
+      "overview_he": "סדרה טורקית מרהיבה ועשירה בכיכובו של בוראק אוזצ'ויט (כוכב \"אהבה אפלה\"), משודרת בימים אלו בטורקיה ושוברת שיא הרייטינג. הסדרה מועמדת לפרס הסדרה הטובה ביותר לשנת 2020. מספרת את סיפורו המיתלוגי של עוסמאן, בנו של ארטוגרול גאזי ומייסד האימפריה העות'מאנית."
+    },
+    {
+      "id": "tt21764074",
+      "imdb_id": "tt21764074",
+      "tmdb_id": 213194,
+      "type": "series",
+      "original_language": "tr",
+      "title_he": "אהבה אחת (שרבט חמוציות)",
+      "title_en": "Kızılcık Şerbeti",
+      "year": "2022",
+      "imdb_rating": "6.7",
+      "runtime_he": "45 דק׳ לפרק",
+      "total_seasons": 5,
+      "genres": [
+        "viva",
+        "drama",
+        "romance"
+      ],
+      "genres_he": [
+        "ויוה ודרמות טורקיות",
+        "דרמה",
+        "רומנטיקה"
+      ],
+      "poster": "https://image.tmdb.org/t/p/w500/lSywl799a9yLED1tPJCjobckjxQ.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/a4FHdQfPGT1T2w4DYUEGgRMxSgZ.jpg",
+      "overview_he": "דואה הצעירה ממשפחה מודרנית וליברלית ופאתיה ממשפחה שמרנית ומסורתית מתאהבים ונישאים בחיפזון — והמפגש הטעון בין שתי המשפחות מצית דרמה משפחתית מרגשת ומטלטלת."
+    },
+    {
+      "id": "tt9721776",
+      "imdb_id": "tt9721776",
+      "tmdb_id": 87623,
+      "type": "series",
+      "original_language": "tr",
+      "title_he": "רוחות של אהבה (הרקאי)",
+      "title_en": "Hercai",
+      "year": "2019",
+      "imdb_rating": "7.8",
+      "runtime_he": "45 דק׳ לפרק",
+      "total_seasons": 3,
+      "genres": [
+        "viva",
+        "drama",
+        "romance"
+      ],
+      "genres_he": [
+        "ויוה ודרמות טורקיות",
+        "דרמה",
+        "רומנטיקה"
+      ],
+      "poster": "https://image.tmdb.org/t/p/w500/xDHKKIQrwL3vP3BKov5TeBTzvRD.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/pcZUSUH31odGlq41XktxLVmjNSm.jpg",
+      "overview_he": "מירן אסלאנבי בחור המבקש נקמה על מות הוריו שנרצחו. סבתו של מירן, עזיזה אסלאנבי מתכננת את הנקמה במשך 27 שנים.\n\nבתהליך הנקמה מירן מתאהב בריאן שאדולו (אברו שאהין) בת המשפחה שהיו אחראיים למות הוריו של מירן...\n\nהאם זה ישנה את תוכניותיו?"
+    },
+    {
+      "id": "tt29258720",
+      "imdb_id": "tt29258720",
+      "tmdb_id": 231100,
+      "type": "series",
+      "original_language": "tr",
+      "title_he": "אהבה ללא גבולות",
+      "title_en": "Hudutsuz Sevda",
+      "year": "2023",
+      "imdb_rating": "8.1",
+      "runtime_he": "45 דק׳ לפרק",
+      "total_seasons": 2,
+      "genres": [
+        "viva",
+        "drama",
+        "romance"
+      ],
+      "genres_he": [
+        "ויוה ודרמות טורקיות",
+        "דרמה",
+        "רומנטיקה"
+      ],
+      "poster": "https://image.tmdb.org/t/p/w500/yf3kEBbPOQil67rMGBwI2fQUAgo.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/vV5GFJtp8DgAysY1F0WfIwedi81.jpg",
+      "overview_he": "כשהיה ילד קטן, האליל איברהים איבד את אביו בגלל נקמת דם והוגלה לאיסטנבול. עשרים שנה לאחר מכן, הוא חוזר לארץ מולדתו בחבל הים השחור כגבר נאה וחזק. הוא מתכנן לשאת את הילדה שהוא אוהב, יסמין, ולהתחיל חיים חדשים. עם זאת, הנסיבות לא מאפשרות זאת. האליל איברהים יוצא למסע נקמה, וחייו ישתנו כליל כאשר יפגוש את זיינפ ממשפחת לטו."
+    },
+    {
+      "id": "tt0233127",
+      "imdb_id": "tt0233127",
+      "tmdb_id": 16286,
+      "type": "series",
+      "original_language": "es",
+      "title_he": "אני בטי המכוערת",
+      "title_en": "Yo soy Betty, la fea",
+      "year": "1999",
+      "imdb_rating": "8.4",
+      "runtime_he": "45 דק׳ לפרק",
+      "total_seasons": 1,
+      "genres": [
+        "viva",
+        "drama",
+        "romance"
+      ],
+      "genres_he": [
+        "ויוה וטלנובלות",
+        "דרמה",
+        "רומנטיקה"
+      ],
+      "poster": "https://image.tmdb.org/t/p/w500/iEBOiXiDGaxVR6w8aKgG5MEusuO.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/mQx26Ah233JDp2iEfIzRfcb4nuo.jpg",
+      "overview_he": "בטי היא צעירה שמנסה להתקבל לעבודה \"רצינית\" אחרי סיום הלימודים באוניברסיטה. היא מקבלת תשובה שלילית ממחלקת כח אדם רק בגלל המראה החיצוני שלה, שאינו מושך. אבל יו\"ר החברה מחליט להעסיק את בטי בתור עוזרת אישית של בנו - העורך הראשי הטרי של מגזין האופנה. גם החלטה זו נבעה בעיקר מהמראה החיצוני של בטי: האב קיווה שבנו, חובב הנשים הידוע, ישמור את יחסיו עם העוזרת הלא מושכת בגבולות העבודה."
+    },
+    {
+      "id": "tt0387763",
+      "imdb_id": "tt0387763",
+      "tmdb_id": 11250,
+      "type": "series",
+      "original_language": "es",
+      "title_he": "תשוקת הנצים",
+      "title_en": "Pasión de gavilanes",
+      "year": "2003",
+      "imdb_rating": "7.7",
+      "runtime_he": "45 דק׳ לפרק",
+      "total_seasons": 2,
+      "genres": [
+        "viva",
+        "drama",
+        "romance"
+      ],
+      "genres_he": [
+        "ויוה וטלנובלות",
+        "דרמה",
+        "רומנטיקה"
+      ],
+      "poster": "https://image.tmdb.org/t/p/w500/91UV7pNcDPhIzJl7EuK36sK5vRG.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/qabMMIpNUUKYFqQxHEWErEEBD8G.jpg",
+      "overview_he": "לאחר שמזלם לא שפר עליהם במולדתם, החליטו האחים לבית רייס לחצות את הגבול ולפתוח מאפייה למחייתם. חואן האח הבכור הוא ראש המשפחה והאחראי על העסקים. הוא חזק וחרוץ, אך גם קפדן ומעט פרימיטיבי. אוסקר הוא שאפתן ומחושב ומחפש רווחים בדרכים לא שגרתיות. פרנקו הוא בוהמיין בנשמתו והרומנטיקן שבחבורה. ליבייה האחות הצעירה היא רק בת 17, בבת עינם של אחיה הגדולים. הבעיות מתחילות כשהנערה חסרת הניסיון, מתאהבת בגבר המבוגר ממנה בשנים רבות, ברנרדו אליסונדו, איתו היא מנהלת רומן סודי וסוער, על אף היותו נשוי. כשהיא מגלה לאחיה על הריונה, הם, שאינם יודעים על היותו נשוי, מאלצים את ברנרדו לשאת אותה לאשה. ברנרדו נאלץ להסכים, אך מספר ימים לאחר מכן נהרג בתאונה. כשליבייה שומעת על מותו של אהובה, היא שמה קץ לחייה. מעל קברה נשבעים אחיה לנקום את מותה. השלושה מגיעים לאחוזת אליסונדו ומתחזים לעובדים שצפויים היו להגיע. בתוכניתם לפתות את הבנות לבית אליסונדו, כשם שברנרדו פיתה את אחותם. תוכניתם משתבשת, כאשר האחים נופלים למלכודת שלהם עצמם והאחוזה הופכת לשדה קרב, בה מעורבים אהבה, שנאה ו... תשוקה."
+    },
+    {
+      "id": "tt0202197",
+      "imdb_id": "tt0202197",
+      "tmdb_id": 16135,
+      "type": "series",
+      "original_language": "es",
+      "title_he": "בובה פראית",
+      "title_en": "Muñeca Brava",
+      "year": "1998",
+      "imdb_rating": "7.5",
+      "runtime_he": "45 דק׳ לפרק",
+      "total_seasons": 1,
+      "genres": [
+        "viva",
+        "drama",
+        "romance"
+      ],
+      "genres_he": [
+        "ויוה וטלנובלות",
+        "דרמה",
+        "רומנטיקה"
+      ],
+      "poster": "https://image.tmdb.org/t/p/w500/cMMiFdM9KZqJAjHTisSRYSR3YlN.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/pXcBTvoFIee7cOwqE6BUF9wFKRY.jpg",
+      "overview_he": "מילי היא צעירה יפהפייה ומרדנית, שגדלה במנזר, לאחר שהוריה נטשו אותה לאחר לידתה. כל עולמה הן הנזירות וקבוצת נערים שמשחקים כדורגל בשכונה. בגיל 18 עוזבת מילי את המנזר ומקבלת עבודה כמשרתת באחוזת משפחת די קרלו העשירה והשמרנית.\n\nבאחוזה מילי פוגשת את איבו, צעיר יפה תואר, פרי אהבתה של בעלת האחוזה וצייר צרפתי. איבו אינו יודע את מוצאו האמיתי ורואה בפדריקו, בעל האחוזה, את אביו החוקי. מילי מתאהבת באיבו ומגלה את האמת על חייו. איבו מתאהב בה אף הוא, אך שומר על אהבתו בסוד.\n\nלנוכחותה של מילי באחוזה תהיינה השלכות על כל בני המשפחה, כאלה שיוציאו לאור אמת קשה וכואבת. מילי תגלה כי איננה יתומה כפי שחשבה וכי שורשיה ומשפחתה קרובים אליה מאד, הרבה יותר מכפי שאפשר להעלות על הדעת...\n\n270 פרקים, ארגנטינה, 1998-1999"
+    },
+    {
+      "id": "tt0328789",
+      "imdb_id": "tt0328789",
+      "tmdb_id": 9027,
+      "type": "series",
+      "original_language": "es",
+      "title_he": "המורדים",
+      "title_en": "Rebelde Way",
+      "year": "2002",
+      "imdb_rating": "8.0",
+      "runtime_he": "45 דק׳ לפרק",
+      "total_seasons": 2,
+      "genres": [
+        "viva",
+        "drama",
+        "romance"
+      ],
+      "genres_he": [
+        "ויוה וטלנובלות",
+        "דרמה",
+        "רומנטיקה"
+      ],
+      "poster": "https://image.tmdb.org/t/p/w500/3ROiiGuYqXkm1CKX1h3KtmSvI8z.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/6WUb3YhgNSpI2Hk33OKiNi0WKUz.jpg",
+      "overview_he": "סיפורם של ארבעה מתבגרים: פבלו בוסטמנטה, בנו של ראש העיר, סרחיו בוסטמנטה, מתבגר עשיר ופופולרי, מיה קולוצ'י, מתבגרת עשירה ומפונקת, יתומה מאמא ואהובת הבנים, מנואל אגירה, אשר מגיע ממקסיקו לארגנטינה על מנת לנקום את מות אביו, ומריצה פיה ספיריטו, אשר גדלה אצל אמה הדוגמנית והשחקנית, סוניה ריי. ארבעתם, לומדים בכיתה ט'(עונה ראשונה) בבית ספר \"אליט וואי סקול\", בית הספר העשיר והטוב ביותר במדינה. מנואל, אשר מגיע לבית הספר פוצח במסע נקמה במיה קולוצ'י, מכיוון שאביה, פרנקו קולוצ'י, מנהל חברת בגדים ידועה, אשם בהתאבדותו של אביו. מריצה המרדנית, נשלחת לבית הספר לאחר שאביה מכריח אותה להירשם אליו. בבית הספר, מתחברים הארבעה אל חבריהם ומתבגרים ביחד איתם. במהלך העונה הראשונה מתרכזת גם כן העלילה במסדר הפועל בבית הספר שנים רבות, התלמידים(תלמידי המלגות ולאחר מכן מצטרפים עוד למאבק) מגלים אודות המסדר שפועל בבית הספר שמנסה להעיף מבית הספר את תלמידי המלגות התלמידים מצליחים לגלות את חברי המסדר בבית הספר ולהביס אותם סופית."
+    },
+    {
+      "id": "tt1151030",
+      "imdb_id": "tt1151030",
+      "tmdb_id": 16321,
+      "type": "series",
+      "original_language": "es",
+      "title_he": "כמעט מלאכים",
+      "title_en": "Casi Ángeles",
+      "year": "2007",
+      "imdb_rating": "7.4",
+      "runtime_he": "45 דק׳ לפרק",
+      "total_seasons": 4,
+      "genres": [
+        "viva",
+        "drama",
+        "romance"
+      ],
+      "genres_he": [
+        "ויוה וטלנובלות",
+        "דרמה",
+        "רומנטיקה"
+      ],
+      "poster": "https://image.tmdb.org/t/p/w500/vXFts2oyWQTa0fESRZ8uQjVsr1Q.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/tVXXPNnNWeoENMRUiVQxvKNWGnr.jpg",
+      "overview_he": "טלנובלת הנוער המצליחה שכבשה לא מעט לבבות ומועדון מעריצים ענק בארץ ובעולם!\n\nהסדרה מלווה חבורת בני נוער החיים בבית יתומים בו הם נאלצים לגנוב כסף מאנשים ברחוב ולהביא אותו לבעלת הבית. לבית היתומים מגיעה מושיעה שעוזרת לנערים ומצילה אותם מידי המרשעת.\n\nבשלב מסוים מקימה חבורת הנוער להקה, והסדרה משתדרגת עם קטעים מוזיקליים, ריקודים והרבה מצב רוח לטיני משובח!"
+    },
+    {
+      "id": "tt8560918",
+      "imdb_id": "tt8560918",
+      "tmdb_id": 80240,
+      "type": "series",
+      "original_language": "es",
+      "title_he": "מלכת הפלואו (בקצב שלה)",
+      "title_en": "La Reina del Flow",
+      "year": "2018",
+      "imdb_rating": "8.0",
+      "runtime_he": "45 דק׳ לפרק",
+      "total_seasons": 3,
+      "genres": [
+        "viva",
+        "drama",
+        "romance"
+      ],
+      "genres_he": [
+        "ויוה וטלנובלות",
+        "דרמה",
+        "רומנטיקה"
+      ],
+      "poster": "https://image.tmdb.org/t/p/w500/fuVuDYrs8sxvEolnYr0wCSvtyTi.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/uxKS3Wmi5xH3zRxZCo7retMpvPR.jpg",
+      "overview_he": "הסדרה מתמקדת בייאמי מונטויה, אשר לאחר שהייתה בכלא שלא בצדק במשך 17 שנים, חוזרת כדי לנקום באנשים שאחראים על הטרגדיה של משפחתה. המסע שלה משלב בין מוזיקה, אהבה ורדיפה אחרי צדק, תוך כדי שהיא מתמודדת עם האתגרים של העבר וההווה שלה."
+    },
+    {
+      "id": "tt6468322",
+      "imdb_id": "tt6468322",
+      "tmdb_id": 71446,
+      "type": "series",
+      "original_language": "es",
+      "title_he": "בית הנייר",
+      "title_en": "La casa de papel",
+      "year": "2017",
+      "imdb_rating": "8.2",
+      "runtime_he": "45 דק׳ לפרק",
+      "total_seasons": 3,
+      "genres": [
+        "viva",
+        "drama",
+        "romance"
+      ],
+      "genres_he": [
+        "ויוה וטלנובלות",
+        "דרמה",
+        "רומנטיקה"
+      ],
+      "poster": "https://image.tmdb.org/t/p/w500/ayYfKwfboj9iT5PAe2MhtexLqji.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/w1280/xGexTKCJDkl12dTW4YCBDXWb1AD.jpg",
+      "overview_he": "איש מסתורי, המכנה עצמו בכינוי \"הפרופסור\" (\"El Profesor\"), מתכנן את השוד הגדול ביותר בהיסטוריה. על מנת לבצע את תוכניתו השאפתנית, הוא מגייס צוות של שמונה אנשים עם התמחויות שונות, שלרובם אין מה להפסיד. המטרה היא להיכנס למטבעה המלכותית של ספרד, ולהדפיס 2.4 מיליארד אירו בשטרות לא מסומנים."
     }
   ],
   "live_channels": [
