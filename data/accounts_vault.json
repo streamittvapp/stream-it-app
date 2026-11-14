@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794698939147,
+      "updatedTs": 1794698940923,
       "subUsersUpdatedAt": 1794694857976,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -428,86 +428,6 @@
                 ],
                 "seasonsCount": 0
               }
-            },
-            "tt11280740": {
-              "id": "tt11280740",
-              "imdbId": "tt11280740",
-              "tmdbId": "95396",
-              "title": "ניתוק",
-              "currentTime": 1165,
-              "duration": 3434,
-              "percent": 34,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794693125347,
-              "snapshot": {
-                "id": "tt11280740",
-                "imdbId": "tt11280740",
-                "tmdbId": "95396",
-                "type": "series",
-                "title": "ניתוק",
-                "originalTitle": "Severance",
-                "year": "2022",
-                "rating": "8.7",
-                "runtimeHe": "2 עונות • 19 פרקים",
-                "ageRating": "16+",
-                "overview": "מארק מוביל צוות עובדים בתאגיד 'לומון' שעברו הליך כירורגי המפריד באופן מוחלט בין זיכרונות העבודה שלהם לבין זיכרונות החיים האישיים שמחוץ למשרד.",
-                "poster": "https://images.metahub.space/poster/medium/tt11280740/img",
-                "backdrop": "https://images.metahub.space/background/medium/tt11280740/img",
-                "cardBackdrop": "https://images.metahub.space/background/medium/tt11280740/img",
-                "genres": [
-                  "scifi",
-                  "drama",
-                  "crime",
-                  "thriller",
-                  "telegram"
-                ],
-                "genresHe": [
-                  "מדע בדיוני",
-                  "דרמה ומתח",
-                  "מסתורין"
-                ],
-                "seasonsCount": 2
-              }
-            },
-            "movie-293660": {
-              "id": "movie-293660",
-              "imdbId": "tt1431045",
-              "tmdbId": "293660",
-              "title": "דדפול",
-              "currentTime": 1959,
-              "duration": 6486,
-              "percent": 30,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794694857976,
-              "snapshot": {
-                "id": "movie-293660",
-                "imdbId": "tt1431045",
-                "tmdbId": "293660",
-                "type": "movie",
-                "title": "דדפול",
-                "originalTitle": "Deadpool",
-                "year": "2016",
-                "rating": "7.6",
-                "runtimeHe": "שעתיים",
-                "ageRating": "12+",
-                "overview": "איש קומנדו לשעבר הופך ללוחם חסר מעצורים, לאחר שניסוי העניק לו כוחות על. חמוש בחרבות ובלשון עוקצנית, הוא יוצא למסע נקמה באדם שהרס את פניו.",
-                "poster": "https://image.tmdb.org/t/p/w500/fJk1kspZ1Xo3R8sl7NhFziXudqt.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/rFj9IKlL75B2pXhZA60jkNWvxeW.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/rFj9IKlL75B2pXhZA60jkNWvxeW.jpg",
-                "genres": [
-                  "action",
-                  "comedy",
-                  "tpb"
-                ],
-                "genresHe": [
-                  "אקשן והרפתקאות",
-                  "קומדיה",
-                  "PirateBay & YTS 4K"
-                ],
-                "seasonsCount": 0
-              }
             }
           },
           "deletedProgressIds": {
@@ -517,7 +437,9 @@
             "1413": 1794686264301,
             "10580": 1794432196249,
             "69557": 1794698934882,
+            "95396": 1794698940923,
             "103913": 1794698937513,
+            "293660": 1794698940065,
             "301528": 1794698933987,
             "533535": 1794686262083,
             "693134": 1794686261114,
@@ -571,7 +493,13 @@
             "series-69557": 1794698934882,
             "movie-1236045": 1794698939147,
             "tt31049299": 1794698939147,
-            "series-1236045": 1794698939147
+            "series-1236045": 1794698939147,
+            "movie-293660": 1794698940065,
+            "tt1431045": 1794698940065,
+            "series-293660": 1794698940065,
+            "tt11280740": 1794698940923,
+            "movie-95396": 1794698940923,
+            "series-95396": 1794698940923
           },
           "progressClearedAt": 1794432225027
         },
