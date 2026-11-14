@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794686259883,
+      "updatedTs": 1794686262083,
       "subUsersUpdatedAt": 1794551843424,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -536,45 +536,6 @@
                 "seasonsCount": 1
               }
             },
-            "tt6263850": {
-              "id": "tt6263850",
-              "imdbId": "tt6263850",
-              "tmdbId": "533535",
-              "title": "דדפול ווולברין",
-              "currentTime": 650,
-              "duration": 7674,
-              "percent": 8,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794565362488,
-              "snapshot": {
-                "id": "tt6263850",
-                "imdbId": "tt6263850",
-                "tmdbId": "533535",
-                "type": "movie",
-                "title": "דדפול ווולברין",
-                "originalTitle": "Deadpool & Wolverine",
-                "year": "2024",
-                "rating": "7.9",
-                "runtimeHe": "2 שעות ו-08 דק'",
-                "ageRating": "16+",
-                "overview": "וייד וילסון נאלץ לעזוב את חייו השקטים כאשר רשות הזמן מאיימת למחוק את עולמו. הוא מגייס וולברין סרבן מיקום מקביל למסע פרוע שישנה את פני היקום הקולנועי.",
-                "poster": "https://images.metahub.space/poster/medium/tt6263850/img",
-                "backdrop": "https://images.metahub.space/background/medium/tt6263850/img",
-                "cardBackdrop": "https://images.metahub.space/background/medium/tt6263850/img",
-                "genres": [
-                  "action",
-                  "comedy",
-                  "scifi"
-                ],
-                "genresHe": [
-                  "אקשן",
-                  "קומדיה",
-                  "מדע בדיוני"
-                ],
-                "seasonsCount": 0
-              }
-            },
             "movie-1283515": {
               "id": "movie-1283515",
               "imdbId": "tt32261958",
@@ -611,46 +572,6 @@
                 ],
                 "seasonsCount": 0
               }
-            },
-            "tt15239678": {
-              "id": "tt15239678",
-              "imdbId": "tt15239678",
-              "tmdbId": "693134",
-              "title": "חולית: חלק שני",
-              "currentTime": 3215,
-              "duration": 9955,
-              "percent": 32,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794678915283,
-              "snapshot": {
-                "id": "tt15239678",
-                "imdbId": "tt15239678",
-                "tmdbId": "693134",
-                "type": "movie",
-                "title": "חולית: חלק שני",
-                "originalTitle": "Dune: Part Two",
-                "year": "2024",
-                "rating": "8.6",
-                "runtimeHe": "2 שעות ו-46 דק'",
-                "ageRating": "14+",
-                "overview": "פול אטריידיס מתאחד עם צ'אני ועם שבטי הדרשנים במדבר העמוק של אראקיס, ויוצא למסע נקמה גורלי נגד הקושרים שהחריבו את משפחתו — תוך שהוא נאבק למנוע עתיד אפל שרק הוא מסוגל לחזות.",
-                "poster": "https://images.metahub.space/poster/medium/tt15239678/img",
-                "backdrop": "https://images.metahub.space/background/medium/tt15239678/img",
-                "cardBackdrop": "https://images.metahub.space/background/medium/tt15239678/img",
-                "genres": [
-                  "scifi",
-                  "action",
-                  "drama",
-                  "telegram"
-                ],
-                "genresHe": [
-                  "מדע בדיוני",
-                  "אקשן והרפתקאות",
-                  "דרמה"
-                ],
-                "seasonsCount": 0
-              }
             }
           },
           "deletedProgressIds": {
@@ -658,6 +579,8 @@
             "278": 1794686259883,
             "10580": 1794432196249,
             "103913": 1794432225027,
+            "533535": 1794686262083,
+            "693134": 1794686261114,
             "1283515": 1794432225027,
             "1339713": 1794432202875,
             "1381078": 1794432225027,
@@ -679,7 +602,7 @@
             "tt4565380": 1794432225027,
             "tt8190688": 1794432225027,
             "tt1745960": 1794432225027,
-            "tt6263850": 1794432225027,
+            "tt6263850": 1794686262083,
             "tt10577736": 1794432225027,
             "movie-103913": 1794432225027,
             "series-103913": 1794432225027,
@@ -688,7 +611,12 @@
             "series-1560520": 1794686257036,
             "tt0111161": 1794686259883,
             "movie-278": 1794686259883,
-            "series-278": 1794686259883
+            "series-278": 1794686259883,
+            "tt15239678": 1794686261114,
+            "movie-693134": 1794686261114,
+            "series-693134": 1794686261114,
+            "movie-533535": 1794686262083,
+            "series-533535": 1794686262083
           },
           "progressClearedAt": 1794432225027
         },
