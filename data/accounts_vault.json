@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794698920714,
+      "updatedTs": 1794698933987,
       "subUsersUpdatedAt": 1794694857976,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -632,46 +632,6 @@
                 ],
                 "seasonsCount": 5
               }
-            },
-            "movie-301528": {
-              "id": "movie-301528",
-              "imdbId": "tt1979376",
-              "tmdbId": "301528",
-              "title": "צעצוע של סיפור 4 (מדובב לעברית)",
-              "currentTime": 1350,
-              "duration": 6003,
-              "percent": 22,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794698920714,
-              "snapshot": {
-                "id": "movie-301528",
-                "imdbId": "tt1979376",
-                "tmdbId": "301528",
-                "type": "movie",
-                "title": "צעצוע של סיפור 4 (מדובב לעברית)",
-                "originalTitle": "Toy Story 4",
-                "year": "2019",
-                "rating": "7.6",
-                "runtimeHe": "",
-                "ageRating": "כל הגילאים",
-                "overview": "וודי, באז שנות-אור ושאר הצעצועים יוצאים למסע דרכים בלתי נשכח יחד עם הצעצוע החדש מזלגי — בדיבוב עברי לכל המשפחה.",
-                "poster": "https://image.tmdb.org/t/p/w500/w9kR8qbmQ01HwnvK4alvnQ2ca0L.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/m67smI1IIMmYzCl9axvKNULVKLr.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w1280/m67smI1IIMmYzCl9axvKNULVKLr.jpg",
-                "genres": [
-                  "animation",
-                  "hebrew_dub",
-                  "disney",
-                  "comedy",
-                  "telegram"
-                ],
-                "genresHe": [
-                  "מדובב לעברית 🇮🇱",
-                  "פיקסאר ודיסני"
-                ],
-                "seasonsCount": 0
-              }
             }
           },
           "deletedProgressIds": {
@@ -681,6 +641,7 @@
             "1413": 1794686264301,
             "10580": 1794432196249,
             "103913": 1794432225027,
+            "301528": 1794698933987,
             "533535": 1794686262083,
             "693134": 1794686261114,
             "1283515": 1794432225027,
@@ -724,7 +685,10 @@
             "movie-1413": 1794686264301,
             "tt10577736": 1794432225027,
             "movie-103913": 1794432225027,
-            "series-103913": 1794432225027
+            "series-103913": 1794432225027,
+            "movie-301528": 1794698933987,
+            "tt1979376": 1794698933987,
+            "series-301528": 1794698933987
           },
           "progressClearedAt": 1794432225027
         },
