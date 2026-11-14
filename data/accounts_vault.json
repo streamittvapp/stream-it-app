@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794696603344,
+      "updatedTs": 1794696660861,
       "subUsersUpdatedAt": 1794694857976,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -448,6 +448,47 @@
                 ],
                 "seasonsCount": 0
               }
+            },
+            "tt4565380": {
+              "id": "tt4565380",
+              "imdbId": "tt4565380",
+              "tmdbId": "69557",
+              "title": "פאודה",
+              "currentTime": 70,
+              "duration": 2500,
+              "percent": 3,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794696660861,
+              "snapshot": {
+                "id": "tt4565380",
+                "imdbId": "tt4565380",
+                "tmdbId": "69557",
+                "type": "series",
+                "title": "פאודה",
+                "originalTitle": "Fauda",
+                "year": "2015",
+                "rating": "8.3",
+                "runtimeHe": "4 עונות • 48 פרקים",
+                "ageRating": "16+",
+                "overview": "דורון, מפקד צוות מסתערבים לשעבר, חוזר לפעילות מבצעית מורכבת כדי ללכוד מבוקש בכיר שכולם האמינו כי חוסל לפני שנים.",
+                "poster": "https://images.metahub.space/poster/medium/tt4565380/img",
+                "backdrop": "https://images.metahub.space/background/medium/tt4565380/img",
+                "cardBackdrop": "https://images.metahub.space/background/medium/tt4565380/img",
+                "genres": [
+                  "israeli",
+                  "action",
+                  "drama",
+                  "war",
+                  "thriller"
+                ],
+                "genresHe": [
+                  "יצירה ישראלית",
+                  "אקשן",
+                  "דרמה"
+                ],
+                "seasonsCount": 5
+              }
             }
           },
           "watchlistSnapshots": {
@@ -620,7 +661,6 @@
             "tt43612870": 1794432217226,
             "movie-1568027": 1794432217226,
             "series-1568027": 1794432217226,
-            "tt4565380": 1794432225027,
             "tt8190688": 1794432225027,
             "tt1745960": 1794432225027,
             "tt6263850": 1794686262083,
@@ -643,7 +683,8 @@
             "series-1396": 1794686263135,
             "series-1413": 1794686264301,
             "tt1844624": 1794686264301,
-            "movie-1413": 1794686264301
+            "movie-1413": 1794686264301,
+            "tt4565380": 1794432225027
           },
           "progressClearedAt": 1794432225027
         },
