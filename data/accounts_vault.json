@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794678915283,
+      "updatedTs": 1794684685036,
       "subUsersUpdatedAt": 1794551843424,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -508,6 +508,44 @@
                 ],
                 "seasonsCount": 0
               }
+            },
+            "tt0111161": {
+              "id": "tt0111161",
+              "imdbId": "tt0111161",
+              "tmdbId": "278",
+              "title": "חומות של תקווה",
+              "currentTime": 18,
+              "duration": 8553,
+              "percent": 3,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794684685032,
+              "snapshot": {
+                "id": "tt0111161",
+                "imdbId": "tt0111161",
+                "tmdbId": "278",
+                "type": "movie",
+                "title": "חומות של תקווה",
+                "originalTitle": "The Shawshank Redemption",
+                "year": "1994",
+                "rating": "9.3",
+                "runtimeHe": "2 שעות ו-22 דק'",
+                "ageRating": "16+",
+                "overview": "בנקאי צעיר הנידון לשני מאסרי עולם בכלא שושנק הקשוח על פשע שלא ביצע רוקם חברות אמיצה עם אסיר ותיק ומוצא דרך לשמור על התקווה והחופש הפנימי.",
+                "poster": "https://images.metahub.space/poster/medium/tt0111161/img",
+                "backdrop": "https://images.metahub.space/background/medium/tt0111161/img",
+                "cardBackdrop": "https://images.metahub.space/background/medium/tt0111161/img",
+                "genres": [
+                  "drama",
+                  "crime",
+                  "tpb"
+                ],
+                "genresHe": [
+                  "דרמה",
+                  "פשע"
+                ],
+                "seasonsCount": 0
+              }
             }
           },
           "watchlistSnapshots": {
@@ -853,7 +891,7 @@
         "fontPx": 34,
         "color": "white",
         "bg": "none",
-        "bottomPct": 8
+        "bottomPct": 11
       }
     }
   },
