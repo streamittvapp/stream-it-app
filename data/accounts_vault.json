@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794686262083,
+      "updatedTs": 1794686264301,
       "subUsersUpdatedAt": 1794551843424,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -455,87 +455,6 @@
                 "seasonsCount": 0
               }
             },
-            "series-1413": {
-              "id": "series-1413",
-              "imdbId": "tt1844624",
-              "tmdbId": "1413",
-              "title": "אימה אמריקאית",
-              "currentTime": 714,
-              "duration": 1484,
-              "percent": 48,
-              "season": 13,
-              "episode": 6,
-              "updatedAt": 1794529228782,
-              "snapshot": {
-                "id": "series-1413",
-                "imdbId": "tt1844624",
-                "tmdbId": "1413",
-                "type": "series",
-                "title": "אימה אמריקאית",
-                "originalTitle": "American Horror Story",
-                "year": "2011",
-                "rating": "8.1",
-                "runtimeHe": "45 דק׳ לפרק",
-                "ageRating": "16+",
-                "overview": "סדרת דרמה-אימה אשר בה כל עונה היא סיפור בפני עצמו המתקיים במקומות שונים; בבית רדוף רוחות, במוסד לחולי רוח ובמסדר מכשפות. הסדרה היא אנתולוגית וכל עונה נתפסת כמיני-סדרה עצמאית בעקבות קבוצה נבדלת של דמויות ורקעים, ועלילה ייחודית עם התחלה, אמצע וסוף. עם זאת,יוצר הסדרה הצהיר כי עד סוף הסדרה הצופים יבינו את הקשר שבין העונות השונות.",
-                "poster": "https://image.tmdb.org/t/p/w500/dpzNasY2sAzRjeoLAarrLkcUeBg.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/5G4Bnc4Q0YUK1bwLEUYmIsmm2Ib.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/5G4Bnc4Q0YUK1bwLEUYmIsmm2Ib.jpg",
-                "genres": [
-                  "drama",
-                  "mystery",
-                  "scifi",
-                  "horror",
-                  "thriller"
-                ],
-                "genresHe": [
-                  "דרמה",
-                  "מסתורין ובלשי",
-                  "מדע בדיוני ופנטזיה",
-                  "אימה",
-                  "מותחנים"
-                ],
-                "seasonsCount": 13
-              }
-            },
-            "tt0903747": {
-              "id": "tt0903747",
-              "imdbId": "tt0903747",
-              "tmdbId": "1396",
-              "title": "שובר שורות",
-              "currentTime": 22,
-              "duration": 7200,
-              "percent": 3,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794565306312,
-              "snapshot": {
-                "id": "tt0903747",
-                "imdbId": "tt0903747",
-                "tmdbId": "1396",
-                "type": "series",
-                "title": "שובר שורות",
-                "originalTitle": "Breaking Bad",
-                "year": "2008",
-                "rating": "9.5",
-                "runtimeHe": "5 עונות • 62 פרקים",
-                "ageRating": "18+",
-                "overview": "מורה לכימיה בתיכון המאובחן בסרטן ריאות מתקדם חובר לתלמיד לשעבר כדי לייצר ולהפיץ מתאמפטמין טהור במטרה להבטיח את עתידה הכלכלי של משפחתו.",
-                "poster": "https://images.metahub.space/poster/medium/tt0903747/img",
-                "backdrop": "https://images.metahub.space/background/medium/tt0903747/img",
-                "cardBackdrop": "https://images.metahub.space/background/medium/tt0903747/img",
-                "genres": [
-                  "crime",
-                  "drama",
-                  "thriller"
-                ],
-                "genresHe": [
-                  "פשע",
-                  "דרמה ומתח"
-                ],
-                "seasonsCount": 1
-              }
-            },
             "movie-1283515": {
               "id": "movie-1283515",
               "imdbId": "tt32261958",
@@ -577,6 +496,8 @@
           "deletedProgressIds": {
             "27": 1794432189831,
             "278": 1794686259883,
+            "1396": 1794686263135,
+            "1413": 1794686264301,
             "10580": 1794432196249,
             "103913": 1794432225027,
             "533535": 1794686262083,
@@ -616,7 +537,13 @@
             "movie-693134": 1794686261114,
             "series-693134": 1794686261114,
             "movie-533535": 1794686262083,
-            "series-533535": 1794686262083
+            "series-533535": 1794686262083,
+            "tt0903747": 1794686263135,
+            "movie-1396": 1794686263135,
+            "series-1396": 1794686263135,
+            "series-1413": 1794686264301,
+            "tt1844624": 1794686264301,
+            "movie-1413": 1794686264301
           },
           "progressClearedAt": 1794432225027
         },
