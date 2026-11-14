@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794686149683,
+      "updatedTs": 1794686187110,
       "subUsersUpdatedAt": 1794551843424,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -686,6 +686,45 @@
                 "genresHe": [
                   "דרמה",
                   "פשע"
+                ],
+                "seasonsCount": 0
+              }
+            },
+            "movie-1560520": {
+              "id": "movie-1560520",
+              "imdbId": "tt32333324",
+              "tmdbId": "1560520",
+              "title": "באטמן: אביר בחשכה, חלק 1",
+              "currentTime": 2750,
+              "duration": 7200,
+              "percent": 38,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794686187110,
+              "snapshot": {
+                "id": "movie-1560520",
+                "imdbId": "tt32333324",
+                "tmdbId": "1560520",
+                "type": "movie",
+                "title": "באטמן: אביר בחשכה, חלק 1",
+                "originalTitle": "Batman: Knightfall Part 1: Knightfall",
+                "year": "2026",
+                "rating": "9.1",
+                "runtimeHe": "שעתיים",
+                "ageRating": "לכל המשפחה (8+)",
+                "overview": "ביין מגיע לגות'אם עם מטרה אחת: לשבור את באטמן. הוא מפוצץ את מוסד ארקהם ומשחרר בבת אחת את כל אויביו של האביר האפל, וגורר אותו ממרדף למרדף, יומיים ללא שינה, עד שהגוף והנפש מתחילים להישבר. במקביל נאבק ברוס ויין בצל מותו של ג'ייסון טוד, ברובין החדש, טים דרייק - שלא יודע לציית לפקודות, ובמתנקם הפגוע עזראל, שמצא מקלט במערת העטלף. כשבאטמן שחוק עד תום, ביין כבר ממתין לו באחוזת ויין.",
+                "poster": "https://image.tmdb.org/t/p/w500/360qdtu2hLnqMu8SVHMywn420w1.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/caBIySpwuFi2i7ynvHIlnxJLOdN.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/caBIySpwuFi2i7ynvHIlnxJLOdN.jpg",
+                "genres": [
+                  "animation",
+                  "action",
+                  "drama"
+                ],
+                "genresHe": [
+                  "אנימציה ומשפחה",
+                  "אקשן והרפתקאות",
+                  "דרמה"
                 ],
                 "seasonsCount": 0
               }
