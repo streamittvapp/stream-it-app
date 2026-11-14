@@ -30,8 +30,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class MainActivity extends BridgeActivity {
-    private static final String INSTALLED_APP_VERSION = "9.9.5";
-    private static final String INSTALLED_NATIVE_APK_VERSION = "9.9.5";
+    private static final String INSTALLED_APP_VERSION = "9.9.6";
+    private static final String INSTALLED_NATIVE_APK_VERSION = "9.9.6";
     private static final int VOICE_RECOGNITION_REQUEST_CODE = 9951;
     private static final String OTA_PREFS_NAME = "streamit_ota_prefs";
     private StreamItEmbeddedServer embeddedServer;

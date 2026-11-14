@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
-  <link rel="stylesheet" href="styles.css?v=9.9.5" />
+  <link rel="stylesheet" href="styles.css?v=9.9.6" />
   <script>
     (function () {
       try {
@@ -34,13 +34,13 @@
           });
         }
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (!otaVer || otaVer <= '9.9.4') {
+        if (!otaVer || otaVer <= '9.9.5') {
           localStorage.removeItem('streamit_ota_css_v9');
           localStorage.removeItem('streamit_ota_app_js_v9');
           localStorage.removeItem('streamit_ota_tv_nav_v9');
         }
         var otaCss = localStorage.getItem('streamit_ota_css_v9') || '';
-        if (otaVer && otaVer > '9.9.5' && otaCss.length > 500) {
+        if (otaVer && otaVer > '9.9.6' && otaCss.length > 500) {
           var st = document.createElement('style');
           st.id = 'streamit-ota-live-style-v9';
           st.textContent = otaCss;
@@ -140,7 +140,7 @@
           <button type="button" class="nav-link tv-focusable" data-category="youtube" aria-label="יוטיוב">יוטיוב</button>
           <button type="button" class="nav-link tv-focusable" data-category="mylist" aria-label="הרשימה שלי">הרשימה שלי</button>
           <span id="tvTopClock" class="tv-top-clock" dir="ltr" aria-label="שעה נוכחית"></span>
-          <span id="appVersionBadge" class="app-version-badge" dir="ltr" aria-label="גרסת מערכת">v9.9.5</span>
+          <span id="appVersionBadge" class="app-version-badge" dir="ltr" aria-label="גרסת מערכת">v9.9.6</span>
         </nav>
       </div>
 
@@ -321,6 +321,13 @@
         </button>
         <button type="button" id="tvRailSearchClearBtn" class="tv-rail-search-clear-btn tv-focusable hidden" aria-label="נקה חיפוש">✕</button>
       </div>
+      <div class="tv-rail-quick-tools-row">
+        <button type="button" id="tvRailAdvSearchBtn" class="tv-rail-adv-search-btn tv-focusable" aria-label="חיפוש מתקדם לפי קטגוריות בצ'קבוקסים">
+          <span>☑ חיפוש מתקדם</span>
+          <span id="tvRailAdvCountBadge" class="adv-count-pill hidden">0</span>
+        </button>
+        <button type="button" id="tvRailRefreshHomeBtn" class="tv-rail-refresh-home-btn tv-focusable" title="רענן המלצות וסדר דף הבית" aria-label="רענן המלצות דף הבית">↻</button>
+      </div>
       <div id="tvRailMiniKeyboard" class="tv-rail-mini-keyboard hidden" dir="ltr" aria-label="מקלדת חיפוש מהירה"></div>
     </div>
 
@@ -368,7 +375,7 @@
         </svg>
         <span id="tvRailProfileName" class="tv-rail-profile-name">ראשי</span>
       </button>
-      <span id="tvRailVersionBadge" class="tv-rail-version-badge" dir="ltr">v9.9.1</span>
+      <span id="tvRailVersionBadge" class="tv-rail-version-badge" dir="ltr">v9.9.6</span>
       <button type="button" id="tvRailSettingsBtn" class="tv-rail-bottom-btn tv-rail-settings-btn tv-focusable" aria-label="הגדרות">
         <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
           <circle cx="12" cy="12" r="3" />
@@ -546,6 +553,30 @@
             <button type="button" id="actorSearchSubmitBtn" class="actor-search-submit-btn tv-focusable" aria-label="חפש שחקן">חפש</button>
           </div>
 
+          <!-- Multi-Category Checkbox Advanced Search & Dynamic Home Refresh Controls -->
+          <div id="explorerSmartActionsWrap" class="explorer-smart-actions-wrap">
+            <button type="button" id="openAdvancedSearchBtn" class="explorer-dropdown-btn adv-search-trigger-btn tv-focusable" aria-haspopup="dialog" aria-label="חיפוש מתקדם לפי שילוב קטגוריות בצ'קבוקסים">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <rect x="3" y="4" width="7" height="7" rx="1.5" />
+                <path d="M5 7.5l1.5 1.5L9 6" />
+                <line x1="14" y1="7.5" x2="21" y2="7.5" />
+                <rect x="3" y="13" width="7" height="7" rx="1.5" />
+                <path d="M5 16.5l1.5 1.5L9 15" />
+                <line x1="14" y1="16.5" x2="21" y2="16.5" />
+              </svg>
+              <span>חיפוש מתקדם</span>
+              <span id="advSearchCountBadge" class="adv-count-pill hidden">0</span>
+            </button>
+
+            <button type="button" id="refreshHomeOrderBtn" class="explorer-dropdown-btn refresh-home-trigger-btn tv-focusable" title="רענן המלצות וסדר אריחים בדף הבית" aria-label="רענן המלצות בדף הבית">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M23 4v6h-6M1 20v-6h6" />
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+              </svg>
+              <span>רענן המלצות</span>
+            </button>
+          </div>
+
           <!-- Live Running News & Cinema Ticker (#liveNewsTickerBar) — Symmetrical Full-Width Balance -->
           <div id="liveNewsTickerBar" class="live-news-ticker-bar" aria-label="פיד מבזקי חדשות ועדכונים בזמן אמת">
             <div class="news-ticker-badge">
@@ -671,6 +702,7 @@
         <button type="button" class="filter-tab tv-focusable" data-search-filter="series" aria-label="סדרות">סדרות</button>
         <button type="button" class="filter-tab tv-focusable" data-search-filter="channels" aria-label="ערוצים">ערוצים</button>
         <button type="button" class="filter-tab tv-focusable" data-search-filter="youtube" aria-label="יוטיוב">יוטיוב</button>
+        <button type="button" id="searchOpenAdvancedBtn" class="filter-tab search-adv-tab-btn tv-focusable" aria-label="חיפוש מתקדם לפי שילוב קטגוריות">☑ חיפוש מתקדם (שילוב קטגוריות)</button>
       </div>
 
       <div id="searchTvKeyboardMount" class="search-tv-keyboard-mount"></div>
@@ -678,6 +710,71 @@
       <div id="searchStatusText" class="search-status-text" aria-live="polite">הקלד לחיפוש בכל הקטלוג</div>
 
       <div id="searchResultsGrid" class="search-results-grid"></div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MULTI-CATEGORY CHECKBOX ADVANCED SEARCH MODAL (#advancedSearchModal)  -->
+  <!-- ===================================================================== -->
+  <div id="advancedSearchModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="advSearchTitle" dir="rtl">
+    <div class="adv-search-modal-card">
+      <div class="adv-search-header">
+        <div class="adv-search-title-wrap">
+          <span class="adv-search-kicker">STREAM IT SMART DISCOVERY</span>
+          <h2 id="advSearchTitle" class="adv-search-title">חיפוש מתקדם לפי שילוב קטגוריות ונושאים</h2>
+          <p class="adv-search-subtitle">סמן מספר צ'קבוקסים במקביל לשילוב מדויק — למשל: <strong>הרפתקאות + חטיפה + טבע</strong> או <strong>אימה + קומדיה</strong></p>
+        </div>
+        <button type="button" id="closeAdvancedSearchBtn" class="modal-close-btn adv-close-btn tv-focusable" aria-label="סגור חיפוש מתקדם">
+          <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+          <span>סגור</span>
+        </button>
+      </div>
+
+      <div class="adv-search-body">
+        <!-- Content Type Filter -->
+        <div class="adv-section-block">
+          <div class="adv-section-label">סוג תוכן</div>
+          <div id="advTypeTabsRow" class="adv-type-tabs-row">
+            <button type="button" class="adv-type-btn active tv-focusable" data-adv-type="all">הכל (סרטים וסדרות)</button>
+            <button type="button" class="adv-type-btn tv-focusable" data-adv-type="movie">סרטים בלבד</button>
+            <button type="button" class="adv-type-btn tv-focusable" data-adv-type="tv">סדרות בלבד</button>
+          </div>
+        </div>
+
+        <!-- Quick Popular Presets -->
+        <div class="adv-section-block adv-presets-block">
+          <div class="adv-section-label">שילובים מהירים בלחיצה</div>
+          <div id="advPresetsRow" class="adv-presets-row">
+            <button type="button" class="adv-preset-pill tv-focusable" data-preset-genres="adventure" data-preset-themes="kidnapping,nature">🌿 הרפתקאות + חטיפה + טבע</button>
+            <button type="button" class="adv-preset-pill tv-focusable" data-preset-genres="horror,comedy" data-preset-themes="">👻 אימה + קומדיה</button>
+            <button type="button" class="adv-preset-pill tv-focusable" data-preset-genres="action,thriller" data-preset-themes="heist">💰 אקשן + מתח + שוד ועוקץ</button>
+            <button type="button" class="adv-preset-pill tv-focusable" data-preset-genres="scifi,thriller" data-preset-themes="time_travel">⏳ מד"ב + מתח + מסע בזמן</button>
+            <button type="button" class="adv-preset-pill tv-focusable" data-preset-genres="crime,mystery" data-preset-themes="serial_killer">🕵️ פשע + מסתורין + חקירת רצח</button>
+          </div>
+        </div>
+
+        <!-- Multi-Select Genre Checkboxes -->
+        <div class="adv-section-block">
+          <div class="adv-section-label">ז'אנרים וסוגות <span class="adv-label-hint">(ניתן לסמן מספר צ'קבוקסים יחד)</span></div>
+          <div id="advGenreCheckboxesGrid" class="adv-checkbox-grid"></div>
+        </div>
+
+        <!-- Multi-Select Plot / Theme Checkboxes -->
+        <div class="adv-section-block">
+          <div class="adv-section-label">עלילה, אווירה ונושאים מיוחדים <span class="adv-label-hint">(חטיפה, טבע, נקמה, שוד, חלל ועוד)</span></div>
+          <div id="advThemeCheckboxesGrid" class="adv-checkbox-grid"></div>
+        </div>
+      </div>
+
+      <div class="adv-search-footer">
+        <div id="advSearchLiveSummary" class="adv-search-live-summary">בחר קטגוריות או נושאים לסינון משולב</div>
+        <div class="adv-search-footer-actions">
+          <button type="button" id="advSearchResetBtn" class="btn-secondary adv-footer-btn tv-focusable">נקה הכל</button>
+          <button type="button" id="advSearchApplyBtn" class="btn-primary adv-footer-btn tv-focusable">הצג תוצאות מותאמות</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1039,12 +1136,14 @@
           <div id="subsListContainer" class="subs-list-container"></div>
 
           <div class="subs-control-section">
-            <div class="subs-control-label">סנכרון תזמון כתוביות</div>
+            <div class="subs-control-label">סנכרון תזמון כתוביות (אוטומטי + כוונון עדין)</div>
             <div class="subs-sync-row" dir="ltr">
               <button type="button" id="subSyncMinusBtn" class="subs-chip-btn tv-focusable" dir="ltr" aria-label="הקדם כתוביות בחצי שנייה">-0.5s</button>
+              <button type="button" id="subSyncFineMinusBtn" class="subs-chip-btn subs-fine-btn tv-focusable" dir="ltr" aria-label="הקדם כתוביות בעשירית שנייה">-0.1s</button>
               <span id="subSyncValueBadge" class="subs-value-readout" dir="ltr" aria-live="polite">0.0s</span>
+              <button type="button" id="subSyncFinePlusBtn" class="subs-chip-btn subs-fine-btn tv-focusable" dir="ltr" aria-label="אחר כתוביות בעשירית שנייה">+0.1s</button>
               <button type="button" id="subSyncPlusBtn" class="subs-chip-btn tv-focusable" dir="ltr" aria-label="אחר כתוביות בחצי שנייה">+0.5s</button>
-              <button type="button" id="subSyncZeroBtn" class="subs-chip-btn subs-mini-reset-btn tv-focusable" dir="rtl" aria-label="אפס תזמון ל-0">אפס תזמון</button>
+              <button type="button" id="subSyncZeroBtn" class="subs-chip-btn subs-mini-reset-btn tv-focusable" dir="rtl" aria-label="אפס תזמון ל-0">אפס</button>
             </div>
           </div>
 
@@ -1749,13 +1848,13 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Core Application & Smart TV Navigation Scripts -->
-  <script src="tv-navigation.js?v=9.9.5"></script>
-  <script src="app.js?v=9.9.5"></script>
+  <script src="tv-navigation.js?v=9.9.6"></script>
+  <script src="app.js?v=9.9.6"></script>
   <script>
     (function () {
       try {
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (otaVer && otaVer > '9.9.5') {
+        if (otaVer && otaVer > '9.9.6') {
           window.__STREAMIT_OTA_INJECTED_RUNNING = true;
           var navCode = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
           if (navCode.length > 500) {

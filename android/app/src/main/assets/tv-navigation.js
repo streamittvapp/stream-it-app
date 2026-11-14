@@ -12,7 +12,7 @@
 (function () {
   'use strict';
 
-  var NAV_VERSION = '9.9.5';
+  var NAV_VERSION = '9.9.6';
   try {
     var pendingOtaVer = localStorage.getItem('streamit_ota_version_v9') || '';
     var pendingOtaNav = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
@@ -176,6 +176,9 @@
       return details;
     }
 
+    var advSearch = document.getElementById('advancedSearchModal');
+    if (advSearch && !advSearch.classList.contains('hidden')) return advSearch;
+
     var search = document.getElementById('searchModal');
     if (search && !search.classList.contains('hidden')) return search;
 
@@ -235,7 +238,7 @@
 
     if (options.scroll !== false && !sameNetflixRow) {
       var scrollTarget = curRow || el;
-      scrollContainer = el.closest('#tvRailListsScroll, #catalogMain, .details-modal-sheet, .search-modal-sheet, .auth-modal-card, .parental-modal-card, #parentalControlModal, #searchModal, #tvMoreModal, .explorer-dropdown-panel');
+      scrollContainer = el.closest('#tvRailListsScroll, #catalogMain, .details-modal-sheet, .search-modal-sheet, .adv-search-body, #advancedSearchModal, .auth-modal-card, .parental-modal-card, #parentalControlModal, #searchModal, #tvMoreModal, .explorer-dropdown-panel');
       if (scrollContainer) {
         var cRect = scrollContainer.getBoundingClientRect();
         var tRect = scrollTarget.getBoundingClientRect();
@@ -1331,6 +1334,10 @@
       var railVoiceBtn = document.getElementById('tvRailVoiceSearchBtn');
       var railSearchClearBtn = document.getElementById('tvRailSearchClearBtn');
       var railSearchRowBtns = [railSearchBtn, railVoiceBtn, railSearchClearBtn].filter(isElementVisible);
+      var railQuickBtns = [
+        document.getElementById('tvRailAdvSearchBtn'),
+        document.getElementById('tvRailRefreshHomeBtn')
+      ].filter(isElementVisible);
       var miniVk = document.getElementById('tvRailMiniKeyboard');
       var miniVkOpen = Boolean(miniVk && !miniVk.classList.contains('hidden') && isElementVisible(miniVk));
       var railListItems = Array.prototype.slice.call(
@@ -1359,9 +1366,40 @@
           return setFocus(currentFocused, { scroll: false });
         }
         if (direction === 'down') {
+          if (railQuickBtns.length) return setFocus(railQuickBtns[0], { scroll: false });
           if (miniVkOpen) {
             var firstVkKey = miniVk.querySelector('.tv-mini-vk-key');
             if (firstVkKey && isElementVisible(firstVkKey)) return setFocus(firstVkKey, { scroll: false });
+          }
+          if (railListItems.length) return setFocus(railListItems[0]);
+          if (railProfileBtn && isElementVisible(railProfileBtn)) return setFocus(railProfileBtn, { scroll: false });
+          return true;
+        }
+      }
+
+      // A1b. Quick Tools Row (#tvRailAdvSearchBtn, #tvRailRefreshHomeBtn)
+      var railQuickPos = railQuickBtns.indexOf(currentFocused);
+      if (railQuickPos !== -1) {
+        if (direction === 'left') {
+          if (railQuickPos < railQuickBtns.length - 1) {
+            return setFocus(railQuickBtns[railQuickPos + 1], { scroll: false });
+          }
+          return focusMainStageFromRail();
+        }
+        if (direction === 'right') {
+          if (railQuickPos > 0) {
+            return setFocus(railQuickBtns[railQuickPos - 1], { scroll: false });
+          }
+          return true;
+        }
+        if (direction === 'up') {
+          if (railSearchRowBtns.length) return setFocus(railSearchRowBtns[0], { scroll: false });
+          return setFocus(currentFocused, { scroll: false });
+        }
+        if (direction === 'down') {
+          if (miniVkOpen) {
+            var firstVkKeyQ = miniVk.querySelector('.tv-mini-vk-key');
+            if (firstVkKeyQ && isElementVisible(firstVkKeyQ)) return setFocus(firstVkKeyQ, { scroll: false });
           }
           if (railListItems.length) return setFocus(railListItems[0]);
           if (railProfileBtn && isElementVisible(railProfileBtn)) return setFocus(railProfileBtn, { scroll: false });
@@ -1393,6 +1431,7 @@
             if (chIdx - vkCols >= 0) {
               return setFocus(charKeys[chIdx - vkCols], { scroll: false });
             }
+            if (railQuickBtns.length) return setFocus(railQuickBtns[0], { scroll: false });
             if (railSearchBtn && isElementVisible(railSearchBtn)) return setFocus(railSearchBtn, { scroll: false });
             return true;
           }
@@ -1530,6 +1569,7 @@
             var vkActs = miniVk.querySelectorAll('.tv-mini-vk-act');
             if (vkActs.length) return setFocus(vkActs[0], { scroll: false });
           }
+          if (railQuickBtns.length) return setFocus(railQuickBtns[0], { scroll: false });
           if (railSearchBtn && isElementVisible(railSearchBtn)) return setFocus(railSearchBtn, { scroll: false });
           // Stay clamped at the top of #tvSideRail — NEVER jump out to #topHeader!
           return setFocus(currentFocused, { scroll: false });
@@ -2603,6 +2643,10 @@
           window.history.replaceState({ streamItBackShield: 1 }, '', window.location.href);
           window.history.pushState({ streamItBackShield: 2 }, '', window.location.href);
           window.history.pushState({ streamItBackShield: 3 }, '', window.location.href);
+          window.history.pushState({ streamItBackShield: 4 }, '', window.location.href);
+        } else if (Number(curState.streamItBackShield) <= 2) {
+          window.history.pushState({ streamItBackShield: 3 }, '', window.location.href);
+          window.history.pushState({ streamItBackShield: 4 }, '', window.location.href);
         }
       }
     } catch (eHistShield) {}
@@ -2630,6 +2674,7 @@
    * Handle Back / Escape Deterministically
    */
   function handleBackButton() {
+    try {
     ensureBackHistoryCushion();
     reclaimTvFocusFromIframe();
 
@@ -2876,6 +2921,17 @@
       return true;
     }
 
+    var advSearchModal = document.getElementById('advancedSearchModal');
+    if (advSearchModal && !advSearchModal.classList.contains('hidden')) {
+      if (typeof window.closeAdvancedSearchModal === 'function') {
+        window.closeAdvancedSearchModal();
+      } else {
+        advSearchModal.classList.add('hidden');
+      }
+      if (lastMainFocus && isElementVisible(lastMainFocus)) setFocus(lastMainFocus);
+      return true;
+    }
+
     var search = document.getElementById('searchModal');
     if (search && !search.classList.contains('hidden')) {
       search.classList.add('hidden');
@@ -2992,11 +3048,10 @@
     }
 
     return true;
+    } catch (errBackShield) {
+      return true;
+    }
   }
-
-  /**
-   * Master Remote D-Pad & Keyboard Dispatcher
-   */
   function handleRemoteCommand(directionOrAction) {
     var nowCmd = Date.now();
     if (directionOrAction === lastCmdDir && nowCmd - lastCmdAt < 22) {
@@ -3276,7 +3331,12 @@
       return handleRemoteCommand('select');
     },
     handleAndroidBackButton: function () {
-      return handleBackButton();
+      try {
+        var r = handleBackButton();
+        return r === false ? false : true;
+      } catch (e) {
+        return true;
+      }
     },
     focusElement: setFocus,
     clearPlayerFocus: clearPlayerFocus,

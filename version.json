@@ -1,10 +1,10 @@
 {
-  "version": "9.9.5",
+  "version": "9.9.6",
   "native_apk_version": "9.8.8",
   "apk_download_url": "https://streamittvapp.github.io/stream-it-app/StreamIt-AndroidTV.apk",
   "apk_short_url": "https://is.gd/streamitapk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-15T00:25:00Z",
-  "notes": "v9.9.5 — Multi-layer Streamer Back button shield inside movies, halved Streamer tile spacing, balanced default subtitle size/position across all platforms, top-opening mobile subtitle menu, deterministic non-resetting subtitle menu controls, and universal Voice Search."
+  "updated_at": "2026-11-15T01:25:00Z",
+  "notes": "v9.9.6 — Removed iframe sandbox (fixes Please Disable Sandbox), crash-proof Streamer Back shield during video playback, native player subtitles forced to NONE (zero double subs), accurate 23.976fps/PAL subtitle sync + fine +/-0.1s sync, Kids Hebrew-dubbed catalog & audio preference, synced scrub thumbnail without poster artwork, hardened SafeWatch blur/mute/skip, multi-category & plot-theme Advanced Checkbox Search, Netflix Top 10 showcase rows, and dynamic Home feed refresh."
 }
