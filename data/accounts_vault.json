@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794684770234,
+      "updatedTs": 1794684999003,
       "subUsersUpdatedAt": 1794551843424,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -272,7 +272,8 @@
             "1236045",
             "1339713",
             "tt10577736",
-            "series-1413"
+            "series-1413",
+            "movie-197"
           ],
           "progress": {
             "1283515": {
@@ -638,9 +639,59 @@
                 "מותחנים"
               ],
               "seasonsCount": 13
+            },
+            "movie-197": {
+              "id": "movie-197",
+              "imdbId": "tt0112573",
+              "tmdbId": "197",
+              "type": "movie",
+              "title": "לב אמיץ",
+              "originalTitle": "Braveheart",
+              "year": "1995",
+              "rating": "7.9",
+              "runtimeHe": "שעתיים",
+              "ageRating": "14+",
+              "overview": "ויליאם ואלאס הוא מורד סקוטי שמנהיג התקוממות נגד אדוארד הלונגשנקס, שליט אנגליה האכזר, שרוצה לרשת את כתר סקוטלנד בעצמו. כשהיה ילד קטן, אביו ואחיו של ויליאם ואלאס, יחד עם רבים אחרים, מתו בנסיון לשחרר את סקוטלנד. ברגע שהוא מאבד עוד אחד מאהוביו, ויליאם ואלאס מתחיל במסע ארוך לשחרר את סקוטלנד לתמיד, יחד עם עזרתו של רוברט הברוס.",
+              "poster": "https://image.tmdb.org/t/p/w500/7W0qk1tHIEPDYAqdDE6fgNZus4v.jpg",
+              "backdrop": "https://image.tmdb.org/t/p/w1280/1m1c5gIWWkb1FEC9lzsoXHhhs7b.jpg",
+              "cardBackdrop": "https://image.tmdb.org/t/p/w500/1m1c5gIWWkb1FEC9lzsoXHhhs7b.jpg",
+              "genres": [
+                "war",
+                "drama"
+              ],
+              "genresHe": [
+                "מלחמה והיסטוריה",
+                "דרמה"
+              ],
+              "seasonsCount": 0
+            },
+            "tt0112573": {
+              "id": "movie-197",
+              "imdbId": "tt0112573",
+              "tmdbId": "197",
+              "type": "movie",
+              "title": "לב אמיץ",
+              "originalTitle": "Braveheart",
+              "year": "1995",
+              "rating": "7.9",
+              "runtimeHe": "שעתיים",
+              "ageRating": "14+",
+              "overview": "ויליאם ואלאס הוא מורד סקוטי שמנהיג התקוממות נגד אדוארד הלונגשנקס, שליט אנגליה האכזר, שרוצה לרשת את כתר סקוטלנד בעצמו. כשהיה ילד קטן, אביו ואחיו של ויליאם ואלאס, יחד עם רבים אחרים, מתו בנסיון לשחרר את סקוטלנד. ברגע שהוא מאבד עוד אחד מאהוביו, ויליאם ואלאס מתחיל במסע ארוך לשחרר את סקוטלנד לתמיד, יחד עם עזרתו של רוברט הברוס.",
+              "poster": "https://image.tmdb.org/t/p/w500/7W0qk1tHIEPDYAqdDE6fgNZus4v.jpg",
+              "backdrop": "https://image.tmdb.org/t/p/w1280/1m1c5gIWWkb1FEC9lzsoXHhhs7b.jpg",
+              "cardBackdrop": "https://image.tmdb.org/t/p/w500/1m1c5gIWWkb1FEC9lzsoXHhhs7b.jpg",
+              "genres": [
+                "war",
+                "drama"
+              ],
+              "genresHe": [
+                "מלחמה והיסטוריה",
+                "דרמה"
+              ],
+              "seasonsCount": 0
             }
           },
-          "watchlistUpdatedAt": 1794528316365,
+          "watchlistUpdatedAt": 1794684999003,
           "deletedProgressIds": {
             "27": 1794432189831,
             "10580": 1794432196249,
