@@ -274,6 +274,82 @@
             "tt10577736",
             "series-1413"
           ],
+          "progress": {
+            "1283515": {
+              "id": "1283515",
+              "imdbId": "tt32261958",
+              "tmdbId": "1283515",
+              "title": "תעתוע",
+              "currentTime": 3136,
+              "duration": 7256,
+              "percent": 43,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794434864507,
+              "snapshot": {
+                "id": "1283515",
+                "imdbId": "tt32261958",
+                "tmdbId": "1283515",
+                "type": "movie",
+                "title": "תעתוע",
+                "originalTitle": "Verity",
+                "year": "2026",
+                "rating": "7.0",
+                "runtimeHe": "שעתיים",
+                "ageRating": "14+",
+                "overview": "סופרת מתקשה עוברת להתגורר באחוזת קרופורד המבודדת כדי לכתוב בשמה של וריטי. לאחר שלואן מגלה מה שנראה כרשימות אוטוביוגרפיות מצמררות של וריטי, היא מתמודדת עם וידויים מטרידים ומעוותים הנוגעים לבעלה של וריטי, ג'רמי ומתקשה להבחין בין דמיון למציאות, בין מניפולציה למשיכה, ובין הזדמנות לאובססיה.",
+                "poster": "https://image.tmdb.org/t/p/w500/fhkXXgxth4IxoplvQvQZ0BSo3F4.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
+                "genres": [
+                  "mystery",
+                  "thriller"
+                ],
+                "genresHe": [
+                  "מסתורין ובלשי",
+                  "מותחנים"
+                ],
+                "seasonsCount": 0
+              }
+            },
+            "movie-1283515": {
+              "id": "movie-1283515",
+              "imdbId": "tt32261958",
+              "tmdbId": "1283515",
+              "title": "תעתוע",
+              "currentTime": 2498,
+              "duration": 7200,
+              "percent": 35,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794686149683,
+              "snapshot": {
+                "id": "movie-1283515",
+                "imdbId": "tt32261958",
+                "tmdbId": "1283515",
+                "type": "movie",
+                "title": "תעתוע",
+                "originalTitle": "Verity",
+                "year": "2026",
+                "rating": "7.0",
+                "runtimeHe": "שעתיים",
+                "ageRating": "14+",
+                "overview": "סופרת מתקשה עוברת להתגורר באחוזת קרופורד המבודדת כדי לכתוב בשמה של וריטי. לאחר שלואן מגלה מה שנראה כרשימות אוטוביוגרפיות מצמררות של וריטי, היא מתמודדת עם וידויים מטרידים ומעוותים הנוגעים לבעלה של וריטי, ג'רמי ומתקשה להבחין בין דמיון למציאות, בין מניפולציה למשיכה, ובין הזדמנות לאובססיה.",
+                "poster": "https://image.tmdb.org/t/p/w500/fhkXXgxth4IxoplvQvQZ0BSo3F4.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
+                "genres": [
+                  "mystery",
+                  "thriller"
+                ],
+                "genresHe": [
+                  "מסתורין ובלשי",
+                  "מותחנים"
+                ],
+                "seasonsCount": 0
+              }
+            }
+          },
           "watchlistSnapshots": {
             "tt10577736": {
               "id": "tt10577736",
@@ -417,82 +493,6 @@
             }
           },
           "watchlistUpdatedAt": 1794685001388,
-          "progress": {
-            "1283515": {
-              "id": "1283515",
-              "imdbId": "tt32261958",
-              "tmdbId": "1283515",
-              "title": "תעתוע",
-              "currentTime": 3136,
-              "duration": 7256,
-              "percent": 43,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794434864507,
-              "snapshot": {
-                "id": "1283515",
-                "imdbId": "tt32261958",
-                "tmdbId": "1283515",
-                "type": "movie",
-                "title": "תעתוע",
-                "originalTitle": "Verity",
-                "year": "2026",
-                "rating": "7.0",
-                "runtimeHe": "שעתיים",
-                "ageRating": "14+",
-                "overview": "סופרת מתקשה עוברת להתגורר באחוזת קרופורד המבודדת כדי לכתוב בשמה של וריטי. לאחר שלואן מגלה מה שנראה כרשימות אוטוביוגרפיות מצמררות של וריטי, היא מתמודדת עם וידויים מטרידים ומעוותים הנוגעים לבעלה של וריטי, ג'רמי ומתקשה להבחין בין דמיון למציאות, בין מניפולציה למשיכה, ובין הזדמנות לאובססיה.",
-                "poster": "https://image.tmdb.org/t/p/w500/fhkXXgxth4IxoplvQvQZ0BSo3F4.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
-                "genres": [
-                  "mystery",
-                  "thriller"
-                ],
-                "genresHe": [
-                  "מסתורין ובלשי",
-                  "מותחנים"
-                ],
-                "seasonsCount": 0
-              }
-            },
-            "movie-1283515": {
-              "id": "movie-1283515",
-              "imdbId": "tt32261958",
-              "tmdbId": "1283515",
-              "title": "תעתוע",
-              "currentTime": 2498,
-              "duration": 7200,
-              "percent": 35,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794686149683,
-              "snapshot": {
-                "id": "movie-1283515",
-                "imdbId": "tt32261958",
-                "tmdbId": "1283515",
-                "type": "movie",
-                "title": "תעתוע",
-                "originalTitle": "Verity",
-                "year": "2026",
-                "rating": "7.0",
-                "runtimeHe": "שעתיים",
-                "ageRating": "14+",
-                "overview": "סופרת מתקשה עוברת להתגורר באחוזת קרופורד המבודדת כדי לכתוב בשמה של וריטי. לאחר שלואן מגלה מה שנראה כרשימות אוטוביוגרפיות מצמררות של וריטי, היא מתמודדת עם וידויים מטרידים ומעוותים הנוגעים לבעלה של וריטי, ג'רמי ומתקשה להבחין בין דמיון למציאות, בין מניפולציה למשיכה, ובין הזדמנות לאובססיה.",
-                "poster": "https://image.tmdb.org/t/p/w500/fhkXXgxth4IxoplvQvQZ0BSo3F4.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
-                "genres": [
-                  "mystery",
-                  "thriller"
-                ],
-                "genresHe": [
-                  "מסתורין ובלשי",
-                  "מותחנים"
-                ],
-                "seasonsCount": 0
-              }
-            }
-          },
           "deletedProgressIds": {
             "27": 1794432189831,
             "278": 1794686259883,
@@ -549,40 +549,38 @@
         },
         "prof-1794166536010": {
           "watchlist": [],
+          "progress": {},
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
-          "progress": {},
           "deletedProgressIds": {},
           "progressClearedAt": 0
         },
         "prof-1794166543582": {
           "watchlist": [],
+          "progress": {},
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
-          "progress": {},
           "deletedProgressIds": {},
           "progressClearedAt": 0
         },
         "prof-1794166553435": {
           "watchlist": [],
+          "progress": {},
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
-          "progress": {},
           "deletedProgressIds": {},
           "progressClearedAt": 0
         },
         "prof-1794166559616": {
           "watchlist": [],
+          "progress": {},
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
-          "progress": {},
           "deletedProgressIds": {},
           "progressClearedAt": 0
         },
         "prof-1794166564722": {
           "watchlist": [],
-          "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0,
           "progress": {
             "27": {
               "id": "27",
@@ -744,6 +742,8 @@
               }
             }
           },
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0,
           "deletedProgressIds": {},
           "progressClearedAt": 0
         }
