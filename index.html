@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
-  <link rel="stylesheet" href="styles.css?v=9.9.1" />
+  <link rel="stylesheet" href="styles.css?v=9.9.4" />
   <script>
     (function () {
       try {
@@ -34,13 +34,13 @@
           });
         }
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (!otaVer || otaVer <= '9.9.0') {
+        if (!otaVer || otaVer <= '9.9.3') {
           localStorage.removeItem('streamit_ota_css_v9');
           localStorage.removeItem('streamit_ota_app_js_v9');
           localStorage.removeItem('streamit_ota_tv_nav_v9');
         }
         var otaCss = localStorage.getItem('streamit_ota_css_v9') || '';
-        if (otaVer && otaVer > '9.9.1' && otaCss.length > 500) {
+        if (otaVer && otaVer > '9.9.4' && otaCss.length > 500) {
           var st = document.createElement('style');
           st.id = 'streamit-ota-live-style-v9';
           st.textContent = otaCss;
@@ -140,7 +140,7 @@
           <button type="button" class="nav-link tv-focusable" data-category="youtube" aria-label="יוטיוב">יוטיוב</button>
           <button type="button" class="nav-link tv-focusable" data-category="mylist" aria-label="הרשימה שלי">הרשימה שלי</button>
           <span id="tvTopClock" class="tv-top-clock" dir="ltr" aria-label="שעה נוכחית"></span>
-          <span id="appVersionBadge" class="app-version-badge" dir="ltr" aria-label="גרסת מערכת">v9.9.1</span>
+          <span id="appVersionBadge" class="app-version-badge" dir="ltr" aria-label="גרסת מערכת">v9.9.4</span>
         </nav>
       </div>
 
@@ -485,6 +485,21 @@
               </svg>
             </button>
             <div id="actorDropdownPanel" class="explorer-dropdown-panel actor-dropdown-panel hidden" role="menu" aria-label="גלריית שחקנים עם תמונות">
+              <div id="mobileActorSearchBox" class="mobile-actor-search-box">
+                <svg viewBox="0 0 24 24" class="icon-svg actor-search-icon" aria-hidden="true">
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="M20 20l-4.2-4.2" />
+                </svg>
+                <input
+                  type="search"
+                  id="mobileActorSearchInput"
+                  class="actor-search-input mobile-actor-search-input"
+                  placeholder="חפש שחקן (ברוס ויליס, גל גדות)..."
+                  aria-label="חיפוש שחקן במובייל"
+                  autocomplete="off"
+                />
+                <button type="button" id="mobileActorSearchBtn" class="actor-search-submit-btn" aria-label="חפש שחקן">חפש</button>
+              </div>
               <div class="actor-panel-header">בחר שחקן לצפייה בכל הסרטים והסדרות שלו:</div>
               <div id="actorFilterStrip" class="actor-photo-grid"></div>
             </div>
@@ -570,28 +585,19 @@
       <span>סדרות</span>
     </button>
 
+    <button type="button" class="mobile-nav-btn" data-category="viva" aria-label="ויוה ודרמות טורקיות">
+      <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+        <path d="M12 21s-7-4.35-9.5-8.5C.5 9.1 2.4 5 6.4 5c2.1 0 3.9 1.2 5.6 3.1C13.7 6.2 15.5 5 17.6 5c4 0 5.9 4.1 3.9 7.5C19 16.65 12 21 12 21z" />
+      </svg>
+      <span>ויוה</span>
+    </button>
+
     <button type="button" class="mobile-nav-btn" data-category="channels" aria-label="ערוצים">
       <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
         <circle cx="12" cy="12" r="2.5" />
         <path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14" />
       </svg>
       <span>ערוצים</span>
-    </button>
-
-    <button type="button" class="mobile-nav-btn" data-category="youtube" aria-label="יוטיוב">
-      <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
-        <rect x="2" y="5" width="20" height="14" rx="2" />
-        <path d="M10 9l5 3-5 3V9z" />
-      </svg>
-      <span>יוטיוב</span>
-    </button>
-
-    <button type="button" id="mobileSearchBtn" class="mobile-nav-btn" aria-label="חיפוש">
-      <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
-        <circle cx="11" cy="11" r="7" />
-        <path d="M20 20l-4.2-4.2" />
-      </svg>
-      <span>חיפוש</span>
     </button>
   </nav>
 
@@ -793,11 +799,11 @@
       </div>
 
       <!-- Player Back / Exit Confirmation Dialog (#playerExitConfirmModal) -->
-      <div id="playerExitConfirmModal" class="player-exit-confirm-modal hidden" dir="rtl" role="alertdialog" aria-modal="true" aria-labelledby="playerExitConfirmHeading">
+      <div id="playerExitConfirmModal" class="player-exit-confirm-modal player-exit-confirm-overlay hidden" dir="rtl" role="alertdialog" aria-modal="true" aria-labelledby="playerExitConfirmHeading">
         <div class="player-exit-confirm-card">
           <div class="player-exit-confirm-badge">יציאה מהנגן</div>
-          <h3 id="playerExitConfirmHeading" class="player-exit-confirm-heading">לצאת מהצפייה?</h3>
-          <p id="playerExitConfirmDesc" class="player-exit-confirm-desc">האם אתה בטוח שברצונך לצאת מהסרט? נקודת העצירה שלך נשמרה אוטומטית.</p>
+          <h3 id="playerExitConfirmHeading" class="player-exit-confirm-heading player-exit-confirm-title">לצאת מהצפייה?</h3>
+          <p id="playerExitConfirmDesc" class="player-exit-confirm-desc player-exit-confirm-sub">האם אתה בטוח שברצונך לצאת מהסרט? נקודת העצירה שלך נשמרה אוטומטית.</p>
           <div class="player-exit-confirm-actions">
             <button type="button" id="playerExitCancelBtn" class="btn-primary player-exit-btn tv-focusable" aria-label="המשך צפייה">
               <span>המשך צפייה</span>
@@ -835,6 +841,9 @@
         <span>דלג על הפתיח</span>
       </button>
 
+      <!-- Mobile Touch Wake-Up Shield when Cross-Origin Embed Controls Auto-Hide -->
+      <div id="mobilePlayerTouchWakeZone" class="mobile-player-touch-wake-zone" aria-hidden="true"></div>
+
       <div id="playerControlsOverlay" class="player-controls-overlay">
         <!-- Top Bar: Title + Multi-Source Switcher (#playerSourceTabs) + Close Button -->
         <div class="player-top-bar">
@@ -857,7 +866,7 @@
                 <rect x="2" y="4" width="20" height="16" rx="2" />
                 <path d="M6 12h4M12 12h6M6 16h8M16 16h2" />
               </svg>
-              <span>כתוביות עברית (הגדרות)</span>
+              <span>כתוביות עברית<span class="player-top-subs-extra"> (הגדרות)</span></span>
             </button>
 
             <div id="playerSourcesDropdownWrap" class="details-sources-dropdown-wrap player-sources-dropdown-wrap">
@@ -873,6 +882,10 @@
                 </svg>
               </button>
               <div id="playerSourceTabs" class="player-source-tabs details-sources-dropdown-panel hidden" role="listbox" aria-label="בחירת מקור שידור">
+                <div class="subs-menu-header-row player-sources-mobile-header">
+                  <div class="subs-menu-header">בחירת מקור שידור ואיכות</div>
+                  <button type="button" id="closePlayerSourcesMenuBtn" class="player-menu-close-x tv-focusable" aria-label="סגור תפריט מקורות">✕</button>
+                </div>
                 <button type="button" class="source-tab-btn tv-focusable active" data-source-mode="direct" aria-label="נגן חכם 4K UHD אוטומטי">נגן חכם 4K UHD (אוטומטי)</button>
                 <button type="button" class="source-tab-btn tv-focusable" data-source-mode="embed1" aria-label="שרת ענן 1 4K VIP">שרת ענן 1 (4K VIP)</button>
                 <button type="button" class="source-tab-btn tv-focusable" data-source-mode="embed2" aria-label="שרת ענן 2 4K Mirror">שרת ענן 2 (4K Mirror)</button>
@@ -988,7 +1001,10 @@
 
         <!-- Subtitles & Sync Control Panel Popover (#playerSubsMenu) — Always Accessible in BOTH Video & Embed Modes -->
         <div id="playerSubsMenu" class="player-subs-menu hidden" dir="rtl" role="menu" aria-label="תפריט כתוביות וסנכרון בעברית בלבד">
-          <div class="subs-menu-header">הגדרות כתוביות וסנכרון (עברית בלבד)</div>
+          <div class="subs-menu-header-row">
+            <div class="subs-menu-header">הגדרות כתוביות וסנכרון (עברית בלבד)</div>
+            <button type="button" id="closePlayerSubsMenuBtn" class="player-menu-close-x tv-focusable" aria-label="סגור הגדרות כתוביות">✕</button>
+          </div>
 
           <div id="subsListContainer" class="subs-list-container"></div>
 
@@ -1044,7 +1060,10 @@
 
         <!-- In-Player SafeWatch Parental Control Quick Popover (#playerParentalMenu) -->
         <div id="playerParentalMenu" class="player-subs-menu player-parental-menu hidden" dir="rtl" role="menu" aria-label="בקרת הורים וסינון סצנות בנגן">
-          <div class="subs-menu-header">בקרת הורים (SafeWatch) — סינון סצנות חי</div>
+          <div class="subs-menu-header-row">
+            <div class="subs-menu-header">בקרת הורים (SafeWatch) — סינון סצנות חי</div>
+            <button type="button" id="closePlayerParentalMenuBtn" class="player-menu-close-x tv-focusable" aria-label="סגור בקרת הורים">✕</button>
+          </div>
           <div id="playerParentalActiveStatus" class="player-parental-status-box"></div>
           <div id="playerParentalQuickToggles" class="player-parental-quick-toggles"></div>
           <div class="subs-control-section">
@@ -1688,13 +1707,13 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Core Application & Smart TV Navigation Scripts -->
-  <script src="tv-navigation.js?v=9.9.1"></script>
-  <script src="app.js?v=9.9.1"></script>
+  <script src="tv-navigation.js?v=9.9.4"></script>
+  <script src="app.js?v=9.9.4"></script>
   <script>
     (function () {
       try {
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (otaVer && otaVer > '9.9.1') {
+        if (otaVer && otaVer > '9.9.4') {
           window.__STREAMIT_OTA_INJECTED_RUNNING = true;
           var navCode = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
           if (navCode.length > 500) {

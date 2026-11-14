@@ -1,10 +1,10 @@
 {
-  "version": "9.9.1",
+  "version": "9.9.4",
   "native_apk_version": "9.8.8",
   "apk_download_url": "https://streamittvapp.github.io/stream-it-app/StreamIt-AndroidTV.apk",
   "apk_short_url": "https://is.gd/streamitapk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-14T22:15:00Z",
-  "notes": "v9.9.1 — Step-by-step Back navigation history + App Exit guard, Original-Language 1080p audio enforcement (no foreign dubs), exact title/year ID verification, and Viva / Turkish Dramas & Telenovelas VOD + Live channels."
+  "updated_at": "2026-11-14T23:35:00Z",
+  "notes": "v9.9.4 — Polished mobile Details sheet (movie & series) + verified portrait & landscape video playback, touch wake-up over cloud embeds, and full in-player subtitle/source/SafeWatch menus."
 }

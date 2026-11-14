@@ -12,7 +12,7 @@
 (function () {
   'use strict';
 
-  var NAV_VERSION = '9.9.1';
+  var NAV_VERSION = '9.9.4';
   try {
     var pendingOtaVer = localStorage.getItem('streamit_ota_version_v9') || '';
     var pendingOtaNav = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
@@ -3094,7 +3094,24 @@
     return false;
   }
 
+  function isMobileTouchViewport() {
+    if (detectTvEnvironment()) return false;
+    if (document.body && document.body.classList.contains('tv-mode')) return false;
+    var vw = window.innerWidth || document.documentElement.clientWidth || 1920;
+    return vw <= 768;
+  }
+
   function ensureInitialTvFocus() {
+    if (isMobileTouchViewport()) {
+      var vkEl = document.getElementById('tvVirtualKeyboard');
+      if (!vkEl || vkEl.classList.contains('hidden')) {
+        if (currentFocused) {
+          currentFocused.classList.remove('tv-focused');
+          currentFocused = null;
+        }
+        return false;
+      }
+    }
     var authModal = document.getElementById('authModal');
     if (authModal && !authModal.classList.contains('hidden')) {
       if (currentFocused && authModal.contains(currentFocused) && isElementVisible(currentFocused)) {
@@ -3232,6 +3249,17 @@
   };
 
   window.addEventListener('keydown', window.__streamItTvKeydownHandler, true);
+
+  if (!window.__streamItMobileTouchClearBound) {
+    window.__streamItMobileTouchClearBound = true;
+    window.addEventListener('touchstart', function () {
+      if (detectTvEnvironment() || (document.body && document.body.classList.contains('tv-mode'))) return;
+      if (currentFocused) {
+        currentFocused.classList.remove('tv-focused');
+        currentFocused = null;
+      }
+    }, { passive: true });
+  }
 
   function initTvNavigationEngine() {
     if (window.__streamItTvNavInstanceId !== myNavInstanceId) return;
