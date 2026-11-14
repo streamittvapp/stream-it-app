@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794696338961,
+      "updatedTs": 1794696351845,
       "subUsersUpdatedAt": 1794694857976,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -174,149 +174,6 @@
             "tt10577736",
             "series-1413"
           ],
-          "watchlistSnapshots": {
-            "tt10577736": {
-              "id": "tt10577736",
-              "imdbId": "tt10577736",
-              "tmdbId": "103913",
-              "type": "series",
-              "title": "טהרן",
-              "originalTitle": "Tehran",
-              "year": "2020",
-              "rating": "7.6",
-              "runtimeHe": "3 עונות • 24 פרקים",
-              "ageRating": "16+",
-              "overview": "תמר רביניאן, האקרית ולוחמת סייבר צעירה במוסד, מוחדרת בזהות בדויה לבירת איראן למשימה מסוכנת של השבתת מערכות המכ\"ם.",
-              "poster": "https://images.metahub.space/poster/medium/tt10577736/img",
-              "backdrop": "https://images.metahub.space/background/medium/tt10577736/img",
-              "cardBackdrop": "https://images.metahub.space/background/medium/tt10577736/img",
-              "genres": [
-                "israeli",
-                "drama",
-                "action",
-                "telegram"
-              ],
-              "genresHe": [
-                "יצירה ישראלית",
-                "מתח וריגול",
-                "דרמה"
-              ],
-              "seasonsCount": 4
-            },
-            "series-1413": {
-              "id": "series-1413",
-              "imdbId": "tt1844624",
-              "tmdbId": "1413",
-              "type": "series",
-              "title": "אימה אמריקאית",
-              "originalTitle": "American Horror Story",
-              "year": "2011",
-              "rating": "8.1",
-              "runtimeHe": "45 דק׳ לפרק",
-              "ageRating": "16+",
-              "overview": "סדרת דרמה-אימה אשר בה כל עונה היא סיפור בפני עצמו המתקיים במקומות שונים; בבית רדוף רוחות, במוסד לחולי רוח ובמסדר מכשפות. הסדרה היא אנתולוגית וכל עונה נתפסת כמיני-סדרה עצמאית בעקבות קבוצה נבדלת של דמויות ורקעים, ועלילה ייחודית עם התחלה, אמצע וסוף. עם זאת,יוצר הסדרה הצהיר כי עד סוף הסדרה הצופים יבינו את הקשר שבין העונות השונות.",
-              "poster": "https://image.tmdb.org/t/p/w500/dpzNasY2sAzRjeoLAarrLkcUeBg.jpg",
-              "backdrop": "https://image.tmdb.org/t/p/w1280/5G4Bnc4Q0YUK1bwLEUYmIsmm2Ib.jpg",
-              "cardBackdrop": "https://image.tmdb.org/t/p/w500/5G4Bnc4Q0YUK1bwLEUYmIsmm2Ib.jpg",
-              "genres": [
-                "drama",
-                "mystery",
-                "scifi",
-                "horror",
-                "thriller"
-              ],
-              "genresHe": [
-                "דרמה",
-                "מסתורין ובלשי",
-                "מדע בדיוני ופנטזיה",
-                "אימה",
-                "מותחנים"
-              ],
-              "seasonsCount": 13
-            },
-            "tt1844624": {
-              "id": "series-1413",
-              "imdbId": "tt1844624",
-              "tmdbId": "1413",
-              "type": "series",
-              "title": "אימה אמריקאית",
-              "originalTitle": "American Horror Story",
-              "year": "2011",
-              "rating": "8.1",
-              "runtimeHe": "45 דק׳ לפרק",
-              "ageRating": "16+",
-              "overview": "סדרת דרמה-אימה אשר בה כל עונה היא סיפור בפני עצמו המתקיים במקומות שונים; בבית רדוף רוחות, במוסד לחולי רוח ובמסדר מכשפות. הסדרה היא אנתולוגית וכל עונה נתפסת כמיני-סדרה עצמאית בעקבות קבוצה נבדלת של דמויות ורקעים, ועלילה ייחודית עם התחלה, אמצע וסוף. עם זאת,יוצר הסדרה הצהיר כי עד סוף הסדרה הצופים יבינו את הקשר שבין העונות השונות.",
-              "poster": "https://image.tmdb.org/t/p/w500/dpzNasY2sAzRjeoLAarrLkcUeBg.jpg",
-              "backdrop": "https://image.tmdb.org/t/p/w1280/5G4Bnc4Q0YUK1bwLEUYmIsmm2Ib.jpg",
-              "cardBackdrop": "https://image.tmdb.org/t/p/w500/5G4Bnc4Q0YUK1bwLEUYmIsmm2Ib.jpg",
-              "genres": [
-                "drama",
-                "mystery",
-                "scifi",
-                "horror",
-                "thriller"
-              ],
-              "genresHe": [
-                "דרמה",
-                "מסתורין ובלשי",
-                "מדע בדיוני ופנטזיה",
-                "אימה",
-                "מותחנים"
-              ],
-              "seasonsCount": 13
-            },
-            "tt0112573": {
-              "id": "movie-197",
-              "imdbId": "tt0112573",
-              "tmdbId": "197",
-              "type": "movie",
-              "title": "לב אמיץ",
-              "originalTitle": "Braveheart",
-              "year": "1995",
-              "rating": "7.9",
-              "runtimeHe": "שעתיים",
-              "ageRating": "14+",
-              "overview": "ויליאם ואלאס הוא מורד סקוטי שמנהיג התקוממות נגד אדוארד הלונגשנקס, שליט אנגליה האכזר, שרוצה לרשת את כתר סקוטלנד בעצמו. כשהיה ילד קטן, אביו ואחיו של ויליאם ואלאס, יחד עם רבים אחרים, מתו בנסיון לשחרר את סקוטלנד. ברגע שהוא מאבד עוד אחד מאהוביו, ויליאם ואלאס מתחיל במסע ארוך לשחרר את סקוטלנד לתמיד, יחד עם עזרתו של רוברט הברוס.",
-              "poster": "https://image.tmdb.org/t/p/w500/7W0qk1tHIEPDYAqdDE6fgNZus4v.jpg",
-              "backdrop": "https://image.tmdb.org/t/p/w1280/1m1c5gIWWkb1FEC9lzsoXHhhs7b.jpg",
-              "cardBackdrop": "https://image.tmdb.org/t/p/w500/1m1c5gIWWkb1FEC9lzsoXHhhs7b.jpg",
-              "genres": [
-                "war",
-                "drama"
-              ],
-              "genresHe": [
-                "מלחמה והיסטוריה",
-                "דרמה"
-              ],
-              "seasonsCount": 0
-            },
-            "movie-197": {
-              "id": "movie-197",
-              "imdbId": "tt0112573",
-              "tmdbId": "197",
-              "type": "movie",
-              "title": "לב אמיץ",
-              "originalTitle": "Braveheart",
-              "year": "1995",
-              "rating": "7.9",
-              "runtimeHe": "שעתיים",
-              "ageRating": "14+",
-              "overview": "ויליאם ואלאס הוא מורד סקוטי שמנהיג התקוממות נגד אדוארד הלונגשנקס, שליט אנגליה האכזר, שרוצה לרשת את כתר סקוטלנד בעצמו. כשהיה ילד קטן, אביו ואחיו של ויליאם ואלאס, יחד עם רבים אחרים, מתו בנסיון לשחרר את סקוטלנד. ברגע שהוא מאבד עוד אחד מאהוביו, ויליאם ואלאס מתחיל במסע ארוך לשחרר את סקוטלנד לתמיד, יחד עם עזרתו של רוברט הברוס.",
-              "poster": "https://image.tmdb.org/t/p/w500/7W0qk1tHIEPDYAqdDE6fgNZus4v.jpg",
-              "backdrop": "https://image.tmdb.org/t/p/w1280/1m1c5gIWWkb1FEC9lzsoXHhhs7b.jpg",
-              "cardBackdrop": "https://image.tmdb.org/t/p/w500/1m1c5gIWWkb1FEC9lzsoXHhhs7b.jpg",
-              "genres": [
-                "war",
-                "drama"
-              ],
-              "genresHe": [
-                "מלחמה והיסטוריה",
-                "דרמה"
-              ],
-              "seasonsCount": 0
-            }
-          },
-          "watchlistUpdatedAt": 1794685001388,
           "progress": {
             "1283515": {
               "id": "1283515",
@@ -360,12 +217,12 @@
               "imdbId": "tt32261958",
               "tmdbId": "1283515",
               "title": "תעתוע",
-              "currentTime": 2476,
+              "currentTime": 2740,
               "duration": 7200,
-              "percent": 34,
+              "percent": 38,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794696338961,
+              "updatedAt": 1794696351845,
               "snapshot": {
                 "id": "movie-1283515",
                 "imdbId": "tt32261958",
@@ -550,6 +407,149 @@
               }
             }
           },
+          "watchlistSnapshots": {
+            "tt10577736": {
+              "id": "tt10577736",
+              "imdbId": "tt10577736",
+              "tmdbId": "103913",
+              "type": "series",
+              "title": "טהרן",
+              "originalTitle": "Tehran",
+              "year": "2020",
+              "rating": "7.6",
+              "runtimeHe": "3 עונות • 24 פרקים",
+              "ageRating": "16+",
+              "overview": "תמר רביניאן, האקרית ולוחמת סייבר צעירה במוסד, מוחדרת בזהות בדויה לבירת איראן למשימה מסוכנת של השבתת מערכות המכ\"ם.",
+              "poster": "https://images.metahub.space/poster/medium/tt10577736/img",
+              "backdrop": "https://images.metahub.space/background/medium/tt10577736/img",
+              "cardBackdrop": "https://images.metahub.space/background/medium/tt10577736/img",
+              "genres": [
+                "israeli",
+                "drama",
+                "action",
+                "telegram"
+              ],
+              "genresHe": [
+                "יצירה ישראלית",
+                "מתח וריגול",
+                "דרמה"
+              ],
+              "seasonsCount": 4
+            },
+            "series-1413": {
+              "id": "series-1413",
+              "imdbId": "tt1844624",
+              "tmdbId": "1413",
+              "type": "series",
+              "title": "אימה אמריקאית",
+              "originalTitle": "American Horror Story",
+              "year": "2011",
+              "rating": "8.1",
+              "runtimeHe": "45 דק׳ לפרק",
+              "ageRating": "16+",
+              "overview": "סדרת דרמה-אימה אשר בה כל עונה היא סיפור בפני עצמו המתקיים במקומות שונים; בבית רדוף רוחות, במוסד לחולי רוח ובמסדר מכשפות. הסדרה היא אנתולוגית וכל עונה נתפסת כמיני-סדרה עצמאית בעקבות קבוצה נבדלת של דמויות ורקעים, ועלילה ייחודית עם התחלה, אמצע וסוף. עם זאת,יוצר הסדרה הצהיר כי עד סוף הסדרה הצופים יבינו את הקשר שבין העונות השונות.",
+              "poster": "https://image.tmdb.org/t/p/w500/dpzNasY2sAzRjeoLAarrLkcUeBg.jpg",
+              "backdrop": "https://image.tmdb.org/t/p/w1280/5G4Bnc4Q0YUK1bwLEUYmIsmm2Ib.jpg",
+              "cardBackdrop": "https://image.tmdb.org/t/p/w500/5G4Bnc4Q0YUK1bwLEUYmIsmm2Ib.jpg",
+              "genres": [
+                "drama",
+                "mystery",
+                "scifi",
+                "horror",
+                "thriller"
+              ],
+              "genresHe": [
+                "דרמה",
+                "מסתורין ובלשי",
+                "מדע בדיוני ופנטזיה",
+                "אימה",
+                "מותחנים"
+              ],
+              "seasonsCount": 13
+            },
+            "tt1844624": {
+              "id": "series-1413",
+              "imdbId": "tt1844624",
+              "tmdbId": "1413",
+              "type": "series",
+              "title": "אימה אמריקאית",
+              "originalTitle": "American Horror Story",
+              "year": "2011",
+              "rating": "8.1",
+              "runtimeHe": "45 דק׳ לפרק",
+              "ageRating": "16+",
+              "overview": "סדרת דרמה-אימה אשר בה כל עונה היא סיפור בפני עצמו המתקיים במקומות שונים; בבית רדוף רוחות, במוסד לחולי רוח ובמסדר מכשפות. הסדרה היא אנתולוגית וכל עונה נתפסת כמיני-סדרה עצמאית בעקבות קבוצה נבדלת של דמויות ורקעים, ועלילה ייחודית עם התחלה, אמצע וסוף. עם זאת,יוצר הסדרה הצהיר כי עד סוף הסדרה הצופים יבינו את הקשר שבין העונות השונות.",
+              "poster": "https://image.tmdb.org/t/p/w500/dpzNasY2sAzRjeoLAarrLkcUeBg.jpg",
+              "backdrop": "https://image.tmdb.org/t/p/w1280/5G4Bnc4Q0YUK1bwLEUYmIsmm2Ib.jpg",
+              "cardBackdrop": "https://image.tmdb.org/t/p/w500/5G4Bnc4Q0YUK1bwLEUYmIsmm2Ib.jpg",
+              "genres": [
+                "drama",
+                "mystery",
+                "scifi",
+                "horror",
+                "thriller"
+              ],
+              "genresHe": [
+                "דרמה",
+                "מסתורין ובלשי",
+                "מדע בדיוני ופנטזיה",
+                "אימה",
+                "מותחנים"
+              ],
+              "seasonsCount": 13
+            },
+            "tt0112573": {
+              "id": "movie-197",
+              "imdbId": "tt0112573",
+              "tmdbId": "197",
+              "type": "movie",
+              "title": "לב אמיץ",
+              "originalTitle": "Braveheart",
+              "year": "1995",
+              "rating": "7.9",
+              "runtimeHe": "שעתיים",
+              "ageRating": "14+",
+              "overview": "ויליאם ואלאס הוא מורד סקוטי שמנהיג התקוממות נגד אדוארד הלונגשנקס, שליט אנגליה האכזר, שרוצה לרשת את כתר סקוטלנד בעצמו. כשהיה ילד קטן, אביו ואחיו של ויליאם ואלאס, יחד עם רבים אחרים, מתו בנסיון לשחרר את סקוטלנד. ברגע שהוא מאבד עוד אחד מאהוביו, ויליאם ואלאס מתחיל במסע ארוך לשחרר את סקוטלנד לתמיד, יחד עם עזרתו של רוברט הברוס.",
+              "poster": "https://image.tmdb.org/t/p/w500/7W0qk1tHIEPDYAqdDE6fgNZus4v.jpg",
+              "backdrop": "https://image.tmdb.org/t/p/w1280/1m1c5gIWWkb1FEC9lzsoXHhhs7b.jpg",
+              "cardBackdrop": "https://image.tmdb.org/t/p/w500/1m1c5gIWWkb1FEC9lzsoXHhhs7b.jpg",
+              "genres": [
+                "war",
+                "drama"
+              ],
+              "genresHe": [
+                "מלחמה והיסטוריה",
+                "דרמה"
+              ],
+              "seasonsCount": 0
+            },
+            "movie-197": {
+              "id": "movie-197",
+              "imdbId": "tt0112573",
+              "tmdbId": "197",
+              "type": "movie",
+              "title": "לב אמיץ",
+              "originalTitle": "Braveheart",
+              "year": "1995",
+              "rating": "7.9",
+              "runtimeHe": "שעתיים",
+              "ageRating": "14+",
+              "overview": "ויליאם ואלאס הוא מורד סקוטי שמנהיג התקוממות נגד אדוארד הלונגשנקס, שליט אנגליה האכזר, שרוצה לרשת את כתר סקוטלנד בעצמו. כשהיה ילד קטן, אביו ואחיו של ויליאם ואלאס, יחד עם רבים אחרים, מתו בנסיון לשחרר את סקוטלנד. ברגע שהוא מאבד עוד אחד מאהוביו, ויליאם ואלאס מתחיל במסע ארוך לשחרר את סקוטלנד לתמיד, יחד עם עזרתו של רוברט הברוס.",
+              "poster": "https://image.tmdb.org/t/p/w500/7W0qk1tHIEPDYAqdDE6fgNZus4v.jpg",
+              "backdrop": "https://image.tmdb.org/t/p/w1280/1m1c5gIWWkb1FEC9lzsoXHhhs7b.jpg",
+              "cardBackdrop": "https://image.tmdb.org/t/p/w500/1m1c5gIWWkb1FEC9lzsoXHhhs7b.jpg",
+              "genres": [
+                "war",
+                "drama"
+              ],
+              "genresHe": [
+                "מלחמה והיסטוריה",
+                "דרמה"
+              ],
+              "seasonsCount": 0
+            }
+          },
+          "watchlistUpdatedAt": 1794685001388,
           "deletedProgressIds": {
             "27": 1794432189831,
             "278": 1794686259883,
@@ -606,40 +606,38 @@
         },
         "prof-1794166536010": {
           "watchlist": [],
+          "progress": {},
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
-          "progress": {},
           "deletedProgressIds": {},
           "progressClearedAt": 0
         },
         "prof-1794166543582": {
           "watchlist": [],
+          "progress": {},
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
-          "progress": {},
           "deletedProgressIds": {},
           "progressClearedAt": 0
         },
         "prof-1794166553435": {
           "watchlist": [],
+          "progress": {},
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
-          "progress": {},
           "deletedProgressIds": {},
           "progressClearedAt": 0
         },
         "prof-1794166559616": {
           "watchlist": [],
+          "progress": {},
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
-          "progress": {},
           "deletedProgressIds": {},
           "progressClearedAt": 0
         },
         "prof-1794166564722": {
           "watchlist": [],
-          "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0,
           "progress": {
             "27": {
               "id": "27",
@@ -801,6 +799,8 @@
               }
             }
           },
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0,
           "deletedProgressIds": {},
           "progressClearedAt": 0
         }
