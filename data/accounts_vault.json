@@ -945,14 +945,7 @@
       "name": "BENSAHAL TV",
       "role": "admin",
       "max_profiles": 5,
-      "ts": 1794690264030
-    },
-    "5005": {
-      "email": "bensahaltv@gmail.com",
-      "name": "BENSAHAL TV",
-      "role": "admin",
-      "max_profiles": 5,
-      "ts": 1794690221954
+      "ts": 1794694742957
     }
   }
 }
