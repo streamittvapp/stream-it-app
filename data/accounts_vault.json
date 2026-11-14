@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794692926797,
+      "updatedTs": 1794692946788,
       "subUsersUpdatedAt": 1794551843424,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -534,12 +534,12 @@
               "imdbId": "tt11280740",
               "tmdbId": "95396",
               "title": "ניתוק",
-              "currentTime": 150,
+              "currentTime": 170,
               "duration": 3434,
-              "percent": 4,
+              "percent": 5,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794692926797,
+              "updatedAt": 1794692946788,
               "snapshot": {
                 "id": "tt11280740",
                 "imdbId": "tt11280740",
