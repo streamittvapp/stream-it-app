@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.9.4';
+  var APP_VERSION = '9.9.5';
 
   // If a strictly newer OTA script is stored in localStorage and index.html is about to inject it,
   // skip running this older bundled script completely so two versions of app.js NEVER run in parallel!
@@ -32,8 +32,10 @@
     window.__STREAMIT_V991_BOOTED ||
     window.__STREAMIT_V992_BOOTED ||
     window.__STREAMIT_V993_BOOTED ||
-    window.__STREAMIT_V994_BOOTED
+    window.__STREAMIT_V994_BOOTED ||
+    window.__STREAMIT_V995_BOOTED
   );
+  window.__STREAMIT_V995_BOOTED = true;
   window.__STREAMIT_V994_BOOTED = true;
   window.__STREAMIT_V993_BOOTED = true;
   window.__STREAMIT_V992_BOOTED = true;
@@ -71,7 +73,8 @@
   window.__STREAMIT_V968_BOOTED = true;
   window.__STREAMIT_V969_BOOTED = true;
   window.__STREAMIT_V970_BOOTED = true;
-  // Synchronously block any older bundled v9.7.0-v9.9.3 script from firing its DOMContentLoaded boot handler after OTA loads!
+  // Synchronously block any older bundled v9.7.0-v9.9.4 script from firing its DOMContentLoaded boot handler after OTA loads!
+  window.__STREAMIT_V994_BOOT_DONE = true;
   window.__STREAMIT_V993_BOOT_DONE = true;
   window.__STREAMIT_V992_BOOT_DONE = true;
   window.__STREAMIT_V991_BOOT_DONE = true;
@@ -1530,17 +1533,18 @@
     hlsInstance: null,
     playerIdleTimer: null,
     skipIntroHideTimer: null,
-    // Subtitles state (Defaults per Elan's specification: ענק 42px, לבן, ללא רקע שקוף, 3.5%)
+    // Subtitles state (Balanced defaults across TV, Desktop & Mobile: רגיל 25px, לבן, ללא רקע, 9% מתחתית המסך)
     parsedCues: [],
     subtitleTracks: [],
     activeSubTrackId: 'he-auto',
     subEnabled: true,
     subOffsetSec: 0,
-    subSize: 'xlarge', // 'normal' | 'large' | 'xlarge' (Default: ענק)
-    subFontPx: 42, // Free font size in px with + / - buttons (16px to 84px, default 42px = ענק)
+    subSize: 'normal', // 'small' | 'normal' | 'large' (Default: רגיל)
+    subFontPx: 25, // Balanced default 25px (16px to 54px)
     subColor: 'white', // 'white' | 'yellow' (Default: לבן)
-    subBg: 'none', // 'none' | 'dark' (Default: ללא רקע שקוף)
-    subBottomPct: 3.5, // % distance from bottom of screen (Default: 3.5%)
+    subBg: 'none', // 'none' | 'dark' (Default: ללא רקע)
+    subBottomPct: 9, // % distance from bottom of player frame (Default: 9%)
+    subPrefsUpdatedAt: 0,
     // Search state
     searchFilter: 'all',
     searchDebounce: null,
@@ -1983,14 +1987,17 @@
     loadAccountScopedState();
 
     try {
-      var sp = localStorage.getItem('streamit_sub_prefs_v947');
+      var sp = localStorage.getItem('streamit_sub_prefs_v995');
       if (sp) {
         var p = JSON.parse(sp);
-        if (p.size) state.subSize = p.size;
-        if (typeof p.fontPx === 'number' && p.fontPx >= 14 && p.fontPx <= 96) state.subFontPx = p.fontPx;
-        if (p.color) state.subColor = p.color;
-        if (p.bg) state.subBg = p.bg;
-        if (typeof p.bottomPct === 'number') state.subBottomPct = p.bottomPct;
+        if (p && Number(p.schemaVer || 0) >= 2) {
+          if (p.size === 'small' || p.size === 'normal' || p.size === 'large') state.subSize = p.size;
+          if (typeof p.fontPx === 'number' && p.fontPx >= 16 && p.fontPx <= 54) state.subFontPx = Math.round(p.fontPx);
+          if (p.color === 'white' || p.color === 'yellow') state.subColor = p.color;
+          if (p.bg === 'none' || p.bg === 'dark') state.subBg = p.bg;
+          if (typeof p.bottomPct === 'number' && p.bottomPct >= 2 && p.bottomPct <= 26) state.subBottomPct = p.bottomPct;
+          if (typeof p.updatedAt === 'number' && p.updatedAt > 0) state.subPrefsUpdatedAt = p.updatedAt;
+        }
       }
     } catch (e) {}
   }
@@ -2251,13 +2258,16 @@
   }
 
   function saveSubtitlePrefs() {
+    state.subPrefsUpdatedAt = Date.now();
     try {
-      localStorage.setItem('streamit_sub_prefs_v947', JSON.stringify({
-        size: state.subSize || 'xlarge',
-        fontPx: typeof state.subFontPx === 'number' ? state.subFontPx : 42,
+      localStorage.setItem('streamit_sub_prefs_v995', JSON.stringify({
+        schemaVer: 2,
+        updatedAt: state.subPrefsUpdatedAt,
+        size: state.subSize || 'normal',
+        fontPx: typeof state.subFontPx === 'number' ? state.subFontPx : 25,
         color: state.subColor || 'white',
         bg: state.subBg || 'none',
-        bottomPct: typeof state.subBottomPct === 'number' ? state.subBottomPct : 3.5
+        bottomPct: typeof state.subBottomPct === 'number' ? state.subBottomPct : 9
       }));
     } catch (e) {}
     scheduleCloudAccountStateSync(1500);
@@ -2282,11 +2292,13 @@
       profileData: JSON.parse(JSON.stringify(state.profileData || {})),
       parentalMaster: JSON.parse(JSON.stringify(state.parentalMaster || { pinCode: '', customSkipSegments: {} })),
       subPrefs: {
-        size: state.subSize || 'xlarge',
-        fontPx: typeof state.subFontPx === 'number' ? state.subFontPx : 42,
+        schemaVer: 2,
+        updatedAt: Number(state.subPrefsUpdatedAt || 0),
+        size: state.subSize || 'normal',
+        fontPx: typeof state.subFontPx === 'number' ? state.subFontPx : 25,
         color: state.subColor || 'white',
         bg: state.subBg || 'none',
-        bottomPct: typeof state.subBottomPct === 'number' ? state.subBottomPct : 3.5
+        bottomPct: typeof state.subBottomPct === 'number' ? state.subBottomPct : 9
       }
     };
   }
@@ -2493,16 +2505,41 @@
       }
     }
 
-    // 5. Subtitle Preferences
-    if (cloudState.subPrefs && typeof cloudState.subPrefs === 'object' && cloudIsNewer) {
-      if (cloudState.subPrefs.size) state.subSize = cloudState.subPrefs.size;
-      if (typeof cloudState.subPrefs.fontPx === 'number') state.subFontPx = cloudState.subPrefs.fontPx;
-      if (cloudState.subPrefs.color) state.subColor = cloudState.subPrefs.color;
-      if (cloudState.subPrefs.bg) state.subBg = cloudState.subPrefs.bg;
-      if (typeof cloudState.subPrefs.bottomPct === 'number') state.subBottomPct = cloudState.subPrefs.bottomPct;
+    // 5. Subtitle Preferences (Only apply v2+ schema preferences that were explicitly updated more recently than local)
+    if (
+      cloudState.subPrefs &&
+      typeof cloudState.subPrefs === 'object' &&
+      Number(cloudState.subPrefs.schemaVer || 0) >= 2 &&
+      Number(cloudState.subPrefs.updatedAt || 0) > Number(state.subPrefsUpdatedAt || 0)
+    ) {
+      if (cloudState.subPrefs.size === 'small' || cloudState.subPrefs.size === 'normal' || cloudState.subPrefs.size === 'large') {
+        state.subSize = cloudState.subPrefs.size;
+      }
+      if (typeof cloudState.subPrefs.fontPx === 'number' && cloudState.subPrefs.fontPx >= 16 && cloudState.subPrefs.fontPx <= 54) {
+        state.subFontPx = Math.round(cloudState.subPrefs.fontPx);
+      }
+      if (cloudState.subPrefs.color === 'white' || cloudState.subPrefs.color === 'yellow') {
+        state.subColor = cloudState.subPrefs.color;
+      }
+      if (cloudState.subPrefs.bg === 'none' || cloudState.subPrefs.bg === 'dark') {
+        state.subBg = cloudState.subPrefs.bg;
+      }
+      if (typeof cloudState.subPrefs.bottomPct === 'number' && cloudState.subPrefs.bottomPct >= 2 && cloudState.subPrefs.bottomPct <= 26) {
+        state.subBottomPct = cloudState.subPrefs.bottomPct;
+      }
+      state.subPrefsUpdatedAt = Number(cloudState.subPrefs.updatedAt || Date.now());
       try {
-        localStorage.setItem('streamit_sub_prefs_v947', JSON.stringify(cloudState.subPrefs));
+        localStorage.setItem('streamit_sub_prefs_v995', JSON.stringify({
+          schemaVer: 2,
+          updatedAt: state.subPrefsUpdatedAt,
+          size: state.subSize,
+          fontPx: state.subFontPx,
+          color: state.subColor,
+          bg: state.subBg,
+          bottomPct: state.subBottomPct
+        }));
       } catch (e) {}
+      applySubtitleStyleToOverlay();
     }
 
     ensureActiveProfileBucket();
@@ -7163,6 +7200,9 @@
     populateDetailsStreamsList(item, 1, 1);
 
     modal.classList.remove('hidden');
+    if (typeof window.ensureStreamItBackHistoryCushion === 'function') {
+      window.ensureStreamItBackHistoryCushion();
+    }
     var modalSheet = modal.querySelector('.details-modal-sheet');
     if (modalSheet) modalSheet.scrollTop = 0;
     var playBtn = document.getElementById('detailsPlayBtn');
@@ -7608,7 +7648,9 @@
       video.muted = false;
     } catch (eUnmute) {}
     try {
-      if (window.history && typeof window.history.pushState === 'function') {
+      if (typeof window.ensureStreamItBackHistoryCushion === 'function') {
+        window.ensureStreamItBackHistoryCushion();
+      } else if (window.history && typeof window.history.pushState === 'function') {
         window.history.pushState({ streamItPlayerOpen: true }, '', window.location.href);
       }
     } catch (eHist) {}
@@ -7851,7 +7893,7 @@
     var ytEmbedUrl = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(ytId) + '?autoplay=1&enablejsapi=1&rel=0&modestbranding=1&hl=he' + startParam;
 
     embedContainer.innerHTML =
-      '<iframe id="streamEmbedIframe" src="' + escapeHtml(ytEmbedUrl) + '" ' +
+      '<iframe id="streamEmbedIframe" tabindex="-1" src="' + escapeHtml(ytEmbedUrl) + '" ' +
       'sandbox="allow-scripts allow-same-origin allow-forms allow-presentation" ' +
       'allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen ' +
       'style="width:100%;height:100%;border:none;background:#000;"></iframe>';
@@ -8322,7 +8364,7 @@
     var startVisible = (state.embedActiveServerKey === 'swarm');
 
     embedContainer.innerHTML =
-      '<iframe id="streamEmbedIframe" src="' + escapeHtml(embedUrl) + '" ' +
+      '<iframe id="streamEmbedIframe" tabindex="-1" src="' + escapeHtml(embedUrl) + '" ' +
       'sandbox="allow-scripts allow-same-origin allow-forms allow-presentation" ' +
       'referrerpolicy="origin" ' +
       'allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen ' +
@@ -8381,6 +8423,9 @@
               var pm = document.getElementById('playerModal');
               if (pm && !pm.classList.contains('hidden') && state.embedVerified) {
                 window.AndroidTvBridge.tapCenterOfScreen();
+                setTimeout(function () {
+                  try { window.focus(); } catch (eWinFoc) {}
+                }, 90);
               }
             }, 900);
           }
@@ -9783,16 +9828,21 @@
       textSpan = document.getElementById('customSubtitleText');
     }
     overlay.classList.remove(
-      'sub-size-normal', 'sub-size-large', 'sub-size-xlarge',
+      'sub-size-small', 'sub-size-normal', 'sub-size-large', 'sub-size-xlarge',
       'sub-color-white', 'sub-color-yellow',
       'sub-bg-dark', 'sub-bg-none'
     );
-    overlay.classList.add('sub-size-' + (state.subSize || 'xlarge'));
+    var normSizeKey = state.subSize;
+    if (normSizeKey !== 'small' && normSizeKey !== 'normal' && normSizeKey !== 'large') {
+      normSizeKey = 'normal';
+      state.subSize = 'normal';
+    }
+    overlay.classList.add('sub-size-' + normSizeKey);
     overlay.classList.add('sub-color-' + (state.subColor || 'white'));
     overlay.classList.add('sub-bg-' + (state.subBg || 'none'));
 
-    var fontPx = typeof state.subFontPx === 'number' ? state.subFontPx : 42;
-    fontPx = Math.max(16, Math.min(84, Math.round(fontPx)));
+    var fontPx = typeof state.subFontPx === 'number' ? state.subFontPx : 25;
+    fontPx = Math.max(16, Math.min(54, Math.round(fontPx)));
     state.subFontPx = fontPx;
     var displayFontPx = fontPx;
     var isTvModeNow = Boolean(document.body && document.body.classList.contains('tv-mode'));
@@ -9800,26 +9850,35 @@
     var vpH = window.innerHeight || document.documentElement.clientHeight || 1080;
     var isMobileViewportNow = !isTvModeNow && Math.min(vpW, vpH) <= 520;
     var isMobilePortraitNow = isMobileViewportNow && vpW < vpH;
-    if (isMobileViewportNow) {
-      var mobileScale = isMobilePortraitNow ? 0.45 : 0.52;
-      displayFontPx = Math.max(14, Math.min(32, Math.round(fontPx * mobileScale)));
+    if (isTvModeNow) {
+      // Streamer renders on a 1280x720 canvas (1.5x physical scale on 1080p), so 0.82x gives crisp cinema proportions!
+      displayFontPx = Math.max(15, Math.min(40, Math.round(fontPx * 0.82)));
+    } else if (isMobileViewportNow) {
+      var mobileScale = isMobilePortraitNow ? 0.64 : 0.68;
+      displayFontPx = Math.max(13, Math.min(26, Math.round(fontPx * mobileScale)));
     }
     if (textSpan) {
       textSpan.style.fontSize = displayFontPx + 'px';
     }
 
-    var fontResetBtn = document.getElementById('subFontResetBtn');
-    if (fontResetBtn) {
-      fontResetBtn.textContent = fontPx + 'px';
+    var fontValueBadge = document.getElementById('subFontValueBadge') || document.getElementById('subFontResetBtn');
+    if (fontValueBadge) {
+      fontValueBadge.textContent = fontPx + 'px';
+    }
+
+    var syncValueBadge = document.getElementById('subSyncValueBadge') || document.getElementById('subSyncResetBtn');
+    if (syncValueBadge) {
+      var curSync = Number(state.subOffsetSec || 0);
+      syncValueBadge.textContent = (curSync > 0 ? '+' : '') + curSync.toFixed(1) + 's';
     }
 
     var sizeBtns = document.querySelectorAll('[data-sub-size]');
     for (var s = 0; s < sizeBtns.length; s++) {
       var szAttr = sizeBtns[s].getAttribute('data-sub-size');
       var matchesPreset =
-        (szAttr === 'normal' && fontPx === 26) ||
-        (szAttr === 'large' && fontPx === 34) ||
-        (szAttr === 'xlarge' && fontPx === 42);
+        (szAttr === 'small' && fontPx === 20) ||
+        (szAttr === 'normal' && fontPx === 25) ||
+        (szAttr === 'large' && fontPx === 31);
       sizeBtns[s].classList.toggle('active', matchesPreset);
     }
 
@@ -9828,56 +9887,65 @@
       colorBtns[c].classList.toggle('active', colorBtns[c].getAttribute('data-sub-color') === (state.subColor || 'white'));
     }
 
-    var bottomPct = typeof state.subBottomPct === 'number' ? state.subBottomPct : 3.5;
-    bottomPct = Math.max(1, Math.min(24, bottomPct));
+    var bottomPct = typeof state.subBottomPct === 'number' ? state.subBottomPct : 9;
+    bottomPct = Math.max(2, Math.min(26, Math.round(bottomPct * 10) / 10));
     state.subBottomPct = bottomPct;
     if (isMobilePortraitNow) {
-      // Place Hebrew subtitles cleanly 46px right below the centered 16:9 video frame in Portrait mode (above bottom controls)
-      var userDeltaVh = ((bottomPct - 3.5) * 0.85).toFixed(1);
-      overlay.style.bottom = 'calc(50dvh - 28.125vw - 46px + ' + userDeltaVh + 'vh)';
-    } else if (isMobileViewportNow) {
-      // Landscape widescreen phone: crisp cinema positioning near bottom of 16:9 frame
-      overlay.style.bottom = Math.max(2, Math.min(22, bottomPct + 1.2)) + 'vh';
+      // Place Hebrew subtitles cleanly right below the centered 16:9 video frame in Portrait mode (above bottom controls)
+      var userDeltaVh = ((bottomPct - 9) * 0.85).toFixed(1);
+      overlay.style.bottom = 'calc(50% - 28.125vw - 32px + ' + userDeltaVh + 'vh)';
     } else {
-      overlay.style.bottom = bottomPct + 'vh';
+      // Percentage of .player-stage height works identically across Desktop, Mobile Landscape & Streamer (--tv-zoom)!
+      overlay.style.bottom = bottomPct + '%';
     }
 
-    var posResetBtn = document.getElementById('subPosResetBtn');
-    if (posResetBtn) {
-      posResetBtn.textContent = (bottomPct % 1 === 0 ? bottomPct : bottomPct.toFixed(1)) + '%';
+    var posValueBadge = document.getElementById('subPosValueBadge') || document.getElementById('subPosResetBtn');
+    if (posValueBadge) {
+      posValueBadge.textContent = (bottomPct % 1 === 0 ? bottomPct : bottomPct.toFixed(1)) + '%';
     }
 
     var bgBtns = document.querySelectorAll('[data-sub-bg]');
     for (var b = 0; b < bgBtns.length; b++) {
       bgBtns[b].classList.toggle('active', bgBtns[b].getAttribute('data-sub-bg') === (state.subBg || 'none'));
     }
+
+    var sizeHeLabels = { small: 'קטן', normal: 'רגיל', large: 'גדול' };
+    var curSizeLabelHe = sizeHeLabels[normSizeKey] || 'רגיל';
+    var userMenuSubsTitleEl = document.getElementById('userMenuSubsTitle');
+    if (userMenuSubsTitleEl) {
+      userMenuSubsTitleEl.textContent = 'העדפות כתוביות: עברית (' + curSizeLabelHe + ')';
+    }
+    var tvMoreSubsLabelEl = document.getElementById('tvMoreSubsLabel') || document.getElementById('tvMoreSubsDesc');
+    if (tvMoreSubsLabelEl) {
+      tvMoreSubsLabelEl.textContent = 'כתוביות: עברית (' + curSizeLabelHe + ')';
+    }
   }
 
   function adjustSubtitleFontSize(deltaPx) {
-    var currentPx = typeof state.subFontPx === 'number' ? state.subFontPx : 42;
-    var nextPx = Math.max(16, Math.min(84, Math.round(currentPx + deltaPx)));
+    var currentPx = typeof state.subFontPx === 'number' ? state.subFontPx : 25;
+    var nextPx = Math.max(16, Math.min(54, Math.round(currentPx + deltaPx)));
     state.subFontPx = nextPx;
-    if (nextPx <= 28) state.subSize = 'normal';
-    else if (nextPx <= 37) state.subSize = 'large';
-    else state.subSize = 'xlarge';
+    if (nextPx <= 22) state.subSize = 'small';
+    else if (nextPx <= 28) state.subSize = 'normal';
+    else state.subSize = 'large';
     applySubtitleStyleToOverlay();
     saveSubtitlePrefs();
     var subStatusEl = document.getElementById('playerSubtitleStatus');
     if (subStatusEl) {
-      subStatusEl.textContent = 'גודל גופן כתוביות נשמר כברירת מחדל: ' + state.subFontPx + 'px';
+      subStatusEl.textContent = 'גודל גופן כתוביות נשמר: ' + state.subFontPx + 'px';
     }
   }
   window.adjustSubtitleFontSize = adjustSubtitleFontSize;
 
   function adjustSubtitleVerticalPosition(deltaPct) {
-    var current = typeof state.subBottomPct === 'number' ? state.subBottomPct : 3.5;
+    var current = typeof state.subBottomPct === 'number' ? state.subBottomPct : 9;
     var next = Math.round((current + deltaPct) * 10) / 10;
-    state.subBottomPct = Math.max(1, Math.min(24, next));
+    state.subBottomPct = Math.max(2, Math.min(26, next));
     applySubtitleStyleToOverlay();
     saveSubtitlePrefs();
     var subStatusEl = document.getElementById('playerSubtitleStatus');
     if (subStatusEl) {
-      subStatusEl.textContent = 'מיקום כתוביות נשמר כברירת מחדל: ' + state.subBottomPct + '% מתחתית המסך';
+      subStatusEl.textContent = 'מיקום כתוביות נשמר: ' + state.subBottomPct + '% מתחתית המסך';
     }
   }
   window.adjustSubtitleVerticalPosition = adjustSubtitleVerticalPosition;
@@ -10268,8 +10336,10 @@
         }
       } catch (eMsg) {}
       try {
-        ifr.src = 'about:blank';
-      } catch (eSrc) {}
+        if (ifr.parentNode) {
+          ifr.parentNode.removeChild(ifr);
+        }
+      } catch (eRemIfr) {}
     }
     var embed = document.getElementById('embedPlayerContainer');
     if (embed) {
@@ -10344,6 +10414,9 @@
   function requestCloseVideoPlayer() {
     var playerModal = document.getElementById('playerModal');
     if (!playerModal || playerModal.classList.contains('hidden')) return;
+    if (typeof window.ensureStreamItBackHistoryCushion === 'function') {
+      window.ensureStreamItBackHistoryCushion();
+    }
     var exitModal = document.getElementById('playerExitConfirmModal');
     if (!exitModal) {
       closeVideoPlayer();
@@ -10356,9 +10429,9 @@
     }
     pausePlaybackForOverlay();
     exitModal.classList.remove('hidden');
-    var confirmBtn = document.getElementById('playerExitConfirmBtn') || document.getElementById('playerExitCancelBtn');
-    if (confirmBtn && typeof window.streamItFocusElement === 'function') {
-      window.streamItFocusElement(confirmBtn, { scroll: false });
+    var defaultDialogBtn = document.getElementById('playerExitCancelBtn') || document.getElementById('playerExitConfirmBtn');
+    if (defaultDialogBtn && typeof window.streamItFocusElement === 'function') {
+      window.streamItFocusElement(defaultDialogBtn, { scroll: false });
     }
   }
   window.requestCloseVideoPlayer = requestCloseVideoPlayer;
@@ -10750,6 +10823,9 @@
     var modal = document.getElementById('searchModal');
     if (!modal) return;
     modal.classList.remove('hidden');
+    if (typeof window.ensureStreamItBackHistoryCushion === 'function') {
+      window.ensureStreamItBackHistoryCushion();
+    }
     var input = document.getElementById('searchInput');
     renderSearchResults('');
     if (input && typeof window.streamItFocusElement === 'function') {
@@ -11669,24 +11745,23 @@
       });
     }
 
+    var cycleGlobalSubtitlePreset = function () {
+      var order = ['normal', 'large', 'small'];
+      var pxMap = { small: 20, normal: 25, large: 31 };
+      var labels = { small: 'קטן', normal: 'רגיל', large: 'גדול' };
+      var cur = (state.subSize === 'small' || state.subSize === 'normal' || state.subSize === 'large') ? state.subSize : 'normal';
+      var nextSize = order[(order.indexOf(cur) + 1) % order.length];
+      state.subSize = nextSize;
+      state.subFontPx = pxMap[nextSize] || 25;
+      applySubtitleStyleToOverlay();
+      saveSubtitlePrefs();
+      showCinemaToast('גודל כתוביות עודכן ל: עברית (' + (labels[nextSize] || 'רגיל') + ')');
+    };
+
     var tvMoreSubsBtn = document.getElementById('tvMoreSubsBtn');
     if (tvMoreSubsBtn) {
       tvMoreSubsBtn.addEventListener('click', function () {
-        var order = ['xlarge', 'large', 'normal'];
-        var labels = { xlarge: 'ענק', large: 'גדול', normal: 'רגיל' };
-        var cur = state.subtitleSize || 'xlarge';
-        var nextIdx = (order.indexOf(cur) + 1) % order.length;
-        state.subtitleSize = order[nextIdx];
-        var subOverlay = document.getElementById('customSubtitleOverlay');
-        if (subOverlay) {
-          subOverlay.classList.remove('sub-size-normal', 'sub-size-large', 'sub-size-xlarge');
-          subOverlay.classList.add('sub-size-' + state.subtitleSize);
-        }
-        var subsDesc = document.getElementById('tvMoreSubsLabel') || document.getElementById('tvMoreSubsDesc');
-        if (subsDesc) {
-          subsDesc.textContent = 'כתוביות: עברית (' + (labels[state.subtitleSize] || 'ענק') + ')';
-        }
-        showCinemaToast('גודל כתוביות עודכן ל: עברית (' + (labels[state.subtitleSize] || 'ענק') + ')');
+        cycleGlobalSubtitlePreset();
       });
     }
 
@@ -11808,20 +11883,7 @@
     if (userMenuSubsBtn) {
       userMenuSubsBtn.addEventListener('click', function (e) {
         e.stopPropagation();
-        var order = ['xlarge', 'large', 'normal'];
-        var labels = { xlarge: 'ענק', large: 'גדול', normal: 'רגיל' };
-        var cur = state.subtitleSize || 'xlarge';
-        var nextIdx = (order.indexOf(cur) + 1) % order.length;
-        state.subtitleSize = order[nextIdx];
-        var subOverlay = document.getElementById('customSubtitleOverlay');
-        if (subOverlay) {
-          subOverlay.classList.remove('sub-size-normal', 'sub-size-large', 'sub-size-xlarge');
-          subOverlay.classList.add('sub-size-' + state.subtitleSize);
-        }
-        var subTitleEl = document.getElementById('userMenuSubsTitle');
-        if (subTitleEl) {
-          subTitleEl.textContent = 'העדפות כתוביות: עברית (' + (labels[state.subtitleSize] || 'ענק') + ')';
-        }
+        cycleGlobalSubtitlePreset();
       });
     }
 
@@ -11957,6 +12019,9 @@
     var headerQuickSearchBox = document.getElementById('headerSearchBox');
     if (headerQuickSearchBox) {
       headerQuickSearchBox.addEventListener('click', function (e) {
+        if (e.target && typeof e.target.closest === 'function' && e.target.closest('.voice-search-btn')) {
+          return;
+        }
         if (document.body && !document.body.classList.contains('tv-mode') && (window.innerWidth || 9999) <= 768) {
           e.preventDefault();
           triggerSearchWithQuery(headerQuickSearchInput ? headerQuickSearchInput.value : '');
@@ -11967,6 +12032,261 @@
         }
       });
     }
+
+    // Cross-Platform Voice Search Engine (Desktop, Mobile PWA & Android TV Streamer)
+    var activeVoiceRec = null;
+    var activeVoiceBtn = null;
+    var activeVoiceTargetMode = 'catalog';
+    var activeVoiceExplicitInput = null;
+    var activeVoiceFinalHandled = false;
+    var activeVoiceLastInterim = '';
+
+    var setVoiceUiListening = function (isListening, statusMsg, transcriptPreview) {
+      window.__streamItVoiceListening = Boolean(isListening);
+      var banner = document.getElementById('voiceListeningBanner');
+      var titleEl = document.getElementById('voiceListeningTitle');
+      var transEl = document.getElementById('voiceListeningTranscript');
+      var allMicBtns = document.querySelectorAll('.voice-search-btn');
+      for (var mb = 0; mb < allMicBtns.length; mb++) {
+        allMicBtns[mb].classList.toggle('is-listening', Boolean(isListening && allMicBtns[mb] === activeVoiceBtn));
+      }
+      if (banner) {
+        banner.classList.toggle('hidden', !isListening);
+      }
+      if (titleEl && statusMsg) {
+        titleEl.textContent = statusMsg;
+      }
+      if (transEl && typeof transcriptPreview === 'string') {
+        transEl.textContent = transcriptPreview;
+      }
+    };
+
+    var applyVoiceTranscriptResult = async function (rawText) {
+      var spoken = String(rawText || '').replace(/[.,!?؟]+$/g, '').trim();
+      if (!spoken) return;
+      activeVoiceFinalHandled = true;
+      var mode = activeVoiceTargetMode || 'catalog';
+      var expInput = activeVoiceExplicitInput;
+      stopStreamItVoiceSearch(true);
+      showCinemaToast('חיפוש קולי: "' + spoken + '"');
+
+      if (mode === 'vk' && expInput) {
+        expInput.value = spoken;
+        try {
+          expInput.dispatchEvent(new Event('input', { bubbles: true }));
+          expInput.dispatchEvent(new Event('change', { bubbles: true }));
+        } catch (eEv) {}
+        var vkPrev = document.getElementById('vkPreviewBox');
+        if (vkPrev) vkPrev.textContent = spoken;
+        var inpId = expInput.id || '';
+        if (inpId === 'searchInput' || inpId === 'headerQuickSearchInput') {
+          if (window.TVNavigation && typeof window.TVNavigation.closeVirtualKeyboard === 'function') {
+            window.TVNavigation.closeVirtualKeyboard(false);
+          }
+          triggerSearchWithQuery(spoken);
+          setTimeout(function () {
+            var firstCard = document.querySelector('#searchResultsGrid .poster-card');
+            if (firstCard && document.body && document.body.classList.contains('tv-mode') && typeof window.streamItFocusElement === 'function') {
+              window.streamItFocusElement(firstCard, { scroll: false });
+            }
+          }, 350);
+        } else if (inpId === 'actorSearchInput' || inpId === 'mobileActorSearchInput' || inpId === 'tvMoreActorSearchInput') {
+          if (window.TVNavigation && typeof window.TVNavigation.closeVirtualKeyboard === 'function') {
+            window.TVNavigation.closeVirtualKeyboard(false);
+          }
+          closeAllExplorerDropdowns();
+          closeTvMoreModal(false);
+          await searchActorByNameAndLoad(spoken);
+        }
+        return;
+      }
+
+      if (mode === 'actor' || mode === 'actor-mobile' || mode === 'actor-tvmore') {
+        var actorInp = document.getElementById(
+          mode === 'actor-mobile' ? 'mobileActorSearchInput' : (mode === 'actor-tvmore' ? 'tvMoreActorSearchInput' : 'actorSearchInput')
+        );
+        if (actorInp) actorInp.value = spoken;
+        closeAllExplorerDropdowns();
+        closeTvMoreModal(false);
+        await searchActorByNameAndLoad(spoken);
+        var firstActorCard = document.querySelector('#catalogRowsContainer .poster-card');
+        if (firstActorCard && document.body && document.body.classList.contains('tv-mode') && typeof window.streamItFocusElement === 'function') {
+          window.streamItFocusElement(firstActorCard, { scroll: true });
+        }
+        return;
+      }
+
+      // Default: 'catalog' / 'modal' / 'tv-rail'
+      if (headerQuickSearchInput) headerQuickSearchInput.value = spoken;
+      var railLbl = document.querySelector('#tvRailSearchBtn .tv-rail-search-text');
+      if (railLbl) railLbl.textContent = spoken;
+      closeUserSettingsDropdown();
+      closeTvMoreModal(false);
+      var sModal = document.getElementById('searchModal');
+      if (sModal && sModal.classList.contains('hidden')) {
+        openSearchModal();
+      }
+      var modalIn = document.getElementById('searchInput');
+      if (modalIn) modalIn.value = spoken;
+      await renderSearchResults(spoken);
+      if (document.body && document.body.classList.contains('tv-mode')) {
+        var firstRes = document.querySelector('#searchResultsGrid .poster-card');
+        if (firstRes && typeof window.streamItFocusElement === 'function') {
+          window.streamItFocusElement(firstRes, { scroll: false });
+        }
+      }
+    };
+
+    var stopStreamItVoiceSearch = function (silent) {
+      window.__streamItVoiceListening = false;
+      if (activeVoiceRec) {
+        var recToStop = activeVoiceRec;
+        activeVoiceRec = null;
+        try { recToStop.onend = null; recToStop.onerror = null; recToStop.abort(); } catch (eAb) {}
+      }
+      setVoiceUiListening(false, '', '');
+      activeVoiceBtn = null;
+      if (!silent) {
+        showCinemaToast('החיפוש הקולי הופסק');
+      }
+    };
+    window.stopStreamItVoiceSearch = stopStreamItVoiceSearch;
+
+    window.__onStreamItNativeVoiceResult = function (spokenText, errMsg) {
+      if (spokenText && String(spokenText).trim()) {
+        applyVoiceTranscriptResult(String(spokenText).trim());
+      } else {
+        stopStreamItVoiceSearch(true);
+        if (errMsg) {
+          showCinemaToast(String(errMsg));
+        }
+      }
+    };
+
+    var startStreamItVoiceSearch = function (targetMode, triggerBtn, explicitInputEl) {
+      if (window.__streamItVoiceListening) {
+        stopStreamItVoiceSearch(true);
+        return;
+      }
+      activeVoiceTargetMode = targetMode || 'catalog';
+      activeVoiceBtn = triggerBtn || null;
+      activeVoiceExplicitInput = explicitInputEl || null;
+      activeVoiceFinalHandled = false;
+      activeVoiceLastInterim = '';
+
+      var isActorTarget = (activeVoiceTargetMode.indexOf('actor') === 0);
+      var promptTitle = isActorTarget ? 'מקשיב לשם שחקן או במאי...' : 'מקשיב... אמור שם סרט, סדרה, שחקן או ערוץ';
+      var SpeechRecCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      // Prefer Native Android TV Voice Recognizer when running inside StreamIt Android TV APK if available
+      if (window.AndroidTvBridge && typeof window.AndroidTvBridge.startVoiceRecognition === 'function' && (!SpeechRecCtor || (document.body && document.body.classList.contains('tv-mode')))) {
+        try {
+          setVoiceUiListening(true, promptTitle, 'דבר אל המיקרופון בשלט הסטרימר...');
+          var startedNative = window.AndroidTvBridge.startVoiceRecognition('he-IL');
+          if (startedNative !== false) {
+            return;
+          }
+        } catch (eNat) {}
+      }
+
+      if (!SpeechRecCtor) {
+        if (window.AndroidTvBridge && typeof window.AndroidTvBridge.startVoiceRecognition === 'function') {
+          try {
+            setVoiceUiListening(true, promptTitle, 'דבר עכשיו...');
+            window.AndroidTvBridge.startVoiceRecognition('he-IL');
+            return;
+          } catch (eNat2) {}
+        }
+        setVoiceUiListening(false, '', '');
+        showCinemaToast('חיפוש קולי אינו נתמך בדפדפן זה — מומלץ להשתמש ב-Chrome / Edge / Safari');
+        return;
+      }
+
+      try {
+        var rec = new SpeechRecCtor();
+        activeVoiceRec = rec;
+        rec.lang = 'he-IL';
+        rec.continuous = false;
+        rec.interimResults = true;
+        rec.maxAlternatives = 3;
+
+        setVoiceUiListening(true, promptTitle, 'אמור למשל: "חולית", "שובר שורות", "גל גדות"...');
+
+        rec.onresult = function (ev) {
+          var interim = '';
+          var finalTxt = '';
+          for (var i = ev.resultIndex; i < ev.results.length; i++) {
+            var transcript = ev.results[i][0] ? ev.results[i][0].transcript : '';
+            if (ev.results[i].isFinal) {
+              finalTxt += transcript;
+            } else {
+              interim += transcript;
+            }
+          }
+          if (interim.trim()) {
+            activeVoiceLastInterim = interim.trim();
+            setVoiceUiListening(true, 'מזהה דיבור בזמן אמת...', '🎤 "' + activeVoiceLastInterim + '"');
+          }
+          if (finalTxt.trim()) {
+            applyVoiceTranscriptResult(finalTxt.trim());
+          }
+        };
+
+        rec.onerror = function (ev) {
+          var code = ev && ev.error ? String(ev.error) : '';
+          if ((code === 'not-allowed' || code === 'service-not-allowed' || code === 'audio-capture') && window.AndroidTvBridge && typeof window.AndroidTvBridge.startVoiceRecognition === 'function') {
+            activeVoiceRec = null;
+            try {
+              window.AndroidTvBridge.startVoiceRecognition('he-IL');
+              return;
+            } catch (eBridgeFallback) {}
+          }
+          stopStreamItVoiceSearch(true);
+          if (code === 'not-allowed' || code === 'service-not-allowed') {
+            showCinemaToast('יש לאשר הרשאת מיקרופון בדפדפן עבור חיפוש קולי');
+          } else if (code === 'no-speech') {
+            showCinemaToast('לא זוהה דיבור — לחץ שוב על המיקרופון ודבר');
+          } else if (code && code !== 'aborted') {
+            showCinemaToast('שגיאה בזיהוי קולי (' + code + ')');
+          }
+        };
+
+        rec.onend = function () {
+          if (!activeVoiceFinalHandled && activeVoiceLastInterim) {
+            applyVoiceTranscriptResult(activeVoiceLastInterim);
+            return;
+          }
+          if (!activeVoiceFinalHandled) {
+            stopStreamItVoiceSearch(true);
+          }
+        };
+
+        rec.start();
+      } catch (eStartRec) {
+        stopStreamItVoiceSearch(true);
+        showCinemaToast('לא ניתן להפעיל מיקרופון במכשיר זה');
+      }
+    };
+    window.startStreamItVoiceSearch = startStreamItVoiceSearch;
+
+    document.addEventListener('click', function (ev) {
+      var t = ev.target;
+      if (!t || typeof t.closest !== 'function') return;
+      var stopVoiceBtn = t.closest('#voiceListeningStopBtn');
+      if (stopVoiceBtn) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        stopStreamItVoiceSearch(true);
+        return;
+      }
+      var micBtn = t.closest('.voice-search-btn');
+      if (micBtn && micBtn.id !== 'vkVoiceBtn') {
+        ev.preventDefault();
+        ev.stopPropagation();
+        var vMode = micBtn.getAttribute('data-voice-target') || 'catalog';
+        startStreamItVoiceSearch(vMode, micBtn, null);
+      }
+    });
     if (headerQuickSearchInput) {
       var syncMobileHeaderPlaceholder = function () {
         if (!headerQuickSearchInput) return;
@@ -12333,10 +12653,12 @@
     var toggleSubsMenuHandler = function (e) {
       e.stopPropagation();
       wakePlayerControls();
+      subsMenu = document.getElementById('playerSubsMenu');
       if (!subsMenu) return;
       var wasHidden = subsMenu.classList.contains('hidden');
       closeAllPlayerMenus();
       if (wasHidden) {
+        applySubtitleStyleToOverlay();
         subsMenu.classList.remove('hidden');
         renderSubtitlesMenu();
         if (document.body && document.body.classList.contains('tv-mode')) {
@@ -12353,15 +12675,6 @@
     if (subsBtn) subsBtn.addEventListener('click', toggleSubsMenuHandler);
     if (topSubsBtn) topSubsBtn.addEventListener('click', toggleSubsMenuHandler);
     if (embedCcBtn) embedCcBtn.addEventListener('click', toggleSubsMenuHandler);
-
-    var closeSubsMenuBtn = document.getElementById('closePlayerSubsMenuBtn');
-    if (closeSubsMenuBtn) {
-      closeSubsMenuBtn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        closeAllPlayerMenus();
-        wakePlayerControls();
-      });
-    }
 
     // SafeWatch Parental Control In-Player Menu & Shield Overlay Controls
     var playerTopParentalBtn = document.getElementById('playerTopParentalBtn');
@@ -12443,126 +12756,100 @@
       });
     }
 
-    var syncMinus = document.getElementById('subSyncMinusBtn');
-    var syncReset = document.getElementById('subSyncResetBtn');
-    var syncPlus = document.getElementById('subSyncPlusBtn');
-    var updateSyncLabel = function () {
-      if (syncReset) {
-        var sign = state.subOffsetSec > 0 ? '+' : '';
-        syncReset.textContent = sign + state.subOffsetSec.toFixed(1) + 's';
-      }
-      updateActiveSubtitleCue(getCurrentPlaybackTimeSec());
-    };
-    if (syncMinus) {
-      syncMinus.addEventListener('click', function () {
+    // Deterministic Delegated Subtitle Menu Controls (Zero Accidental Resets Across All Platforms)
+    var delegatedSubsMenu = document.getElementById('playerSubsMenu');
+    if (delegatedSubsMenu && !delegatedSubsMenu.__v995Bound) {
+      delegatedSubsMenu.__v995Bound = true;
+      delegatedSubsMenu.addEventListener('click', function (ev) {
+        ev.stopPropagation();
         wakePlayerControls();
-        state.subOffsetSec = Math.round((state.subOffsetSec - 0.5) * 10) / 10;
-        updateSyncLabel();
-      });
-    }
-    if (syncReset) {
-      syncReset.addEventListener('click', function () {
-        wakePlayerControls();
-        state.subOffsetSec = 0;
-        updateSyncLabel();
-      });
-    }
-    if (syncPlus) {
-      syncPlus.addEventListener('click', function () {
-        wakePlayerControls();
-        state.subOffsetSec = Math.round((state.subOffsetSec + 0.5) * 10) / 10;
-        updateSyncLabel();
-      });
-    }
+        var target = ev.target;
+        if (!target || typeof target.closest !== 'function') return;
+        var btn = target.closest('button');
+        if (!btn || !delegatedSubsMenu.contains(btn)) return;
+        // Track selection buttons inside #subsListContainer handle their own clicks
+        if (btn.closest('#subsListContainer')) return;
 
-    var fontMinusBtn = document.getElementById('subFontMinusBtn');
-    var fontResetBtn = document.getElementById('subFontResetBtn');
-    var fontPlusBtn = document.getElementById('subFontPlusBtn');
-    if (fontMinusBtn) {
-      fontMinusBtn.addEventListener('click', function () {
-        wakePlayerControls();
-        adjustSubtitleFontSize(-2);
-      });
-    }
-    if (fontResetBtn) {
-      fontResetBtn.addEventListener('click', function () {
-        wakePlayerControls();
-        state.subFontPx = 42;
-        state.subSize = 'xlarge';
-        applySubtitleStyleToOverlay();
-        saveSubtitlePrefs();
-      });
-    }
-    if (fontPlusBtn) {
-      fontPlusBtn.addEventListener('click', function () {
-        wakePlayerControls();
-        adjustSubtitleFontSize(2);
-      });
-    }
-
-    var sizeBtns = document.querySelectorAll('[data-sub-size]');
-    for (var sz = 0; sz < sizeBtns.length; sz++) {
-      sizeBtns[sz].addEventListener('click', function () {
-        wakePlayerControls();
-        var chosen = this.getAttribute('data-sub-size') || 'xlarge';
-        state.subSize = chosen;
-        state.subFontPx = chosen === 'normal' ? 26 : (chosen === 'large' ? 34 : 42);
-        applySubtitleStyleToOverlay();
-        saveSubtitlePrefs();
-      });
-    }
-
-    var colorBtns = document.querySelectorAll('[data-sub-color]');
-    for (var cl = 0; cl < colorBtns.length; cl++) {
-      colorBtns[cl].addEventListener('click', function () {
-        wakePlayerControls();
-        state.subColor = this.getAttribute('data-sub-color') || 'white';
-        applySubtitleStyleToOverlay();
-        saveSubtitlePrefs();
-      });
-    }
-
-    var bgBtns = document.querySelectorAll('[data-sub-bg]');
-    for (var bg = 0; bg < bgBtns.length; bg++) {
-      bgBtns[bg].addEventListener('click', function () {
-        wakePlayerControls();
-        state.subBg = this.getAttribute('data-sub-bg') || 'none';
-        applySubtitleStyleToOverlay();
-        saveSubtitlePrefs();
-      });
-    }
-
-    // Subtitle Vertical Position Controls (`#subPosDownBtn`, `#subPosBottomMaxBtn`, `#subPosResetBtn`, `#subPosUpBtn`)
-    var subPosDownBtn = document.getElementById('subPosDownBtn');
-    var subPosBottomMaxBtn = document.getElementById('subPosBottomMaxBtn');
-    var subPosResetBtn = document.getElementById('subPosResetBtn');
-    var subPosUpBtn = document.getElementById('subPosUpBtn');
-    if (subPosDownBtn) {
-      subPosDownBtn.addEventListener('click', function () {
-        wakePlayerControls();
-        adjustSubtitleVerticalPosition(-1.5);
-      });
-    }
-    if (subPosBottomMaxBtn) {
-      subPosBottomMaxBtn.addEventListener('click', function () {
-        wakePlayerControls();
-        state.subBottomPct = 1.5;
-        applySubtitleStyleToOverlay();
-        saveSubtitlePrefs();
-      });
-    }
-    if (subPosResetBtn) {
-      subPosResetBtn.addEventListener('click', function () {
-        wakePlayerControls();
-        state.subBottomPct = 3.5;
-        applySubtitleStyleToOverlay();
-        saveSubtitlePrefs();
-      });
-    }
-    if (subPosUpBtn) {
-      subPosUpBtn.addEventListener('click', function () {
-        wakePlayerControls();
-        adjustSubtitleVerticalPosition(1.5);
+        var id = btn.id || '';
+        if (id === 'closePlayerSubsMenuBtn') {
+          closeAllPlayerMenus();
+          return;
+        }
+        if (id === 'subSyncMinusBtn') {
+          state.subOffsetSec = Math.round(((state.subOffsetSec || 0) - 0.5) * 10) / 10;
+          applySubtitleStyleToOverlay();
+          updateActiveSubtitleCue(getCurrentPlaybackTimeSec());
+          return;
+        }
+        if (id === 'subSyncPlusBtn') {
+          state.subOffsetSec = Math.round(((state.subOffsetSec || 0) + 0.5) * 10) / 10;
+          applySubtitleStyleToOverlay();
+          updateActiveSubtitleCue(getCurrentPlaybackTimeSec());
+          return;
+        }
+        if (id === 'subSyncZeroBtn' || id === 'subSyncResetBtn') {
+          state.subOffsetSec = 0;
+          applySubtitleStyleToOverlay();
+          updateActiveSubtitleCue(getCurrentPlaybackTimeSec());
+          showCinemaToast('תזמון הכתוביות אופס ל-0.0s');
+          return;
+        }
+        if (id === 'subFontMinusBtn') {
+          adjustSubtitleFontSize(-2);
+          return;
+        }
+        if (id === 'subFontPlusBtn') {
+          adjustSubtitleFontSize(2);
+          return;
+        }
+        if (btn.hasAttribute('data-sub-size')) {
+          var chosenSize = btn.getAttribute('data-sub-size') || 'normal';
+          if (chosenSize === 'small') {
+            state.subSize = 'small';
+            state.subFontPx = 20;
+          } else if (chosenSize === 'large') {
+            state.subSize = 'large';
+            state.subFontPx = 31;
+          } else {
+            state.subSize = 'normal';
+            state.subFontPx = 25;
+          }
+          applySubtitleStyleToOverlay();
+          saveSubtitlePrefs();
+          return;
+        }
+        if (btn.hasAttribute('data-sub-color')) {
+          state.subColor = btn.getAttribute('data-sub-color') === 'yellow' ? 'yellow' : 'white';
+          applySubtitleStyleToOverlay();
+          saveSubtitlePrefs();
+          return;
+        }
+        if (btn.hasAttribute('data-sub-bg')) {
+          state.subBg = btn.getAttribute('data-sub-bg') === 'dark' ? 'dark' : 'none';
+          applySubtitleStyleToOverlay();
+          saveSubtitlePrefs();
+          return;
+        }
+        if (id === 'subPosDownBtn') {
+          adjustSubtitleVerticalPosition(-1.5);
+          return;
+        }
+        if (id === 'subPosUpBtn') {
+          adjustSubtitleVerticalPosition(1.5);
+          return;
+        }
+        if (id === 'resetAllSubPrefsBtn') {
+          state.subOffsetSec = 0;
+          state.subSize = 'normal';
+          state.subFontPx = 25;
+          state.subColor = 'white';
+          state.subBg = 'none';
+          state.subBottomPct = 9;
+          applySubtitleStyleToOverlay();
+          saveSubtitlePrefs();
+          updateActiveSubtitleCue(getCurrentPlaybackTimeSec());
+          showCinemaToast('הגדרות הכתוביות אופסו לברירת המחדל');
+        }
       });
     }
 
@@ -14830,18 +15117,110 @@
       }
     }
     var subsMenuEl = document.getElementById('playerSubsMenu');
-    if (subsMenuEl && !document.getElementById('closePlayerSubsMenuBtn')) {
-      var oldSubHdr = subsMenuEl.querySelector('.subs-menu-header');
-      var hdrRowSub = document.createElement('div');
-      hdrRowSub.className = 'subs-menu-header-row';
-      hdrRowSub.innerHTML =
-        '<div class="subs-menu-header">הגדרות כתוביות וסנכרון (עברית בלבד)</div>' +
-        '<button type="button" id="closePlayerSubsMenuBtn" class="player-menu-close-x tv-focusable" aria-label="סגור הגדרות כתוביות">✕</button>';
-      if (oldSubHdr && oldSubHdr.parentNode === subsMenuEl) {
-        subsMenuEl.replaceChild(hdrRowSub, oldSubHdr);
-      } else {
-        subsMenuEl.insertBefore(hdrRowSub, subsMenuEl.firstChild);
+    if (subsMenuEl && !document.getElementById('resetAllSubPrefsBtn')) {
+      subsMenuEl.innerHTML =
+        '<div class="subs-menu-header-row">' +
+          '<div class="subs-menu-header">הגדרות כתוביות וסנכרון (עברית בלבד)</div>' +
+          '<button type="button" id="closePlayerSubsMenuBtn" class="player-menu-close-x tv-focusable" aria-label="סגור הגדרות כתוביות">✕</button>' +
+        '</div>' +
+        '<div id="subsListContainer" class="subs-list-container"></div>' +
+        '<div class="subs-popover-section">' +
+          '<div class="subs-popover-title">סנכרון תזמון כתוביות <span id="subSyncValueBadge" class="subs-value-readout">0.0s</span></div>' +
+          '<div class="subs-sync-controls">' +
+            '<button type="button" id="subSyncMinusBtn" class="subs-chip-btn tv-focusable">-0.5s</button>' +
+            '<button type="button" id="subSyncZeroBtn" class="subs-chip-btn tv-focusable">אפס תזמון</button>' +
+            '<button type="button" id="subSyncPlusBtn" class="subs-chip-btn tv-focusable">+0.5s</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="subs-popover-section">' +
+          '<div class="subs-popover-title">גודל גופן הכתוביות <span id="subFontValueBadge" class="subs-value-readout">25px</span></div>' +
+          '<div class="subs-sync-controls">' +
+            '<button type="button" id="subFontMinusBtn" class="subs-chip-btn tv-focusable" title="הקטן גופן">A-</button>' +
+            '<button type="button" class="subs-chip-btn tv-focusable" data-sub-size="small">קטן</button>' +
+            '<button type="button" class="subs-chip-btn active tv-focusable" data-sub-size="normal">רגיל</button>' +
+            '<button type="button" class="subs-chip-btn tv-focusable" data-sub-size="large">גדול</button>' +
+            '<button type="button" id="subFontPlusBtn" class="subs-chip-btn tv-focusable" title="הגדל גופן">A+</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="subs-popover-section">' +
+          '<div class="subs-popover-title">צבע ורקע הכתוביות</div>' +
+          '<div class="subs-sync-controls">' +
+            '<button type="button" class="subs-chip-btn active tv-focusable" data-sub-color="white">לבן</button>' +
+            '<button type="button" class="subs-chip-btn tv-focusable" data-sub-color="yellow">צהוב</button>' +
+            '<button type="button" class="subs-chip-btn active tv-focusable" data-sub-bg="none">ללא רקע</button>' +
+            '<button type="button" class="subs-chip-btn tv-focusable" data-sub-bg="dark">רקע כהה</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="subs-popover-section">' +
+          '<div class="subs-popover-title">מיקום אנכי של הכתוביות <span id="subPosValueBadge" class="subs-value-readout">9%</span></div>' +
+          '<div class="subs-sync-controls">' +
+            '<button type="button" id="subPosDownBtn" class="subs-chip-btn tv-focusable" title="הורד כתוביות למטה">למטה ▼</button>' +
+            '<button type="button" id="subPosUpBtn" class="subs-chip-btn tv-focusable" title="הרם כתוביות למעלה">למעלה ▲</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="subs-popover-section subs-reset-footer">' +
+          '<button type="button" id="resetAllSubPrefsBtn" class="subs-reset-all-btn tv-focusable">איפוס להגדרות ברירת מחדל</button>' +
+        '</div>';
+    }
+
+    // Ensure Voice Search microphone buttons & HUD banner exist even on OTA-upgraded DOMs
+    var micSvgMarkup = '<svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" y1="19" x2="12" y2="23" /><line x1="8" y1="23" x2="16" y2="23" /></svg>';
+    var ensureMicBtn = function (btnId, containerSel, beforeSel, targetAttr, extraCls) {
+      if (document.getElementById(btnId)) return;
+      var cont = document.querySelector(containerSel);
+      if (!cont) return;
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.id = btnId;
+      b.className = 'voice-search-btn tv-focusable' + (extraCls ? (' ' + extraCls) : '');
+      b.setAttribute('data-voice-target', targetAttr);
+      b.setAttribute('title', 'חיפוש קולי');
+      b.setAttribute('aria-label', 'חיפוש קולי');
+      b.innerHTML = micSvgMarkup;
+      var refNode = beforeSel ? cont.querySelector(beforeSel) : null;
+      if (refNode && refNode.parentNode === cont) cont.insertBefore(b, refNode);
+      else cont.appendChild(b);
+    };
+    ensureMicBtn('headerVoiceSearchBtn', '#headerSearchBox', '#headerQuickSearchSubmitBtn', 'catalog', '');
+    ensureMicBtn('modalVoiceSearchBtn', '#searchModal .search-input-wrap', '#closeSearchBtn', 'modal', '');
+    ensureMicBtn('actorVoiceSearchBtn', '.actor-search-box', '#actorSearchClearBtn', 'actor', '');
+    ensureMicBtn('mobileActorVoiceSearchBtn', '#mobileActorSearchBox', '#mobileActorSearchSubmitBtn', 'actor-mobile', '');
+    ensureMicBtn('tvMoreActorVoiceSearchBtn', '#tvMoreModal .tv-more-actor-search-bar', '#tvMoreActorSearchBtn', 'actor-tvmore', '');
+    var tvRailSearchBtnEl = document.getElementById('tvRailSearchBtn');
+    if (tvRailSearchBtnEl && !document.getElementById('tvRailVoiceSearchBtn') && tvRailSearchBtnEl.parentNode) {
+      var railRow = tvRailSearchBtnEl.parentNode;
+      if (!railRow.classList.contains('tv-rail-search-row')) {
+        var wrapRow = document.createElement('div');
+        wrapRow.className = 'tv-rail-search-row';
+        railRow.insertBefore(wrapRow, tvRailSearchBtnEl);
+        wrapRow.appendChild(tvRailSearchBtnEl);
+        railRow = wrapRow;
       }
+      var rMic = document.createElement('button');
+      rMic.type = 'button';
+      rMic.id = 'tvRailVoiceSearchBtn';
+      rMic.className = 'tv-rail-voice-btn voice-search-btn tv-focusable';
+      rMic.setAttribute('data-voice-target', 'tv-rail');
+      rMic.setAttribute('title', 'חיפוש קולי מהשלט');
+      rMic.setAttribute('aria-label', 'חיפוש קולי');
+      rMic.innerHTML = micSvgMarkup;
+      railRow.appendChild(rMic);
+    }
+    if (!document.getElementById('voiceListeningBanner') && document.body) {
+      var vBanner = document.createElement('div');
+      vBanner.id = 'voiceListeningBanner';
+      vBanner.className = 'voice-listening-banner hidden';
+      vBanner.setAttribute('role', 'status');
+      vBanner.setAttribute('aria-live', 'polite');
+      vBanner.setAttribute('dir', 'rtl');
+      vBanner.innerHTML =
+        '<div class="voice-listening-pulse" aria-hidden="true">' + micSvgMarkup + '</div>' +
+        '<div class="voice-listening-body">' +
+          '<strong id="voiceListeningTitle" class="voice-listening-title">מקשיב... אמור שם סרט, סדרה, שחקן או ערוץ</strong>' +
+          '<span id="voiceListeningTranscript" class="voice-listening-transcript">למשל: "חולית", "שובר שורות", "פאודה", "גל גדות"...</span>' +
+        '</div>' +
+        '<button type="button" id="voiceListeningStopBtn" class="voice-listening-stop-btn tv-focusable">ביטול ✕</button>';
+      document.body.appendChild(vBanner);
     }
     var parMenuEl = document.getElementById('playerParentalMenu');
     if (parMenuEl && !document.getElementById('closePlayerParentalMenuBtn')) {
@@ -15029,7 +15408,8 @@
   }
 
   function bootStreamItApp() {
-    if (window.__STREAMIT_V994_BOOT_DONE) return;
+    if (window.__STREAMIT_V995_BOOT_DONE) return;
+    window.__STREAMIT_V995_BOOT_DONE = true;
     window.__STREAMIT_V994_BOOT_DONE = true;
     window.__STREAMIT_V993_BOOT_DONE = true;
     window.__STREAMIT_V992_BOOT_DONE = true;
@@ -15054,7 +15434,9 @@
     }
 
     try {
-      if (window.history && typeof window.history.pushState === 'function') {
+      if (typeof window.ensureStreamItBackHistoryCushion === 'function') {
+        window.ensureStreamItBackHistoryCushion();
+      } else if (window.history && typeof window.history.pushState === 'function') {
         window.history.pushState({ streamItGuard: true }, '', window.location.href);
       }
     } catch (eInitHist) {}
@@ -15069,6 +15451,7 @@
     initTvTopClock();
     updateVersionBadgesUi();
     loadLocalStorageState();
+    applySubtitleStyleToOverlay();
     bindUiEvents();
     updateAuthUi();
     updateVersionBadgesUi();

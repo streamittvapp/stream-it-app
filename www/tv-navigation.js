@@ -12,7 +12,7 @@
 (function () {
   'use strict';
 
-  var NAV_VERSION = '9.9.4';
+  var NAV_VERSION = '9.9.5';
   try {
     var pendingOtaVer = localStorage.getItem('streamit_ota_version_v9') || '';
     var pendingOtaNav = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
@@ -778,31 +778,85 @@
       return true;
     }
 
-    // 1. Open Subtitles Menu (#playerSubsMenu)
+    // 1. Open Subtitles Menu (#playerSubsMenu) — Clean Row-by-Row & Horizontal D-Pad Navigation
     if (subsMenu && !subsMenu.classList.contains('hidden')) {
       var subItems = Array.prototype.slice.call(subsMenu.querySelectorAll('button')).filter(isElementVisible);
       if (!subItems.length) return true;
       if (!currentFocused || !subsMenu.contains(currentFocused)) {
-        return setFocus(subItems[0]);
+        var firstSubTarget = subsMenu.querySelector('.sub-track-item.active, .sub-size-btn.active, .subs-chip-btn') || subItems[0];
+        return setFocus(isElementVisible(firstSubTarget) ? firstSubTarget : subItems[0], { scroll: false });
       }
-      var nearSub = findNearestPhysical(currentFocused, direction, subItems);
-      if (nearSub) return setFocus(nearSub);
-      var sIdx = subItems.indexOf(currentFocused);
-      if (direction === 'down') {
-        if (sIdx < subItems.length - 1) return setFocus(subItems[sIdx + 1]);
-        if (document.body && document.body.classList.contains('tv-mode')) {
-          return setFocus(subItems[subItems.length - 1]);
+      // Group visible buttons inside #playerSubsMenu into visual rows by offsetTop (within 14px tolerance)
+      var subRows = [];
+      for (var sr = 0; sr < subItems.length; sr++) {
+        var btnEl = subItems[sr];
+        var bTop = btnEl.getBoundingClientRect().top;
+        var placedRow = null;
+        for (var rCheck = 0; rCheck < subRows.length; rCheck++) {
+          if (Math.abs(subRows[rCheck].top - bTop) <= 14) {
+            placedRow = subRows[rCheck];
+            break;
+          }
         }
-        subsMenu.classList.add('hidden');
-        return setFocus(subsBtn && isElementVisible(subsBtn) ? subsBtn : (topSubsBtn || closeBtn));
+        if (!placedRow) {
+          placedRow = { top: bTop, items: [] };
+          subRows.push(placedRow);
+        }
+        placedRow.items.push(btnEl);
       }
-      if (direction === 'up') {
-        if (sIdx > 0) return setFocus(subItems[sIdx - 1]);
-        if (document.body && document.body.classList.contains('tv-mode')) {
-          return setFocus(subItems[0]);
+      subRows.sort(function (a, b) { return a.top - b.top; });
+      var curRowIdx = -1;
+      for (var ri = 0; ri < subRows.length; ri++) {
+        subRows[ri].items.sort(function (a, b) { return a.getBoundingClientRect().left - b.getBoundingClientRect().left; });
+        if (subRows[ri].items.indexOf(currentFocused) !== -1) {
+          curRowIdx = ri;
         }
-        subsMenu.classList.add('hidden');
-        return setFocus(topSubsBtn && isElementVisible(topSubsBtn) ? topSubsBtn : (subsBtn || closeBtn));
+      }
+      if (curRowIdx !== -1) {
+        var rowBtns = subRows[curRowIdx].items;
+        var colPos = rowBtns.indexOf(currentFocused);
+        if (direction === 'left') {
+          if (colPos > 0) return setFocus(rowBtns[colPos - 1], { scroll: false });
+          return true;
+        }
+        if (direction === 'right') {
+          if (colPos < rowBtns.length - 1) return setFocus(rowBtns[colPos + 1], { scroll: false });
+          return true;
+        }
+        if (direction === 'down') {
+          if (curRowIdx < subRows.length - 1) {
+            var nextRowItems = subRows[curRowIdx + 1].items;
+            var curCenter = currentFocused.getBoundingClientRect().left + currentFocused.getBoundingClientRect().width / 2;
+            var bestDown = nextRowItems[0];
+            var bestDist = Infinity;
+            for (var nd = 0; nd < nextRowItems.length; nd++) {
+              var nr = nextRowItems[nd].getBoundingClientRect();
+              var dX = Math.abs((nr.left + nr.width / 2) - curCenter);
+              if (dX < bestDist) { bestDist = dX; bestDown = nextRowItems[nd]; }
+            }
+            return setFocus(bestDown, { scroll: false });
+          }
+          return true;
+        }
+        if (direction === 'up') {
+          if (curRowIdx > 0) {
+            var prevRowItems = subRows[curRowIdx - 1].items;
+            var curCenterUp = currentFocused.getBoundingClientRect().left + currentFocused.getBoundingClientRect().width / 2;
+            var bestUp = prevRowItems[0];
+            var bestDistUp = Infinity;
+            for (var nu = 0; nu < prevRowItems.length; nu++) {
+              var pr = prevRowItems[nu].getBoundingClientRect();
+              var dXUp = Math.abs((pr.left + pr.width / 2) - curCenterUp);
+              if (dXUp < bestDistUp) { bestDistUp = dXUp; bestUp = prevRowItems[nu]; }
+            }
+            return setFocus(bestUp, { scroll: false });
+          }
+          if (document.body && document.body.classList.contains('tv-mode')) {
+            return true;
+          }
+          subsMenu.classList.add('hidden');
+          return setFocus(topSubsBtn && isElementVisible(topSubsBtn) ? topSubsBtn : (subsBtn || closeBtn));
+        }
       }
       return true;
     }
@@ -1144,8 +1198,8 @@
 
     var isTvMode = Boolean(document.body && document.body.classList.contains('tv-mode'));
     var headerSelector = isTvMode
-      ? '.main-nav .nav-link, #headerQuickSearchInput, #openSearchBtn, #userSettingsMenuBtn'
-      : '#brandLogo, .main-nav .nav-link, #headerQuickSearchInput, #openSearchBtn, #userSettingsMenuBtn';
+      ? '.main-nav .nav-link, #headerQuickSearchInput, #headerVoiceSearchBtn, #openSearchBtn, #userSettingsMenuBtn'
+      : '#brandLogo, .main-nav .nav-link, #headerQuickSearchInput, #headerVoiceSearchBtn, #openSearchBtn, #userSettingsMenuBtn';
     var headerItems = topHeader
       ? Array.prototype.slice.call(
           topHeader.querySelectorAll(headerSelector)
@@ -1271,10 +1325,12 @@
       }
     }
 
-    // A. Inside TV Right Side Rail (#tvSideRail: חיפוש + מקלדת מובנית | אקורדיון קטגוריות / פלטפורמות / לפי שנה / שחקנים | פרופיל והגדרות)
+    // A. Inside TV Right Side Rail (#tvSideRail: חיפוש + חיפוש קולי + מקלדת מובנית | אקורדיון קטגוריות / פלטפורמות / לפי שנה / שחקנים | פרופיל והגדרות)
     if (sideRail && sideRail.contains(currentFocused)) {
       var railSearchBtn = document.getElementById('tvRailSearchBtn');
+      var railVoiceBtn = document.getElementById('tvRailVoiceSearchBtn');
       var railSearchClearBtn = document.getElementById('tvRailSearchClearBtn');
+      var railSearchRowBtns = [railSearchBtn, railVoiceBtn, railSearchClearBtn].filter(isElementVisible);
       var miniVk = document.getElementById('tvRailMiniKeyboard');
       var miniVkOpen = Boolean(miniVk && !miniVk.classList.contains('hidden') && isElementVisible(miniVk));
       var railListItems = Array.prototype.slice.call(
@@ -1283,17 +1339,18 @@
       var railProfileBtn = document.getElementById('tvRailProfileBtn');
       var railSettingsBtn = document.getElementById('tvRailSettingsBtn');
 
-      // A1. Search Header Row (#tvRailSearchBtn, #tvRailSearchClearBtn)
-      if (currentFocused === railSearchBtn || currentFocused === railSearchClearBtn) {
+      // A1. Search Header Row (#tvRailSearchBtn, #tvRailVoiceSearchBtn, #tvRailSearchClearBtn)
+      var railTopPos = railSearchRowBtns.indexOf(currentFocused);
+      if (railTopPos !== -1) {
         if (direction === 'left') {
-          if (currentFocused === railSearchBtn && railSearchClearBtn && isElementVisible(railSearchClearBtn)) {
-            return setFocus(railSearchClearBtn, { scroll: false });
+          if (railTopPos < railSearchRowBtns.length - 1) {
+            return setFocus(railSearchRowBtns[railTopPos + 1], { scroll: false });
           }
           return focusMainStageFromRail();
         }
         if (direction === 'right') {
-          if (currentFocused === railSearchClearBtn && railSearchBtn && isElementVisible(railSearchBtn)) {
-            return setFocus(railSearchBtn, { scroll: false });
+          if (railTopPos > 0) {
+            return setFocus(railSearchRowBtns[railTopPos - 1], { scroll: false });
           }
           return true;
         }
@@ -1827,9 +1884,10 @@
     if (!searchModal || searchModal.classList.contains('hidden')) return false;
 
     var searchInput = document.getElementById('searchInput');
+    var voiceBtn = document.getElementById('modalVoiceSearchBtn');
     var clearBtn = document.getElementById('clearSearchBtn');
     var closeBtn = document.getElementById('closeSearchBtn');
-    var topRow = [searchInput, clearBtn, closeBtn].filter(isElementVisible);
+    var topRow = [searchInput, voiceBtn, clearBtn, closeBtn].filter(isElementVisible);
     var filterTabs = Array.prototype.slice.call(searchModal.querySelectorAll('#searchFilterTabs .filter-tab')).filter(isElementVisible);
     var resultCards = Array.prototype.slice.call(searchModal.querySelectorAll('#searchResultsGrid .poster-card, #searchResultsGrid .channel-tile-card')).filter(isElementVisible);
 
@@ -2145,13 +2203,14 @@
     if (oldQuickBar && oldQuickBar.parentNode) {
       oldQuickBar.parentNode.removeChild(oldQuickBar);
     }
-    if (!document.getElementById('vkTopBackspaceBtn')) {
+    if (!document.getElementById('vkTopBackspaceBtn') || !document.getElementById('vkVoiceBtn')) {
       vk.innerHTML =
         '<div class="vk-container" dir="ltr">' +
           '<div class="vk-header" dir="ltr">' +
             '<span id="vkFieldBadge" class="vk-field-badge" dir="rtl">שדה הקלדה</span>' +
             '<div id="vkPreviewText" class="vk-preview-text" dir="ltr"></div>' +
             '<div class="vk-header-actions" dir="rtl">' +
+              '<button type="button" id="vkVoiceBtn" class="vk-top-act-btn vk-voice-btn voice-search-btn tv-focusable" data-vk-action="voice" aria-label="חיפוש והכתבה קולית">🎤 קולי</button>' +
               '<button type="button" id="vkTopPassBtn" class="vk-top-act-btn tv-focusable hidden" data-vk-action="toggle-pass">הצג/הסתר</button>' +
               '<button type="button" id="vkTopBackspaceBtn" class="vk-top-act-btn vk-top-del-btn tv-focusable" data-vk-action="backspace">⌫ מחק אות</button>' +
               '<button type="button" id="vkTopClearBtn" class="vk-top-act-btn vk-top-clear-btn tv-focusable" data-vk-action="clear">נקה הכל</button>' +
@@ -2266,10 +2325,15 @@
     }
 
     var topPassBtn = document.getElementById('vkTopPassBtn');
+    var isPass = isPasswordField(inputEl);
+    var isEmail = id === 'authEmailInput' || (inputEl.getAttribute('type') || '').toLowerCase() === 'email';
     if (topPassBtn) {
-      var isPass = isPasswordField(inputEl);
       topPassBtn.classList.toggle('hidden', !isPass);
       topPassBtn.textContent = vkRevealPass ? 'הסתר סיסמה' : 'הצג סיסמה';
+    }
+    var vkVoiceBtn = document.getElementById('vkVoiceBtn');
+    if (vkVoiceBtn) {
+      vkVoiceBtn.classList.toggle('hidden', Boolean(isPass || isEmail));
     }
 
     var doneBtn = document.getElementById('vkDoneBtn');
@@ -2366,11 +2430,19 @@
       else if (el.id === 'vkDoneBtn') vkAction = 'done';
       else if (el.id === 'vkTopCloseBtn') vkAction = 'close';
       else if (el.id === 'vkTopPassBtn') vkAction = 'toggle-pass';
+      else if (el.id === 'vkVoiceBtn') vkAction = 'voice';
     }
 
     if (vkAction) {
       lastVkActionAt = now;
       var targetIn = getActiveVkInput();
+
+      if (vkAction === 'voice') {
+        if (typeof window.startStreamItVoiceSearch === 'function') {
+          window.startStreamItVoiceSearch('vk', el, targetIn);
+        }
+        return true;
+      }
 
       if (vkAction === 'backspace') {
         if (targetIn) {
@@ -2520,17 +2592,69 @@
   }
 
   /**
+   * Ensure Multi-Layer Browser/WebView History Cushion so Streamer Back NEVER Exits to Launcher!
+   */
+  function ensureBackHistoryCushion() {
+    if (window.__streamItAllowNativeBackExit) return;
+    try {
+      if (window.history && typeof window.history.pushState === 'function') {
+        var curState = window.history.state;
+        if (!curState || !curState.streamItBackShield) {
+          window.history.replaceState({ streamItBackShield: 1 }, '', window.location.href);
+          window.history.pushState({ streamItBackShield: 2 }, '', window.location.href);
+          window.history.pushState({ streamItBackShield: 3 }, '', window.location.href);
+        }
+      }
+    } catch (eHistShield) {}
+  }
+
+  /**
+   * Reclaim Top-Window Focus Whenever Cross-Origin Movie Embed Iframe Steals Focus on Streamer (`body.tv-mode`)
+   */
+  function reclaimTvFocusFromIframe() {
+    var isTv = Boolean(document.body && document.body.classList.contains('tv-mode'));
+    if (!isTv) return;
+    var active = document.activeElement;
+    if (active && (active.tagName || '').toUpperCase() === 'IFRAME') {
+      try { active.blur(); } catch (eBlr) {}
+      try { window.focus(); } catch (eWinFoc) {}
+      var pm = document.getElementById('playerModal');
+      if (pm && !pm.classList.contains('hidden')) {
+        if (!pm.hasAttribute('tabindex')) pm.setAttribute('tabindex', '-1');
+        try { pm.focus({ preventScroll: true }); } catch (ePmFoc) {}
+      }
+    }
+  }
+
+  /**
    * Handle Back / Escape Deterministically
    */
   function handleBackButton() {
+    ensureBackHistoryCushion();
+    reclaimTvFocusFromIframe();
+
     var isTv = Boolean(document.body && document.body.classList.contains('tv-mode'));
     var now = Date.now();
+    var elapsedSinceLastBack = now - lastBackHandledAt;
+
+    // Deduplicate simultaneous OS/WebView signals (< 145ms apart) fired from a single physical remote press!
+    if (elapsedSinceLastBack >= 0 && elapsedSinceLastBack < 145) {
+      return true;
+    }
+
+    // If Voice Search is actively listening, first Back press cancels listening cleanly without closing the screen!
+    if (window.__streamItVoiceActive && typeof window.stopStreamItVoiceSearch === 'function') {
+      lastBackHandledAt = now;
+      window.stopStreamItVoiceSearch(true);
+      return true;
+    }
+
     var playerCheck = document.getElementById('playerModal');
     var isPlayerActive = Boolean(playerCheck && !playerCheck.classList.contains('hidden'));
-    var isQuickDoubleBackInPlayer = isPlayerActive && (now - lastBackHandledAt < 520);
+    var isQuickDoubleBackInPlayer = isPlayerActive && (elapsedSinceLastBack >= 155 && elapsedSinceLastBack < 580);
 
-    // Do not block double-press Back inside the video player so double-Back exits immediately!
-    if (isTv && !isPlayerActive && now - lastBackHandledAt < 220) {
+    // Do not block double-press Back inside the video player so intentional human double-Back exits the movie!
+    if (isTv && !isPlayerActive && elapsedSinceLastBack < 220) {
       return true;
     }
     lastBackHandledAt = now;
@@ -3250,6 +3374,69 @@
 
   window.addEventListener('keydown', window.__streamItTvKeydownHandler, true);
 
+  // Intercept Browser/WebView History `popstate` (Android 12/13/14 Predictive Back, Capacitor BridgeActivity v9.8.8+, Smart TV Browsers)
+  // so pressing Back on the Streamer remote NEVER pops out of the app to the Android TV Home Launcher!
+  if (window.__streamItPopstateBackHandler) {
+    try { window.removeEventListener('popstate', window.__streamItPopstateBackHandler, true); } catch (ePopRm) {}
+  }
+  window.__streamItPopstateBackHandler = function (ev) {
+    if (window.__streamItAllowNativeBackExit) return;
+    try {
+      if (window.history && typeof window.history.pushState === 'function') {
+        window.history.pushState({ streamItBackShield: Date.now() }, '', window.location.href);
+      }
+    } catch (eRePush) {}
+    handleBackButton();
+  };
+  window.addEventListener('popstate', window.__streamItPopstateBackHandler, true);
+
+  // Intercept Cordova / Capacitor `backbutton` DOM event & Capacitor App plugin `backButton`
+  if (window.__streamItCordovaBackHandler) {
+    try { document.removeEventListener('backbutton', window.__streamItCordovaBackHandler, true); } catch (eBbRm) {}
+  }
+  window.__streamItCordovaBackHandler = function (ev) {
+    if (window.__streamItAllowNativeBackExit) return;
+    if (ev && typeof ev.preventDefault === 'function') ev.preventDefault();
+    if (ev && typeof ev.stopPropagation === 'function') ev.stopPropagation();
+    ensureBackHistoryCushion();
+    handleBackButton();
+  };
+  document.addEventListener('backbutton', window.__streamItCordovaBackHandler, true);
+
+  if (!window.__streamItCapAppBackBound) {
+    try {
+      var capApp = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
+      if (capApp && typeof capApp.addListener === 'function') {
+        window.__streamItCapAppBackBound = true;
+        capApp.addListener('backButton', function () {
+          if (window.__streamItAllowNativeBackExit) {
+            if (typeof capApp.exitApp === 'function') capApp.exitApp();
+            return;
+          }
+          ensureBackHistoryCushion();
+          handleBackButton();
+        });
+      }
+    } catch (eCapBack) {}
+  }
+
+  // Reclaim keyboard/remote focus whenever a cross-origin movie embed iframe tries to steal focus on Streamer (`body.tv-mode`)
+  if (!window.__streamItTvIframeFocusShieldBound) {
+    window.__streamItTvIframeFocusShieldBound = true;
+    window.addEventListener('blur', function () {
+      setTimeout(reclaimTvFocusFromIframe, 0);
+      setTimeout(reclaimTvFocusFromIframe, 120);
+    });
+    setInterval(function () {
+      var pm = document.getElementById('playerModal');
+      if (pm && !pm.classList.contains('hidden')) {
+        reclaimTvFocusFromIframe();
+      }
+    }, 350);
+  }
+
+  window.ensureStreamItBackHistoryCushion = ensureBackHistoryCushion;
+
   if (!window.__streamItMobileTouchClearBound) {
     window.__streamItMobileTouchClearBound = true;
     window.addEventListener('touchstart', function () {
@@ -3264,6 +3451,7 @@
   function initTvNavigationEngine() {
     if (window.__streamItTvNavInstanceId !== myNavInstanceId) return;
     applyTvModeClass();
+    ensureBackHistoryCushion();
     bindVirtualKeyboardActions();
     ensureInitialTvFocus();
     setTimeout(function () {

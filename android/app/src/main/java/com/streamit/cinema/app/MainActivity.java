@@ -7,6 +7,7 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.speech.RecognizerIntent;
 import android.util.Base64;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -26,13 +27,16 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 public class MainActivity extends BridgeActivity {
-    private static final String INSTALLED_APP_VERSION = "9.9.1";
-    private static final String INSTALLED_NATIVE_APK_VERSION = "9.9.1";
+    private static final String INSTALLED_APP_VERSION = "9.9.5";
+    private static final String INSTALLED_NATIVE_APK_VERSION = "9.9.5";
+    private static final int VOICE_RECOGNITION_REQUEST_CODE = 9951;
     private static final String OTA_PREFS_NAME = "streamit_ota_prefs";
     private StreamItEmbeddedServer embeddedServer;
     private volatile boolean apkUpdateInProgress = false;
+    private volatile boolean voiceDialogOpen = false;
 
     private static class CloudHttpResponse {
         final String text;
@@ -174,6 +178,32 @@ public class MainActivity extends BridgeActivity {
         }
 
         @JavascriptInterface
+        public boolean startVoiceRecognition(String lang) {
+            try {
+                Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, (lang != null && !lang.trim().isEmpty()) ? lang.trim() : "he-IL");
+                intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "אמור שם סרט, סדרה, שחקן או ערוץ...");
+                intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
+                if (intent.resolveActivity(getPackageManager()) == null) {
+                    return false;
+                }
+                runOnUiThread(() -> {
+                    try {
+                        voiceDialogOpen = true;
+                        startActivityForResult(intent, VOICE_RECOGNITION_REQUEST_CODE);
+                    } catch (Exception e) {
+                        voiceDialogOpen = false;
+                        deliverNativeVoiceResult("", "חיפוש קולי אינו זמין במכשיר זה");
+                    }
+                });
+                return true;
+            } catch (Exception ignored) {
+                return false;
+            }
+        }
+
+        @JavascriptInterface
         public void exitApp() {
             runOnUiThread(() -> {
                 try {
@@ -183,6 +213,39 @@ public class MainActivity extends BridgeActivity {
                 }
             });
         }
+    }
+
+    private void deliverNativeVoiceResult(String spokenText, String errMsg) {
+        runOnUiThread(() -> {
+            try {
+                if (getBridge() != null && getBridge().getWebView() != null) {
+                    String safeText = JSONObject.quote(spokenText != null ? spokenText : "");
+                    String safeErr = JSONObject.quote(errMsg != null ? errMsg : "");
+                    getBridge().getWebView().evaluateJavascript(
+                            "(function(){ try { if(window.__onStreamItNativeVoiceResult) window.__onStreamItNativeVoiceResult(" + safeText + ", " + safeErr + "); } catch(e){} })()",
+                            null
+                    );
+                }
+            } catch (Exception ignored) {
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == VOICE_RECOGNITION_REQUEST_CODE) {
+            voiceDialogOpen = false;
+            if (resultCode == RESULT_OK && data != null) {
+                ArrayList<String> matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                if (matches != null && !matches.isEmpty() && matches.get(0) != null) {
+                    deliverNativeVoiceResult(matches.get(0).trim(), "");
+                    return;
+                }
+            }
+            deliverNativeVoiceResult("", "");
+            return;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void routeBackButtonToWebView() {
@@ -508,14 +571,16 @@ public class MainActivity extends BridgeActivity {
 
     @Override
     public void onPause() {
-        try {
-            if (getBridge() != null && getBridge().getWebView() != null) {
-                getBridge().getWebView().evaluateJavascript(
-                        "(function(){ try { if(window.closeVideoPlayer) window.closeVideoPlayer(); } catch(e){} })()",
-                        null
-                );
+        if (!voiceDialogOpen) {
+            try {
+                if (getBridge() != null && getBridge().getWebView() != null) {
+                    getBridge().getWebView().evaluateJavascript(
+                            "(function(){ try { if(window.closeVideoPlayer) window.closeVideoPlayer(); } catch(e){} })()",
+                            null
+                    );
+                }
+            } catch (Exception ignored) {
             }
-        } catch (Exception ignored) {
         }
         super.onPause();
     }
@@ -645,6 +710,13 @@ public class MainActivity extends BridgeActivity {
                 if (keyCode == KeyEvent.KEYCODE_MEDIA_PREVIOUS) {
                     webView.evaluateJavascript(
                         "(function(){ if(window.StreamItApp) window.StreamItApp.playPrevBingeTarget(); })()",
+                        null
+                    );
+                    return true;
+                }
+                if (keyCode == KeyEvent.KEYCODE_SEARCH) {
+                    webView.evaluateJavascript(
+                        "(function(){ if(window.startStreamItVoiceSearch) window.startStreamItVoiceSearch('tv-rail', document.getElementById('tvRailVoiceSearchBtn'), null); })()",
                         null
                     );
                     return true;

@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
-  <link rel="stylesheet" href="styles.css?v=9.9.4" />
+  <link rel="stylesheet" href="styles.css?v=9.9.5" />
   <script>
     (function () {
       try {
@@ -34,13 +34,13 @@
           });
         }
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (!otaVer || otaVer <= '9.9.3') {
+        if (!otaVer || otaVer <= '9.9.4') {
           localStorage.removeItem('streamit_ota_css_v9');
           localStorage.removeItem('streamit_ota_app_js_v9');
           localStorage.removeItem('streamit_ota_tv_nav_v9');
         }
         var otaCss = localStorage.getItem('streamit_ota_css_v9') || '';
-        if (otaVer && otaVer > '9.9.4' && otaCss.length > 500) {
+        if (otaVer && otaVer > '9.9.5' && otaCss.length > 500) {
           var st = document.createElement('style');
           st.id = 'streamit-ota-live-style-v9';
           st.textContent = otaCss;
@@ -140,7 +140,7 @@
           <button type="button" class="nav-link tv-focusable" data-category="youtube" aria-label="יוטיוב">יוטיוב</button>
           <button type="button" class="nav-link tv-focusable" data-category="mylist" aria-label="הרשימה שלי">הרשימה שלי</button>
           <span id="tvTopClock" class="tv-top-clock" dir="ltr" aria-label="שעה נוכחית"></span>
-          <span id="appVersionBadge" class="app-version-badge" dir="ltr" aria-label="גרסת מערכת">v9.9.4</span>
+          <span id="appVersionBadge" class="app-version-badge" dir="ltr" aria-label="גרסת מערכת">v9.9.5</span>
         </nav>
       </div>
 
@@ -159,6 +159,12 @@
             aria-label="חפש סרט, סדרה, שחקן או ערוץ"
             autocomplete="off"
           />
+          <button type="button" id="headerVoiceSearchBtn" class="voice-search-btn tv-focusable" data-voice-target="catalog" title="חיפוש קולי" aria-label="חיפוש קולי">
+            <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+              <rect x="9" y="2" width="6" height="12" rx="3" />
+              <path d="M5 10a7 7 0 0 0 14 0M12 19v3M8 22h8" />
+            </svg>
+          </button>
           <button type="button" id="openSearchBtn" class="header-search-submit-btn tv-focusable" aria-label="חיפוש קטלוג">
             <span class="header-btn-text">חיפוש</span>
           </button>
@@ -247,7 +253,7 @@
                 <path d="M6 12h4M12 12h6M6 16h8M16 16h2" />
               </svg>
               <div class="user-menu-item-text">
-                <span id="userMenuSubsTitle" class="user-menu-item-title">העדפות כתוביות: עברית (ענק)</span>
+                <span id="userMenuSubsTitle" class="user-menu-item-title">העדפות כתוביות: עברית (רגיל)</span>
                 <span class="user-menu-item-sub">לחץ לשינוי גודל גופן ברירת מחדל</span>
               </div>
             </button>
@@ -306,6 +312,12 @@
             <path d="M20 20l-4.2-4.2" />
           </svg>
           <span id="tvRailSearchText" class="tv-rail-search-text">חיפוש...</span>
+        </button>
+        <button type="button" id="tvRailVoiceSearchBtn" class="tv-rail-voice-btn voice-search-btn tv-focusable" data-voice-target="tv-rail" title="חיפוש קולי" aria-label="חיפוש קולי">
+          <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+            <rect x="9" y="2" width="6" height="12" rx="3" />
+            <path d="M5 10a7 7 0 0 0 14 0M12 19v3M8 22h8" />
+          </svg>
         </button>
         <button type="button" id="tvRailSearchClearBtn" class="tv-rail-search-clear-btn tv-focusable hidden" aria-label="נקה חיפוש">✕</button>
       </div>
@@ -498,6 +510,12 @@
                   aria-label="חיפוש שחקן במובייל"
                   autocomplete="off"
                 />
+                <button type="button" id="mobileActorVoiceSearchBtn" class="voice-search-btn" data-voice-target="actor-mobile" title="חיפוש שחקן קולי" aria-label="חיפוש שחקן קולי">
+                  <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                    <rect x="9" y="2" width="6" height="12" rx="3" />
+                    <path d="M5 10a7 7 0 0 0 14 0M12 19v3M8 22h8" />
+                  </svg>
+                </button>
                 <button type="button" id="mobileActorSearchBtn" class="actor-search-submit-btn" aria-label="חפש שחקן">חפש</button>
               </div>
               <div class="actor-panel-header">בחר שחקן לצפייה בכל הסרטים והסדרות שלו:</div>
@@ -519,6 +537,12 @@
               aria-label="חיפוש סרטים וסדרות לפי שחקן"
               autocomplete="off"
             />
+            <button type="button" id="actorVoiceSearchBtn" class="voice-search-btn tv-focusable" data-voice-target="actor" title="חיפוש שחקן קולי" aria-label="חיפוש שחקן קולי">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <rect x="9" y="2" width="6" height="12" rx="3" />
+                <path d="M5 10a7 7 0 0 0 14 0M12 19v3M8 22h8" />
+              </svg>
+            </button>
             <button type="button" id="actorSearchSubmitBtn" class="actor-search-submit-btn tv-focusable" aria-label="חפש שחקן">חפש</button>
           </div>
 
@@ -620,6 +644,12 @@
             aria-label="חיפוש סרט, סדרה או ערוץ"
             autocomplete="off"
           />
+          <button type="button" id="modalVoiceSearchBtn" class="voice-search-btn tv-focusable" data-voice-target="modal" title="חיפוש קולי" aria-label="חיפוש קולי">
+            <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+              <rect x="9" y="2" width="6" height="12" rx="3" />
+              <path d="M5 10a7 7 0 0 0 14 0M12 19v3M8 22h8" />
+            </svg>
+          </button>
           <button type="button" id="clearSearchBtn" class="icon-btn tv-focusable" aria-label="נקה שדה חיפוש">
             <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
               <path d="M18 6L6 18M6 6l12 12" />
@@ -761,7 +791,7 @@
       <div id="embedPlayerContainer" class="embed-player-container hidden"></div>
 
       <!-- Custom RTL Cinema Subtitle Stage (#customSubtitleOverlay) -->
-      <div id="customSubtitleOverlay" class="custom-subtitle-overlay sub-size-xlarge sub-color-white sub-bg-none" dir="rtl" aria-live="off">
+      <div id="customSubtitleOverlay" class="custom-subtitle-overlay sub-size-normal sub-color-white sub-bg-none" dir="rtl" aria-live="off">
         <span id="customSubtitleText" class="custom-subtitle-text"></span>
       </div>
 
@@ -1012,49 +1042,47 @@
             <div class="subs-control-label">סנכרון תזמון כתוביות</div>
             <div class="subs-sync-row" dir="ltr">
               <button type="button" id="subSyncMinusBtn" class="subs-chip-btn tv-focusable" dir="ltr" aria-label="הקדם כתוביות בחצי שנייה">-0.5s</button>
-              <button type="button" id="subSyncResetBtn" class="subs-chip-btn active tv-focusable" dir="ltr" aria-label="אפס סנכרון כתוביות">0.0s</button>
+              <span id="subSyncValueBadge" class="subs-value-readout" dir="ltr" aria-live="polite">0.0s</span>
               <button type="button" id="subSyncPlusBtn" class="subs-chip-btn tv-focusable" dir="ltr" aria-label="אחר כתוביות בחצי שנייה">+0.5s</button>
+              <button type="button" id="subSyncZeroBtn" class="subs-chip-btn subs-mini-reset-btn tv-focusable" dir="rtl" aria-label="אפס תזמון ל-0">אפס תזמון</button>
             </div>
           </div>
 
           <div class="subs-control-section">
             <div class="subs-control-label">גודל גופן</div>
-            <div class="subs-options-row" dir="ltr">
-              <button type="button" id="subFontMinusBtn" class="subs-chip-btn tv-focusable" dir="ltr" aria-label="הקטן גודל גופן">-</button>
-              <button type="button" id="subFontResetBtn" class="subs-chip-btn active tv-focusable" dir="ltr" aria-label="גודל גופן נוכחי">42px</button>
-              <button type="button" id="subFontPlusBtn" class="subs-chip-btn tv-focusable" dir="ltr" aria-label="הגדל גודל גופן">+</button>
-            </div>
-            <div class="subs-options-row" style="margin-top:4px;">
-              <button type="button" class="subs-chip-btn sub-size-btn tv-focusable" data-sub-size="normal" aria-label="גודל רגיל">רגיל</button>
+            <div class="subs-options-row">
+              <button type="button" class="subs-chip-btn sub-size-btn tv-focusable" data-sub-size="small" aria-label="גודל קטן">קטן</button>
+              <button type="button" class="subs-chip-btn sub-size-btn active tv-focusable" data-sub-size="normal" aria-label="גודל רגיל">רגיל</button>
               <button type="button" class="subs-chip-btn sub-size-btn tv-focusable" data-sub-size="large" aria-label="גודל גדול">גדול</button>
-              <button type="button" class="subs-chip-btn sub-size-btn active tv-focusable" data-sub-size="xlarge" aria-label="גודל ענק">ענק</button>
+            </div>
+            <div class="subs-options-row" dir="ltr" style="margin-top:4px;">
+              <button type="button" id="subFontMinusBtn" class="subs-chip-btn tv-focusable" dir="ltr" aria-label="הקטן גודל גופן">−</button>
+              <span id="subFontValueBadge" class="subs-value-readout" dir="ltr" aria-live="polite">25px</span>
+              <button type="button" id="subFontPlusBtn" class="subs-chip-btn tv-focusable" dir="ltr" aria-label="הגדל גודל גופן">+</button>
             </div>
           </div>
 
           <div class="subs-control-section">
-            <div class="subs-control-label">צבע כתוביות</div>
+            <div class="subs-control-label">צבע ורקע כתוביות</div>
             <div class="subs-options-row">
               <button type="button" class="subs-chip-btn sub-color-btn active tv-focusable" data-sub-color="white" aria-label="צבע לבן">לבן</button>
               <button type="button" class="subs-chip-btn sub-color-btn tv-focusable" data-sub-color="yellow" aria-label="צבע צהוב">צהוב</button>
-            </div>
-          </div>
-
-          <div class="subs-control-section">
-            <div class="subs-control-label">רקע כתוביות</div>
-            <div class="subs-options-row">
-              <button type="button" class="subs-chip-btn sub-bg-btn active tv-focusable" data-sub-bg="none" aria-label="ללא רקע שקוף">ללא רקע (שקוף)</button>
+              <button type="button" class="subs-chip-btn sub-bg-btn active tv-focusable" data-sub-bg="none" aria-label="ללא רקע שקוף">שקוף</button>
               <button type="button" class="subs-chip-btn sub-bg-btn tv-focusable" data-sub-bg="dark" aria-label="רקע כהה">רקע כהה</button>
             </div>
           </div>
 
           <div class="subs-control-section">
-            <div class="subs-control-label">מיקום כתוביות במסך (שליטה עם השלט)</div>
+            <div class="subs-control-label">מיקום כתוביות במסך</div>
             <div class="subs-options-row">
-              <button type="button" id="subPosDownBtn" class="subs-chip-btn tv-focusable" aria-label="הורד כתוביות למטה">למטה יותר</button>
-              <button type="button" id="subPosBottomMaxBtn" class="subs-chip-btn tv-focusable" aria-label="הצמד לתחתית המסך">צמוד לתחתית</button>
-              <button type="button" id="subPosResetBtn" class="subs-chip-btn active tv-focusable" aria-label="מיקום כתוביות נוכחי">3.5%</button>
-              <button type="button" id="subPosUpBtn" class="subs-chip-btn tv-focusable" aria-label="הרם כתוביות למעלה">למעלה יותר</button>
+              <button type="button" id="subPosDownBtn" class="subs-chip-btn tv-focusable" aria-label="הורד כתוביות למטה">למטה ▼</button>
+              <span id="subPosValueBadge" class="subs-value-readout" dir="ltr" aria-live="polite">9%</span>
+              <button type="button" id="subPosUpBtn" class="subs-chip-btn tv-focusable" aria-label="הרם כתוביות למעלה">למעלה ▲</button>
             </div>
+          </div>
+
+          <div class="subs-control-section subs-reset-footer">
+            <button type="button" id="resetAllSubPrefsBtn" class="subs-chip-btn subs-reset-all-btn tv-focusable" aria-label="איפוס כל הגדרות הכתוביות לברירת מחדל">איפוס להגדרות ברירת מחדל</button>
           </div>
         </div>
 
@@ -1585,8 +1613,8 @@
               <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="0" /><path d="M6 12h4M12 12h6M6 16h8M16 16h2" /></svg>
             </span>
             <div class="tv-more-text">
-              <strong id="tvMoreSubsLabel">כתוביות: עברית (ענק)</strong>
-              <span>החלף שפת כתוביות ברירת מחדל (עברית / אנגלית / כבוי)</span>
+              <strong id="tvMoreSubsLabel">כתוביות: עברית (רגיל)</strong>
+              <span>החלף גודל כתוביות ברירת מחדל (רגיל / גדול / קטן)</span>
             </div>
           </button>
 
@@ -1637,6 +1665,12 @@
                 aria-label="חיפוש לפי שם שחקן"
                 autocomplete="off"
               />
+              <button type="button" id="tvMoreActorVoiceSearchBtn" class="voice-search-btn tv-focusable" data-voice-target="actor-tvmore" title="חיפוש שחקן קולי" aria-label="חיפוש שחקן קולי">
+                <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                  <rect x="9" y="2" width="6" height="12" rx="3" />
+                  <path d="M5 10a7 7 0 0 0 14 0M12 19v3M8 22h8" />
+                </svg>
+              </button>
               <button type="button" id="tvMoreActorSearchBtn" class="btn-primary tv-more-actor-btn tv-focusable">חפש שחקן</button>
             </div>
           </div>
@@ -1655,6 +1689,7 @@
         <span id="vkFieldBadge" class="vk-field-badge" dir="rtl">שדה הקלדה</span>
         <div id="vkPreviewText" class="vk-preview-text" dir="ltr"></div>
         <div class="vk-header-actions" dir="rtl">
+          <button type="button" id="vkVoiceBtn" class="vk-top-act-btn vk-voice-btn voice-search-btn tv-focusable" data-vk-action="voice" aria-label="חיפוש והכתבה קולית">🎤 קולי</button>
           <button type="button" id="vkTopPassBtn" class="vk-top-act-btn tv-focusable hidden" data-vk-action="toggle-pass">הצג/הסתר</button>
           <button type="button" id="vkTopBackspaceBtn" class="vk-top-act-btn vk-top-del-btn tv-focusable" data-vk-action="backspace">⌫ מחק אות</button>
           <button type="button" id="vkTopClearBtn" class="vk-top-act-btn vk-top-clear-btn tv-focusable" data-vk-action="clear">נקה הכל</button>
@@ -1703,17 +1738,24 @@
     </div>
   </div>
 
+  <!-- Live Voice Search Listening HUD (#voiceListeningBanner) -->
+  <div id="voiceListeningBanner" class="voice-listening-banner hidden" dir="rtl" role="status" aria-live="polite">
+    <span class="voice-pulse-dot" aria-hidden="true"></span>
+    <span id="voiceListeningText" class="voice-listening-text">מקשיב... אמור שם סרט, סדרה, שחקן או ערוץ</span>
+    <button type="button" id="voiceListeningStopBtn" class="voice-listening-stop-btn tv-focusable" aria-label="עצור הקלטה קולית">ביטול ✕</button>
+  </div>
+
   <!-- Toast Notifications Container -->
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Core Application & Smart TV Navigation Scripts -->
-  <script src="tv-navigation.js?v=9.9.4"></script>
-  <script src="app.js?v=9.9.4"></script>
+  <script src="tv-navigation.js?v=9.9.5"></script>
+  <script src="app.js?v=9.9.5"></script>
   <script>
     (function () {
       try {
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (otaVer && otaVer > '9.9.4') {
+        if (otaVer && otaVer > '9.9.5') {
           window.__STREAMIT_OTA_INJECTED_RUNNING = true;
           var navCode = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
           if (navCode.length > 500) {
