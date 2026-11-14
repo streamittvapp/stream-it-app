@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794678895486,
+      "updatedTs": 1794678915283,
       "subUsersUpdatedAt": 1794551843424,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -474,12 +474,12 @@
               "imdbId": "tt15239678",
               "tmdbId": "693134",
               "title": "חולית: חלק שני",
-              "currentTime": 3195,
+              "currentTime": 3215,
               "duration": 9955,
               "percent": 32,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794678895486,
+              "updatedAt": 1794678915283,
               "snapshot": {
                 "id": "tt15239678",
                 "imdbId": "tt15239678",
