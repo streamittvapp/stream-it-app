@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794698937513,
+      "updatedTs": 1794698939147,
       "subUsersUpdatedAt": 1794694857976,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -508,49 +508,6 @@
                 ],
                 "seasonsCount": 0
               }
-            },
-            "movie-1236045": {
-              "id": "movie-1236045",
-              "imdbId": "tt31049299",
-              "tmdbId": "1236045",
-              "title": "חיות אדם",
-              "currentTime": 947,
-              "duration": 6491,
-              "percent": 15,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794696374223,
-              "snapshot": {
-                "id": "movie-1236045",
-                "imdbId": "tt31049299",
-                "tmdbId": "1236045",
-                "type": "movie",
-                "title": "חיות אדם",
-                "originalTitle": "Animals",
-                "year": "2026",
-                "rating": "6.9",
-                "runtimeHe": "שעתיים",
-                "ageRating": "16+",
-                "overview": "הבן של המועמד לראשות עיריית לוס אנג'לס נחטף, והוא ואשתו הנואשים מנסים לגייס את דמי הכופר ומקבלים החלטות שעלולות להחריב את עולמם.",
-                "poster": "https://image.tmdb.org/t/p/w500/yRnFgYHTQJ0Z4DYEcDdlYWQKnqD.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/5yzM78Tp8nYwSCQtyRcmnHmCn5C.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/5yzM78Tp8nYwSCQtyRcmnHmCn5C.jpg",
-                "genres": [
-                  "thriller",
-                  "drama",
-                  "action",
-                  "crime",
-                  "netflix"
-                ],
-                "genresHe": [
-                  "מותחנים",
-                  "דרמה",
-                  "אקשן והרפתקאות",
-                  "מתח ופשע",
-                  "נטפליקס (Netflix)"
-                ],
-                "seasonsCount": 0
-              }
             }
           },
           "deletedProgressIds": {
@@ -564,6 +521,7 @@
             "301528": 1794698933987,
             "533535": 1794686262083,
             "693134": 1794686261114,
+            "1236045": 1794698939147,
             "1283515": 1794432225027,
             "1339713": 1794432202875,
             "1381078": 1794432225027,
@@ -610,7 +568,10 @@
             "tt1979376": 1794698933987,
             "series-301528": 1794698933987,
             "movie-69557": 1794698934882,
-            "series-69557": 1794698934882
+            "series-69557": 1794698934882,
+            "movie-1236045": 1794698939147,
+            "tt31049299": 1794698939147,
+            "series-1236045": 1794698939147
           },
           "progressClearedAt": 1794432225027
         },
