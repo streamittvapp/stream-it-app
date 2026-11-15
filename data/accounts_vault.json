@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794774751757,
+      "updatedTs": 1794774770079,
       "subUsersUpdatedAt": 1794774698606,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -314,12 +314,12 @@
               "imdbId": "tt0944947",
               "tmdbId": "1399",
               "title": "משחקי הכס",
-              "currentTime": 74,
+              "currentTime": 1353,
               "duration": 3697,
-              "percent": 3,
+              "percent": 37,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794774751757,
+              "updatedAt": 1794774770079,
               "snapshot": {
                 "id": "series-1399",
                 "imdbId": "tt0944947",
