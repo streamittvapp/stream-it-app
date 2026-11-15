@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794778868860,
+      "updatedTs": 1794778914860,
       "subUsersUpdatedAt": 1794778521326,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -320,6 +320,45 @@
                   "מסתורין",
                   "מותחן",
                   "דרמה"
+                ],
+                "seasonsCount": 0
+              }
+            },
+            "movie-216015": {
+              "id": "movie-216015",
+              "imdbId": "tt2322441",
+              "tmdbId": "216015",
+              "title": "חמישים גוונים של אפור",
+              "currentTime": 64,
+              "duration": 572,
+              "percent": 11,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794778914860,
+              "snapshot": {
+                "id": "movie-216015",
+                "imdbId": "tt2322441",
+                "tmdbId": "216015",
+                "type": "movie",
+                "title": "חמישים גוונים של אפור",
+                "originalTitle": "Fifty Shades of Grey",
+                "year": "2015",
+                "rating": "5.9",
+                "runtimeHe": "שעתיים",
+                "ageRating": "12+",
+                "overview": "\"חמישים גוונים של אפור\" מבוסס על הרומן האירוטי המצליח של שנת 2011 שנכתב על ידי אי. אל. ג'יימס. חייה של אנסטסיה, סטודנטית לספרות, משתנים מקצה לקצה כאשר היא פוגשת את כריסטיאן גריי, יזם צעיר ועשיר. בין השניים מתפתחת מערכת יחסים אינטימית וסודית הכוללת יחסי שליטה וכניעה.",
+                "poster": "https://image.tmdb.org/t/p/w500/5y5uDOWjToH4M0gyDa6Tc3nHCuz.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/7IGKrY1f1KfwMipx9wZC4NRgIdF.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/7IGKrY1f1KfwMipx9wZC4NRgIdF.jpg",
+                "genres": [
+                  "drama",
+                  "romance",
+                  "thriller"
+                ],
+                "genresHe": [
+                  "דרמה",
+                  "רומנטיקה",
+                  "מותחנים"
                 ],
                 "seasonsCount": 0
               }
