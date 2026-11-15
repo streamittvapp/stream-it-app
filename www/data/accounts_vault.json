@@ -132,12 +132,16 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794725041218,
-      "subUsersUpdatedAt": 1794694857976,
+      "updatedTs": 1794773222825,
+      "subUsersUpdatedAt": 1794772301939,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
         "prof-bedroom": 1794494898603,
-        "prof-kids": 1794494905106
+        "prof-kids": 1794494905106,
+        "prof-1794772211399": 1794772250535,
+        "prof-1794772219833": 1794772251715,
+        "prof-1794772225879": 1794772301090,
+        "prof-1794772238633": 1794772301939
       },
       "activeSubUserId": "prof-main",
       "subUsers": [
@@ -148,15 +152,17 @@
           "isKids": false,
           "isPrimary": true,
           "parentalControl": {
-            "enabled": false,
-            "actionMode": "skip",
+            "enabled": true,
+            "actionMode": "blur_mute",
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
+            "blurPx": 22,
+            "updatedAt": 1794773500000,
             "categories": {
               "sex": true,
-              "violence": true,
-              "profanity": true,
-              "drugs": true,
+              "violence": false,
+              "profanity": false,
+              "drugs": false,
               "horror": false
             }
           }
@@ -174,6 +180,48 @@
             "tt10577736",
             "series-1413"
           ],
+          "progress": {
+            "tt32261958": {
+              "id": "tt32261958",
+              "imdbId": "tt32261958",
+              "tmdbId": "1283515",
+              "title": "תעתוע",
+              "currentTime": 235,
+              "duration": 7200,
+              "percent": 3,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794771587533,
+              "snapshot": {
+                "id": "tt32261958",
+                "imdbId": "tt32261958",
+                "tmdbId": "1283515",
+                "type": "movie",
+                "title": "תעתוע",
+                "originalTitle": "Verity",
+                "year": "2026",
+                "rating": "7.4",
+                "runtimeHe": "שעה ו-58 דק'",
+                "ageRating": "16+",
+                "overview": "סופרת מתקשה עוברת להתגורר באחוזת קרופורד המבודדת כדי לכתוב בשמה של וריטי. לאחר שלואן מגלה מה שנראה כרשימות אוטוביוגרפיות מצמררות של וריטי, היא מתמודדת עם וידויים מטרידים ומעוותים הנוגעים לבעלה של וריטי, ג'רמי ומתקשה להבחין בין דמיון למציאות, בין מניפולציה למשיכה, ובין הזדמנות לאובססיה.",
+                "poster": "https://image.tmdb.org/t/p/w500/fhkXXgxth4IxoplvQvQZ0BSo3F4.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/original/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
+                "genres": [
+                  "mystery",
+                  "thriller",
+                  "drama",
+                  "telegram"
+                ],
+                "genresHe": [
+                  "מסתורין",
+                  "מותחן",
+                  "דרמה"
+                ],
+                "seasonsCount": 0
+              }
+            }
+          },
           "watchlistSnapshots": {
             "tt10577736": {
               "id": "tt10577736",
@@ -317,173 +365,28 @@
             }
           },
           "watchlistUpdatedAt": 1794685001388,
-          "progress": {
-            "1283515": {
-              "id": "1283515",
-              "imdbId": "tt32261958",
-              "tmdbId": "1283515",
-              "title": "תעתוע",
-              "currentTime": 3136,
-              "duration": 7256,
-              "percent": 43,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794434864507,
-              "snapshot": {
-                "id": "1283515",
-                "imdbId": "tt32261958",
-                "tmdbId": "1283515",
-                "type": "movie",
-                "title": "תעתוע",
-                "originalTitle": "Verity",
-                "year": "2026",
-                "rating": "7.0",
-                "runtimeHe": "שעתיים",
-                "ageRating": "14+",
-                "overview": "סופרת מתקשה עוברת להתגורר באחוזת קרופורד המבודדת כדי לכתוב בשמה של וריטי. לאחר שלואן מגלה מה שנראה כרשימות אוטוביוגרפיות מצמררות של וריטי, היא מתמודדת עם וידויים מטרידים ומעוותים הנוגעים לבעלה של וריטי, ג'רמי ומתקשה להבחין בין דמיון למציאות, בין מניפולציה למשיכה, ובין הזדמנות לאובססיה.",
-                "poster": "https://image.tmdb.org/t/p/w500/fhkXXgxth4IxoplvQvQZ0BSo3F4.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
-                "genres": [
-                  "mystery",
-                  "thriller"
-                ],
-                "genresHe": [
-                  "מסתורין ובלשי",
-                  "מותחנים"
-                ],
-                "seasonsCount": 0
-              }
-            },
-            "movie-1283515": {
-              "id": "movie-1283515",
-              "imdbId": "tt32261958",
-              "tmdbId": "1283515",
-              "title": "תעתוע",
-              "currentTime": 3000,
-              "duration": 6668,
-              "percent": 45,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794725041218,
-              "snapshot": {
-                "id": "movie-1283515",
-                "imdbId": "tt32261958",
-                "tmdbId": "1283515",
-                "type": "movie",
-                "title": "תעתוע",
-                "originalTitle": "Verity",
-                "year": "2026",
-                "rating": "7.0",
-                "runtimeHe": "שעתיים",
-                "ageRating": "14+",
-                "overview": "סופרת מתקשה עוברת להתגורר באחוזת קרופורד המבודדת כדי לכתוב בשמה של וריטי. לאחר שלואן מגלה מה שנראה כרשימות אוטוביוגרפיות מצמררות של וריטי, היא מתמודדת עם וידויים מטרידים ומעוותים הנוגעים לבעלה של וריטי, ג'רמי ומתקשה להבחין בין דמיון למציאות, בין מניפולציה למשיכה, ובין הזדמנות לאובססיה.",
-                "poster": "https://image.tmdb.org/t/p/w500/fhkXXgxth4IxoplvQvQZ0BSo3F4.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
-                "genres": [
-                  "mystery",
-                  "thriller"
-                ],
-                "genresHe": [
-                  "מסתורין ובלשי",
-                  "מותחנים"
-                ],
-                "seasonsCount": 0
-              }
-            },
-            "tt15398776": {
-              "id": "tt15398776",
-              "imdbId": "tt15398776",
-              "tmdbId": "872585",
-              "title": "אופנהיימר",
-              "currentTime": 420,
-              "duration": 10786,
-              "percent": 4,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794691488145,
-              "snapshot": {
-                "id": "tt15398776",
-                "imdbId": "tt15398776",
-                "tmdbId": "872585",
-                "type": "movie",
-                "title": "אופנהיימר",
-                "originalTitle": "Oppenheimer",
-                "year": "2023",
-                "rating": "8.9",
-                "runtimeHe": "3 שעות ו-00 דק'",
-                "ageRating": "16+",
-                "overview": "סיפורו המטלטל של הפיזיקאי האמריקאי ג'יי רוברט אופנהיימר ותפקידו המרכזי בפרויקט מנהטן הסודי לפיתוח הפצצה האטומית הראשונה במלחמת העולם השנייה.",
-                "poster": "https://images.metahub.space/poster/medium/tt15398776/img",
-                "backdrop": "https://images.metahub.space/background/medium/tt15398776/img",
-                "cardBackdrop": "https://images.metahub.space/background/medium/tt15398776/img",
-                "genres": [
-                  "drama",
-                  "docu"
-                ],
-                "genresHe": [
-                  "דרמה",
-                  "ביוגרפיה והיסטוריה"
-                ],
-                "seasonsCount": 0
-              }
-            },
-            "movie-1011985": {
-              "id": "movie-1011985",
-              "imdbId": "tt21692408",
-              "tmdbId": "1011985",
-              "title": "קונג פו פנדה 4 (מדובב לעברית)",
-              "currentTime": 1221,
-              "duration": 5617,
-              "percent": 22,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794722284673,
-              "snapshot": {
-                "id": "movie-1011985",
-                "imdbId": "tt21692408",
-                "tmdbId": "1011985",
-                "type": "movie",
-                "title": "קונג פו פנדה 4 (מדובב לעברית)",
-                "originalTitle": "Kung Fu Panda 4",
-                "year": "2024",
-                "rating": "7.1",
-                "runtimeHe": "",
-                "ageRating": "כל הגילאים",
-                "overview": "פו לוחם הדרקון יוצא להרפתקה חדשה ומצחיקה לחיפוש יורש רוחני לעמק השלום מול הזיקית המשנה צורה — בדיבוב עברי.",
-                "poster": "https://image.tmdb.org/t/p/w500/kDp1vUBnMpe8ak4rjgl3cLELqjU.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/1XDDXPXGiI8id7MrUxK36ke7gkX.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w1280/1XDDXPXGiI8id7MrUxK36ke7gkX.jpg",
-                "genres": [
-                  "animation",
-                  "hebrew_dub",
-                  "action",
-                  "comedy"
-                ],
-                "genresHe": [
-                  "מדובב לעברית 🇮🇱",
-                  "אנימציה ואקשן"
-                ],
-                "seasonsCount": 0
-              }
-            }
-          },
           "deletedProgressIds": {
             "27": 1794432189831,
             "278": 1794686259883,
+            "550": 1794772327539,
             "1396": 1794686263135,
+            "1399": 1794772333743,
             "1413": 1794686264301,
-            "10580": 1794432196249,
+            "10580": 1794770938868,
             "69557": 1794698934882,
             "95396": 1794698940923,
             "103913": 1794698937513,
+            "157336": 1794770988551,
             "293660": 1794698940065,
             "301528": 1794698933987,
             "533535": 1794686262083,
             "693134": 1794686261114,
+            "872585": 1794770987478,
+            "933260": 1794772609370,
+            "1011985": 1794770989183,
             "1236045": 1794698939147,
-            "1283515": 1794432225027,
+            "1283515": 1794731391181,
+            "1290417": 1794770985537,
             "1339713": 1794432202875,
             "1381078": 1794432225027,
             "1560520": 1794686257036,
@@ -492,9 +395,9 @@
             "tt0411705": 1794432189831,
             "movie-27": 1794432189831,
             "series-27": 1794432189831,
-            "tt0079118": 1794432196249,
-            "movie-10580": 1794432196249,
-            "series-10580": 1794432196249,
+            "tt0079118": 1794770938868,
+            "movie-10580": 1794770938868,
+            "series-10580": 1794770938868,
             "tt37287335": 1794432202875,
             "movie-1339713": 1794432202875,
             "series-1339713": 1794432202875,
@@ -538,46 +441,68 @@
             "series-293660": 1794698940065,
             "tt11280740": 1794698940923,
             "movie-95396": 1794698940923,
-            "series-95396": 1794698940923
+            "series-95396": 1794698940923,
+            "movie-1283515": 1794731391181,
+            "tt32261958": 1794731391181,
+            "series-1283515": 1794731391181,
+            "movie-1290417": 1794770985537,
+            "tt32362890": 1794770985537,
+            "series-1290417": 1794770985537,
+            "tt15398776": 1794770987478,
+            "movie-872585": 1794770987478,
+            "series-872585": 1794770987478,
+            "tt0816692": 1794770988551,
+            "movie-157336": 1794770988551,
+            "series-157336": 1794770988551,
+            "movie-1011985": 1794770989183,
+            "tt21692408": 1794770989183,
+            "series-1011985": 1794770989183,
+            "movie-550": 1794772327539,
+            "tt0137523": 1794772327539,
+            "series-550": 1794772327539,
+            "series-1399": 1794772333743,
+            "tt0944947": 1794772333743,
+            "movie-1399": 1794772333743,
+            "tt17526714": 1794772609370,
+            "movie-933260": 1794772609370,
+            "series-933260": 1794772609370
           },
           "progressClearedAt": 1794432225027
         },
         "prof-1794166536010": {
           "watchlist": [],
+          "progress": {},
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
-          "progress": {},
           "deletedProgressIds": {},
           "progressClearedAt": 0
         },
         "prof-1794166543582": {
           "watchlist": [],
+          "progress": {},
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
-          "progress": {},
           "deletedProgressIds": {},
           "progressClearedAt": 0
         },
         "prof-1794166553435": {
           "watchlist": [],
+          "progress": {},
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
-          "progress": {},
           "deletedProgressIds": {},
           "progressClearedAt": 0
         },
         "prof-1794166559616": {
           "watchlist": [],
+          "progress": {},
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
-          "progress": {},
           "deletedProgressIds": {},
           "progressClearedAt": 0
         },
         "prof-1794166564722": {
           "watchlist": [],
-          "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0,
           "progress": {
             "27": {
               "id": "27",
@@ -739,31 +664,24 @@
               }
             }
           },
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0,
           "deletedProgressIds": {},
           "progressClearedAt": 0
         }
       },
       "parentalMaster": {
         "pinCode": "",
-        "customSkipSegments": {
-          "tt0411705": [
-            {
-              "start": 18,
-              "end": 50,
-              "category": "sex",
-              "label": "קטע שסומן ע״י המשתמש"
-            }
-          ]
-        }
+        "customSkipSegments": {}
       },
       "subPrefs": {
         "schemaVer": 2,
-        "updatedAt": 1794699365696,
-        "size": "normal",
-        "fontPx": 25,
+        "updatedAt": 1794732688104,
+        "size": "large",
+        "fontPx": 37,
         "color": "white",
         "bg": "none",
-        "bottomPct": 7.5
+        "bottomPct": 9
       }
     }
   },

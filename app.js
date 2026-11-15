@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.9.94';
+  var APP_VERSION = '9.9.95';
 
   function ensureOtaStylesheetInjected() {
     try {
@@ -75,8 +75,10 @@
     window.__STREAMIT_V9991_BOOTED ||
     window.__STREAMIT_V9992_BOOTED ||
     window.__STREAMIT_V9993_BOOTED ||
-    window.__STREAMIT_V9994_BOOTED
+    window.__STREAMIT_V9994_BOOTED ||
+    window.__STREAMIT_V9995_BOOTED
   );
+  window.__STREAMIT_V9995_BOOTED = true;
   window.__STREAMIT_V9994_BOOTED = true;
   window.__STREAMIT_V9993_BOOTED = true;
   window.__STREAMIT_V9992_BOOTED = true;
@@ -123,7 +125,8 @@
   window.__STREAMIT_V968_BOOTED = true;
   window.__STREAMIT_V969_BOOTED = true;
   window.__STREAMIT_V970_BOOTED = true;
-  // Synchronously block any older bundled v9.7.0-v9.9.93 script from firing its DOMContentLoaded boot handler after OTA loads!
+  // Synchronously block any older bundled v9.7.0-v9.9.94 script from firing its DOMContentLoaded boot handler after OTA loads!
+  window.__STREAMIT_V9994_BOOT_DONE = true;
   window.__STREAMIT_V9993_BOOT_DONE = true;
   window.__STREAMIT_V9992_BOOT_DONE = true;
   window.__STREAMIT_V9991_BOOT_DONE = true;
@@ -1818,17 +1821,12 @@
   }
 
   function hasLocalBackend() {
+    // Only the Android TV Streamer APK has an internal embedded Java bridge; PC & Mobile Web are 100% pure Cloud!
     if (window.AndroidTvBridge && typeof window.AndroidTvBridge.isAndroidTv === 'function') return true;
-    if ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port === '8092') return true;
-    return Boolean(state.pythonApiConfirmed);
+    return false;
   }
 
   function getApiBase() {
-    var host = window.location.hostname;
-    var port = window.location.port;
-    if ((host === 'localhost' || host === '127.0.0.1') && port === '8092') {
-      return '';
-    }
     return 'http://127.0.0.1:8092';
   }
 
@@ -1837,19 +1835,6 @@
       state.pythonApiConfirmed = true;
       return true;
     }
-    try {
-      var ctrl = new AbortController();
-      var t = setTimeout(function () { ctrl.abort(); }, 1200);
-      var res = await fetch(getApiBase() + '/api/health', { signal: ctrl.signal });
-      clearTimeout(t);
-      if (res && res.ok) {
-        var data = await res.json();
-        if (data && data.ok) {
-          state.pythonApiConfirmed = true;
-          return true;
-        }
-      }
-    } catch (e) {}
     return false;
   }
 
@@ -9041,10 +9026,10 @@
       await probeLocalPythonBackend();
     }
 
-    // Mobile / Web Cloud Direct Stream Resolver (`data/cloud_streams.json` — zero local server required!)
+    // Mobile & PC Web Cloud Direct Stream Resolver (`data/cloud_streams.json` — 100% pure Cloud, zero local server!)
     if (!hasLocalBackend()) {
+      var csMap = await ensureCloudStreamsMapLoaded();
       if (tmdbId && hevcDashSupported && !item._dashFailedOnDevice) {
-        var csMap = await ensureCloudStreamsMapLoaded();
         var csKey = mediaType === 'series'
           ? ('tv:' + tmdbId + ':' + sNum + ':' + eNum)
           : ('movie:' + tmdbId);
@@ -9055,6 +9040,9 @@
             return mobileDashBlobUrl;
           }
         }
+      }
+      if (!hevcDashSupported) {
+        item._dashFailedOnDevice = true;
       }
       return null;
     }
@@ -14657,6 +14645,42 @@
       });
     }
 
+    var parentalShieldDismissBtn = document.getElementById('parentalShieldDismissBtn');
+    if (parentalShieldDismissBtn) {
+      parentalShieldDismissBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var seg = state.parentalShieldActiveSegment;
+        if (seg) {
+          state.parentalDismissedSegmentSig = getSegmentSignature(seg);
+        }
+        state.parentalShieldActiveSegment = null;
+        hideParentalShieldOverlay();
+        setParentalTemporaryMute(false);
+        showCinemaToast('טשטוש בוטל עבור קטע זה');
+      });
+    }
+
+    var playerBlurMinusBtn = document.getElementById('playerParentalBlurMinusBtn');
+    if (playerBlurMinusBtn) {
+      playerBlurMinusBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        wakePlayerControls();
+        var curProf = getActiveSubUser();
+        var cfg = curProf ? ensureProfileParentalConfig(curProf) : null;
+        setProfileParentalBlurPx(curProf, (cfg ? cfg.blurPx : 22) - 4);
+      });
+    }
+    var playerBlurPlusBtn = document.getElementById('playerParentalBlurPlusBtn');
+    if (playerBlurPlusBtn) {
+      playerBlurPlusBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        wakePlayerControls();
+        var curProf = getActiveSubUser();
+        var cfg = curProf ? ensureProfileParentalConfig(curProf) : null;
+        setProfileParentalBlurPx(curProf, (cfg ? cfg.blurPx : 22) + 4);
+      });
+    }
+
     // Deterministic Delegated Subtitle Menu Controls (Zero Accidental Resets Across All Platforms)
     var delegatedSubsMenu = document.getElementById('playerSubsMenu');
     if (delegatedSubsMenu && !delegatedSubsMenu.__v995Bound) {
@@ -15236,10 +15260,11 @@
         cfg.enabled = !cfg.enabled;
         if (cfg.enabled && countEnabledParentalCategories(cfg) === 0) {
           cfg.categories.sex = true;
-          cfg.categories.violence = true;
-          cfg.categories.profanity = true;
         }
-        saveSubUsersState();
+        cfg.updatedAt = Date.now();
+        saveSubUsersState({ markSubUsersUpdated: true, cloudDelayMs: 300 });
+        rebuildParentalSkipTimelineForCurrentMedia();
+        enforceParentalSceneGuard(getCurrentPlaybackTimeSec());
         renderParentalControlModal();
         updateUserMenuParentalSummary();
         updateInPlayerParentalUi();
@@ -15260,10 +15285,9 @@
         var srcCfg = ensureProfileParentalConfig(srcProf);
         var cloned = JSON.parse(JSON.stringify(srcCfg));
         cloned.enabled = true;
+        cloned.updatedAt = Date.now();
         if (countEnabledParentalCategories(cloned) === 0) {
           cloned.categories.sex = true;
-          cloned.categories.violence = true;
-          cloned.categories.profanity = true;
         }
         var updatedCount = 0;
         for (var i = 0; i < state.subUsers.length; i++) {
@@ -15272,7 +15296,9 @@
             updatedCount++;
           }
         }
-        saveSubUsersState();
+        saveSubUsersState({ markSubUsersUpdated: true, cloudDelayMs: 300 });
+        rebuildParentalSkipTimelineForCurrentMedia();
+        enforceParentalSceneGuard(getCurrentPlaybackTimeSec());
         renderParentalControlModal();
         updateUserMenuParentalSummary();
         updateInPlayerParentalUi();
@@ -15289,15 +15315,16 @@
         var srcCfg = ensureProfileParentalConfig(srcProf);
         var cloned = JSON.parse(JSON.stringify(srcCfg));
         cloned.enabled = true;
+        cloned.updatedAt = Date.now();
         if (countEnabledParentalCategories(cloned) === 0) {
           cloned.categories.sex = true;
-          cloned.categories.violence = true;
-          cloned.categories.profanity = true;
         }
         for (var i = 0; i < state.subUsers.length; i++) {
           state.subUsers[i].parentalControl = JSON.parse(JSON.stringify(cloned));
         }
-        saveSubUsersState();
+        saveSubUsersState({ markSubUsersUpdated: true, cloudDelayMs: 300 });
+        rebuildParentalSkipTimelineForCurrentMedia();
+        enforceParentalSceneGuard(getCurrentPlaybackTimeSec());
         renderParentalControlModal();
         updateUserMenuParentalSummary();
         updateInPlayerParentalUi();
@@ -15317,11 +15344,15 @@
         if (cfg.categories[catKey] && !cfg.enabled) {
           cfg.enabled = true;
         }
-        saveSubUsersState();
+        cfg.updatedAt = Date.now();
+        saveSubUsersState({ markSubUsersUpdated: true, cloudDelayMs: 300 });
+        rebuildParentalSkipTimelineForCurrentMedia();
+        enforceParentalSceneGuard(getCurrentPlaybackTimeSec());
         renderParentalControlModal();
         updateUserMenuParentalSummary();
         updateInPlayerParentalUi();
         renderInitialStage();
+        updateActiveSubtitleCue(getCurrentPlaybackTimeSec());
       });
     }
 
@@ -15333,9 +15364,13 @@
         if (!prof || !mode) return;
         var cfg = ensureProfileParentalConfig(prof);
         cfg.actionMode = mode;
-        saveSubUsersState();
+        cfg.updatedAt = Date.now();
+        saveSubUsersState({ markSubUsersUpdated: true, cloudDelayMs: 300 });
+        rebuildParentalSkipTimelineForCurrentMedia();
+        enforceParentalSceneGuard(getCurrentPlaybackTimeSec());
         renderParentalControlModal();
         updateUserMenuParentalSummary();
+        updateInPlayerParentalUi();
       });
     }
 
@@ -15347,7 +15382,10 @@
         if (!prof || !pMode) return;
         var cfg = ensureProfileParentalConfig(prof);
         cfg.profanityMode = pMode;
-        saveSubUsersState();
+        cfg.updatedAt = Date.now();
+        saveSubUsersState({ markSubUsersUpdated: true, cloudDelayMs: 300 });
+        rebuildParentalSkipTimelineForCurrentMedia();
+        enforceParentalSceneGuard(getCurrentPlaybackTimeSec());
         renderParentalControlModal();
       });
     }
@@ -15360,8 +15398,58 @@
         if (!prof || !sens) return;
         var cfg = ensureProfileParentalConfig(prof);
         cfg.sensitivity = sens;
-        saveSubUsersState();
+        cfg.updatedAt = Date.now();
+        saveSubUsersState({ markSubUsersUpdated: true, cloudDelayMs: 300 });
+        rebuildParentalSkipTimelineForCurrentMedia();
+        enforceParentalSceneGuard(getCurrentPlaybackTimeSec());
         renderParentalControlModal();
+        updateActiveSubtitleCue(getCurrentPlaybackTimeSec());
+      });
+    }
+
+    var parentalBlurPresetBtns = document.querySelectorAll('[data-parental-blur-preset]');
+    for (var pbp = 0; pbp < parentalBlurPresetBtns.length; pbp++) {
+      parentalBlurPresetBtns[pbp].addEventListener('click', function (ev) {
+        ev.stopPropagation();
+        var presetPx = Number(this.getAttribute('data-parental-blur-preset') || 22);
+        var inPlayerMenu = this.closest && this.closest('#playerParentalMenu');
+        if (inPlayerMenu) {
+          wakePlayerControls();
+          setProfileParentalBlurPx(getActiveSubUser(), presetPx);
+        } else {
+          setProfileParentalBlurPx(getEditingParentalProfile(), presetPx);
+        }
+      });
+    }
+
+    var parentalBlurRangeInput = document.getElementById('parentalBlurRangeInput');
+    if (parentalBlurRangeInput) {
+      parentalBlurRangeInput.addEventListener('input', function () {
+        var px = normalizeParentalBlurPx(this.value);
+        applyParentalBlurIntensityCss(px);
+        var badge = document.getElementById('parentalBlurValueBadge');
+        if (badge) badge.textContent = getParentalBlurLevelLabel(px);
+      });
+      parentalBlurRangeInput.addEventListener('change', function () {
+        setProfileParentalBlurPx(getEditingParentalProfile(), Number(this.value || 22));
+      });
+    }
+
+    var parentalBlurMinusBtn = document.getElementById('parentalBlurMinusBtn');
+    if (parentalBlurMinusBtn) {
+      parentalBlurMinusBtn.addEventListener('click', function () {
+        var prof = getEditingParentalProfile();
+        var cfg = prof ? ensureProfileParentalConfig(prof) : null;
+        setProfileParentalBlurPx(prof, (cfg ? cfg.blurPx : 22) - 4);
+      });
+    }
+
+    var parentalBlurPlusBtn = document.getElementById('parentalBlurPlusBtn');
+    if (parentalBlurPlusBtn) {
+      parentalBlurPlusBtn.addEventListener('click', function () {
+        var prof = getEditingParentalProfile();
+        var cfg = prof ? ensureProfileParentalConfig(prof) : null;
+        setProfileParentalBlurPx(prof, (cfg ? cfg.blurPx : 22) + 4);
       });
     }
 
@@ -16928,10 +17016,13 @@
       pShield.setAttribute('aria-live', 'assertive');
       pShield.innerHTML =
         '<div class="parental-shield-card">' +
-          '<div class="parental-shield-badge"><svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="M9 12l2 2 4-4" /></svg><span>מגן צפייה משפחתי פעיל</span></div>' +
-          '<h3 id="parentalShieldHeading" class="parental-shield-title">המסך מטושטש ע״י בקרת הורים</h3>' +
+          '<div class="parental-shield-badge"><svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="M9 12l2 2 4-4" /></svg><span>בקרת הורים • טשטוש והשתקה פעילים</span></div>' +
+          '<h3 id="parentalShieldHeading" class="parental-shield-title">הסצנה מטושטשת והשמע מושתק</h3>' +
           '<p id="parentalShieldSub" class="parental-shield-sub">התמונה מטושטשת והשמע מושתק אוטומטית עד לסיום הקטע</p>' +
-          '<button type="button" id="parentalShieldSkipNowBtn" class="btn-primary parental-shield-skip-btn tv-focusable">דלג מיד לסיום הקטע ⏭</button>' +
+          '<div class="parental-shield-actions">' +
+            '<button type="button" id="parentalShieldSkipNowBtn" class="btn-primary parental-shield-skip-btn tv-focusable">דלג מיד לסוף הקטע ⏭</button>' +
+            '<button type="button" id="parentalShieldDismissBtn" class="btn-secondary parental-shield-dismiss-btn tv-focusable">בטל טשטוש לקטע זה 👁️</button>' +
+          '</div>' +
         '</div>';
       playerStage.appendChild(pShield);
     }
@@ -16960,6 +17051,20 @@
           '<div class="subs-popover-title">🛡️ בקרת הורים וסינון סצנות (SafeWatch)</div>' +
           '<div id="playerParentalActiveStatus" class="player-parental-status-box">פרופיל פעיל: ראשי</div>' +
           '<div id="playerParentalQuickToggles" class="player-parental-quick-toggles"></div>' +
+          '<div id="playerParentalBlurRow" class="player-parental-blur-row">' +
+            '<div class="player-parental-blur-top">' +
+              '<span class="player-parental-blur-label">עוצמת טשטוש מסך:</span>' +
+              '<strong id="playerParentalBlurBadge" class="player-parental-blur-badge">22px (בינוני)</strong>' +
+            '</div>' +
+            '<div class="player-parental-blur-controls">' +
+              '<button type="button" id="playerParentalBlurMinusBtn" class="subs-chip-btn tv-focusable" aria-label="הפחת טשטוש">−</button>' +
+              '<button type="button" class="subs-chip-btn player-blur-preset-btn tv-focusable" data-blur-px="10">עדין</button>' +
+              '<button type="button" class="subs-chip-btn player-blur-preset-btn active tv-focusable" data-blur-px="22">בינוני</button>' +
+              '<button type="button" class="subs-chip-btn player-blur-preset-btn tv-focusable" data-blur-px="36">חזק</button>' +
+              '<button type="button" class="subs-chip-btn player-blur-preset-btn tv-focusable" data-blur-px="52">מלא</button>' +
+              '<button type="button" id="playerParentalBlurPlusBtn" class="subs-chip-btn tv-focusable" aria-label="הגבר טשטוש">+</button>' +
+            '</div>' +
+          '</div>' +
         '</div>' +
         '<div class="subs-popover-section">' +
           '<div class="subs-popover-title">סימון קטע בזמן אמת (ידני + אוטומטי לעתיד)</div>' +
@@ -17034,6 +17139,37 @@
               '<div class="parental-option-box"><h4 class="parental-option-heading">3. פעולה בזמן סצנה ויזואלית (סקס / אלימות / סמים / אימה):</h4><div class="parental-segmented-row"><button type="button" class="parental-seg-btn active tv-focusable" data-parental-action="skip">⏭ דילוג אוטומטי על הסצנה</button><button type="button" class="parental-seg-btn tv-focusable" data-parental-action="blur_mute">🌫️ טשטוש מסך + השתקת קול</button></div></div>' +
               '<div class="parental-option-box"><h4 class="parental-option-heading">4. פעולה בזמן שפה בוטה וקללות:</h4><div class="parental-segmented-row"><button type="button" class="parental-seg-btn active tv-focusable" data-parental-profanity="mute_censor">🔇 השתקת שמע + צנזור כתוביות (מומלץ)</button><button type="button" class="parental-seg-btn tv-focusable" data-parental-profanity="skip">⏭ דילוג מלא על המשפט</button></div></div>' +
               '<div class="parental-option-box"><h4 class="parental-option-heading">5. רמת רגישות וטווח ביטחון:</h4><div class="parental-segmented-row"><button type="button" class="parental-seg-btn active tv-focusable" data-parental-sensitivity="balanced">⚖️ מאוזן (מדויק לפי הסצנה)</button><button type="button" class="parental-seg-btn tv-focusable" data-parental-sensitivity="strict">🔒 מחמיר (+5 שניות מרווח ביטחון)</button></div></div>' +
+            '</div>' +
+            '<div id="parentalBlurControlBox" class="parental-blur-control-box">' +
+              '<div class="parental-blur-header-row">' +
+                '<div class="parental-blur-title-group">' +
+                  '<h4 class="parental-option-heading">6. עוצמת טשטוש המסך (כאשר נבחר "טשטוש מסך + השתקת קול"):</h4>' +
+                  '<p class="parental-blur-sub">שליטה מדויקת ברמת הטשטוש האופטי של הווידאו בזמן אמת — ללא החשכת המסך לשחור</p>' +
+                '</div>' +
+                '<div class="parental-blur-preview-wrap">' +
+                  '<div class="parental-blur-sample-box" aria-hidden="true">' +
+                    '<div id="parentalBlurPreviewSample" class="parental-blur-sample-inner">' +
+                      '<span class="parental-blur-sample-tag">LIVE</span>' +
+                      '<span class="parental-blur-sample-shape">🎬 STREAM IT</span>' +
+                    '</div>' +
+                    '<span class="parental-blur-sample-caption">הדמיית טשטוש</span>' +
+                  '</div>' +
+                  '<span id="parentalBlurValueBadge" class="parental-blur-value-badge">22px (בינוני)</span>' +
+                '</div>' +
+              '</div>' +
+              '<div class="parental-blur-controls-row">' +
+                '<div class="parental-blur-presets" role="group" aria-label="רמות טשטוש מוכנות">' +
+                  '<button type="button" class="parental-blur-preset-btn tv-focusable" data-blur-preset="10">עדין (10px)</button>' +
+                  '<button type="button" class="parental-blur-preset-btn active tv-focusable" data-blur-preset="22">בינוני (22px)</button>' +
+                  '<button type="button" class="parental-blur-preset-btn tv-focusable" data-blur-preset="36">חזק (36px)</button>' +
+                  '<button type="button" class="parental-blur-preset-btn tv-focusable" data-blur-preset="52">מקסימלי (52px)</button>' +
+                '</div>' +
+                '<div class="parental-blur-slider-wrap">' +
+                  '<button type="button" id="parentalBlurMinusBtn" class="parental-blur-step-btn tv-focusable" aria-label="הפחת עוצמת טשטוש">−</button>' +
+                  '<input type="range" id="parentalBlurRangeInput" class="parental-blur-range-input tv-focusable" min="4" max="60" step="2" value="22" dir="ltr" aria-label="עוצמת טשטוש המסך בפיקסלים" />' +
+                  '<button type="button" id="parentalBlurPlusBtn" class="parental-blur-step-btn tv-focusable" aria-label="הגבר עוצמת טשטוש">+</button>' +
+                '</div>' +
+              '</div>' +
             '</div>' +
             '<div class="parental-pin-setup-bar">' +
               '<div class="parental-pin-setup-info"><strong class="parental-pin-setup-title">🔐 נעילת הגדרות בקוד PIN של המשתמש הראשי:</strong><span class="parental-pin-setup-sub">מנע מתתי-היוזרים והילדים לכבות את הסינון או לעבור לפרופיל מבוגר ללא קוד</span></div>' +

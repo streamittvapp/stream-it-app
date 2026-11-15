@@ -156,6 +156,8 @@
             "actionMode": "blur_mute",
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
+            "blurPx": 22,
+            "updatedAt": 1794773500000,
             "categories": {
               "sex": true,
               "violence": false,
@@ -862,16 +864,7 @@
       },
       "parentalMaster": {
         "pinCode": "",
-        "customSkipSegments": {
-          "tt0411705": [
-            {
-              "start": 18,
-              "end": 50,
-              "category": "sex",
-              "label": "קטע שסומן ע״י המשתמש"
-            }
-          ]
-        }
+        "customSkipSegments": {}
       },
       "subPrefs": {
         "schemaVer": 2,
