@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794777022228,
+      "updatedTs": 1794777223638,
       "subUsersUpdatedAt": 1794774698606,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -307,6 +307,47 @@
                   "דרמה"
                 ],
                 "seasonsCount": 0
+              }
+            },
+            "series-5303": {
+              "id": "series-5303",
+              "imdbId": "tt0092383",
+              "tmdbId": "5303",
+              "title": "סיפורי עמים",
+              "currentTime": 15,
+              "duration": 7200,
+              "percent": 3,
+              "season": 1,
+              "episode": 2,
+              "updatedAt": 1794777223638,
+              "snapshot": {
+                "id": "series-5303",
+                "imdbId": "tt0092383",
+                "tmdbId": "5303",
+                "type": "series",
+                "title": "סיפורי עמים",
+                "originalTitle": "The Storyteller",
+                "year": "1988",
+                "rating": "8.2",
+                "runtimeHe": "45 דק׳ לפרק",
+                "ageRating": "לכל המשפחה (8+)",
+                "overview": "יצור קטן, צרוד וזקן עם עור פנים מחוספס, יושב על כיסא נוח מול האח הבוערת, בעוד כלבו הציני והמרוט שרוע לרגליו, הוא מספר אגדה מופלאה. ביחד השניים חושפים בפנינו את עולמן המופלא של אגדות העם. מספר הסיפורים הוא ג'ון הארט, הכלב הוא קולו של בריאן הנסון והאגדה היא אחת שכבר שמעתם.",
+                "poster": "https://image.tmdb.org/t/p/w500/xmxsuEWhAjHy2GVlOL28KjHXobe.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/celzfQGiEaOLzZaGPYrO3fP2ogX.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/celzfQGiEaOLzZaGPYrO3fP2ogX.jpg",
+                "genres": [
+                  "action",
+                  "animation",
+                  "scifi",
+                  "drama"
+                ],
+                "genresHe": [
+                  "אקשן והרפתקאות",
+                  "אנימציה ומשפחה",
+                  "מדע בדיוני ופנטזיה",
+                  "דרמה"
+                ],
+                "seasonsCount": 1
               }
             }
           },
