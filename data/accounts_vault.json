@@ -983,13 +983,13 @@
     }
   },
   "_system_config": {
-    "updatedTs": 1794779093488,
+    "updatedTs": 1794779206303,
     "features": {
       "top10Shelves": true,
       "strictPosterFilter": true,
       "strictSourcesAndSubs": true,
       "autoCollapseTvRail": true,
-      "parentalSafeWatch": false,
+      "parentalSafeWatch": true,
       "bootLoaderAnim": true,
       "autoResumePlayback": true,
       "crossDeviceCloudSync": true,
