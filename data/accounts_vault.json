@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794771196086,
+      "updatedTs": 1794771201202,
       "subUsersUpdatedAt": 1794694857976,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -154,9 +154,9 @@
             "sensitivity": "balanced",
             "categories": {
               "sex": true,
-              "violence": true,
+              "violence": false,
               "profanity": true,
-              "drugs": true,
+              "drugs": false,
               "horror": false
             }
           }
