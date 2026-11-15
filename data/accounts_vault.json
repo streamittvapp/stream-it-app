@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794778951755,
+      "updatedTs": 1794778957642,
       "subUsersUpdatedAt": 1794778521326,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -329,12 +329,12 @@
               "imdbId": "tt2322441",
               "tmdbId": "216015",
               "title": "חמישים גוונים של אפור",
-              "currentTime": 494,
+              "currentTime": 563,
               "duration": 572,
-              "percent": 86,
+              "percent": 98,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794778951755,
+              "updatedAt": 1794778957642,
               "snapshot": {
                 "id": "movie-216015",
                 "imdbId": "tt2322441",
