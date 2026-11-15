@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794770938868,
+      "updatedTs": 1794770985537,
       "subUsersUpdatedAt": 1794694857976,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -437,43 +437,6 @@
                 "seasonsCount": 0
               }
             },
-            "movie-1290417": {
-              "id": "movie-1290417",
-              "imdbId": "tt32362890",
-              "tmdbId": "1290417",
-              "title": "הפלישה",
-              "currentTime": 3057,
-              "duration": 5168,
-              "percent": 59,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794770898879,
-              "snapshot": {
-                "id": "movie-1290417",
-                "imdbId": "tt32362890",
-                "tmdbId": "1290417",
-                "type": "movie",
-                "title": "הפלישה",
-                "originalTitle": "Thrash",
-                "year": "2026",
-                "rating": "6.1",
-                "runtimeHe": "שעתיים",
-                "ageRating": "16+",
-                "overview": "סופת הוריקן אימתנית מכה בעיירת חוף, והתושבים הלכודים נאלצים להילחם על חייהם אל מול מפלס המים שהולך ועולה – והכרישים הרעבים שפולשים לעיירה.",
-                "poster": "https://image.tmdb.org/t/p/w500/oj6nz6vQ71RLP2lkY3ZMbxWQqJW.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/jlkvoHXKQHsgf15wp1AV1CTk4e7.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/jlkvoHXKQHsgf15wp1AV1CTk4e7.jpg",
-                "genres": [
-                  "thriller",
-                  "horror"
-                ],
-                "genresHe": [
-                  "מותחנים",
-                  "אימה"
-                ],
-                "seasonsCount": 0
-              }
-            },
             "tt32261958": {
               "id": "tt32261958",
               "imdbId": "tt32261958",
@@ -529,6 +492,7 @@
             "693134": 1794686261114,
             "1236045": 1794698939147,
             "1283515": 1794731391181,
+            "1290417": 1794770985537,
             "1339713": 1794432202875,
             "1381078": 1794432225027,
             "1560520": 1794686257036,
@@ -586,7 +550,10 @@
             "series-1283515": 1794731391181,
             "tt0079118": 1794770938868,
             "movie-10580": 1794770938868,
-            "series-10580": 1794770938868
+            "series-10580": 1794770938868,
+            "movie-1290417": 1794770985537,
+            "tt32362890": 1794770985537,
+            "series-1290417": 1794770985537
           },
           "progressClearedAt": 1794432225027
         },
