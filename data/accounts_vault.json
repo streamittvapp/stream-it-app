@@ -764,9 +764,9 @@
       },
       "subPrefs": {
         "schemaVer": 2,
-        "updatedAt": 1794732665651,
+        "updatedAt": 1794732675404,
         "size": "large",
-        "fontPx": 29,
+        "fontPx": 35,
         "color": "white",
         "bg": "none",
         "bottomPct": 7.5
