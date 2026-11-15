@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.9.95';
+  var APP_VERSION = '9.9.96';
 
   function ensureOtaStylesheetInjected() {
     try {
@@ -76,8 +76,10 @@
     window.__STREAMIT_V9992_BOOTED ||
     window.__STREAMIT_V9993_BOOTED ||
     window.__STREAMIT_V9994_BOOTED ||
-    window.__STREAMIT_V9995_BOOTED
+    window.__STREAMIT_V9995_BOOTED ||
+    window.__STREAMIT_V9996_BOOTED
   );
+  window.__STREAMIT_V9996_BOOTED = true;
   window.__STREAMIT_V9995_BOOTED = true;
   window.__STREAMIT_V9994_BOOTED = true;
   window.__STREAMIT_V9993_BOOTED = true;
@@ -125,7 +127,8 @@
   window.__STREAMIT_V968_BOOTED = true;
   window.__STREAMIT_V969_BOOTED = true;
   window.__STREAMIT_V970_BOOTED = true;
-  // Synchronously block any older bundled v9.7.0-v9.9.94 script from firing its DOMContentLoaded boot handler after OTA loads!
+  // Synchronously block any older bundled v9.7.0-v9.9.95 script from firing its DOMContentLoaded boot handler after OTA loads!
+  window.__STREAMIT_V9995_BOOT_DONE = true;
   window.__STREAMIT_V9994_BOOT_DONE = true;
   window.__STREAMIT_V9993_BOOT_DONE = true;
   window.__STREAMIT_V9992_BOOT_DONE = true;
@@ -17583,7 +17586,10 @@
   }
 
   function bootStreamItApp() {
-    if (window.__STREAMIT_V9993_BOOT_DONE) return;
+    if (window.__STREAMIT_V9996_BOOT_DONE) return;
+    window.__STREAMIT_V9996_BOOT_DONE = true;
+    window.__STREAMIT_V9995_BOOT_DONE = true;
+    window.__STREAMIT_V9994_BOOT_DONE = true;
     window.__STREAMIT_V9993_BOOT_DONE = true;
     window.__STREAMIT_V9992_BOOT_DONE = true;
     window.__STREAMIT_V9991_BOOT_DONE = true;

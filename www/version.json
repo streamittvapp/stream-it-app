@@ -1,10 +1,10 @@
 {
-  "version": "9.9.95",
-  "native_apk_version": "9.9.95",
+  "version": "9.9.96",
+  "native_apk_version": "9.9.96",
   "apk_download_url": "https://streamittvapp.github.io/stream-it-app/StreamIt-AndroidTV.apk",
   "apk_short_url": "https://is.gd/streamitapk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-15T22:05:00Z",
-  "notes": "v9.9.94 — Mobile & Web Cloud Stream Vault (data/cloud_streams.json) + iOS ManagedMediaSource + vidlink/vidfast H.264 HLS mobile failover alongside Desktop & Streamer 1080p DASH/HLS."
+  "updated_at": "2026-11-15T22:20:00Z",
+  "notes": "v9.9.96 — Fix 12% boot loader guard (__STREAMIT_V9996_BOOT_DONE) + 100% Pure Cloud architecture (zero local PC server) + Cloud Stream Vault."
 }
