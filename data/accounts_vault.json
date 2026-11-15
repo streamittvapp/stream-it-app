@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794773442245,
+      "updatedTs": 1794773463423,
       "subUsersUpdatedAt": 1794773270494,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -811,6 +811,46 @@
                 "genresHe": [
                   "דרמה",
                   "ביוגרפיה והיסטוריה"
+                ],
+                "seasonsCount": 0
+              }
+            },
+            "tt32261958": {
+              "id": "tt32261958",
+              "imdbId": "tt32261958",
+              "tmdbId": "1283515",
+              "title": "תעתוע",
+              "currentTime": 15,
+              "duration": 7200,
+              "percent": 3,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794773463423,
+              "snapshot": {
+                "id": "tt32261958",
+                "imdbId": "tt32261958",
+                "tmdbId": "1283515",
+                "type": "movie",
+                "title": "תעתוע",
+                "originalTitle": "Verity",
+                "year": "2026",
+                "rating": "7.4",
+                "runtimeHe": "שעה ו-58 דק'",
+                "ageRating": "16+",
+                "overview": "סופרת מתקשה עוברת להתגורר באחוזת קרופורד המבודדת כדי לכתוב בשמה של וריטי. לאחר שלואן מגלה מה שנראה כרשימות אוטוביוגרפיות מצמררות של וריטי, היא מתמודדת עם וידויים מטרידים ומעוותים הנוגעים לבעלה של וריטי, ג'רמי ומתקשה להבחין בין דמיון למציאות, בין מניפולציה למשיכה, ובין הזדמנות לאובססיה.",
+                "poster": "https://image.tmdb.org/t/p/w500/fhkXXgxth4IxoplvQvQZ0BSo3F4.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/original/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
+                "genres": [
+                  "mystery",
+                  "thriller",
+                  "drama",
+                  "telegram"
+                ],
+                "genresHe": [
+                  "מסתורין",
+                  "מותחן",
+                  "דרמה"
                 ],
                 "seasonsCount": 0
               }
