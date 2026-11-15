@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794778866126,
+      "updatedTs": 1794778868860,
       "subUsersUpdatedAt": 1794778521326,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -323,47 +323,6 @@
                 ],
                 "seasonsCount": 0
               }
-            },
-            "series-5303": {
-              "id": "series-5303",
-              "imdbId": "tt0092383",
-              "tmdbId": "5303",
-              "title": "סיפורי עמים",
-              "currentTime": 15,
-              "duration": 7200,
-              "percent": 3,
-              "season": 1,
-              "episode": 2,
-              "updatedAt": 1794777223638,
-              "snapshot": {
-                "id": "series-5303",
-                "imdbId": "tt0092383",
-                "tmdbId": "5303",
-                "type": "series",
-                "title": "סיפורי עמים",
-                "originalTitle": "The Storyteller",
-                "year": "1988",
-                "rating": "8.2",
-                "runtimeHe": "45 דק׳ לפרק",
-                "ageRating": "לכל המשפחה (8+)",
-                "overview": "יצור קטן, צרוד וזקן עם עור פנים מחוספס, יושב על כיסא נוח מול האח הבוערת, בעוד כלבו הציני והמרוט שרוע לרגליו, הוא מספר אגדה מופלאה. ביחד השניים חושפים בפנינו את עולמן המופלא של אגדות העם. מספר הסיפורים הוא ג'ון הארט, הכלב הוא קולו של בריאן הנסון והאגדה היא אחת שכבר שמעתם.",
-                "poster": "https://image.tmdb.org/t/p/w500/xmxsuEWhAjHy2GVlOL28KjHXobe.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/celzfQGiEaOLzZaGPYrO3fP2ogX.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/celzfQGiEaOLzZaGPYrO3fP2ogX.jpg",
-                "genres": [
-                  "action",
-                  "animation",
-                  "scifi",
-                  "drama"
-                ],
-                "genresHe": [
-                  "אקשן והרפתקאות",
-                  "אנימציה ומשפחה",
-                  "מדע בדיוני ופנטזיה",
-                  "דרמה"
-                ],
-                "seasonsCount": 1
-              }
             }
           },
           "watchlistSnapshots": {
@@ -518,6 +477,7 @@
             "1413": 1794686264301,
             "2251": 1794778847466,
             "2875": 1794777022228,
+            "5303": 1794778868860,
             "10580": 1794770938868,
             "15976": 1794778866125,
             "24611": 1794776669508,
@@ -633,7 +593,10 @@
             "series-337167": 1794778850838,
             "movie-15976": 1794778866125,
             "tt0476643": 1794778866125,
-            "series-15976": 1794778866125
+            "series-15976": 1794778866125,
+            "series-5303": 1794778868860,
+            "tt0092383": 1794778868860,
+            "movie-5303": 1794778868860
           },
           "progressClearedAt": 1794432225027
         },
