@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794732654437,
+      "updatedTs": 1794732664195,
       "subUsersUpdatedAt": 1794694857976,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -439,12 +439,12 @@
               "imdbId": "tt32362890",
               "tmdbId": "1290417",
               "title": "הפלישה",
-              "currentTime": 334,
+              "currentTime": 650,
               "duration": 5168,
-              "percent": 6,
+              "percent": 13,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794732654437,
+              "updatedAt": 1794732664195,
               "snapshot": {
                 "id": "movie-1290417",
                 "imdbId": "tt32362890",
@@ -764,9 +764,9 @@
       },
       "subPrefs": {
         "schemaVer": 2,
-        "updatedAt": 1794699365696,
-        "size": "normal",
-        "fontPx": 25,
+        "updatedAt": 1794732665651,
+        "size": "large",
+        "fontPx": 29,
         "color": "white",
         "bg": "none",
         "bottomPct": 7.5
