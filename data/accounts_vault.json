@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794778733725,
+      "updatedTs": 1794778751661,
       "subUsersUpdatedAt": 1794778521326,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -411,12 +411,12 @@
               "imdbId": "tt0250797",
               "tmdbId": "2251",
               "title": "בוגדת",
-              "currentTime": 3275,
+              "currentTime": 3279,
               "duration": 7374,
               "percent": 44,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794778733725,
+              "updatedAt": 1794778751661,
               "snapshot": {
                 "id": "movie-2251",
                 "imdbId": "tt0250797",
