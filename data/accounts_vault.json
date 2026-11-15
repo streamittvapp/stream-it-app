@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794731387347,
+      "updatedTs": 1794731391181,
       "subUsersUpdatedAt": 1794694857976,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -318,80 +318,6 @@
           },
           "watchlistUpdatedAt": 1794685001388,
           "progress": {
-            "1283515": {
-              "id": "1283515",
-              "imdbId": "tt32261958",
-              "tmdbId": "1283515",
-              "title": "תעתוע",
-              "currentTime": 3136,
-              "duration": 7256,
-              "percent": 43,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794434864507,
-              "snapshot": {
-                "id": "1283515",
-                "imdbId": "tt32261958",
-                "tmdbId": "1283515",
-                "type": "movie",
-                "title": "תעתוע",
-                "originalTitle": "Verity",
-                "year": "2026",
-                "rating": "7.0",
-                "runtimeHe": "שעתיים",
-                "ageRating": "14+",
-                "overview": "סופרת מתקשה עוברת להתגורר באחוזת קרופורד המבודדת כדי לכתוב בשמה של וריטי. לאחר שלואן מגלה מה שנראה כרשימות אוטוביוגרפיות מצמררות של וריטי, היא מתמודדת עם וידויים מטרידים ומעוותים הנוגעים לבעלה של וריטי, ג'רמי ומתקשה להבחין בין דמיון למציאות, בין מניפולציה למשיכה, ובין הזדמנות לאובססיה.",
-                "poster": "https://image.tmdb.org/t/p/w500/fhkXXgxth4IxoplvQvQZ0BSo3F4.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
-                "genres": [
-                  "mystery",
-                  "thriller"
-                ],
-                "genresHe": [
-                  "מסתורין ובלשי",
-                  "מותחנים"
-                ],
-                "seasonsCount": 0
-              }
-            },
-            "movie-1283515": {
-              "id": "movie-1283515",
-              "imdbId": "tt32261958",
-              "tmdbId": "1283515",
-              "title": "תעתוע",
-              "currentTime": 3042,
-              "duration": 6668,
-              "percent": 46,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794731387347,
-              "snapshot": {
-                "id": "movie-1283515",
-                "imdbId": "tt32261958",
-                "tmdbId": "1283515",
-                "type": "movie",
-                "title": "תעתוע",
-                "originalTitle": "Verity",
-                "year": "2026",
-                "rating": "7.0",
-                "runtimeHe": "שעתיים",
-                "ageRating": "14+",
-                "overview": "סופרת מתקשה עוברת להתגורר באחוזת קרופורד המבודדת כדי לכתוב בשמה של וריטי. לאחר שלואן מגלה מה שנראה כרשימות אוטוביוגרפיות מצמררות של וריטי, היא מתמודדת עם וידויים מטרידים ומעוותים הנוגעים לבעלה של וריטי, ג'רמי ומתקשה להבחין בין דמיון למציאות, בין מניפולציה למשיכה, ובין הזדמנות לאובססיה.",
-                "poster": "https://image.tmdb.org/t/p/w500/fhkXXgxth4IxoplvQvQZ0BSo3F4.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
-                "genres": [
-                  "mystery",
-                  "thriller"
-                ],
-                "genresHe": [
-                  "מסתורין ובלשי",
-                  "מותחנים"
-                ],
-                "seasonsCount": 0
-              }
-            },
             "tt15398776": {
               "id": "tt15398776",
               "imdbId": "tt15398776",
@@ -523,7 +449,7 @@
             "533535": 1794686262083,
             "693134": 1794686261114,
             "1236045": 1794698939147,
-            "1283515": 1794432225027,
+            "1283515": 1794731391181,
             "1339713": 1794432202875,
             "1381078": 1794432225027,
             "1560520": 1794686257036,
@@ -578,7 +504,10 @@
             "series-293660": 1794698940065,
             "tt11280740": 1794698940923,
             "movie-95396": 1794698940923,
-            "series-95396": 1794698940923
+            "series-95396": 1794698940923,
+            "movie-1283515": 1794731391181,
+            "tt32261958": 1794731391181,
+            "series-1283515": 1794731391181
           },
           "progressClearedAt": 1794432225027
         },
