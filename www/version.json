@@ -1,10 +1,10 @@
 {
-  "version": "9.9.8",
+  "version": "9.9.9",
   "native_apk_version": "9.8.8",
   "apk_download_url": "https://streamittvapp.github.io/stream-it-app/StreamIt-AndroidTV.apk",
   "apk_short_url": "https://is.gd/streamitapk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-15T09:50:00Z",
-  "notes": "v9.9.8 — 1080p Full HD (w7dn 1920x1080) direct stream lock on both physical Streamer APK & Desktop, 100% automatic Israeli Hebrew subtitles via rest.opensubtitles.org + Windows-1255/UTF-8 decoder, and strict blockbuster-first Home catalog."
+  "updated_at": "2026-11-15T10:39:00Z",
+  "notes": "v9.9.9 — Guaranteed Cross-Platform OTA CSS + JS Sync on Physical Streamer APK, Desktop, Web & Mobile; 1080p Full HD (w7dn 1920x1080) direct stream lock; 100% automatic Israeli Hebrew subtitles via rest.opensubtitles.org + Windows-1255/UTF-8 decoder."
 }

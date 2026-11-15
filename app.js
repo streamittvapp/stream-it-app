@@ -10,7 +10,41 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.9.8';
+  var APP_VERSION = '9.9.9';
+
+  function ensureOtaStylesheetInjected() {
+    try {
+      if (typeof document === 'undefined' || !document.head) return;
+      var cachedOtaCss = '';
+      try {
+        cachedOtaCss = localStorage.getItem('streamit_ota_css_v9') || '';
+      } catch (eCssRead) {}
+      if (cachedOtaCss && cachedOtaCss.length > 200) {
+        var otaStyleEl = document.getElementById('streamit-ota-css');
+        if (!otaStyleEl) {
+          otaStyleEl = document.createElement('style');
+          otaStyleEl.id = 'streamit-ota-css';
+          document.head.appendChild(otaStyleEl);
+        }
+        if (otaStyleEl.textContent !== cachedOtaCss) {
+          otaStyleEl.textContent = cachedOtaCss;
+        }
+      }
+      var isOtaOrNative = Boolean(
+        window.__STREAMIT_OTA_INJECTED_RUNNING ||
+        (window.AndroidTvBridge && typeof window.AndroidTvBridge.isAndroidTv === 'function') ||
+        window.Capacitor
+      );
+      if (isOtaOrNative && !document.getElementById('streamit-ota-css-link')) {
+        var otaLink = document.createElement('link');
+        otaLink.id = 'streamit-ota-css-link';
+        otaLink.rel = 'stylesheet';
+        otaLink.href = 'https://streamittvapp.github.io/stream-it-app/styles.css?v=' + APP_VERSION;
+        document.head.appendChild(otaLink);
+      }
+    } catch (eOtaCss) {}
+  }
+  ensureOtaStylesheetInjected();
 
   // If a strictly newer OTA script is stored in localStorage and index.html is about to inject it,
   // skip running this older bundled script completely so two versions of app.js NEVER run in parallel!
@@ -36,8 +70,10 @@
     window.__STREAMIT_V995_BOOTED ||
     window.__STREAMIT_V996_BOOTED ||
     window.__STREAMIT_V997_BOOTED ||
-    window.__STREAMIT_V998_BOOTED
+    window.__STREAMIT_V998_BOOTED ||
+    window.__STREAMIT_V999_BOOTED
   );
+  window.__STREAMIT_V999_BOOTED = true;
   window.__STREAMIT_V998_BOOTED = true;
   window.__STREAMIT_V997_BOOTED = true;
   window.__STREAMIT_V996_BOOTED = true;
@@ -79,7 +115,10 @@
   window.__STREAMIT_V968_BOOTED = true;
   window.__STREAMIT_V969_BOOTED = true;
   window.__STREAMIT_V970_BOOTED = true;
-  // Synchronously block any older bundled v9.7.0-v9.9.5 script from firing its DOMContentLoaded boot handler after OTA loads!
+  // Synchronously block any older bundled v9.7.0-v9.9.8 script from firing its DOMContentLoaded boot handler after OTA loads!
+  window.__STREAMIT_V998_BOOT_DONE = true;
+  window.__STREAMIT_V997_BOOT_DONE = true;
+  window.__STREAMIT_V996_BOOT_DONE = true;
   window.__STREAMIT_V995_BOOT_DONE = true;
   window.__STREAMIT_V994_BOOT_DONE = true;
   window.__STREAMIT_V993_BOOT_DONE = true;
@@ -1720,6 +1759,7 @@
 
   function hasLocalBackend() {
     if (window.AndroidTvBridge && typeof window.AndroidTvBridge.isAndroidTv === 'function') return true;
+    if ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port === '8092') return true;
     return Boolean(state.pythonApiConfirmed);
   }
 
@@ -4509,8 +4549,11 @@
 
       var cachedVer = localStorage.getItem('streamit_ota_version_v9') || APP_VERSION;
       var cachedJsCheck = localStorage.getItem('streamit_ota_app_js_v9') || '';
+      var cachedCssCheck = localStorage.getItem('streamit_ota_css_v9') || '';
+      ensureOtaStylesheetInjected();
       var needsOtaWrite = (verObj.version !== cachedVer && verObj.version >= APP_VERSION) ||
-        (verObj.version > APP_VERSION && cachedJsCheck.length < 2000);
+        (verObj.version > APP_VERSION && cachedJsCheck.length < 2000) ||
+        (verObj.version >= APP_VERSION && cachedCssCheck.length < 200);
       if (needsOtaWrite) {
         var cssTxt = await fetchCloudKey('css');
         var navTxt = await fetchCloudKey('nav');
@@ -4520,7 +4563,11 @@
             var keysToPurge = [];
             for (var ki = 0; ki < localStorage.length; ki++) {
               var kName = localStorage.key(ki);
-              if (kName && kName.indexOf('streamit_enriched_catalog_cache_') === 0) {
+              if (kName && (
+                kName.indexOf('streamit_enriched_catalog_cache_') === 0 ||
+                kName.indexOf('streamit_catalog_cache_') === 0 ||
+                kName.indexOf('streamit_tmdb_he_cache_') === 0
+              )) {
                 keysToPurge.push(kName);
               }
             }
@@ -4530,21 +4577,6 @@
           } catch (eClean) {}
         };
         freeOtaQuotaSpace();
-        if (cssTxt && cssTxt.length > 200) {
-          try {
-            localStorage.removeItem('streamit_ota_css_v9');
-            localStorage.setItem('streamit_ota_css_v9', cssTxt);
-          } catch (eQuota1) {
-            try { freeOtaQuotaSpace(); localStorage.setItem('streamit_ota_css_v9', cssTxt); } catch (e2) {}
-          }
-          var otaStyle = document.getElementById('streamit-ota-css');
-          if (!otaStyle) {
-            otaStyle = document.createElement('style');
-            otaStyle.id = 'streamit-ota-css';
-            document.head.appendChild(otaStyle);
-          }
-          otaStyle.textContent = cssTxt;
-        }
         var navSaved = false;
         if (navTxt && navTxt.length > 500) {
           try {
@@ -4564,6 +4596,21 @@
           } catch (eQuota3) {
             try { freeOtaQuotaSpace(); localStorage.setItem('streamit_ota_app_js_v9', jsTxt); jsSaved = true; } catch (e4) {}
           }
+        }
+        if (cssTxt && cssTxt.length > 200) {
+          try {
+            localStorage.removeItem('streamit_ota_css_v9');
+            localStorage.setItem('streamit_ota_css_v9', cssTxt);
+          } catch (eQuota1) {
+            try { freeOtaQuotaSpace(); localStorage.setItem('streamit_ota_css_v9', cssTxt); } catch (e2) {}
+          }
+          var otaStyle = document.getElementById('streamit-ota-css');
+          if (!otaStyle) {
+            otaStyle = document.createElement('style');
+            otaStyle.id = 'streamit-ota-css';
+            document.head.appendChild(otaStyle);
+          }
+          otaStyle.textContent = cssTxt;
         }
         if (jsSaved && navSaved) {
           try {
@@ -8586,17 +8633,15 @@
       return;
     }
 
-    // 7. Try Native 1080p Direct HLS Stream (Plyr.io + HLS.js) with a fast 2.8s non-blocking timeout
-    if (hasLocalBackend()) {
-      var resolvedM3u8 = await resolveDirect1080pHlsUrl(item, imdbId, state.activeSeason, state.activeEpisode);
-      if (!isPlaybackSessionActive(mySessionId)) {
-        stopCurrentMedia();
-        return;
-      }
-      if (resolvedM3u8) {
-        playDirectHlsOrMp4(resolvedM3u8, startOffsetSec, null, mySessionId);
-        return;
-      }
+    // 7. Try Native 1080p Direct HLS Stream (Plyr.io + HLS.js) — always probe/resolve on Desktop & Streamer
+    var resolvedM3u8 = await resolveDirect1080pHlsUrl(item, imdbId, state.activeSeason, state.activeEpisode);
+    if (!isPlaybackSessionActive(mySessionId)) {
+      stopCurrentMedia();
+      return;
+    }
+    if (resolvedM3u8) {
+      playDirectHlsOrMp4(resolvedM3u8, startOffsetSec, null, mySessionId);
+      return;
     }
 
     // 8. Instant Cloud Streaming on ANY computer / Smart TV in the world (Zero local server dependency!)
@@ -8723,6 +8768,9 @@
   async function resolveDirect1080pHlsUrl(item, imdbId, season, episode) {
     if (!hasLocalBackend()) {
       await probeLocalPythonBackend();
+    }
+    if (!hasLocalBackend()) {
+      return null;
     }
     var apiBase = getApiBase();
     var mediaType = item.type === 'series' ? 'series' : 'movie';
@@ -9244,9 +9292,9 @@
     var queryStr = '?' + baseParams;
     if (state.embedActiveServerKey === 'embed2') {
       if (item.type === 'series') {
-        embedUrl = 'https://vidsrc.pm/tv/' + encodeURIComponent(mediaId) + '/' + (season || 1) + '/' + (episode || 1) + queryStr;
+        embedUrl = 'https://vidlink.pro/tv/' + encodeURIComponent(tmdbId || mediaId) + '/' + (season || 1) + '/' + (episode || 1) + '?autoplay=true&sub=off&ds_lang=off';
       } else {
-        embedUrl = 'https://vidsrc.pm/movie/' + encodeURIComponent(mediaId) + queryStr;
+        embedUrl = 'https://vidlink.pro/movie/' + encodeURIComponent(tmdbId || mediaId) + '?autoplay=true&sub=off&ds_lang=off';
       }
     } else if (state.embedActiveServerKey === 'swarm') {
       if (item.type === 'series') {
@@ -9270,7 +9318,7 @@
 
     state.embedResumeSeekDone = !(state.embedStartOffsetSec > 15);
     state.lastEmbedPostMsgTimeAt = 0;
-    var startVisible = (state.embedActiveServerKey === 'swarm');
+    var startVisible = (state.embedActiveServerKey === 'swarm' || state.embedActiveServerKey === 'embed2');
 
     embedContainer.innerHTML =
       '<iframe id="streamEmbedIframe" tabindex="-1" src="' + escapeHtml(embedUrl) + '" ' +
@@ -9321,6 +9369,12 @@
         if (!isPlaybackSessionActive(activeSession)) {
           stopCurrentMedia();
           return;
+        }
+        if (state.embedActiveServerKey === 'embed2' || state.embedActiveServerKey === 'swarm') {
+          state.embedVerified = true;
+          syncPlayerModalStateClasses();
+          iframe.style.opacity = '1';
+          if (spinner) spinner.classList.add('hidden');
         }
         try {
           if (iframe.contentWindow) {
@@ -16767,7 +16821,8 @@
   }
 
   function bootStreamItApp() {
-    if (window.__STREAMIT_V998_BOOT_DONE) return;
+    if (window.__STREAMIT_V999_BOOT_DONE) return;
+    window.__STREAMIT_V999_BOOT_DONE = true;
     window.__STREAMIT_V998_BOOT_DONE = true;
     window.__STREAMIT_V997_BOOT_DONE = true;
     window.__STREAMIT_V996_BOOT_DONE = true;
@@ -16783,6 +16838,7 @@
     window.__STREAMIT_V986_BOOT_DONE = true;
     window.__STREAMIT_V985_BOOT_DONE = true;
     window.__STREAMIT_V970_BOOT_DONE = true;
+    ensureOtaStylesheetInjected();
 
     // If an older bundled APK script ran 1ms earlier, strip its stale DOM listeners via cloneNode(true)
     if (wasLegacyBooted) {
