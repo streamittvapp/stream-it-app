@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794772450685,
+      "updatedTs": 1794772469042,
       "subUsersUpdatedAt": 1794772301939,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -224,12 +224,12 @@
               "imdbId": "tt17526714",
               "tmdbId": "933260",
               "title": "יופי מסוכן",
-              "currentTime": 1475,
+              "currentTime": 1330,
               "duration": 8466,
-              "percent": 17,
+              "percent": 16,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794772450685,
+              "updatedAt": 1794772469042,
               "snapshot": {
                 "id": "tt17526714",
                 "imdbId": "tt17526714",
