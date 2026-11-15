@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794778521326,
+      "updatedTs": 1794778542291,
       "subUsersUpdatedAt": 1794778521326,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -363,6 +363,47 @@
                   "דרמה"
                 ],
                 "seasonsCount": 1
+              }
+            },
+            "movie-15976": {
+              "id": "movie-15976",
+              "imdbId": "tt0476643",
+              "tmdbId": "15976",
+              "title": "הבועה",
+              "currentTime": 475,
+              "duration": 5400,
+              "percent": 9,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794778542291,
+              "snapshot": {
+                "id": "movie-15976",
+                "imdbId": "tt0476643",
+                "tmdbId": "15976",
+                "type": "movie",
+                "title": "הבועה",
+                "originalTitle": "הבועה",
+                "year": "2006",
+                "rating": "6.3",
+                "runtimeHe": "שעתיים",
+                "ageRating": "12+",
+                "overview": "חייהם של שלושה שותפים טיפוסיים לדירה בלב העיר - נועם מוכר דיסקים בחנות האוזן השלישית, לולו מוכרת ב-\"סבון של פעם\" ויהלי מנהל משמרת בבית הקפה \"אורנה ואלה\", משתנים כאשר מגיע לתל אביב אשרף, צעיר פלסטיני שנועם פגש בעת שרות מילואים בגדה המערבית.",
+                "poster": "https://image.tmdb.org/t/p/w500/9FE0HLzHciE8m5hUhOOOHer1djd.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/n2lMQH3x1cwzJmgfC5S0Jksg4AH.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/n2lMQH3x1cwzJmgfC5S0Jksg4AH.jpg",
+                "genres": [
+                  "drama",
+                  "romance",
+                  "comedy",
+                  "israeli"
+                ],
+                "genresHe": [
+                  "דרמה",
+                  "רומנטיקה",
+                  "קומדיה",
+                  "יצירה ישראלית"
+                ],
+                "seasonsCount": 0
               }
             }
           },
