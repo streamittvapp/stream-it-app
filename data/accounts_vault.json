@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794777020516,
+      "updatedTs": 1794777022228,
       "subUsersUpdatedAt": 1794774698606,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -308,47 +308,6 @@
                 ],
                 "seasonsCount": 0
               }
-            },
-            "series-2875": {
-              "id": "series-2875",
-              "imdbId": "tt0088559",
-              "tmdbId": "2875",
-              "title": "מקגייוור",
-              "currentTime": 772,
-              "duration": 2493,
-              "percent": 31,
-              "season": 1,
-              "episode": 4,
-              "updatedAt": 1794777020516,
-              "snapshot": {
-                "id": "series-2875",
-                "imdbId": "tt0088559",
-                "tmdbId": "2875",
-                "type": "series",
-                "title": "מקגייוור",
-                "originalTitle": "MacGyver",
-                "year": "1985",
-                "rating": "7.7",
-                "runtimeHe": "45 דק׳ לפרק",
-                "ageRating": "16+",
-                "overview": "סוכן חשאי שמועסק ע\"י ארגון \"הפניקס\" שמקבל את משימותיו מהממשל. מקגיוור פועל ללא נשק חם, אבל בעת שמתעוררות בעיות הוא מסוגל להתגבר עליהם באמצעות אמצעים שונים הנמצאים \"תחת ידו\".",
-                "poster": "https://image.tmdb.org/t/p/w500/zhgJNHbFxGkqdsKdkZLBrDWagOv.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/dW58Jn2Fi29P5tC0oSJ6YWhiV9E.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/dW58Jn2Fi29P5tC0oSJ6YWhiV9E.jpg",
-                "genres": [
-                  "drama",
-                  "action",
-                  "crime",
-                  "thriller"
-                ],
-                "genresHe": [
-                  "דרמה",
-                  "אקשן והרפתקאות",
-                  "מתח ופשע",
-                  "מותחנים"
-                ],
-                "seasonsCount": 7
-              }
             }
           },
           "watchlistSnapshots": {
@@ -501,6 +460,7 @@
             "1396": 1794686263135,
             "1399": 1794776544169,
             "1413": 1794686264301,
+            "2875": 1794777022228,
             "10580": 1794770938868,
             "24611": 1794776669508,
             "69557": 1794698934882,
@@ -602,7 +562,10 @@
             "series-24611": 1794776669508,
             "series-226637": 1794776887772,
             "tt22091076": 1794776887772,
-            "movie-226637": 1794776887772
+            "movie-226637": 1794776887772,
+            "series-2875": 1794777022228,
+            "tt0088559": 1794777022228,
+            "movie-2875": 1794777022228
           },
           "progressClearedAt": 1794432225027
         },
