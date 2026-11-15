@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794774400348,
+      "updatedTs": 1794774666630,
       "subUsersUpdatedAt": 1794773270494,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -143,7 +143,7 @@
         "prof-1794772225879": 1794772301090,
         "prof-1794772238633": 1794772301939
       },
-      "activeSubUserId": "prof-1794773270494",
+      "activeSubUserId": "prof-main",
       "subUsers": [
         {
           "id": "prof-main",
