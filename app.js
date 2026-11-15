@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.9.9';
+  var APP_VERSION = '9.9.91';
 
   function ensureOtaStylesheetInjected() {
     try {
@@ -71,8 +71,10 @@
     window.__STREAMIT_V996_BOOTED ||
     window.__STREAMIT_V997_BOOTED ||
     window.__STREAMIT_V998_BOOTED ||
-    window.__STREAMIT_V999_BOOTED
+    window.__STREAMIT_V999_BOOTED ||
+    window.__STREAMIT_V9991_BOOTED
   );
+  window.__STREAMIT_V9991_BOOTED = true;
   window.__STREAMIT_V999_BOOTED = true;
   window.__STREAMIT_V998_BOOTED = true;
   window.__STREAMIT_V997_BOOTED = true;
@@ -115,7 +117,8 @@
   window.__STREAMIT_V968_BOOTED = true;
   window.__STREAMIT_V969_BOOTED = true;
   window.__STREAMIT_V970_BOOTED = true;
-  // Synchronously block any older bundled v9.7.0-v9.9.8 script from firing its DOMContentLoaded boot handler after OTA loads!
+  // Synchronously block any older bundled v9.7.0-v9.9.9 script from firing its DOMContentLoaded boot handler after OTA loads!
+  window.__STREAMIT_V999_BOOT_DONE = true;
   window.__STREAMIT_V998_BOOT_DONE = true;
   window.__STREAMIT_V997_BOOT_DONE = true;
   window.__STREAMIT_V996_BOOT_DONE = true;
@@ -2975,25 +2978,14 @@
     }
     if (!year) year = type === 'channel' ? 'LIVE' : '2025';
 
-    // Strict Readiness Check #1b: Reject unreleased future theatrical stubs (e.g. TMDB 1568027 "קופה ראשית: הסרט" 2026-06-17, Avengers Doomsday, Sunrise on the Reaping)
-    // and raw TMDB discovery items with low vote counts that do not yet exist on any VOD streaming server
+    // Strict Readiness Check #1b: Reject ONLY unreleased 0-vote theatrical stubs (e.g. TMDB 1568027 "קופה ראשית: הסרט", Avengers Doomsday, Sunrise on the Reaping)
+    // Never reject released 2026 titles (such as "תעתוע" / Verity TMDB 1283515) or Israeli/Viva titles!
     var hasDirectCustomStream = Boolean(raw.stream_url || raw.streamUrl || raw.hls_url || raw.directUrl || raw.direct_yt_id || raw.directYtId || raw.videoId);
     if (type !== 'channel' && type !== 'youtube' && !hasDirectCustomStream && !isYtsItem && !isTelegramItem) {
       if (tmdbId === '1568027' || tmdbId === '851725' || tmdbId === '1003596' || tmdbId === '1336368') {
         return null;
       }
-      if (rawRelDateStr && rawRelDateStr > '2026-07-15') {
-        return null;
-      }
-      if (raw.vote_count !== undefined) {
-        var vcNum = Number(raw.vote_count) || 0;
-        if (vcNum < 45) {
-          return null;
-        }
-        if ((year === '2026' || (rawRelDateStr && rawRelDateStr >= '2026-01-01')) && vcNum < 350) {
-          return null;
-        }
-      } else if (year === '2026' && !raw.imdbId && !raw.imdb_id) {
+      if (raw.vote_count !== undefined && Number(raw.vote_count) === 0 && Number(year) >= 2026) {
         return null;
       }
     }
@@ -3495,7 +3487,8 @@
       localStorage.removeItem('streamit_enriched_catalog_cache_v986');
       localStorage.removeItem('streamit_enriched_catalog_cache_v987');
       localStorage.removeItem('streamit_enriched_catalog_cache_v991');
-      var cachedRaw = localStorage.getItem('streamit_enriched_catalog_cache_v998');
+      localStorage.removeItem('streamit_enriched_catalog_cache_v998');
+      var cachedRaw = localStorage.getItem('streamit_enriched_catalog_cache_v9991');
       if (cachedRaw) {
         var cachedObj = JSON.parse(cachedRaw);
         var heRe = /[\u0590-\u05FF]/;
@@ -3645,7 +3638,8 @@
         try {
           localStorage.removeItem('streamit_enriched_catalog_cache_v986');
           localStorage.removeItem('streamit_enriched_catalog_cache_v991');
-          localStorage.setItem('streamit_enriched_catalog_cache_v998', JSON.stringify({
+          localStorage.removeItem('streamit_enriched_catalog_cache_v998');
+          localStorage.setItem('streamit_enriched_catalog_cache_v9991', JSON.stringify({
             ts: Date.now(),
             movies: (state.catalog.movies || []).slice(0, isTvCache ? 140 : 280),
             series: (state.catalog.series || []).slice(0, isTvCache ? 90 : 180)
@@ -8811,7 +8805,7 @@
       '&expected_title=' + encodeURIComponent(expectedTitle) +
       '&expected_year=' + encodeURIComponent(expectedYear);
 
-    var candidateCalls = tmdbId ? [w7dnPriorityUrl, directEndpointUrl] : [directEndpointUrl];
+    var candidateCalls = tmdbId ? [w7dnPriorityUrl, w7dnPriorityUrl, directEndpointUrl] : [directEndpointUrl];
     for (var attempt = 0; attempt < candidateCalls.length; attempt++) {
       try {
         var ctrl = new AbortController();
@@ -8851,6 +8845,88 @@
       } catch (e) {}
     }
     return '';
+  }
+
+  function createStreamItCleanHlsLoader() {
+    if (!window.Hls || !window.Hls.DefaultConfig || !window.Hls.DefaultConfig.loader) return undefined;
+    var BaseLoader = window.Hls.DefaultConfig.loader;
+    function StreamItHlsLoader(config) {
+      this.base = new BaseLoader(config);
+      this.context = this.base.context;
+      this.stats = this.base.stats;
+    }
+    StreamItHlsLoader.prototype.destroy = function () {
+      if (this.base && this.base.destroy) this.base.destroy();
+    };
+    StreamItHlsLoader.prototype.abort = function () {
+      if (this.base && this.base.abort) this.base.abort();
+    };
+    StreamItHlsLoader.prototype.getCacheAge = function () {
+      return (this.base && typeof this.base.getCacheAge === 'function') ? this.base.getCacheAge() : null;
+    };
+    StreamItHlsLoader.prototype.getResponseHeader = function (name) {
+      return (this.base && typeof this.base.getResponseHeader === 'function') ? this.base.getResponseHeader(name) : null;
+    };
+    StreamItHlsLoader.prototype.load = function (context, config, callbacks) {
+      var self = this;
+      var origOnSuccess = callbacks.onSuccess;
+      var wrappedCallbacks = {};
+      for (var k in callbacks) {
+        if (Object.prototype.hasOwnProperty.call(callbacks, k)) {
+          wrappedCallbacks[k] = callbacks[k];
+        }
+      }
+      wrappedCallbacks.onSuccess = function (response, stats, ctx, networkDetails) {
+        try {
+          self.context = self.base.context;
+          self.stats = self.base.stats;
+          if (response && response.data) {
+            if (typeof response.data === 'string' && response.data.indexOf('#EXTM3U') !== -1) {
+              var m3u8Lines = response.data.split(/\r?\n/);
+              var cleanLines = [];
+              for (var li = 0; li < m3u8Lines.length; li++) {
+                var ln = m3u8Lines[li];
+                var up = ln.trim().toUpperCase();
+                if (up.indexOf('#EXT-X-MEDIA:') === 0 && (up.indexOf('TYPE=SUBTITLES') !== -1 || up.indexOf('TYPE=CLOSED-CAPTIONS') !== -1)) {
+                  continue;
+                }
+                ln = ln.replace(/,SUBTITLES="[^"]*"/gi, '').replace(/,CLOSED-CAPTIONS="[^"]*"/gi, '');
+                if (up.indexOf('#EXT-X-STREAM-INF:') === 0 && up.indexOf('RESOLUTION=') === -1) {
+                  var mRes = ln.match(/NAME="(\d{3,4})p"/i);
+                  if (mRes) {
+                    var hVal = parseInt(mRes[1], 10) || 0;
+                    if (hVal > 0) {
+                      var wVal = Math.round((hVal * 16 / 9) / 2) * 2;
+                      ln += ',RESOLUTION=' + wVal + 'x' + hVal;
+                    }
+                  }
+                }
+                cleanLines.push(ln);
+              }
+              response.data = cleanLines.join('\n');
+            } else if (response.data instanceof ArrayBuffer) {
+              var u8 = new Uint8Array(response.data);
+              // Strip 64-byte PNG disguise header (\x89PNG... before byte 64 0x47 MPEG-TS sync byte) on w7dn 1080p segments
+              if (u8.length > 64 && u8[0] === 0x89 && u8[1] === 0x50 && u8[2] === 0x4E && u8[3] === 0x47 && u8[64] === 0x47) {
+                response.data = response.data.slice(64);
+              } else if (u8.length > 256 && u8[0] !== 0x47) {
+                for (var sOff = 1; sOff <= 128 && sOff + 188 < u8.length; sOff++) {
+                  if (u8[sOff] === 0x47 && u8[sOff + 188] === 0x47) {
+                    response.data = response.data.slice(sOff);
+                    break;
+                  }
+                }
+              }
+            }
+          }
+        } catch (eCleanHls) {}
+        origOnSuccess(response, stats, ctx, networkDetails);
+      };
+      this.base.load(context, config, wrappedCallbacks);
+      this.context = this.base.context;
+      this.stats = this.base.stats;
+    };
+    return StreamItHlsLoader;
   }
 
   function disableAllNativeVideoTextTracks(video) {
@@ -9084,7 +9160,8 @@
     }
 
     if ((streamUrl.indexOf('.m3u8') !== -1 || streamUrl.indexOf('/api/hls-proxy') !== -1) && window.Hls && window.Hls.isSupported()) {
-      var hls = new window.Hls({
+      var customHlsLoader = createStreamItCleanHlsLoader();
+      var hlsCfg = {
         maxBufferLength: 30,
         maxMaxBufferLength: 60,
         liveSyncDurationCount: 3,
@@ -9097,7 +9174,11 @@
         enableIMSC1: false,
         enableCEA708Captions: false,
         subtitleDisplay: false
-      });
+      };
+      if (customHlsLoader) {
+        hlsCfg.loader = customHlsLoader;
+      }
+      var hls = new window.Hls(hlsCfg);
       state.hlsInstance = hls;
       window.__streamItActiveHls = hls;
       hls.loadSource(streamUrl);
@@ -16821,7 +16902,8 @@
   }
 
   function bootStreamItApp() {
-    if (window.__STREAMIT_V999_BOOT_DONE) return;
+    if (window.__STREAMIT_V9991_BOOT_DONE) return;
+    window.__STREAMIT_V9991_BOOT_DONE = true;
     window.__STREAMIT_V999_BOOT_DONE = true;
     window.__STREAMIT_V998_BOOT_DONE = true;
     window.__STREAMIT_V997_BOOT_DONE = true;

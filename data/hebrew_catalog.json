@@ -47,6 +47,45 @@
   ],
   "movies": [
     {
+      "id": "tt32261958",
+      "imdb_id": "tt32261958",
+      "tmdb_id": 1283515,
+      "type": "movie",
+      "title_he": "תעתוע",
+      "title_en": "Verity",
+      "year": 2026,
+      "imdb_rating": 7.4,
+      "age_rating": "16+",
+      "runtime_he": "שעה ו-58 דק'",
+      "quality": "4K UHD",
+      "audio": "Dolby Atmos",
+      "seeders": 1420,
+      "top10_rank": 1,
+      "featured_hero": true,
+      "director_he": "מייקל שואוולטר",
+      "cast_he": "אן האת'וויי, דקוטה ג'ונסון, ג'וש הארטנט",
+      "genres": [
+        "mystery",
+        "thriller",
+        "drama"
+      ],
+      "genres_he": [
+        "מסתורין",
+        "מותחן",
+        "דרמה"
+      ],
+      "overview_he": "סופרת מתקשה עוברת להתגורר באחוזת קרופורד המבודדת כדי לכתוב בשמה של וריטי. לאחר שלואן מגלה מה שנראה כרשימות אוטוביוגרפיות מצמררות של וריטי, היא מתמודדת עם וידויים מטרידים ומעוותים הנוגעים לבעלה של וריטי, ג'רמי ומתקשה להבחין בין דמיון למציאות, בין מניפולציה למשיכה, ובין הזדמנות לאובססיה.",
+      "poster": "https://image.tmdb.org/t/p/w500/fhkXXgxth4IxoplvQvQZ0BSo3F4.jpg",
+      "backdrop": "https://image.tmdb.org/t/p/original/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
+      "gallery": [
+        "https://image.tmdb.org/t/p/w780/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
+        "https://image.tmdb.org/t/p/w500/fhkXXgxth4IxoplvQvQZ0BSo3F4.jpg"
+      ],
+      "default_release": "Verity.2026.1080p.AMZN.WEB-DL.DDP5.1.Atmos.H.264-BYNDR",
+      "fps": 23.976,
+      "original_language": "en"
+    },
+    {
       "id": "tt15239678",
       "imdb_id": "tt15239678",
       "tmdb_id": 693134,

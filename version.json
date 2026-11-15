@@ -1,10 +1,10 @@
 {
-  "version": "9.9.9",
+  "version": "9.9.91",
   "native_apk_version": "9.9.9",
   "apk_download_url": "https://streamittvapp.github.io/stream-it-app/StreamIt-AndroidTV.apk",
   "apk_short_url": "https://is.gd/streamitapk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-15T10:39:00Z",
-  "notes": "v9.9.9 — Guaranteed Cross-Platform OTA CSS + JS Sync on Physical Streamer APK, Desktop, Web & Mobile; 1080p Full HD (w7dn 1920x1080) direct stream lock; 100% automatic Israeli Hebrew subtitles via rest.opensubtitles.org + Windows-1255/UTF-8 decoder."
+  "updated_at": "2026-11-15T11:11:00Z",
+  "notes": "v9.9.91 — Strip 64-byte PNG header & subtitle tracks directly inside HLS.js loader so 1080p w7dn plays natively on Streamer APK without falling back to VidSpark iframe (0 built-in subtitles), and restore all 2026 movies including Verity (תעתוע)."
 }
