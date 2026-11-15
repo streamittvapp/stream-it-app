@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794778788996,
+      "updatedTs": 1794778807832,
       "subUsersUpdatedAt": 1794778521326,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -450,12 +450,12 @@
               "imdbId": "tt4477536",
               "tmdbId": "337167",
               "title": "חמישים גוונים של שחרור",
-              "currentTime": 70,
+              "currentTime": 329,
               "duration": 566,
-              "percent": 12,
+              "percent": 58,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794778788996,
+              "updatedAt": 1794778807832,
               "snapshot": {
                 "id": "movie-337167",
                 "imdbId": "tt4477536",
