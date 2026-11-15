@@ -9602,16 +9602,18 @@
               ? ('https://rest.opensubtitles.org/search/episode-' + eNum + '/imdbid-' + imdbDigits + '/season-' + sNum + '/sublanguageid-heb')
               : ('https://rest.opensubtitles.org/search/imdbid-' + imdbDigits + '/sublanguageid-heb'))
           : '';
-        var stremUrl = 'https://opensubtitles-v3.strem.io/subtitles/' + stremType + '/' + encodeURIComponent(targetId) + '.json';
 
-        var parallelResults = await Promise.all([
-          restHebUrl ? fetchJsonWithTimeout(restHebUrl, { headers: { 'X-User-Agent': 'VLSub 0.10.2' } }, 4000) : Promise.resolve(null),
-          fetchJsonWithTimeout(stremUrl, {}, 4000)
-        ]);
+        var restHebArr = restHebUrl
+          ? (await fetchJsonWithTimeout(restHebUrl, { headers: { 'X-User-Agent': 'VLSub 0.10.2' } }, 3500))
+          : null;
+        if (!Array.isArray(restHebArr)) restHebArr = [];
 
-        var restHebArr = Array.isArray(parallelResults[0]) ? parallelResults[0] : [];
-        var osData = parallelResults[1];
-        var stremSubs = (osData && Array.isArray(osData.subtitles)) ? osData.subtitles : [];
+        var stremSubs = [];
+        if (!restHebArr.length) {
+          var stremUrl = 'https://opensubtitles-v3.strem.io/subtitles/' + stremType + '/' + encodeURIComponent(targetId) + '.json';
+          var osData = await fetchJsonWithTimeout(stremUrl, {}, 3500);
+          stremSubs = (osData && Array.isArray(osData.subtitles)) ? osData.subtitles : [];
+        }
 
         var hebTracks = [];
         var seenSubUrls = {};
