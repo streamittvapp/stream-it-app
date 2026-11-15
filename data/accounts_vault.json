@@ -132,8 +132,8 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794779036712,
-      "subUsersUpdatedAt": 1794778521326,
+      "updatedTs": 1794779201403,
+      "subUsersUpdatedAt": 1794779201403,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
         "prof-bedroom": 1794494898603,
@@ -159,9 +159,9 @@
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
             "blurPx": 22,
-            "updatedAt": 1794776500000,
+            "updatedAt": 1794779201403,
             "categories": {
-              "sex": true,
+              "sex": false,
               "violence": false,
               "profanity": false,
               "drugs": false,
