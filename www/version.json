@@ -1,10 +1,10 @@
 {
-  "version": "9.9.91",
+  "version": "9.9.92",
   "native_apk_version": "9.9.91",
   "apk_download_url": "https://streamittvapp.github.io/stream-it-app/StreamIt-AndroidTV.apk",
   "apk_short_url": "https://is.gd/streamitapk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-15T11:11:00Z",
-  "notes": "v9.9.91 — Strip 64-byte PNG header & subtitle tracks directly inside HLS.js loader so 1080p w7dn plays natively on Streamer APK without falling back to VidSpark iframe (0 built-in subtitles), and restore all 2026 movies including Verity (תעתוע)."
+  "updated_at": "2026-11-15T20:09:00Z",
+  "notes": "v9.9.92 — Remove iframe sandbox attribute completely to eliminate 'Please disable sandbox' error across all embed mirrors, and fix React Router route path in /api/embed-clean."
 }

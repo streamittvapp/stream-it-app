@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.9.91';
+  var APP_VERSION = '9.9.92';
 
   function ensureOtaStylesheetInjected() {
     try {
@@ -72,8 +72,10 @@
     window.__STREAMIT_V997_BOOTED ||
     window.__STREAMIT_V998_BOOTED ||
     window.__STREAMIT_V999_BOOTED ||
-    window.__STREAMIT_V9991_BOOTED
+    window.__STREAMIT_V9991_BOOTED ||
+    window.__STREAMIT_V9992_BOOTED
   );
+  window.__STREAMIT_V9992_BOOTED = true;
   window.__STREAMIT_V9991_BOOTED = true;
   window.__STREAMIT_V999_BOOTED = true;
   window.__STREAMIT_V998_BOOTED = true;
@@ -117,7 +119,8 @@
   window.__STREAMIT_V968_BOOTED = true;
   window.__STREAMIT_V969_BOOTED = true;
   window.__STREAMIT_V970_BOOTED = true;
-  // Synchronously block any older bundled v9.7.0-v9.9.9 script from firing its DOMContentLoaded boot handler after OTA loads!
+  // Synchronously block any older bundled v9.7.0-v9.9.91 script from firing its DOMContentLoaded boot handler after OTA loads!
+  window.__STREAMIT_V9991_BOOT_DONE = true;
   window.__STREAMIT_V999_BOOT_DONE = true;
   window.__STREAMIT_V998_BOOT_DONE = true;
   window.__STREAMIT_V997_BOOT_DONE = true;
@@ -9399,14 +9402,14 @@
 
     state.embedResumeSeekDone = !(state.embedStartOffsetSec > 15);
     state.lastEmbedPostMsgTimeAt = 0;
-    var startVisible = (state.embedActiveServerKey === 'swarm' || state.embedActiveServerKey === 'embed2');
 
+    // Never set a `sandbox` attribute on `#streamEmbedIframe` — modern streaming embeds (VidLink, VidSpark/VidPrime, Embed.su)
+    // actively check for `sandbox` and block playback with "Please disable sandbox" when present!
     embedContainer.innerHTML =
       '<iframe id="streamEmbedIframe" tabindex="-1" src="' + escapeHtml(embedUrl) + '" ' +
       'referrerpolicy="origin" ' +
-      'sandbox="allow-scripts allow-same-origin allow-forms allow-presentation" ' +
       'allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen ' +
-      'style="width:100%;height:100%;border:none;background:#000;opacity:' + (startVisible ? '1' : '0') + ';pointer-events:auto;transition:opacity 0.25s ease;"></iframe>';
+      'style="width:100%;height:100%;border:none;background:#000;opacity:1;pointer-events:auto;transition:opacity 0.25s ease;"></iframe>';
 
     var iframe = document.getElementById('streamEmbedIframe');
 
@@ -9423,8 +9426,8 @@
       } catch (e) {}
     }, 600);
 
-    // Automatic Failover Watchdog: NEVER fall back to random YouTube trailers when watching a movie or series!
-    var watchdogMs = state.embedActiveServerKey === 'embed1' ? 7500 : 8000;
+    // Automatic Failover Watchdog
+    var watchdogMs = state.embedActiveServerKey === 'embed1' ? 14000 : 12000;
     state.embedWatchdogTimer = setTimeout(function () {
       if (!isPlaybackSessionActive(activeSession)) {
         stopCurrentMedia();
@@ -9451,12 +9454,10 @@
           stopCurrentMedia();
           return;
         }
-        if (state.embedActiveServerKey === 'embed2' || state.embedActiveServerKey === 'swarm') {
-          state.embedVerified = true;
-          syncPlayerModalStateClasses();
-          iframe.style.opacity = '1';
-          if (spinner) spinner.classList.add('hidden');
-        }
+        state.embedVerified = true;
+        syncPlayerModalStateClasses();
+        iframe.style.opacity = '1';
+        if (spinner) spinner.classList.add('hidden');
         try {
           if (iframe.contentWindow) {
             iframe.contentWindow.postMessage({ action: 'getStatus' }, '*');
@@ -16902,7 +16903,8 @@
   }
 
   function bootStreamItApp() {
-    if (window.__STREAMIT_V9991_BOOT_DONE) return;
+    if (window.__STREAMIT_V9992_BOOT_DONE) return;
+    window.__STREAMIT_V9992_BOOT_DONE = true;
     window.__STREAMIT_V9991_BOOT_DONE = true;
     window.__STREAMIT_V999_BOOT_DONE = true;
     window.__STREAMIT_V998_BOOT_DONE = true;

@@ -297,21 +297,23 @@ class StreamItDevHandler(SimpleHTTPRequestHandler):
             season = (qs.get("season") or ["1"])[0]
             episode = (qs.get("episode") or ["1"])[0]
             start_sec = (qs.get("start") or ["0"])[0]
-            vp_url = (
-                f"https://cdn.vidspark.to/tv/{media_id}/{season}/{episode}"
+            route_path = (
+                f"/tv/{media_id}/{season}/{episode}"
                 if media_type == "series"
-                else f"https://cdn.vidspark.to/movie/{media_id}"
+                else f"/movie/{media_id}"
             )
+            vp_url = "https://cdn.vidspark.to" + route_path
             if start_sec and start_sec != "0":
                 vp_url += f"?startAt={start_sec}"
+                route_path += f"?startAt={start_sec}"
             try:
                 req = urllib.request.Request(vp_url, headers={"User-Agent": UA})
                 with urllib.request.urlopen(req, timeout=6) as upstream:
                     html = upstream.read().decode("utf-8", errors="ignore")
                 inject_head = (
-                    '<base href="https://cdn.vidspark.to/">'
                     "<script>"
                     "try{"
+                    f"history.replaceState(null,'','{route_path}');"
                     "localStorage.setItem('vp_subtitle_lang','off');"
                     "localStorage.setItem('vp_server','w7dn');"
                     "const _of=window.fetch;"
@@ -327,6 +329,7 @@ class StreamItDevHandler(SimpleHTTPRequestHandler):
                     "};"
                     "}catch(e){}"
                     "</script>"
+                    '<base href="https://cdn.vidspark.to/">'
                     "<style>"
                     ".vds-captions,[class*='captions'],[data-media-captions],track,::cue{display:none!important;opacity:0!important;visibility:hidden!important;font-size:0!important;}"
                     "</style>"
