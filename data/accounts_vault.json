@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794771429719,
+      "updatedTs": 1794771458307,
       "subUsersUpdatedAt": 1794694857976,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -148,15 +148,15 @@
           "isKids": false,
           "isPrimary": true,
           "parentalControl": {
-            "enabled": true,
+            "enabled": false,
             "actionMode": "skip",
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
             "categories": {
               "sex": true,
-              "violence": false,
-              "profanity": false,
-              "drugs": false,
+              "violence": true,
+              "profanity": true,
+              "drugs": true,
               "horror": false
             }
           }
@@ -323,12 +323,12 @@
               "imdbId": "tt32261958",
               "tmdbId": "1283515",
               "title": "תעתוע",
-              "currentTime": 209,
-              "duration": 7256,
+              "currentTime": 210,
+              "duration": 7200,
               "percent": 3,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794770883258,
+              "updatedAt": 1794771458306,
               "snapshot": {
                 "id": "tt32261958",
                 "imdbId": "tt32261958",
@@ -347,7 +347,8 @@
                 "genres": [
                   "mystery",
                   "thriller",
-                  "drama"
+                  "drama",
+                  "telegram"
                 ],
                 "genresHe": [
                   "מסתורין",
@@ -425,6 +426,9 @@
             "tt0411705": 1794432189831,
             "movie-27": 1794432189831,
             "series-27": 1794432189831,
+            "tt0079118": 1794770938868,
+            "movie-10580": 1794770938868,
+            "series-10580": 1794770938868,
             "tt37287335": 1794432202875,
             "movie-1339713": 1794432202875,
             "series-1339713": 1794432202875,
@@ -469,12 +473,6 @@
             "tt11280740": 1794698940923,
             "movie-95396": 1794698940923,
             "series-95396": 1794698940923,
-            "movie-1283515": 1794731391181,
-            "tt32261958": 1794731391181,
-            "series-1283515": 1794731391181,
-            "tt0079118": 1794770938868,
-            "movie-10580": 1794770938868,
-            "series-10580": 1794770938868,
             "movie-1290417": 1794770985537,
             "tt32362890": 1794770985537,
             "series-1290417": 1794770985537,
@@ -486,7 +484,10 @@
             "series-157336": 1794770988551,
             "movie-1011985": 1794770989183,
             "tt21692408": 1794770989183,
-            "series-1011985": 1794770989183
+            "series-1011985": 1794770989183,
+            "movie-1283515": 1794731391181,
+            "tt32261958": 1794731391181,
+            "series-1283515": 1794731391181
           },
           "progressClearedAt": 1794432225027
         },
