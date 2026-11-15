@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794772333743,
+      "updatedTs": 1794772394903,
       "subUsersUpdatedAt": 1794772301939,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -215,6 +215,46 @@
                   "מסתורין",
                   "מותחן",
                   "דרמה"
+                ],
+                "seasonsCount": 0
+              }
+            },
+            "tt17526714": {
+              "id": "tt17526714",
+              "imdbId": "tt17526714",
+              "tmdbId": "933260",
+              "title": "יופי מסוכן",
+              "currentTime": 1100,
+              "duration": 8466,
+              "percent": 13,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794772394903,
+              "snapshot": {
+                "id": "tt17526714",
+                "imdbId": "tt17526714",
+                "tmdbId": "933260",
+                "type": "movie",
+                "title": "יופי מסוכן",
+                "originalTitle": "The Substance",
+                "year": "2024",
+                "rating": "7.4",
+                "runtimeHe": "2 שעות ו-21 דק'",
+                "ageRating": "18+",
+                "overview": "כוכבת הוליוודית דועכת מחליטה להשתמש בסם שוק שחור מסתורי המשכפל תאים ויוצר זמנית גרסה צעירה ומושלמת יותר של עצמה — אך להפרת כללי האיזון יש מחיר מצמרר.",
+                "poster": "https://images.metahub.space/poster/medium/tt17526714/img",
+                "backdrop": "https://images.metahub.space/background/medium/tt17526714/img",
+                "cardBackdrop": "https://images.metahub.space/background/medium/tt17526714/img",
+                "genres": [
+                  "horror",
+                  "drama",
+                  "scifi",
+                  "telegram"
+                ],
+                "genresHe": [
+                  "אימה",
+                  "מתח",
+                  "מדע בדיוני"
                 ],
                 "seasonsCount": 0
               }
