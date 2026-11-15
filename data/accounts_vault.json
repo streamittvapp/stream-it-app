@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794776544169,
+      "updatedTs": 1794776630002,
       "subUsersUpdatedAt": 1794774698606,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -305,6 +305,43 @@
                   "מסתורין",
                   "מותחן",
                   "דרמה"
+                ],
+                "seasonsCount": 0
+              }
+            },
+            "movie-24611": {
+              "id": "movie-24611",
+              "imdbId": "tt0073052",
+              "tmdbId": "24611",
+              "title": "גבעת חלפון אינה עונה",
+              "currentTime": 900,
+              "duration": 6381,
+              "percent": 14,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794776630002,
+              "snapshot": {
+                "id": "movie-24611",
+                "imdbId": "tt0073052",
+                "tmdbId": "24611",
+                "type": "movie",
+                "title": "גבעת חלפון אינה עונה",
+                "originalTitle": "גבעת חלפון אינה עונה",
+                "year": "1976",
+                "rating": "8.0",
+                "runtimeHe": "שעתיים",
+                "ageRating": "12+",
+                "overview": "בדרכו להציע נישואים ליעלי אהובתו, נשלח ג'ינג'י להביא למילואים את סרג'יו קונסטנצה המשתמט. ויקטור, אביה של יעלי, מסרב להצעת נישואים של ג'ינג'י ויעלי בורחת מהבית ומסתתרת בג'יפ של ג'ינג'י. ויקטור, שלו גם חשבון לא סגור עם סרג'יו, יוצא בעקבותיהם. כך הופך בסיס שגרתי באי סיני לבסיס מוטרף ומטורף. המפקד יוצא מדעתו, המצרים מוזנקים לגבול ואפילו הטבח מגלה שאפשר גם אחרת. ויקטור, יעלי ג'ינג'י וסרג'יו הופכים מוצב אחד לקרנבל שלם בדרך להשגת מטרותיהם.",
+                "poster": "https://image.tmdb.org/t/p/w500/r6zBsZh2f255aJnZWZ5dwL24qUT.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/rCsW4Vh8beOvxLeTUpkFqYZwpEX.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/rCsW4Vh8beOvxLeTUpkFqYZwpEX.jpg",
+                "genres": [
+                  "comedy",
+                  "israeli"
+                ],
+                "genresHe": [
+                  "קומדיה",
+                  "יצירה ישראלית"
                 ],
                 "seasonsCount": 0
               }
