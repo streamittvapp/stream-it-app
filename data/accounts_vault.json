@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794773545846,
+      "updatedTs": 1794774383070,
       "subUsersUpdatedAt": 1794773270494,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -184,7 +184,9 @@
               "profanity": true,
               "drugs": true,
               "horror": false
-            }
+            },
+            "blurPx": 22,
+            "updatedAt": 0
           }
         },
         {
@@ -204,7 +206,9 @@
               "profanity": true,
               "drugs": true,
               "horror": false
-            }
+            },
+            "blurPx": 22,
+            "updatedAt": 0
           }
         },
         {
@@ -224,7 +228,9 @@
               "profanity": true,
               "drugs": true,
               "horror": false
-            }
+            },
+            "blurPx": 22,
+            "updatedAt": 0
           }
         },
         {
@@ -244,7 +250,9 @@
               "profanity": true,
               "drugs": true,
               "horror": false
-            }
+            },
+            "blurPx": 22,
+            "updatedAt": 0
           }
         }
       ],
@@ -822,12 +830,12 @@
               "imdbId": "tt32261958",
               "tmdbId": "1283515",
               "title": "תעתוע",
-              "currentTime": 55,
+              "currentTime": 58,
               "duration": 7200,
               "percent": 3,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794773545846,
+              "updatedAt": 1794773608669,
               "snapshot": {
                 "id": "tt32261958",
                 "imdbId": "tt32261958",
@@ -856,6 +864,47 @@
                 ],
                 "seasonsCount": 0
               }
+            },
+            "movie-1571955": {
+              "id": "movie-1571955",
+              "imdbId": "tt38793125",
+              "tmdbId": "1571955",
+              "title": "מסלול התנגשות",
+              "currentTime": 885,
+              "duration": 6381,
+              "percent": 14,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794774383069,
+              "snapshot": {
+                "id": "movie-1571955",
+                "imdbId": "tt38793125",
+                "tmdbId": "1571955",
+                "type": "movie",
+                "title": "מסלול התנגשות",
+                "originalTitle": "Colisión",
+                "year": "2026",
+                "rating": "6.3",
+                "runtimeHe": "שעתיים",
+                "ageRating": "16+",
+                "overview": "מדריד, 2013: ספרד עדיין שקועה במשבר הכלכלי, וחבורת שודדים פורצת לבנק. בדרך החוצה רכב המילוט מתרסק, והתאונה מתחילה לפרק את הקבוצה מבפנים. בזמן שהם מנסים להימלט, נחשפים הסודות שכל אחד מהשודדים הסתיר, והבגידות והשקרים שהצטברו ביניהם הרבה לפני שנכנסו לבנק, ומתברר שאיש מהם אינו בדיוק מי שנראה.",
+                "poster": "https://image.tmdb.org/t/p/w500/nD47vSQkRwsFE8X2SXGEelRa5g7.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/uI3kWI7kGW5E0F8WduewgQYPt34.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/uI3kWI7kGW5E0F8WduewgQYPt34.jpg",
+                "genres": [
+                  "thriller",
+                  "drama",
+                  "crime",
+                  "netflix"
+                ],
+                "genresHe": [
+                  "מותחנים",
+                  "דרמה",
+                  "מתח ופשע",
+                  "נטפליקס (Netflix)"
+                ],
+                "seasonsCount": 0
+              }
             }
           },
           "deletedProgressIds": {},
@@ -864,7 +913,16 @@
       },
       "parentalMaster": {
         "pinCode": "",
-        "customSkipSegments": {}
+        "customSkipSegments": {
+          "tt0411705": [
+            {
+              "start": 18,
+              "end": 50,
+              "category": "sex",
+              "label": "קטע שסומן ע״י המשתמש"
+            }
+          ]
+        }
       },
       "subPrefs": {
         "schemaVer": 2,
