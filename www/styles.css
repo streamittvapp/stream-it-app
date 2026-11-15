@@ -11159,4 +11159,311 @@ body.tv-mode .poster-card.top10-showcase-card:focus {
   }
 }
 
+/* =========================================================================
+   v9.9.97: PROFILE SQUARE COLOR PICKER, AVATAR / IMAGE SELECTOR & PER-USER CONTROLS
+   ========================================================================= */
+#addSubUserForm.add-sub-user-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  margin-top: 12px;
+  background: rgba(15, 20, 32, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+}
+
+#addSubUserForm.add-sub-user-form.hidden {
+  display: none !important;
+}
+
+.sub-user-form-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 8px;
+}
+
+.sub-user-form-title {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.sub-user-form-sub {
+  font-size: 0.78rem;
+  color: #94a3b8;
+}
+
+.sub-user-form-top-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.sub-user-live-preview-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.sub-user-live-preview-square {
+  width: 68px !important;
+  height: 68px !important;
+  border-radius: 8px !important;
+  border: 2px solid rgba(255, 255, 255, 0.45) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  font-size: 1.7rem !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.55);
+}
+
+.sub-user-live-preview-caption {
+  font-size: 0.7rem;
+  color: #cbd5e1;
+  font-weight: 500;
+}
+
+.sub-user-form-fields-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sub-user-customizer-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(9, 12, 20, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+
+.sub-user-customizer-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sub-user-customizer-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.sub-user-custom-color-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #f8fafc;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sub-user-custom-color-input {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.sub-user-color-swatches-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sub-user-color-swatch-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  border: 2px solid rgba(255, 255, 255, 0.22);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: transform 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease;
+}
+
+.sub-user-color-swatch-btn.active,
+.sub-user-color-swatch-btn:hover,
+.sub-user-color-swatch-btn.tv-focused {
+  border-color: #ffffff !important;
+  transform: scale(1.1);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
+}
+
+.sub-user-photo-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sub-user-upload-btn {
+  min-height: 28px !important;
+  height: 28px !important;
+  padding: 0 10px !important;
+  font-size: 0.76rem !important;
+  border-radius: 5px !important;
+}
+
+.sub-user-avatar-presets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+  gap: 7px;
+}
+
+.sub-user-avatar-preset-btn {
+  height: 46px;
+  border-radius: 6px;
+  background: rgba(30, 41, 59, 0.72);
+  border: 1.5px solid rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  transition: transform 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+}
+
+.sub-user-avatar-preset-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+.sub-user-avatar-preset-btn .avatar-preset-initial {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.sub-user-avatar-preset-btn.active,
+.sub-user-avatar-preset-btn:hover,
+.sub-user-avatar-preset-btn.tv-focused {
+  border-color: #ffffff !important;
+  background: rgba(229, 9, 20, 0.35) !important;
+  transform: scale(1.06);
+}
+
+.sub-user-custom-url-row {
+  margin-top: 2px;
+}
+
+.sub-user-url-input {
+  height: 34px !important;
+  font-size: 0.8rem !important;
+  padding: 0 10px !important;
+  border-radius: 6px !important;
+}
+
+/* Profile Avatar SVG & Custom Image rendering inside profile squares */
+.sub-user-avatar,
+.parental-prof-avatar,
+#headerUserAvatarBadge,
+#userMenuAvatarCircle {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sub-user-avatar {
+  border-radius: 8px !important;
+}
+
+.parental-prof-avatar,
+#headerUserAvatarBadge,
+#userMenuAvatarCircle {
+  border-radius: 6px !important;
+}
+
+.profile-avatar-svg {
+  width: 64%;
+  height: 64%;
+  display: block;
+  color: #ffffff;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+}
+
+.profile-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.sub-user-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+}
+
+.sub-user-edit-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 28px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  color: #e2e8f0;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.sub-user-edit-btn:hover,
+.sub-user-edit-btn:focus,
+.sub-user-edit-btn.tv-focused {
+  background: #ffffff !important;
+  border-color: #ffffff !important;
+  color: #090d16 !important;
+}
+
+.parental-master-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.parental-switch-viewer-btn {
+  min-height: 38px !important;
+  padding: 0 12px !important;
+  font-size: 0.82rem !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+}
+
+
 

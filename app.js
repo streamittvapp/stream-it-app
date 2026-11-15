@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.9.96';
+  var APP_VERSION = '9.9.97';
 
   function ensureOtaStylesheetInjected() {
     try {
@@ -77,8 +77,10 @@
     window.__STREAMIT_V9993_BOOTED ||
     window.__STREAMIT_V9994_BOOTED ||
     window.__STREAMIT_V9995_BOOTED ||
-    window.__STREAMIT_V9996_BOOTED
+    window.__STREAMIT_V9996_BOOTED ||
+    window.__STREAMIT_V9997_BOOTED
   );
+  window.__STREAMIT_V9997_BOOTED = true;
   window.__STREAMIT_V9996_BOOTED = true;
   window.__STREAMIT_V9995_BOOTED = true;
   window.__STREAMIT_V9994_BOOTED = true;
@@ -127,7 +129,8 @@
   window.__STREAMIT_V968_BOOTED = true;
   window.__STREAMIT_V969_BOOTED = true;
   window.__STREAMIT_V970_BOOTED = true;
-  // Synchronously block any older bundled v9.7.0-v9.9.95 script from firing its DOMContentLoaded boot handler after OTA loads!
+  // Synchronously block any older bundled v9.7.0-v9.9.96 script from firing its DOMContentLoaded boot handler after OTA loads!
+  window.__STREAMIT_V9996_BOOT_DONE = true;
   window.__STREAMIT_V9995_BOOT_DONE = true;
   window.__STREAMIT_V9994_BOOT_DONE = true;
   window.__STREAMIT_V9993_BOOT_DONE = true;
@@ -1752,6 +1755,11 @@
               el.style.webkitFilter = 'blur(' + px + 'px)';
             }
           }
+          var plyrEl = pm.querySelector('.plyr');
+          if (plyrEl) {
+            plyrEl.style.filter = 'blur(' + px + 'px)';
+            plyrEl.style.webkitFilter = 'blur(' + px + 'px)';
+          }
         }
       }
       var sampleEl = document.getElementById('parentalBlurPreviewSample');
@@ -1763,25 +1771,76 @@
     } catch (e) {}
   }
 
+  // Profile Square Architectural Color Swatches (Refined Dark Cinema Palette — Zero Neon)
+  var PROFILE_COLOR_PRESETS = [
+    { hex: '#b91c1c', label: 'אדום קולנוע' },
+    { hex: '#1e40af', label: 'כחול רויאל' },
+    { hex: '#047857', label: 'ירוק אמרלד' },
+    { hex: '#b45309', label: 'זהב ענבר' },
+    { hex: '#6d28d9', label: 'סגול מלכותי' },
+    { hex: '#0e7490', label: 'טורקיז עמוק' },
+    { hex: '#be185d', label: 'בורדו רוז' },
+    { hex: '#4338ca', label: 'אינדיגו לילי' },
+    { hex: '#334155', label: 'אפור פלדה' },
+    { hex: '#18181b', label: 'שחור אובסידיאן' }
+  ];
+
+  // Crisp Illustrated SVG Avatar Presets for Users & Sub-Users
+  var PROFILE_AVATAR_PRESETS = [
+    { key: 'initial', label: 'אות השם', svg: '' },
+    { key: 'king', label: 'כתר VIP', svg: '<svg viewBox="0 0 24 24" class="profile-avatar-svg" fill="currentColor"><path d="M3 18h18v2H3v-2zm0-2l2-9 4.5 4L12 5l2.5 6L19 7l2 9H3z"/></svg>' },
+    { key: 'cinema', label: 'במאי קולנוע', svg: '<svg viewBox="0 0 24 24" class="profile-avatar-svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="8" width="20" height="13" rx="2"/><path d="M2 8l2-5h16l2 5"/><path d="M7 3l2 5M12 3l2 5M17 3l2 5"/><polygon points="10 12 15 14.5 10 17 10 12" fill="currentColor"/></svg>' },
+    { key: 'lion', label: 'אריה מלכותי', svg: '<svg viewBox="0 0 24 24" class="profile-avatar-svg" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 2.2 3.2-.4 1 3.1 2.8 1.6-1.2 3 1.2 3-2.8 1.6-1 3.1-3.2-.4L12 21l-2.4-2.2-3.2.4-1-3.1-2.8-1.6 1.2-3-1.2-3 2.8-1.6 1-3.1 3.2.4L12 2z"/><circle cx="9.5" cy="10.5" r="1" fill="currentColor"/><circle cx="14.5" cy="10.5" r="1" fill="currentColor"/><path d="M10 14.5c.7.7 1.3 1 2 1s1.3-.3 2-1"/><polygon points="12 12 11 13.5 13 13.5" fill="currentColor"/></svg>' },
+    { key: 'wolf', label: 'זאב לילי', svg: '<svg viewBox="0 0 24 24" class="profile-avatar-svg" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polygon points="4 3 9 8 15 8 20 3 19 14 12 21 5 14 4 3"/><polygon points="9 12 10.5 12 10 13.5" fill="currentColor"/><polygon points="15 12 13.5 12 14 13.5" fill="currentColor"/><polygon points="12 17 10.8 15.5 13.2 15.5" fill="currentColor"/></svg>' },
+    { key: 'astronaut', label: 'אסטרונאוט', svg: '<svg viewBox="0 0 24 24" class="profile-avatar-svg" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="11" r="7"/><rect x="7.5" y="8" width="9" height="5.5" rx="2.5" fill="currentColor" fill-opacity="0.25"/><path d="M9 10h2"/><path d="M6 19c1.5-1.5 3.5-2 6-2s4.5.5 6 2"/><path d="M4 11h1M19 11h1"/></svg>' },
+    { key: 'ninja', label: 'נינג׳ה', svg: '<svg viewBox="0 0 24 24" class="profile-avatar-svg" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><rect x="5" y="9" width="14" height="4.5" rx="1.5"/><circle cx="9.5" cy="11.2" r="1" fill="currentColor"/><circle cx="14.5" cy="11.2" r="1" fill="currentColor"/><path d="M19 8l3-2M19 10l3 1"/></svg>' },
+    { key: 'cyber', label: 'סייבר רובוט', svg: '<svg viewBox="0 0 24 24" class="profile-avatar-svg" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="13" rx="3"/><line x1="12" y1="2" x2="12" y2="6"/><circle cx="12" cy="2" r="1" fill="currentColor"/><circle cx="9" cy="11.5" r="1.5" fill="currentColor"/><circle cx="15" cy="11.5" r="1.5" fill="currentColor"/><line x1="8.5" y1="15.5" x2="15.5" y2="15.5"/></svg>' },
+    { key: 'detective', label: 'בלש מסתורין', svg: '<svg viewBox="0 0 24 24" class="profile-avatar-svg" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20"/><path d="M6 12l2-6h8l2 6"/><circle cx="8.5" cy="16.5" r="2.5"/><circle cx="15.5" cy="16.5" r="2.5"/><line x1="11" y1="16.5" x2="13" y2="16.5"/></svg>' },
+    { key: 'gamer', label: 'גיימר', svg: '<svg viewBox="0 0 24 24" class="profile-avatar-svg" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="4"/><path d="M6 12h4M8 10v4"/><circle cx="15.5" cy="11" r="1" fill="currentColor"/><circle cx="17.5" cy="13" r="1" fill="currentColor"/></svg>' },
+    { key: 'music', label: 'מוזיקה', svg: '<svg viewBox="0 0 24 24" class="profile-avatar-svg" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>' },
+    { key: 'diamond', label: 'יהלום יוקרתי', svg: '<svg viewBox="0 0 24 24" class="profile-avatar-svg" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 18 3 22 9 12 21 2 9 6 3"/><line x1="2" y1="9" x2="22" y2="9"/><polyline points="12 21 8 9 10 3"/><polyline points="12 21 16 9 14 3"/></svg>' },
+    { key: 'star', label: 'כוכב VIP', svg: '<svg viewBox="0 0 24 24" class="profile-avatar-svg" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>' },
+    { key: 'kids', label: 'ילדים ונוער', svg: '<svg viewBox="0 0 24 24" class="profile-avatar-svg" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="7"/><circle cx="6.5" cy="7.5" r="2.5"/><circle cx="17.5" cy="7.5" r="2.5"/><circle cx="9.5" cy="12" r="1" fill="currentColor"/><circle cx="14.5" cy="12" r="1" fill="currentColor"/><path d="M9.5 15.5c1 1 4 1 5 0"/></svg>' }
+  ];
+
+  function getProfileAvatarSvgByKey(avatarKey) {
+    if (!avatarKey || avatarKey === 'initial') return '';
+    for (var i = 0; i < PROFILE_AVATAR_PRESETS.length; i++) {
+      if (PROFILE_AVATAR_PRESETS[i].key === avatarKey) {
+        return PROFILE_AVATAR_PRESETS[i].svg || '';
+      }
+    }
+    return '';
+  }
+
+  function renderProfileAvatarInnerHtml(su) {
+    if (!su) return '<span>P</span>';
+    var customImg = String(su.avatarUrl || '').trim();
+    if (customImg && (customImg.indexOf('data:image/') === 0 || customImg.indexOf('https://') === 0 || customImg.indexOf('http://') === 0)) {
+      return '<img src="' + escapeHtml(customImg) + '" class="profile-avatar-img" alt="' + escapeHtml(su.name || 'פרופיל') + '" loading="lazy" />';
+    }
+    var svgMarkup = getProfileAvatarSvgByKey(su.avatarKey);
+    if (svgMarkup) {
+      return svgMarkup;
+    }
+    var initial = (su.name || 'P').trim().charAt(0) || 'P';
+    return '<span>' + escapeHtml(initial) + '</span>';
+  }
+
   function ensureProfileParentalConfig(su) {
     if (!su || typeof su !== 'object') return null;
-    // Normalize any legacy neon/bright avatar colors to matte Dark Cinema slate/crimson
-    var legacyColorMap = {
-      '#e50914': '#b91c1c',
-      '#2563eb': '#334155',
-      '#059669': '#3f3f46',
-      '#10b981': '#3f3f46',
-      '#d97706': '#475569',
-      '#7c3aed': '#52525b',
-      '#db2777': '#64748b'
-    };
-    var curCol = String(su.color || '').trim().toLowerCase();
-    if (legacyColorMap[curCol]) {
-      su.color = legacyColorMap[curCol];
-    } else if (!curCol) {
+    var curCol = String(su.color || '').trim();
+    if (!curCol || curCol.toLowerCase() === '#e50914') {
       su.color = su.isPrimary ? '#b91c1c' : '#334155';
     }
+    if (typeof su.avatarKey !== 'string' || !su.avatarKey) {
+      su.avatarKey = su.isKids ? 'kids' : 'initial';
+    }
+    if (typeof su.avatarUrl !== 'string') {
+      su.avatarUrl = '';
+    }
     var isKids = Boolean(su.isKids);
+
     if (!su.parentalControl || typeof su.parentalControl !== 'object') {
       su.parentalControl = {
         enabled: isKids,
@@ -2050,10 +2109,7 @@
     var primaryName = (state.user && state.user.name) ? state.user.name : 'פרופיל ראשי';
     var maxProf = (state.user && Number(state.user.max_profiles) > 0) ? Number(state.user.max_profiles) : 5;
     var list = [
-      { id: 'prof-main', name: primaryName, color: '#b91c1c', isKids: false, isPrimary: true },
-      { id: 'prof-living', name: 'סלון', color: '#334155', isKids: false, isPrimary: false },
-      { id: 'prof-bedroom', name: 'חדר שינה', color: '#3f3f46', isKids: false, isPrimary: false },
-      { id: 'prof-kids', name: 'ילדים ונוער', color: '#475569', isKids: true, isPrimary: false }
+      { id: 'prof-main', name: primaryName, color: '#b91c1c', avatarKey: 'king', avatarUrl: '', isKids: false, isPrimary: true }
     ].filter(function (su) {
       return su.isPrimary || !delIds[su.id];
     });
@@ -2570,11 +2626,15 @@
       state.activeSubUserId = (state.subUsers[0] && state.subUsers[0].id) || 'prof-main';
     }
 
-    // 2. Active Sub-User ID
-    if (cloudState.activeSubUserId && cloudIsNewer) {
-      if (state.subUsers.some(function (u) { return u.id === cloudState.activeSubUserId; })) {
-        state.activeSubUserId = cloudState.activeSubUserId;
-      }
+    // 2. Active Sub-User ID — Keep per-device profile selection sticky unless no local profile was explicitly chosen yet!
+    var explicitLocalActId = '';
+    try {
+      explicitLocalActId = localStorage.getItem('streamit_active_subuser_v954_' + ns) || '';
+    } catch (e) {}
+    if (explicitLocalActId && state.subUsers.some(function (u) { return u.id === explicitLocalActId; })) {
+      state.activeSubUserId = explicitLocalActId;
+    } else if (cloudState.activeSubUserId && state.subUsers.some(function (u) { return u.id === cloudState.activeSubUserId; })) {
+      state.activeSubUserId = cloudState.activeSubUserId;
     }
 
     // 3. Merge Per-Profile Watchlist & Continue Watching (`profileData`)
@@ -9727,9 +9787,8 @@
         return;
       }
       if (state.playingMode === 'embed' && !state.embedPaused && (state.embedVerified || state.embedCurrentTime >= 0)) {
-        // Only synthesize +0.25s fallback clock when the embed player is NOT actively sending postMessage currentTime ticks!
-        var msSinceRealTick = Date.now() - (state.lastEmbedPostMsgTimeAt || 0);
-        if (state.embedVerified && msSinceRealTick > 950) {
+        // Only synthesize +0.25s fallback clock if the embed mirror does not emit postMessage time ticks at all
+        if (state.embedVerified && state.embedAutoPlayed && !state.lastEmbedPostMsgTimeAt) {
           state.embedCurrentTime += 0.25;
         }
         updateActiveSubtitleCue(state.embedCurrentTime);
@@ -9788,11 +9847,12 @@
       : String(item.originalLanguage || (item.isIsraeli ? 'he' : 'en')).toLowerCase();
     var embedUrl = '';
 
-    // 100% Verified Original-Language Cloud Mirrors (`cdn.vidspark.to` + `vidsrc.pm` + `embed.su`)
+    // 100% Verified Original-Language Cloud Mirrors (`cdn.vidspark.to` + `vidlink.pro` + `vidfast.pro`)
     // Strictly set native embed player subtitles to NONE (`sub=off&ds_lang=off&captions=0`) so ONLY our custom Hebrew subtitles render!
     var baseParams = 'sub=off&subs=off&ds_lang=off&sub_lang=off&defaultSub=off&captions=0&subtitles=0&cc_load_policy=0&autoplay=1&audio=' + encodeURIComponent(origAudioLang);
     if (state.embedStartOffsetSec > 15) {
-      baseParams += '&start=' + Math.floor(state.embedStartOffsetSec) + '&t=' + Math.floor(state.embedStartOffsetSec);
+      var startFloor = Math.floor(state.embedStartOffsetSec);
+      baseParams += '&startAt=' + startFloor + '&start=' + startFloor + '&t=' + startFloor;
     }
     var queryStr = '?' + baseParams;
     if ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port === '8092') {
@@ -9805,26 +9865,22 @@
     } else {
       var sNumEmbed = season || 1;
       var eNumEmbed = episode || 1;
-      var csKeyEmbed = item.type === 'series'
-        ? ('tv:' + tmdbId + ':' + sNumEmbed + ':' + eNumEmbed)
-        : ('movie:' + tmdbId);
-      var isP9fxTitleInVault = Boolean(state.cloudStreamsMap && state.cloudStreamsMap[csKeyEmbed]);
-      // If we are on a mobile browser where HEVC DASH is unsupported (e.g. older iOS) and the title is p9fx-only,
-      // cdn.vidspark.to will fail and redirect to broken player.vidprime.top — so route directly to Mirror #2 (vidlink.pro H.264 HLS)!
-      if (state.embedActiveServerKey === 'embed1' && (item._dashFailedOnDevice || isP9fxTitleInVault)) {
-        state.embedActiveServerKey = 'embed2';
-      }
+      var startParamMirror = state.embedStartOffsetSec > 15
+        ? ('&startAt=' + Math.floor(state.embedStartOffsetSec) + '&t=' + Math.floor(state.embedStartOffsetSec))
+        : '';
+      // Note: `cdn.vidspark.to` (`embed1`) automatically detects HEVC support internally and falls back to H.264 HLS
+      // while providing full two-way `postMessage` sync (`currentTime`, `duration`, `paused`, `seek`, `mute`, `unmute`, `setVolume`)!
       if (state.embedActiveServerKey === 'embed2') {
         if (item.type === 'series') {
-          embedUrl = 'https://vidlink.pro/tv/' + encodeURIComponent(mediaId) + '/' + sNumEmbed + '/' + eNumEmbed + '?autoplay=true&primaryColor=e50914&title=false&poster=false';
+          embedUrl = 'https://vidlink.pro/tv/' + encodeURIComponent(mediaId) + '/' + sNumEmbed + '/' + eNumEmbed + '?autoplay=true&primaryColor=e50914&title=false&poster=false' + startParamMirror;
         } else {
-          embedUrl = 'https://vidlink.pro/movie/' + encodeURIComponent(mediaId) + '?autoplay=true&primaryColor=e50914&title=false&poster=false';
+          embedUrl = 'https://vidlink.pro/movie/' + encodeURIComponent(mediaId) + '?autoplay=true&primaryColor=e50914&title=false&poster=false' + startParamMirror;
         }
       } else if (state.embedActiveServerKey === 'swarm') {
         if (item.type === 'series') {
-          embedUrl = 'https://vidfast.pro/tv/' + encodeURIComponent(mediaId) + '/' + sNumEmbed + '/' + eNumEmbed + '?autoPlay=true';
+          embedUrl = 'https://vidfast.pro/tv/' + encodeURIComponent(mediaId) + '/' + sNumEmbed + '/' + eNumEmbed + '?autoPlay=true' + startParamMirror;
         } else {
-          embedUrl = 'https://vidfast.pro/movie/' + encodeURIComponent(mediaId) + '?autoPlay=true';
+          embedUrl = 'https://vidfast.pro/movie/' + encodeURIComponent(mediaId) + '?autoPlay=true' + startParamMirror;
         }
       } else {
         if (item.type === 'series') {
@@ -10181,11 +10237,11 @@
         if (!Array.isArray(restHebArr)) restHebArr = [];
 
         var stremSubs = [];
-        if (!restHebArr.length) {
+        try {
           var stremUrl = 'https://opensubtitles-v3.strem.io/subtitles/' + stremType + '/' + encodeURIComponent(targetId) + '.json';
           var osData = await fetchJsonWithTimeout(stremUrl, {}, 3500);
           stremSubs = (osData && Array.isArray(osData.subtitles)) ? osData.subtitles : [];
-        }
+        } catch (eStrem) {}
 
         var hebTracks = [];
         var seenSubUrls = {};
@@ -10269,6 +10325,8 @@
                     if (subStatusEl) {
                       subStatusEl.textContent = 'כתוביות בעברית פעילות (' + state.parsedCues.length + ' שורות מסונכרנות)';
                     }
+                    rebuildParentalSkipTimelineForCurrentMedia();
+                    updateInPlayerParentalUi();
                     renderSubtitlesMenu();
                     updateActiveSubtitleCue(getCurrentPlaybackTimeSec());
                     break;
@@ -10279,19 +10337,20 @@
           }
         }
 
-        // If no English tracks came from strem.io and we still need English cues (either for AI translation fallback or SafeWatch), check `rest.opensubtitles.org` for `eng`
-        if (!engTracks.length && imdbDigits && state.parsedCues.length < 10) {
+        // Always query `rest.opensubtitles.org` for `eng` when `imdbDigits` is available because `strem.io` omits `SubFileName` and `SubHearingImpaired` metadata needed to pick the true SDH track for SafeWatch!
+        if (imdbDigits) {
           var restEngUrl = stremType === 'series'
             ? ('https://rest.opensubtitles.org/search/episode-' + eNum + '/imdbid-' + imdbDigits + '/season-' + sNum + '/sublanguageid-eng')
             : ('https://rest.opensubtitles.org/search/imdbid-' + imdbDigits + '/sublanguageid-eng');
           var restEngArr = await fetchJsonWithTimeout(restEngUrl, { headers: { 'X-User-Agent': 'VLSub 0.10.2' } }, 3500);
           if (Array.isArray(restEngArr)) {
-            for (var reIdx = 0; reIdx < Math.min(5, restEngArr.length); reIdx++) {
+            for (var reIdx = 0; reIdx < Math.min(8, restEngArr.length); reIdx++) {
               var reItem = restEngArr[reIdx];
               if (reItem && reItem.SubDownloadLink) {
-                engTracks.push({
+                engTracks.unshift({
                   url: String(reItem.SubDownloadLink).replace(/\.gz$/i, ''),
                   SubFileName: reItem.SubFileName || reItem.MovieReleaseName || '',
+                  SubHearingImpaired: String(reItem.SubHearingImpaired || '0') === '1',
                   lang: 'eng'
                 });
               }
@@ -10300,11 +10359,19 @@
         }
 
         // Fetch English SDH track for Parental SafeWatch & automatic Hebrew translation fallback when no native Hebrew SRT exists yet!
-        var candidateEngTracks = engTracks.length ? engTracks : stremSubs.filter(function (s) { return s && s.url && hebTracks.indexOf(s) === -1; });
+        var candidateEngTracks = engTracks.length ? engTracks.slice() : stremSubs.filter(function (s) { return s && s.url && hebTracks.indexOf(s) === -1; });
+        candidateEngTracks.sort(function (a, b) {
+          var aMeta = String((a && (a.SubFileName || a.MovieReleaseName || a.filename || a.id)) || '');
+          var bMeta = String((b && (b.SubFileName || b.MovieReleaseName || b.filename || b.id)) || '');
+          var aSdh = (a && a.SubHearingImpaired) || /\bsdh\b|\bhi\b|hearing|cc/i.test(aMeta) ? 1 : 0;
+          var bSdh = (b && b.SubHearingImpaired) || /\bsdh\b|\bhi\b|hearing|cc/i.test(bMeta) ? 1 : 0;
+          if (bSdh !== aSdh) return bSdh - aSdh;
+          return scoreOpenSubTrack(b) - scoreOpenSubTrack(a);
+        });
         if (candidateEngTracks.length) {
           var bestEngCues = null;
           var bestSdhScore = -1;
-          var maxEngTries = state.parsedCues.length >= 10 ? 2 : 4;
+          var maxEngTries = 5;
           for (var tryE = 0; tryE < Math.min(maxEngTries, candidateEngTracks.length); tryE++) {
             try {
               var eCtrl = new AbortController();
@@ -10321,13 +10388,16 @@
                     bestSdhScore = sdhMatches;
                     bestEngCues = eCues;
                   }
-                  if (sdhMatches >= 25 || state.parsedCues.length < 10) break;
+                  if (sdhMatches >= 25) break;
                 }
               }
             } catch (errE) {}
           }
           if (bestEngCues && bestEngCues.length >= 10) {
             state.englishSdhCues = bestEngCues;
+            rebuildParentalSkipTimelineForCurrentMedia();
+            updateInPlayerParentalUi();
+            enforceParentalSceneGuard(getCurrentPlaybackTimeSec());
             if (state.parsedCues.length < 10) {
               item._hebSubsVerified = 'ai';
               await translateEnglishCuesToHebrewProgressive(bestEngCues, item);
@@ -10478,14 +10548,60 @@
   var BUILTIN_SCENE_SKIP_DB = {
     // Oppenheimer (2023)
     'tt15398776': [
-      { start: 1410, end: 1478, category: 'sex', severity: 'balanced', label: 'סצנת מין ועירום מלא' },
-      { start: 1715, end: 1765, category: 'sex', severity: 'balanced', label: 'סצנת עירום בדיון' },
-      { start: 6820, end: 6885, category: 'sex', severity: 'balanced', label: 'סצנת עירום וחקירה' }
+      { start: 1390, end: 1585, category: 'sex', severity: 'balanced', label: 'סצנת מין ועירום מלא' },
+      { start: 1715, end: 1775, category: 'sex', severity: 'balanced', label: 'סצנת עירום בדיון' },
+      { start: 4465, end: 4595, category: 'sex', severity: 'balanced', label: 'סצנת מין ועירום במלון' },
+      { start: 6945, end: 7050, category: 'sex', severity: 'balanced', label: 'סצנת עירום וחקירה' }
     ],
     '872585': [
-      { start: 1410, end: 1478, category: 'sex', severity: 'balanced', label: 'סצנת מין ועירום מלא' },
-      { start: 1715, end: 1765, category: 'sex', severity: 'balanced', label: 'סצנת עירום בדיון' },
-      { start: 6820, end: 6885, category: 'sex', severity: 'balanced', label: 'סצנת עירום וחקירה' }
+      { start: 1390, end: 1585, category: 'sex', severity: 'balanced', label: 'סצנת מין ועירום מלא' },
+      { start: 1715, end: 1775, category: 'sex', severity: 'balanced', label: 'סצנת עירום בדיון' },
+      { start: 4465, end: 4595, category: 'sex', severity: 'balanced', label: 'סצנת מין ועירום במלון' },
+      { start: 6945, end: 7050, category: 'sex', severity: 'balanced', label: 'סצנת עירום וחקירה' }
+    ],
+    // Verity / תעתוע (2026)
+    'tt32261958': [
+      { start: 1858, end: 1882, category: 'sex', severity: 'balanced', label: 'סצנה מינית' },
+      { start: 2118, end: 2205, category: 'sex', severity: 'balanced', label: 'סצנת מין מפורשת' },
+      { start: 2318, end: 2342, category: 'sex', severity: 'balanced', label: 'סצנת מין' },
+      { start: 2735, end: 2815, category: 'sex', severity: 'balanced', label: 'סצנת מין ועירום' },
+      { start: 3670, end: 3685, category: 'violence', severity: 'balanced', label: 'אלימות ודקירה' },
+      { start: 4395, end: 4448, category: 'sex', severity: 'balanced', label: 'סצנת מין ואינטימיות' },
+      { start: 5590, end: 5705, category: 'violence', severity: 'balanced', label: 'אלימות קשה' }
+    ],
+    '1283515': [
+      { start: 1858, end: 1882, category: 'sex', severity: 'balanced', label: 'סצנה מינית' },
+      { start: 2118, end: 2205, category: 'sex', severity: 'balanced', label: 'סצנת מין מפורשת' },
+      { start: 2318, end: 2342, category: 'sex', severity: 'balanced', label: 'סצנת מין' },
+      { start: 2735, end: 2815, category: 'sex', severity: 'balanced', label: 'סצנת מין ועירום' },
+      { start: 3670, end: 3685, category: 'violence', severity: 'balanced', label: 'אלימות ודקירה' },
+      { start: 4395, end: 4448, category: 'sex', severity: 'balanced', label: 'סצנת מין ואינטימיות' },
+      { start: 5590, end: 5705, category: 'violence', severity: 'balanced', label: 'אלימות קשה' }
+    ],
+    // 9 Songs / 9 שירים (2004)
+    'tt0411705': [
+      { start: 15, end: 42, category: 'sex', severity: 'balanced', label: 'סצנת מין ועירום בפתיחה' },
+      { start: 186, end: 268, category: 'sex', severity: 'balanced', label: 'סצנת מין מפורשת' },
+      { start: 460, end: 690, category: 'sex', severity: 'balanced', label: 'סצנת מין ועירום מלא' },
+      { start: 825, end: 865, category: 'sex', severity: 'balanced', label: 'סצנה מינית מפורשת' },
+      { start: 1205, end: 1310, category: 'sex', severity: 'balanced', label: 'סצנת עירום ומין' },
+      { start: 1590, end: 1995, category: 'sex', severity: 'balanced', label: 'סצנת מין מפורשת' },
+      { start: 2190, end: 2410, category: 'sex', severity: 'balanced', label: 'סצנת מין ועירום' },
+      { start: 2790, end: 3150, category: 'sex', severity: 'balanced', label: 'סצנת מין מפורשת' },
+      { start: 3290, end: 3355, category: 'sex', severity: 'balanced', label: 'סצנת מין' },
+      { start: 3640, end: 3880, category: 'sex', severity: 'balanced', label: 'סצנת מין בסיום' }
+    ],
+    '27': [
+      { start: 15, end: 42, category: 'sex', severity: 'balanced', label: 'סצנת מין ועירום בפתיחה' },
+      { start: 186, end: 268, category: 'sex', severity: 'balanced', label: 'סצנת מין מפורשת' },
+      { start: 460, end: 690, category: 'sex', severity: 'balanced', label: 'סצנת מין ועירום מלא' },
+      { start: 825, end: 865, category: 'sex', severity: 'balanced', label: 'סצנה מינית מפורשת' },
+      { start: 1205, end: 1310, category: 'sex', severity: 'balanced', label: 'סצנת עירום ומין' },
+      { start: 1590, end: 1995, category: 'sex', severity: 'balanced', label: 'סצנת מין מפורשת' },
+      { start: 2190, end: 2410, category: 'sex', severity: 'balanced', label: 'סצנת מין ועירום' },
+      { start: 2790, end: 3150, category: 'sex', severity: 'balanced', label: 'סצנת מין מפורשת' },
+      { start: 3290, end: 3355, category: 'sex', severity: 'balanced', label: 'סצנת מין' },
+      { start: 3640, end: 3880, category: 'sex', severity: 'balanced', label: 'סצנת מין בסיום' }
     ],
     // The Wolf of Wall Street (2013)
     'tt0993846': [
@@ -10541,18 +10657,18 @@
   var ENGLISH_PROFANITY_REGEX = /\b(motherfuck(?:er|ing|ers)?|fuck(?:ing|ed|er|s)?|shit(?:ty|s|ting)?|bullshit|bitch(?:es|ing)?|asshole(?:s)?|dickhead|cocksucker|cunt(?:s)?|whore(?:s)?|slut(?:s)?|bastard(?:s)?|pussy)\b/gi;
   var ENGLISH_STRICT_PROFANITY_REGEX = /\b(damn(?:it)?|goddamn|hell|crap|piss(?:ed)?|dick|cock)\b/gi;
 
-  // High-precision scene detection patterns (ONLY explicit stage directions & unambiguous sexual/graphic markers — zero false positives on normal sighs/gasps/dialogue)
+  // High-precision scene detection patterns (matches SDH sexual cues & explicit sexual dialogue — zero false positives on normal sighs/gasps/fight grunts)
   var SEX_CUE_PATTERNS = [
-    /\[[^\]]*(?:sex scene|having sex|making love|explicit nudity|full nudity|both naked|undressing each other|moaning passionately|moans passionately|sexual moaning|erotic moaning|climaxing|orgasming|סצנת מין|מקיימים יחסי מין|עירום מלא|מתפשטים בלהט|גניחות מיניות|אנחות מיניות)[^\]]*\]/i,
-    /\([^\)]*(?:sex scene|having sex|making love|explicit nudity|full nudity|both naked|undressing each other|moaning passionately|moans passionately|sexual moaning|erotic moaning|climaxing|orgasming|סצנת מין|מקיימים יחסי מין|עירום מלא|מתפשטים בלהט|גניחות מיניות|אנחות מיניות)[^\)]*\)/i,
-    /\b(?:let's have sex|having sex right now|make love to me|take all your clothes off|strip naked for me|full frontal nudity)\b/i,
-    /(?:בוא נעשה סקס|בואי נעשה סקס|עושים סקס עכשיו|תתפשטי לגמרי|תתפשט לגמרי|תורידי את כל הבגדים|תוריד את כל הבגדים)/
+    /\[[^\]]*(?:sex scene|having sex|making love|explicit nudity|full nudity|both naked|undressing each other|\bmoans?\b|\bmoaning\b|screams in ecstasy|cry of pleasure|climaxing|orgasming|(?:both|\band\b)[^\]\)]*(?:breathing heavily|panting|moaning|kissing)|(?:breathing heavily|panting)\s*,\s*(?:grunting|moaning)|(?:grunting|moaning)\s*,\s*(?:panting|breathing heavily)|panting softly|heavy panting|sensual music|erotic music|thrusting|סצנת מין|מקיימים יחסי מין|עירום מלא|מתפשטים בלהט|גניחות|גונחת|גונח|נאנקת מהנאה|אנחות מיניות)[^\]]*\]/i,
+    /\([^\)]*(?:sex scene|having sex|making love|explicit nudity|full nudity|both naked|undressing each other|\bmoans?\b|\bmoaning\b|screams in ecstasy|cry of pleasure|climaxing|orgasming|(?:both|\band\b)[^\]\)]*(?:breathing heavily|panting|moaning|kissing)|(?:breathing heavily|panting)\s*,\s*(?:grunting|moaning)|(?:grunting|moaning)\s*,\s*(?:panting|breathing heavily)|panting softly|heavy panting|sensual music|erotic music|thrusting|סצנת מין|מקיימים יחסי מין|עירום מלא|מתפשטים בלהט|גניחות|גונחת|גונח|נאנקת מהנאה|אנחות מיניות)[^\)]*\)/i,
+    /\b(?:let's have sex|having sex|during sex|while (?:he's|she's|we're|they're) fucking|fuck[- ]?me\b|fucking me\b|fucked me\b|make love to me|making love to|take (?:all )?your clothes off|take off your clothes|strip naked|completely naked|both naked|put me inside you|inside of me|come inside me|cum inside|massage my pussy|my pussy|her pussy|suck my cock|cock in (?:her|my) mouth|grabs his balls|lick my|ride my cock|full frontal nudity)\b/i,
+    /(?:בוא נעשה סקס|בואי נעשה סקס|עושים סקס|בזמן סקס|בזמן שהוא מזיין|תזיין אותי|מזיין אותי|תתפשטי לגמרי|תתפשט לגמרי|תורידי את כל הבגדים|תוריד את כל הבגדים|עירומה לגמרי|עירום לגמרי|תיכנס לתוכי|בתוכי|תגמור בתוכי|לעסות לי את הכוס|הכוס שלי|תמצצי לי|למצוץ לך)/
   ];
   var SEX_STRICT_PATTERNS = [
-    /\[[^\]]*(?:kissing passionately|making out|passionate kiss|heavy kissing|מתנשקים בלהט|נשיקה לוהטת|מתמזמזים)[^\]]*\]/i,
-    /\([^\)]*(?:kissing passionately|making out|passionate kiss|heavy kissing|מתנשקים בלהט|נשיקה לוהטת|מתמזמזים)[^\)]*\)/i,
-    /(?:נשיקה לוהטת|מתנשקים בלהט|מתמזמזים במיטה|בואי נשכב|בוא נשכב)/,
-    /\b(?:kissing passionately|making out passionately|come make love)\b/i
+    /\[[^\]]*(?:kissing passionately|making out|passionate kiss|heavy kissing|kisses passionately|מתנשקים בלהט|נשיקה לוהטת|מתמזמזים)[^\]]*\]/i,
+    /\([^\)]*(?:kissing passionately|making out|passionate kiss|heavy kissing|kisses passionately|מתנשקים בלהט|נשיקה לוהטת|מתמזמזים)[^\)]*\)/i,
+    /(?:נשיקה לוהטת|מתנשקים בלהט|מתמזמזים במיטה|בואי נשכב|בוא נשכב|שוכבים במיטה)/,
+    /\b(?:kissing passionately|making out passionately|come make love|sleep with me tonight)\b/i
   ];
 
   var VIOLENCE_CUE_PATTERNS = [
@@ -10659,7 +10775,8 @@
       } else {
         var last = merged[merged.length - 1];
         var gap = seg.start - last.end;
-        var win = seg.category === 'profanity' ? 0.8 : mergeWindowSec;
+        // Bridge sexual/intimate cues up to 48s apart so start-of-scene dialogue and climax/moaning cues merge into one continuous scene segment
+        var win = seg.category === 'profanity' ? 0.8 : (seg.category === 'sex' ? 48.0 : mergeWindowSec);
         if (last.category === seg.category && gap <= win) {
           last.end = Math.max(last.end, seg.end);
           if (seg.severity === 'balanced') last.severity = 'balanced';
@@ -10778,8 +10895,8 @@
           var isSexStrict = !isSexBalanced && isStrictMode && matchesAnyRegexList(txt, SEX_STRICT_PATTERNS);
           if (isSexBalanced || isSexStrict) {
             rawList.push({
-              start: Math.max(0, cue.start - 0.8),
-              end: cue.end + (isSexBalanced ? 4.5 : 3.0),
+              start: Math.max(0, cue.start - 2.5),
+              end: cue.end + (isSexBalanced ? 8.0 : 4.5),
               category: 'sex',
               severity: isSexBalanced ? 'balanced' : 'strict',
               label: isSexBalanced ? 'סצנת מין ועירום' : 'סצנה אינטימית / נשיקה',
@@ -10874,6 +10991,7 @@
       if (ifr && ifr.contentWindow) {
         try {
           ifr.contentWindow.postMessage({ action: shouldMute ? 'mute' : 'unmute' }, '*');
+          ifr.contentWindow.postMessage({ action: 'setVolume', volume: shouldMute ? 0 : 1 }, '*');
           ifr.contentWindow.postMessage({ command: shouldMute ? 'mute' : 'unmute' }, '*');
           ifr.contentWindow.postMessage({ event: 'command', func: shouldMute ? 'mute' : 'unmute', args: [] }, '*');
           ifr.contentWindow.postMessage(JSON.stringify({ event: 'command', func: shouldMute ? 'mute' : 'unmute', args: [] }), '*');
@@ -10918,6 +11036,11 @@
         el.style.webkitFilter = 'blur(' + blurPx + 'px)';
       }
     }
+    var plyrEl = document.querySelector('#playerModal .plyr');
+    if (plyrEl) {
+      plyrEl.style.filter = 'blur(' + blurPx + 'px)';
+      plyrEl.style.webkitFilter = 'blur(' + blurPx + 'px)';
+    }
     if (!shield) return;
     var catName = (seg && (seg.label || PARENTAL_CATEGORY_LABELS[seg.category])) || 'תוכן לא הולם';
     if (heading) heading.textContent = 'טשטוש בקרת הורים פעיל (' + catName + ')';
@@ -10940,6 +11063,11 @@
         el.style.filter = '';
         el.style.webkitFilter = '';
       }
+    }
+    var plyrEl = document.querySelector('#playerModal .plyr');
+    if (plyrEl) {
+      plyrEl.style.filter = '';
+      plyrEl.style.webkitFilter = '';
     }
     var shield = document.getElementById('parentalShieldOverlay');
     if (shield && !shield.classList.contains('hidden')) {
@@ -11378,9 +11506,8 @@
         var suCfg = ensureProfileParentalConfig(su);
         var isSel = su.id === editingProf.id;
         var isCurrentViewer = su.id === state.activeSubUserId;
-        var initial = (su.name || 'P').trim().charAt(0);
         var roleTag = su.isPrimary ? 'משתמש ראשי (מנהל)' : (su.isKids ? 'תת-יוזר • ילדים' : 'תת-יוזר');
-        if (isCurrentViewer) roleTag += ' • צופה כעת';
+        if (isCurrentViewer) roleTag += ' • צופה כעת ✓';
         var shieldBadge = suCfg.enabled
           ? ('פעיל (' + countEnabledParentalCategories(suCfg) + ')')
           : 'ללא סינון';
@@ -11389,7 +11516,7 @@
           '<button type="button" role="tab" aria-selected="' + (isSel ? 'true' : 'false') + '" ' +
             'class="parental-profile-tab tv-focusable' + (isSel ? ' active' : '') + (suCfg.enabled ? ' is-protected' : '') + '" ' +
             'data-parental-profile-tab="' + escapeHtml(su.id) + '">' +
-            '<span class="parental-prof-avatar" style="background:' + escapeHtml(su.color || '#334155') + '">' + escapeHtml(initial) + '</span>' +
+            '<span class="parental-prof-avatar" style="background:' + escapeHtml(su.color || '#334155') + '">' + renderProfileAvatarInnerHtml(su) + '</span>' +
             '<span class="parental-prof-info">' +
               '<span class="parental-prof-name">' + escapeHtml(su.name) + '</span>' +
               '<span class="parental-prof-role">' + escapeHtml(roleTag) + '</span>' +
@@ -11418,6 +11545,7 @@
     var masterCard = document.getElementById('parentalMasterToggleCard');
     var masterBtn = document.getElementById('parentalMasterToggleBtn');
     var masterLabel = document.getElementById('parentalMasterToggleLabel');
+    var switchViewerBtn = document.getElementById('parentalSwitchToEditingProfileBtn');
     var editTitle = document.getElementById('parentalEditingProfileTitle');
     var editSub = document.getElementById('parentalEditingProfileSub');
 
@@ -11431,8 +11559,15 @@
     if (masterLabel) {
       masterLabel.textContent = pCfg.enabled ? 'פעיל — מוגן' : 'כבוי';
     }
+    if (switchViewerBtn) {
+      var isAlreadyActiveViewer = editingProf.id === state.activeSubUserId;
+      switchViewerBtn.classList.toggle('hidden', isAlreadyActiveViewer);
+      if (!isAlreadyActiveViewer) {
+        switchViewerBtn.innerHTML = '<span>הפוך את "' + escapeHtml(editingProf.name) + '" לפרופיל הצופה כעת</span>';
+      }
+    }
     if (editTitle) {
-      editTitle.textContent = 'סינון צפייה עבור: ' + editingProf.name + (editingProf.isPrimary ? ' (משתמש ראשי)' : ' (תת-יוזר)');
+      editTitle.textContent = 'סינון צפייה עבור: ' + editingProf.name + (editingProf.isPrimary ? ' (משתמש ראשי)' : ' (תת-יוזר)') + (editingProf.id === state.activeSubUserId ? ' • צופה כעת' : '');
     }
     if (editSub) {
       editSub.textContent = pCfg.enabled
@@ -11558,13 +11693,20 @@
     if (!targetProfileId) return;
     state.activeSubUserId = targetProfileId;
     ensureActiveProfileBucket();
-    saveSubUsersState();
+    saveSubUsersState({ markSubUsersUpdated: true, cloudDelayMs: 250 });
     updateAuthUi();
     renderGenreFilterStrip();
     renderInitialStage();
     rebuildParentalSkipTimelineForCurrentMedia();
+    enforceParentalSceneGuard(getCurrentPlaybackTimeSec());
+    updateActiveSubtitleCue(getCurrentPlaybackTimeSec());
     updateInPlayerParentalUi();
     updateUserMenuParentalSummary();
+    var switchedProf = getActiveSubUser();
+    if (switchedProf && switchedProf.name) {
+      var swCfg = ensureProfileParentalConfig(switchedProf);
+      showCinemaToast('הוחלף לפרופיל: ' + switchedProf.name + (swCfg && swCfg.enabled ? ' (🛡️ בקרת הורים פעילה)' : ''));
+    }
     var am = document.getElementById('authModal');
     if (am) am.classList.add('hidden');
     closeUserSettingsDropdown();
@@ -12852,23 +12994,25 @@
       if (!su) continue;
       var suCfg = ensureProfileParentalConfig(su);
       var isAct = su.id === state.activeSubUserId;
-      var initial = (su.name || 'P').trim().charAt(0);
-      var badgeLabel = su.isKids ? 'ילדים' : (isAct ? 'פעיל כעת' : 'פרופיל');
+      var badgeLabel = su.isKids ? 'ילדים' : (isAct ? '✓ צופה כעת' : 'פרופיל');
       if (suCfg && suCfg.enabled) {
         badgeLabel += ' • 🛡️ מוגן';
       }
       html +=
         '<div class="sub-user-card-wrap">' +
           '<button type="button" class="sub-user-card tv-focusable' + (isAct ? ' active' : '') + '" data-subuser-id="' + escapeHtml(su.id) + '">' +
-            '<div class="sub-user-avatar" style="background:' + escapeHtml(su.color || '#E50914') + '">' +
-              '<span>' + escapeHtml(initial) + '</span>' +
+            '<div class="sub-user-avatar" style="background:' + escapeHtml(su.color || '#b91c1c') + '">' +
+              renderProfileAvatarInnerHtml(su) +
             '</div>' +
             '<span class="sub-user-name">' + escapeHtml(su.name) + '</span>' +
             '<span class="sub-user-badge">' + escapeHtml(badgeLabel) + '</span>' +
           '</button>' +
-          (!su.isPrimary
-            ? '<button type="button" class="sub-user-delete-btn tv-focusable" data-delete-subuser="' + escapeHtml(su.id) + '" title="מחק פרופיל ' + escapeHtml(su.name) + '" aria-label="מחק פרופיל ' + escapeHtml(su.name) + '">✕ מחק פרופיל</button>'
-            : '<span class="sub-user-primary-lock">פרופיל ראשי</span>') +
+          '<div class="sub-user-card-actions">' +
+            '<button type="button" class="sub-user-edit-btn tv-focusable" data-edit-subuser="' + escapeHtml(su.id) + '" title="ערוך צבע ואוואטר עבור ' + escapeHtml(su.name) + '" aria-label="ערוך פרופיל ' + escapeHtml(su.name) + '">✏️ ערוך</button>' +
+            (!su.isPrimary
+              ? '<button type="button" class="sub-user-delete-btn tv-focusable" data-delete-subuser="' + escapeHtml(su.id) + '" title="מחק פרופיל ' + escapeHtml(su.name) + '" aria-label="מחק פרופיל ' + escapeHtml(su.name) + '">✕ מחק</button>'
+              : '') +
+          '</div>' +
         '</div>';
     }
     grid.innerHTML = html;
@@ -12879,6 +13023,17 @@
         var pid = this.getAttribute('data-subuser-id');
         if (!pid) return;
         trySwitchActiveSubUser(pid);
+      });
+    }
+
+    var editBtns = grid.querySelectorAll('[data-edit-subuser]');
+    for (var eb = 0; eb < editBtns.length; eb++) {
+      editBtns[eb].addEventListener('click', function (e) {
+        e.stopPropagation();
+        var editId = this.getAttribute('data-edit-subuser');
+        if (typeof window.openSubUserCustomizerForm === 'function') {
+          window.openSubUserCustomizerForm(editId);
+        }
       });
     }
 
@@ -12911,16 +13066,16 @@
 
     var activeProf = getActiveSubUser();
     var profName = activeProf ? activeProf.name : (state.user && state.user.name ? state.user.name : 'פרופיל ראשי');
-    var profColor = (activeProf && activeProf.color) ? activeProf.color : '#E50914';
-    var profInitial = (profName || 'S').trim().charAt(0);
+    var profColor = (activeProf && activeProf.color) ? activeProf.color : '#b91c1c';
+    var avatarInner = activeProf ? renderProfileAvatarInnerHtml(activeProf) : ('<span>' + escapeHtml((profName || 'S').trim().charAt(0)) + '</span>');
 
     if (avatarCircle) {
-      avatarCircle.textContent = profInitial;
       avatarCircle.style.background = profColor;
+      avatarCircle.innerHTML = avatarInner;
     }
     if (headerBadge) {
       headerBadge.style.background = profColor;
-      headerBadge.innerHTML = '<span>' + escapeHtml(profInitial) + '</span>';
+      headerBadge.innerHTML = avatarInner;
     }
     if (activeNameEl) {
       var actCfg = activeProf ? ensureProfileParentalConfig(activeProf) : null;
@@ -14412,13 +14567,34 @@
       });
     }
 
-    // Listen to postMessage events from sandboxed VidSpark/Vidsrc player:
-    // 1. Verifies stream is live (`source === 'vidspark-player' || source === 'moviesapi-player'`), reveals iframe, hides loading spinner, and auto-plays
-    // 2. Keeps custom Hebrew subtitles synced with exact playback timestamp
+    // Listen to postMessage events from sandboxed VidSpark/VidLink/VidFast/MoviesAPI player:
+    // 1. Verifies stream is live, reveals iframe, hides loading spinner, and auto-plays
+    // 2. Keeps custom Hebrew subtitles & SafeWatch Parental Control synced with exact playback timestamp!
     window.addEventListener('message', function (ev) {
       try {
-        var d = ev && ev.data;
-        if (d && (d.source === 'vidspark-player' || d.source === 'moviesapi-player')) {
+        var rawData = ev && ev.data;
+        if (!rawData) return;
+        if (typeof rawData === 'string') {
+          if (rawData.charAt(0) === '{') {
+            try { rawData = JSON.parse(rawData); } catch (eJson) { return; }
+          } else {
+            return;
+          }
+        }
+        var d = rawData;
+        var isVidsparkMsg = Boolean(d && (d.source === 'vidspark-player' || d.source === 'moviesapi-player'));
+        // Also support vidlink.pro / vidfast.pro PLAYER_EVENT & MEDIA_DATA messages
+        if (!isVidsparkMsg && d && (d.type === 'PLAYER_EVENT' || d.type === 'MEDIA_DATA') && d.data && typeof d.data === 'object') {
+          d = {
+            source: 'vidspark-player',
+            event: d.data.event || 'timeupdate',
+            currentTime: typeof d.data.currentTime === 'number' ? d.data.currentTime : undefined,
+            duration: typeof d.data.duration === 'number' ? d.data.duration : undefined,
+            paused: d.data.event === 'pause' ? true : (d.data.event === 'play' || d.data.event === 'timeupdate' ? false : undefined)
+          };
+          isVidsparkMsg = true;
+        }
+        if (d && isVidsparkMsg) {
           if (!isPlaybackSessionActive()) {
             stopCurrentMedia();
             return;
@@ -14435,7 +14611,7 @@
             var sp = document.getElementById('playerLoadingSpinner');
             if (sp) sp.classList.add('hidden');
           }
-          if (!state.embedAutoPlayed && state.playingMode === 'embed' && (d.event === 'ready' || d.event === 'playerstatus')) {
+          if (!state.embedAutoPlayed && state.playingMode === 'embed' && (d.event === 'ready' || d.event === 'playerstatus' || d.event === 'timeupdate' || d.event === 'play')) {
             state.embedAutoPlayed = true;
             var ifrPlay = document.getElementById('streamEmbedIframe');
             if (ifrPlay && ifrPlay.contentWindow) {
@@ -15157,63 +15333,294 @@
       quickLoginBtn.addEventListener('click', performQuickTestLogin);
     }
 
-    // Add / Manage Sub-Users
+    // Add / Edit / Manage Sub-Users (with Custom Square Color Picker & Cool Avatar / Image Selector)
     var addSuToggle = document.getElementById('addSubUserToggleBtn');
     var addSuForm = document.getElementById('addSubUserForm');
     var saveSuBtn = document.getElementById('saveNewSubUserBtn');
     var cancelSuBtn = document.getElementById('cancelNewSubUserBtn');
     var manageSuBtn = document.getElementById('manageSubUsersToggleBtn');
     var kidsToggleBtn = document.getElementById('newSubUserKidsBtn');
+    var customColorInput = document.getElementById('subUserCustomColorInput');
+    var avatarFileInput = document.getElementById('subUserAvatarFileInput');
+    var uploadImgBtn = document.getElementById('subUserUploadImgBtn');
+    var clearImgBtn = document.getElementById('subUserClearImgBtn');
+    var avatarUrlInput = document.getElementById('subUserAvatarUrlInput');
+    var nameInputEl = document.getElementById('newSubUserNameInput');
+
+    var editingProfileId = null;
+    var formColorHex = '#b91c1c';
+    var formAvatarKey = 'initial';
+    var formAvatarUrl = '';
     var newSuKidsState = false;
 
+    function updateSubUserFormLivePreview() {
+      var previewSq = document.getElementById('subUserFormLivePreviewSquare');
+      var curName = (nameInputEl && nameInputEl.value ? nameInputEl.value.trim() : '') || 'פרופיל';
+      if (previewSq) {
+        previewSq.style.background = formColorHex || '#b91c1c';
+        previewSq.innerHTML = renderProfileAvatarInnerHtml({
+          name: curName,
+          color: formColorHex,
+          avatarKey: formAvatarKey,
+          avatarUrl: formAvatarUrl
+        });
+      }
+      if (clearImgBtn) {
+        clearImgBtn.classList.toggle('hidden', !formAvatarUrl);
+      }
+      var swatchBtns = document.querySelectorAll('#subUserColorSwatchesRow [data-profile-color]');
+      for (var s = 0; s < swatchBtns.length; s++) {
+        var cHex = String(swatchBtns[s].getAttribute('data-profile-color') || '').toLowerCase();
+        var isMatch = cHex === String(formColorHex || '').toLowerCase();
+        swatchBtns[s].classList.toggle('active', isMatch);
+        swatchBtns[s].innerHTML = isMatch ? '✓' : '';
+      }
+      var presetBtns = document.querySelectorAll('#subUserAvatarPresetsGrid [data-profile-avatar]');
+      for (var p = 0; p < presetBtns.length; p++) {
+        var aKey = presetBtns[p].getAttribute('data-profile-avatar');
+        var isAvMatch = !formAvatarUrl && aKey === formAvatarKey;
+        presetBtns[p].classList.toggle('active', isAvMatch);
+        var initSpan = presetBtns[p].querySelector('.avatar-preset-initial');
+        if (initSpan) {
+          initSpan.textContent = curName.charAt(0) || 'א';
+        }
+      }
+    }
+
+    function renderSubUserFormPickers() {
+      var swatchesRow = document.getElementById('subUserColorSwatchesRow');
+      if (swatchesRow && !swatchesRow.children.length) {
+        var swHtml = '';
+        for (var i = 0; i < PROFILE_COLOR_PRESETS.length; i++) {
+          var cp = PROFILE_COLOR_PRESETS[i];
+          swHtml +=
+            '<button type="button" class="sub-user-color-swatch-btn tv-focusable" ' +
+              'style="background:' + escapeHtml(cp.hex) + '" ' +
+              'data-profile-color="' + escapeHtml(cp.hex) + '" ' +
+              'title="' + escapeHtml(cp.label) + '" ' +
+              'aria-label="צבע ' + escapeHtml(cp.label) + '"></button>';
+        }
+        swatchesRow.innerHTML = swHtml;
+        var sBtns = swatchesRow.querySelectorAll('[data-profile-color]');
+        for (var sb = 0; sb < sBtns.length; sb++) {
+          sBtns[sb].addEventListener('click', function () {
+            formColorHex = this.getAttribute('data-profile-color') || '#b91c1c';
+            if (customColorInput) customColorInput.value = formColorHex;
+            updateSubUserFormLivePreview();
+          });
+        }
+      }
+
+      var presetsGrid = document.getElementById('subUserAvatarPresetsGrid');
+      if (presetsGrid && !presetsGrid.children.length) {
+        var avHtml = '';
+        for (var a = 0; a < PROFILE_AVATAR_PRESETS.length; a++) {
+          var ap = PROFILE_AVATAR_PRESETS[a];
+          var inner = ap.key === 'initial'
+            ? '<span class="avatar-preset-initial">א</span>'
+            : ap.svg;
+          avHtml +=
+            '<button type="button" class="sub-user-avatar-preset-btn tv-focusable" ' +
+              'data-profile-avatar="' + escapeHtml(ap.key) + '" ' +
+              'title="' + escapeHtml(ap.label) + '" ' +
+              'aria-label="אוואטר ' + escapeHtml(ap.label) + '">' +
+              inner +
+            '</button>';
+        }
+        presetsGrid.innerHTML = avHtml;
+        var aBtns = presetsGrid.querySelectorAll('[data-profile-avatar]');
+        for (var ab = 0; ab < aBtns.length; ab++) {
+          aBtns[ab].addEventListener('click', function () {
+            formAvatarKey = this.getAttribute('data-profile-avatar') || 'initial';
+            formAvatarUrl = '';
+            if (avatarUrlInput) avatarUrlInput.value = '';
+            updateSubUserFormLivePreview();
+          });
+        }
+      }
+    }
+
+    function openSubUserCustomizerForm(targetProfId) {
+      if (!addSuForm) return;
+      renderSubUserFormPickers();
+      var existingProf = targetProfId ? getProfileById(targetProfId) : null;
+      var headingEl = document.getElementById('subUserFormHeading');
+      var saveLabelEl = document.getElementById('saveNewSubUserBtnLabel');
+
+      if (existingProf && targetProfId) {
+        editingProfileId = existingProf.id;
+        ensureProfileParentalConfig(existingProf);
+        formColorHex = existingProf.color || '#b91c1c';
+        formAvatarKey = existingProf.avatarKey || 'initial';
+        formAvatarUrl = existingProf.avatarUrl || '';
+        newSuKidsState = Boolean(existingProf.isKids);
+        if (nameInputEl) nameInputEl.value = existingProf.name || '';
+        if (avatarUrlInput) avatarUrlInput.value = (formAvatarUrl && formAvatarUrl.indexOf('http') === 0) ? formAvatarUrl : '';
+        if (headingEl) headingEl.textContent = 'עריכת פרופיל: ' + existingProf.name;
+        if (saveLabelEl) saveLabelEl.textContent = 'שמור שינויים בפרופיל';
+        if (kidsToggleBtn) {
+          kidsToggleBtn.classList.toggle('hidden', Boolean(existingProf.isPrimary));
+          kidsToggleBtn.classList.toggle('active', newSuKidsState);
+          kidsToggleBtn.textContent = newSuKidsState ? 'מצב ילדים: פעיל 🛡️' : 'מצב ילדים: כבוי';
+        }
+      } else {
+        editingProfileId = null;
+        var defaultColors = PROFILE_COLOR_PRESETS.map(function (c) { return c.hex; });
+        formColorHex = defaultColors[state.subUsers.length % defaultColors.length] || '#1e40af';
+        formAvatarKey = 'initial';
+        formAvatarUrl = '';
+        newSuKidsState = false;
+        if (nameInputEl) nameInputEl.value = '';
+        if (avatarUrlInput) avatarUrlInput.value = '';
+        if (headingEl) headingEl.textContent = 'הוספת תת-יוזר חדש';
+        if (saveLabelEl) saveLabelEl.textContent = 'צור פרופיל חדש';
+        if (kidsToggleBtn) {
+          kidsToggleBtn.classList.remove('hidden', 'active');
+          kidsToggleBtn.textContent = 'מצב ילדים: כבוי';
+        }
+      }
+
+      if (customColorInput) customColorInput.value = formColorHex;
+      updateSubUserFormLivePreview();
+      addSuForm.classList.remove('hidden');
+      if (nameInputEl && typeof window.streamItFocusElement === 'function') {
+        window.streamItFocusElement(nameInputEl, { scroll: true });
+      }
+    }
+    window.openSubUserCustomizerForm = openSubUserCustomizerForm;
+
+    if (nameInputEl) {
+      nameInputEl.addEventListener('input', updateSubUserFormLivePreview);
+    }
+    if (customColorInput) {
+      customColorInput.addEventListener('input', function () {
+        if (this.value) {
+          formColorHex = this.value;
+          updateSubUserFormLivePreview();
+        }
+      });
+    }
+    if (avatarUrlInput) {
+      avatarUrlInput.addEventListener('input', function () {
+        var v = String(this.value || '').trim();
+        if (v && (v.indexOf('https://') === 0 || v.indexOf('http://') === 0 || v.indexOf('data:image/') === 0)) {
+          formAvatarUrl = v;
+        } else if (!v && formAvatarUrl.indexOf('http') === 0) {
+          formAvatarUrl = '';
+        }
+        updateSubUserFormLivePreview();
+      });
+    }
+    if (uploadImgBtn && avatarFileInput) {
+      uploadImgBtn.addEventListener('click', function () {
+        avatarFileInput.click();
+      });
+      avatarFileInput.addEventListener('change', function () {
+        var file = this.files && this.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function (ev) {
+          var img = new Image();
+          img.onload = function () {
+            try {
+              var canvas = document.createElement('canvas');
+              var sz = 160;
+              canvas.width = sz;
+              canvas.height = sz;
+              var ctx = canvas.getContext('2d');
+              var minSide = Math.min(img.width, img.height);
+              var sx = Math.max(0, (img.width - minSide) / 2);
+              var sy = Math.max(0, (img.height - minSide) / 2);
+              ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, sz, sz);
+              formAvatarUrl = canvas.toDataURL('image/jpeg', 0.84);
+              if (avatarUrlInput) avatarUrlInput.value = '';
+              updateSubUserFormLivePreview();
+            } catch (eCanvas) {}
+          };
+          img.src = String(ev.target.result || '');
+        };
+        reader.readAsDataURL(file);
+        this.value = '';
+      });
+    }
+    if (clearImgBtn) {
+      clearImgBtn.addEventListener('click', function () {
+        formAvatarUrl = '';
+        if (avatarUrlInput) avatarUrlInput.value = '';
+        updateSubUserFormLivePreview();
+      });
+    }
     if (kidsToggleBtn) {
       kidsToggleBtn.addEventListener('click', function () {
         newSuKidsState = !newSuKidsState;
         this.classList.toggle('active', newSuKidsState);
         this.textContent = newSuKidsState ? 'מצב ילדים: פעיל 🛡️' : 'מצב ילדים: כבוי';
+        if (newSuKidsState && formAvatarKey === 'initial' && !formAvatarUrl) {
+          formAvatarKey = 'kids';
+        }
+        updateSubUserFormLivePreview();
       });
     }
     if (addSuToggle && addSuForm) {
       addSuToggle.addEventListener('click', function () {
-        addSuForm.classList.toggle('hidden');
-        var nameIn = document.getElementById('newSubUserNameInput');
-        if (nameIn && !addSuForm.classList.contains('hidden')) {
-          nameIn.value = '';
-          if (typeof window.streamItFocusElement === 'function') window.streamItFocusElement(nameIn);
+        if (!addSuForm.classList.contains('hidden') && !editingProfileId) {
+          addSuForm.classList.add('hidden');
+        } else {
+          openSubUserCustomizerForm(null);
         }
       });
     }
     if (cancelSuBtn && addSuForm) {
       cancelSuBtn.addEventListener('click', function () {
+        editingProfileId = null;
         addSuForm.classList.add('hidden');
       });
     }
     if (saveSuBtn) {
       saveSuBtn.addEventListener('click', function () {
-        var nameIn = document.getElementById('newSubUserNameInput');
-        var nameVal = nameIn && nameIn.value ? nameIn.value.trim() : '';
-        if (!nameVal) return;
-        var colors = ['#b91c1c', '#334155', '#3f3f46', '#475569', '#52525b', '#1e293b'];
-        var newId = 'prof-' + Date.now();
-        var newSuObj = {
-          id: newId,
-          name: nameVal,
-          color: colors[state.subUsers.length % colors.length],
-          isKids: newSuKidsState,
-          isPrimary: false
-        };
-        ensureProfileParentalConfig(newSuObj);
-        state.subUsers.push(newSuObj);
-        state.activeSubUserId = newId;
-        newSuKidsState = false;
-        if (kidsToggleBtn) {
-          kidsToggleBtn.classList.remove('active');
-          kidsToggleBtn.textContent = 'מצב ילדים: כבוי';
+        var nameVal = nameInputEl && nameInputEl.value ? nameInputEl.value.trim() : '';
+        if (!nameVal) {
+          showCinemaToast('נא להזין שם לפרופיל');
+          return;
+        }
+        if (editingProfileId) {
+          var targetSu = getProfileById(editingProfileId);
+          if (targetSu) {
+            targetSu.name = nameVal;
+            targetSu.color = formColorHex || '#b91c1c';
+            targetSu.avatarKey = formAvatarKey || 'initial';
+            targetSu.avatarUrl = formAvatarUrl || '';
+            if (!targetSu.isPrimary) {
+              targetSu.isKids = newSuKidsState;
+            }
+            ensureProfileParentalConfig(targetSu);
+            showCinemaToast('הפרופיל "' + targetSu.name + '" עודכן בהצלחה');
+          }
+          editingProfileId = null;
+        } else {
+          var newId = 'prof-' + Date.now();
+          var newSuObj = {
+            id: newId,
+            name: nameVal,
+            color: formColorHex || '#1e40af',
+            avatarKey: formAvatarKey || (newSuKidsState ? 'kids' : 'initial'),
+            avatarUrl: formAvatarUrl || '',
+            isKids: newSuKidsState,
+            isPrimary: false
+          };
+          ensureProfileParentalConfig(newSuObj);
+          state.subUsers.push(newSuObj);
+          // Do NOT hijack state.activeSubUserId when adding a sub-user unless no valid active profile exists!
+          if (!state.activeSubUserId || !state.subUsers.some(function (u) { return u.id === state.activeSubUserId; })) {
+            state.activeSubUserId = newId;
+          }
+          showCinemaToast('תת-היוזר "' + newSuObj.name + '" נוסף בהצלחה (לחץ עליו כדי לעבור אליו)');
         }
         if (addSuForm) addSuForm.classList.add('hidden');
         ensureActiveProfileBucket();
         saveSubUsersState({ markSubUsersUpdated: true, cloudDelayMs: 150 });
         updateAuthUi();
+        renderParentalControlModal();
         renderGenreFilterStrip();
         renderInitialStage();
       });
@@ -15223,20 +15630,30 @@
         state.manageSubUsersMode = !state.manageSubUsersMode;
         this.classList.toggle('active', state.manageSubUsersMode);
         renderSubUsersGrid();
-        var firstDelBtn = document.querySelector('#subUsersGrid .sub-user-delete-btn');
-        if (firstDelBtn && typeof window.streamItFocusElement === 'function') {
-          window.streamItFocusElement(firstDelBtn, { scroll: false });
+        var firstEditBtn = document.querySelector('#subUsersGrid .sub-user-edit-btn') || document.querySelector('#subUsersGrid .sub-user-delete-btn');
+        if (firstEditBtn && typeof window.streamItFocusElement === 'function') {
+          window.streamItFocusElement(firstEditBtn, { scroll: false });
         }
       });
     }
 
-    // SafeWatch Parental Control Modal (`#parentalControlModal`) & Account-Wide Sub-User Controls
+    // SafeWatch Parental Control Modal (`#parentalControlModal`) & Per-User Controls
     var authOpenParentalBtn = document.getElementById('authOpenParentalModalBtn');
     if (authOpenParentalBtn) {
       authOpenParentalBtn.addEventListener('click', function () {
         var am = document.getElementById('authModal');
         if (am) am.classList.add('hidden');
         openParentalControlModal(state.activeSubUserId);
+      });
+    }
+
+    var parentalSwitchViewerBtn = document.getElementById('parentalSwitchToEditingProfileBtn');
+    if (parentalSwitchViewerBtn) {
+      parentalSwitchViewerBtn.addEventListener('click', function () {
+        var prof = getEditingParentalProfile();
+        if (!prof) return;
+        completeSubUserSwitch(prof.id);
+        renderParentalControlModal();
       });
     }
 
@@ -17586,7 +18003,8 @@
   }
 
   function bootStreamItApp() {
-    if (window.__STREAMIT_V9996_BOOT_DONE) return;
+    if (window.__STREAMIT_V9997_BOOT_DONE) return;
+    window.__STREAMIT_V9997_BOOT_DONE = true;
     window.__STREAMIT_V9996_BOOT_DONE = true;
     window.__STREAMIT_V9995_BOOT_DONE = true;
     window.__STREAMIT_V9994_BOOT_DONE = true;

@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
-  <link rel="stylesheet" href="styles.css?v=9.9.96" />
+  <link rel="stylesheet" href="styles.css?v=9.9.97" />
   <script>
     (function () {
       try {
@@ -39,13 +39,13 @@
           });
         }
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (!otaVer || otaVer <= '9.9.95') {
+        if (!otaVer || otaVer <= '9.9.96') {
           localStorage.removeItem('streamit_ota_css_v9');
           localStorage.removeItem('streamit_ota_app_js_v9');
           localStorage.removeItem('streamit_ota_tv_nav_v9');
         }
         var otaCss = localStorage.getItem('streamit_ota_css_v9') || '';
-        if (otaVer && otaVer > '9.9.95' && otaCss.length > 500) {
+        if (otaVer && otaVer > '9.9.96' && otaCss.length > 500) {
           var st = document.createElement('style');
           st.id = 'streamit-ota-live-style-v9';
           st.textContent = otaCss;
@@ -1274,28 +1274,85 @@
           </button>
         </div>
 
-        <!-- Inline Add Sub-User Form -->
+        <!-- Inline Add / Edit Sub-User Form (Name, Square Color, Avatar & Custom Image) -->
         <div id="addSubUserForm" class="add-sub-user-form hidden">
-          <input
-            type="text"
-            id="newSubUserNameInput"
-            class="form-input sub-user-name-input tv-focusable"
-            dir="rtl"
-            value=""
-            placeholder="שם הפרופיל החדש..."
-            aria-label="שם הפרופיל החדש"
-            autocomplete="off"
-          />
+          <div class="sub-user-form-header">
+            <h4 id="subUserFormHeading" class="sub-user-form-title">הוספת פרופיל חדש</h4>
+            <span id="subUserFormSub" class="sub-user-form-sub">בחר שם, צבע ריבוע ואוואטר או תמונה אישית</span>
+          </div>
 
-          <button type="button" id="newSubUserKidsBtn" class="btn-secondary kids-toggle-btn tv-focusable" aria-pressed="false" aria-label="סמן כפרופיל ילדים">
-            <span>מצב ילדים: כבוי</span>
-          </button>
+          <div class="sub-user-form-top-row">
+            <div class="sub-user-live-preview-wrap">
+              <div id="subUserFormLivePreviewSquare" class="sub-user-avatar sub-user-live-preview-square" style="background:#b91c1c">
+                <span>פ</span>
+              </div>
+              <span class="sub-user-live-preview-caption">תצוגה מקדימה</span>
+            </div>
+
+            <div class="sub-user-form-fields-col">
+              <input
+                type="text"
+                id="newSubUserNameInput"
+                class="form-input sub-user-name-input tv-focusable"
+                dir="rtl"
+                value=""
+                placeholder="שם הפרופיל..."
+                aria-label="שם הפרופיל"
+                autocomplete="off"
+              />
+
+              <button type="button" id="newSubUserKidsBtn" class="btn-secondary kids-toggle-btn tv-focusable" aria-pressed="false" aria-label="סמן כפרופיל ילדים">
+                <span>מצב ילדים: כבוי</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Square Color Picker -->
+          <div class="sub-user-customizer-block">
+            <div class="sub-user-customizer-label-row">
+              <span class="sub-user-customizer-label">צבע הריבוע של היוזר:</span>
+              <label class="sub-user-custom-color-label tv-focusable" for="subUserCustomColorInput" title="בחירת צבע מותאם אישית">
+                <input type="color" id="subUserCustomColorInput" class="sub-user-custom-color-input" value="#b91c1c" aria-label="צבע מותאם אישית" />
+                <span>🎨 צבע חופשי</span>
+              </label>
+            </div>
+            <div id="subUserColorSwatchesRow" class="sub-user-color-swatches-row" role="radiogroup" aria-label="בחירת צבע לריבוע הפרופיל"></div>
+          </div>
+
+          <!-- Cool Avatar / Icon / Image Selector -->
+          <div class="sub-user-customizer-block">
+            <div class="sub-user-customizer-label-row">
+              <span class="sub-user-customizer-label">בחר אוואטר מגניב או תמונה אישית:</span>
+              <div class="sub-user-photo-actions">
+                <input type="file" id="subUserAvatarFileInput" class="hidden" accept="image/*" />
+                <button type="button" id="subUserUploadImgBtn" class="btn-secondary sub-user-upload-btn tv-focusable">
+                  <span>📷 העלה תמונה</span>
+                </button>
+                <button type="button" id="subUserClearImgBtn" class="btn-secondary sub-user-upload-btn hidden tv-focusable">
+                  <span>✕ הסר תמונה</span>
+                </button>
+              </div>
+            </div>
+            <div id="subUserAvatarPresetsGrid" class="sub-user-avatar-presets-grid" role="radiogroup" aria-label="בחירת אוואטר לפרופיל"></div>
+            <div class="sub-user-custom-url-row">
+              <input
+                type="url"
+                id="subUserAvatarUrlInput"
+                class="form-input sub-user-url-input tv-focusable"
+                dir="ltr"
+                value=""
+                placeholder="או הדבק קישור ישיר לתמונה (https://...)"
+                aria-label="קישור לתמונת אוואטר מותאמת אישית"
+                autocomplete="off"
+              />
+            </div>
+          </div>
 
           <div class="add-sub-user-form-btns">
-            <button type="button" id="saveNewSubUserBtn" class="btn-primary tv-focusable" aria-label="שמור תת-יוזר">
-              <span>שמור פרופיל</span>
+            <button type="button" id="saveNewSubUserBtn" class="btn-primary tv-focusable" aria-label="שמור פרופיל">
+              <span id="saveNewSubUserBtnLabel">שמור פרופיל</span>
             </button>
-            <button type="button" id="cancelNewSubUserBtn" class="btn-secondary tv-focusable" aria-label="בטל הוספת תת-יוזר">
+            <button type="button" id="cancelNewSubUserBtn" class="btn-secondary tv-focusable" aria-label="בטל עריכת פרופיל">
               <span>ביטול</span>
             </button>
           </div>
@@ -1461,9 +1518,14 @@
                 <p id="parentalEditingProfileSub" class="parental-selected-desc">כבוי — כל התכנים מתנגנים ללא סינון וללא דילוגים</p>
               </div>
             </div>
-            <button type="button" id="parentalMasterToggleBtn" class="parental-switch-btn tv-focusable" aria-pressed="false">
-              <span id="parentalMasterToggleLabel">כבוי — לחץ להפעלה</span>
-            </button>
+            <div class="parental-master-actions-group">
+              <button type="button" id="parentalSwitchToEditingProfileBtn" class="btn-secondary parental-switch-viewer-btn hidden tv-focusable">
+                <span>הפוך לפרופיל הצופה כעת</span>
+              </button>
+              <button type="button" id="parentalMasterToggleBtn" class="parental-switch-btn tv-focusable" aria-pressed="false">
+                <span id="parentalMasterToggleLabel">כבוי — לחץ להפעלה</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -1913,13 +1975,13 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Core Application & Smart TV Navigation Scripts -->
-  <script src="tv-navigation.js?v=9.9.96"></script>
-  <script src="app.js?v=9.9.96"></script>
+  <script src="tv-navigation.js?v=9.9.97"></script>
+  <script src="app.js?v=9.9.97"></script>
   <script>
     (function () {
       try {
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (otaVer && otaVer > '9.9.96') {
+        if (otaVer && otaVer > '9.9.97') {
           window.__STREAMIT_OTA_INJECTED_RUNNING = true;
           var otaCssBottom = localStorage.getItem('streamit_ota_css_v9') || '';
           if (otaCssBottom.length > 200 && !document.getElementById('streamit-ota-css')) {

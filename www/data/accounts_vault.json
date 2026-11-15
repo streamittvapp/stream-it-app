@@ -132,8 +132,8 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794773222825,
-      "subUsersUpdatedAt": 1794772301939,
+      "updatedTs": 1794776500000,
+      "subUsersUpdatedAt": 1794776500000,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
         "prof-bedroom": 1794494898603,
@@ -149,6 +149,8 @@
           "id": "prof-main",
           "name": "BENSAHAL TV",
           "color": "#b91c1c",
+          "avatarKey": "king",
+          "avatarImage": "",
           "isKids": false,
           "isPrimary": true,
           "parentalControl": {
@@ -157,7 +159,7 @@
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
             "blurPx": 22,
-            "updatedAt": 1794773500000,
+            "updatedAt": 1794776500000,
             "categories": {
               "sex": true,
               "violence": false,
@@ -165,6 +167,110 @@
               "drugs": false,
               "horror": false
             }
+          }
+        },
+        {
+          "id": "prof-1794773247760",
+          "name": "איה",
+          "color": "#be185d",
+          "avatarKey": "star",
+          "avatarImage": "",
+          "isKids": false,
+          "isPrimary": false,
+          "parentalControl": {
+            "enabled": false,
+            "actionMode": "blur_mute",
+            "profanityMode": "mute_censor",
+            "sensitivity": "balanced",
+            "blurPx": 22,
+            "updatedAt": 1794776500000,
+            "categories": {
+              "sex": true,
+              "violence": false,
+              "profanity": false,
+              "drugs": false,
+              "horror": false
+            },
+            "blurPx": 22,
+            "updatedAt": 0
+          }
+        },
+        {
+          "id": "prof-1794773258268",
+          "name": "אלדר",
+          "color": "#1e40af",
+          "avatarKey": "gamer",
+          "avatarImage": "",
+          "isKids": false,
+          "isPrimary": false,
+          "parentalControl": {
+            "enabled": false,
+            "actionMode": "blur_mute",
+            "profanityMode": "mute_censor",
+            "sensitivity": "balanced",
+            "blurPx": 22,
+            "updatedAt": 1794776500000,
+            "categories": {
+              "sex": true,
+              "violence": false,
+              "profanity": false,
+              "drugs": false,
+              "horror": false
+            },
+            "blurPx": 22,
+            "updatedAt": 0
+          }
+        },
+        {
+          "id": "prof-1794773265526",
+          "name": "שקד",
+          "color": "#047857",
+          "avatarKey": "music",
+          "avatarImage": "",
+          "isKids": false,
+          "isPrimary": false,
+          "parentalControl": {
+            "enabled": false,
+            "actionMode": "blur_mute",
+            "profanityMode": "mute_censor",
+            "sensitivity": "balanced",
+            "blurPx": 22,
+            "updatedAt": 1794776500000,
+            "categories": {
+              "sex": true,
+              "violence": false,
+              "profanity": false,
+              "drugs": false,
+              "horror": false
+            },
+            "blurPx": 22,
+            "updatedAt": 0
+          }
+        },
+        {
+          "id": "prof-1794773270494",
+          "name": "שי",
+          "color": "#6d28d9",
+          "avatarKey": "astronaut",
+          "avatarImage": "",
+          "isKids": false,
+          "isPrimary": false,
+          "parentalControl": {
+            "enabled": false,
+            "actionMode": "blur_mute",
+            "profanityMode": "mute_censor",
+            "sensitivity": "balanced",
+            "blurPx": 22,
+            "updatedAt": 1794776500000,
+            "categories": {
+              "sex": true,
+              "violence": false,
+              "profanity": false,
+              "drugs": false,
+              "horror": false
+            },
+            "blurPx": 22,
+            "updatedAt": 0
           }
         }
       ],
@@ -219,6 +325,47 @@
                   "דרמה"
                 ],
                 "seasonsCount": 0
+              }
+            },
+            "series-5303": {
+              "id": "series-5303",
+              "imdbId": "tt0092383",
+              "tmdbId": "5303",
+              "title": "סיפורי עמים",
+              "currentTime": 15,
+              "duration": 7200,
+              "percent": 3,
+              "season": 1,
+              "episode": 2,
+              "updatedAt": 1794777223638,
+              "snapshot": {
+                "id": "series-5303",
+                "imdbId": "tt0092383",
+                "tmdbId": "5303",
+                "type": "series",
+                "title": "סיפורי עמים",
+                "originalTitle": "The Storyteller",
+                "year": "1988",
+                "rating": "8.2",
+                "runtimeHe": "45 דק׳ לפרק",
+                "ageRating": "לכל המשפחה (8+)",
+                "overview": "יצור קטן, צרוד וזקן עם עור פנים מחוספס, יושב על כיסא נוח מול האח הבוערת, בעוד כלבו הציני והמרוט שרוע לרגליו, הוא מספר אגדה מופלאה. ביחד השניים חושפים בפנינו את עולמן המופלא של אגדות העם. מספר הסיפורים הוא ג'ון הארט, הכלב הוא קולו של בריאן הנסון והאגדה היא אחת שכבר שמעתם.",
+                "poster": "https://image.tmdb.org/t/p/w500/xmxsuEWhAjHy2GVlOL28KjHXobe.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/celzfQGiEaOLzZaGPYrO3fP2ogX.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/celzfQGiEaOLzZaGPYrO3fP2ogX.jpg",
+                "genres": [
+                  "action",
+                  "animation",
+                  "scifi",
+                  "drama"
+                ],
+                "genresHe": [
+                  "אקשן והרפתקאות",
+                  "אנימציה ומשפחה",
+                  "מדע בדיוני ופנטזיה",
+                  "דרמה"
+                ],
+                "seasonsCount": 1
               }
             }
           },
@@ -370,13 +517,16 @@
             "278": 1794686259883,
             "550": 1794772327539,
             "1396": 1794686263135,
-            "1399": 1794772333743,
+            "1399": 1794776544169,
             "1413": 1794686264301,
+            "2875": 1794777022228,
             "10580": 1794770938868,
+            "24611": 1794776669508,
             "69557": 1794698934882,
             "95396": 1794698940923,
             "103913": 1794698937513,
             "157336": 1794770988551,
+            "226637": 1794776887772,
             "293660": 1794698940065,
             "301528": 1794698933987,
             "533535": 1794686262083,
@@ -460,12 +610,21 @@
             "movie-550": 1794772327539,
             "tt0137523": 1794772327539,
             "series-550": 1794772327539,
-            "series-1399": 1794772333743,
-            "tt0944947": 1794772333743,
-            "movie-1399": 1794772333743,
             "tt17526714": 1794772609370,
             "movie-933260": 1794772609370,
-            "series-933260": 1794772609370
+            "series-933260": 1794772609370,
+            "series-1399": 1794776544169,
+            "tt0944947": 1794776544169,
+            "movie-1399": 1794776544169,
+            "movie-24611": 1794776669508,
+            "tt0073052": 1794776669508,
+            "series-24611": 1794776669508,
+            "series-226637": 1794776887772,
+            "tt22091076": 1794776887772,
+            "movie-226637": 1794776887772,
+            "series-2875": 1794777022228,
+            "tt0088559": 1794777022228,
+            "movie-2875": 1794777022228
           },
           "progressClearedAt": 1794432225027
         },
@@ -668,11 +827,173 @@
           "watchlistUpdatedAt": 0,
           "deletedProgressIds": {},
           "progressClearedAt": 0
+        },
+        "prof-1794773247760": {
+          "watchlist": [],
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0,
+          "progress": {},
+          "deletedProgressIds": {},
+          "progressClearedAt": 0
+        },
+        "prof-1794773258268": {
+          "watchlist": [],
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0,
+          "progress": {},
+          "deletedProgressIds": {},
+          "progressClearedAt": 0
+        },
+        "prof-1794773265526": {
+          "watchlist": [],
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0,
+          "progress": {},
+          "deletedProgressIds": {},
+          "progressClearedAt": 0
+        },
+        "prof-1794773270494": {
+          "watchlist": [],
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0,
+          "progress": {
+            "tt15398776": {
+              "id": "tt15398776",
+              "imdbId": "tt15398776",
+              "tmdbId": "872585",
+              "title": "אופנהיימר",
+              "currentTime": 1902,
+              "duration": 10822,
+              "percent": 18,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794773442245,
+              "snapshot": {
+                "id": "tt15398776",
+                "imdbId": "tt15398776",
+                "tmdbId": "872585",
+                "type": "movie",
+                "title": "אופנהיימר",
+                "originalTitle": "Oppenheimer",
+                "year": "2023",
+                "rating": "8.9",
+                "runtimeHe": "3 שעות ו-00 דק'",
+                "ageRating": "16+",
+                "overview": "סיפורו המטלטל של הפיזיקאי האמריקאי ג'יי רוברט אופנהיימר ותפקידו המרכזי בפרויקט מנהטן הסודי לפיתוח הפצצה האטומית הראשונה במלחמת העולם השנייה.",
+                "poster": "https://images.metahub.space/poster/medium/tt15398776/img",
+                "backdrop": "https://images.metahub.space/background/medium/tt15398776/img",
+                "cardBackdrop": "https://images.metahub.space/background/medium/tt15398776/img",
+                "genres": [
+                  "drama",
+                  "docu",
+                  "war",
+                  "telegram"
+                ],
+                "genresHe": [
+                  "דרמה",
+                  "ביוגרפיה והיסטוריה"
+                ],
+                "seasonsCount": 0
+              }
+            },
+            "tt32261958": {
+              "id": "tt32261958",
+              "imdbId": "tt32261958",
+              "tmdbId": "1283515",
+              "title": "תעתוע",
+              "currentTime": 58,
+              "duration": 7200,
+              "percent": 3,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794773608669,
+              "snapshot": {
+                "id": "tt32261958",
+                "imdbId": "tt32261958",
+                "tmdbId": "1283515",
+                "type": "movie",
+                "title": "תעתוע",
+                "originalTitle": "Verity",
+                "year": "2026",
+                "rating": "7.4",
+                "runtimeHe": "שעה ו-58 דק'",
+                "ageRating": "16+",
+                "overview": "סופרת מתקשה עוברת להתגורר באחוזת קרופורד המבודדת כדי לכתוב בשמה של וריטי. לאחר שלואן מגלה מה שנראה כרשימות אוטוביוגרפיות מצמררות של וריטי, היא מתמודדת עם וידויים מטרידים ומעוותים הנוגעים לבעלה של וריטי, ג'רמי ומתקשה להבחין בין דמיון למציאות, בין מניפולציה למשיכה, ובין הזדמנות לאובססיה.",
+                "poster": "https://image.tmdb.org/t/p/w500/fhkXXgxth4IxoplvQvQZ0BSo3F4.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/original/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
+                "genres": [
+                  "mystery",
+                  "thriller",
+                  "drama",
+                  "telegram"
+                ],
+                "genresHe": [
+                  "מסתורין",
+                  "מותחן",
+                  "דרמה"
+                ],
+                "seasonsCount": 0
+              }
+            },
+            "movie-1571955": {
+              "id": "movie-1571955",
+              "imdbId": "tt38793125",
+              "tmdbId": "1571955",
+              "title": "מסלול התנגשות",
+              "currentTime": 900,
+              "duration": 6381,
+              "percent": 14,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794774400348,
+              "snapshot": {
+                "id": "movie-1571955",
+                "imdbId": "tt38793125",
+                "tmdbId": "1571955",
+                "type": "movie",
+                "title": "מסלול התנגשות",
+                "originalTitle": "Colisión",
+                "year": "2026",
+                "rating": "6.3",
+                "runtimeHe": "שעתיים",
+                "ageRating": "16+",
+                "overview": "מדריד, 2013: ספרד עדיין שקועה במשבר הכלכלי, וחבורת שודדים פורצת לבנק. בדרך החוצה רכב המילוט מתרסק, והתאונה מתחילה לפרק את הקבוצה מבפנים. בזמן שהם מנסים להימלט, נחשפים הסודות שכל אחד מהשודדים הסתיר, והבגידות והשקרים שהצטברו ביניהם הרבה לפני שנכנסו לבנק, ומתברר שאיש מהם אינו בדיוק מי שנראה.",
+                "poster": "https://image.tmdb.org/t/p/w500/nD47vSQkRwsFE8X2SXGEelRa5g7.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/uI3kWI7kGW5E0F8WduewgQYPt34.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/uI3kWI7kGW5E0F8WduewgQYPt34.jpg",
+                "genres": [
+                  "thriller",
+                  "drama",
+                  "crime",
+                  "netflix"
+                ],
+                "genresHe": [
+                  "מותחנים",
+                  "דרמה",
+                  "מתח ופשע",
+                  "נטפליקס (Netflix)"
+                ],
+                "seasonsCount": 0
+              }
+            }
+          },
+          "deletedProgressIds": {},
+          "progressClearedAt": 0
         }
       },
       "parentalMaster": {
         "pinCode": "",
-        "customSkipSegments": {}
+        "customSkipSegments": {
+          "tt0411705": [
+            {
+              "start": 18,
+              "end": 50,
+              "category": "sex",
+              "label": "קטע שסומן ע״י המשתמש"
+            }
+          ]
+        }
       },
       "subPrefs": {
         "schemaVer": 2,
@@ -736,13 +1057,5 @@
     "disabledLiveChannels": {},
     "disabledTelegramChannels": {}
   },
-  "__qr_pairings": {
-    "4633": {
-      "email": "bensahaltv@gmail.com",
-      "name": "BENSAHAL TV",
-      "role": "admin",
-      "max_profiles": 5,
-      "ts": 1794694742957
-    }
-  }
+  "__qr_pairings": {}
 }

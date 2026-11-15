@@ -132,8 +132,8 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794777223638,
-      "subUsersUpdatedAt": 1794774698606,
+      "updatedTs": 1794776500000,
+      "subUsersUpdatedAt": 1794776500000,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
         "prof-bedroom": 1794494898603,
@@ -149,6 +149,8 @@
           "id": "prof-main",
           "name": "BENSAHAL TV",
           "color": "#b91c1c",
+          "avatarKey": "king",
+          "avatarImage": "",
           "isKids": false,
           "isPrimary": true,
           "parentalControl": {
@@ -157,7 +159,7 @@
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
             "blurPx": 22,
-            "updatedAt": 1794774698606,
+            "updatedAt": 1794776500000,
             "categories": {
               "sex": true,
               "violence": false,
@@ -170,19 +172,23 @@
         {
           "id": "prof-1794773247760",
           "name": "איה",
-          "color": "#334155",
+          "color": "#be185d",
+          "avatarKey": "star",
+          "avatarImage": "",
           "isKids": false,
           "isPrimary": false,
           "parentalControl": {
             "enabled": false,
-            "actionMode": "skip",
+            "actionMode": "blur_mute",
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
+            "blurPx": 22,
+            "updatedAt": 1794776500000,
             "categories": {
               "sex": true,
-              "violence": true,
-              "profanity": true,
-              "drugs": true,
+              "violence": false,
+              "profanity": false,
+              "drugs": false,
               "horror": false
             },
             "blurPx": 22,
@@ -192,19 +198,23 @@
         {
           "id": "prof-1794773258268",
           "name": "אלדר",
-          "color": "#3f3f46",
+          "color": "#1e40af",
+          "avatarKey": "gamer",
+          "avatarImage": "",
           "isKids": false,
           "isPrimary": false,
           "parentalControl": {
             "enabled": false,
-            "actionMode": "skip",
+            "actionMode": "blur_mute",
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
+            "blurPx": 22,
+            "updatedAt": 1794776500000,
             "categories": {
               "sex": true,
-              "violence": true,
-              "profanity": true,
-              "drugs": true,
+              "violence": false,
+              "profanity": false,
+              "drugs": false,
               "horror": false
             },
             "blurPx": 22,
@@ -214,19 +224,23 @@
         {
           "id": "prof-1794773265526",
           "name": "שקד",
-          "color": "#475569",
+          "color": "#047857",
+          "avatarKey": "music",
+          "avatarImage": "",
           "isKids": false,
           "isPrimary": false,
           "parentalControl": {
             "enabled": false,
-            "actionMode": "skip",
+            "actionMode": "blur_mute",
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
+            "blurPx": 22,
+            "updatedAt": 1794776500000,
             "categories": {
               "sex": true,
-              "violence": true,
-              "profanity": true,
-              "drugs": true,
+              "violence": false,
+              "profanity": false,
+              "drugs": false,
               "horror": false
             },
             "blurPx": 22,
@@ -236,19 +250,23 @@
         {
           "id": "prof-1794773270494",
           "name": "שי",
-          "color": "#52525b",
+          "color": "#6d28d9",
+          "avatarKey": "astronaut",
+          "avatarImage": "",
           "isKids": false,
           "isPrimary": false,
           "parentalControl": {
             "enabled": false,
-            "actionMode": "skip",
+            "actionMode": "blur_mute",
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
+            "blurPx": 22,
+            "updatedAt": 1794776500000,
             "categories": {
               "sex": true,
-              "violence": true,
-              "profanity": true,
-              "drugs": true,
+              "violence": false,
+              "profanity": false,
+              "drugs": false,
               "horror": false
             },
             "blurPx": 22,
@@ -1039,13 +1057,5 @@
     "disabledLiveChannels": {},
     "disabledTelegramChannels": {}
   },
-  "__qr_pairings": {
-    "4633": {
-      "email": "bensahaltv@gmail.com",
-      "name": "BENSAHAL TV",
-      "role": "admin",
-      "max_profiles": 5,
-      "ts": 1794694742957
-    }
-  }
+  "__qr_pairings": {}
 }

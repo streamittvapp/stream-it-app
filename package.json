@@ -4,7 +4,6 @@
   "private": true,
   "description": "STREAM IT — Encrypted Multi-Profile Cinema & Streamer Platform",
   "scripts": {
-    "start": "python server.py 8092",
     "build": "python build_www.py",
     "cap:init": "npx @capacitor/cli init \"STREAM IT\" com.streamit.cinema.app --web-dir www",
     "cap:add:android": "npx @capacitor/cli add android",
