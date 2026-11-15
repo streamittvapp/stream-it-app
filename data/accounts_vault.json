@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794722281146,
+      "updatedTs": 1794722284673,
       "subUsersUpdatedAt": 1794694857976,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -434,12 +434,12 @@
               "imdbId": "tt21692408",
               "tmdbId": "1011985",
               "title": "קונג פו פנדה 4 (מדובב לעברית)",
-              "currentTime": 1219,
+              "currentTime": 1221,
               "duration": 5617,
               "percent": 22,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794722281146,
+              "updatedAt": 1794722284673,
               "snapshot": {
                 "id": "movie-1011985",
                 "imdbId": "tt21692408",
