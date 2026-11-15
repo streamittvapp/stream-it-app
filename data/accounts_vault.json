@@ -132,8 +132,8 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794776500000,
-      "subUsersUpdatedAt": 1794776500000,
+      "updatedTs": 1794778517688,
+      "subUsersUpdatedAt": 1794778517688,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
         "prof-bedroom": 1794494898603,
@@ -143,7 +143,7 @@
         "prof-1794772225879": 1794772301090,
         "prof-1794772238633": 1794772301939
       },
-      "activeSubUserId": "prof-main",
+      "activeSubUserId": "prof-1794773270494",
       "subUsers": [
         {
           "id": "prof-main",
@@ -167,7 +167,8 @@
               "drugs": false,
               "horror": false
             }
-          }
+          },
+          "avatarUrl": ""
         },
         {
           "id": "prof-1794773247760",
@@ -183,17 +184,16 @@
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
             "blurPx": 22,
-            "updatedAt": 1794776500000,
+            "updatedAt": 0,
             "categories": {
               "sex": true,
               "violence": false,
               "profanity": false,
               "drugs": false,
               "horror": false
-            },
-            "blurPx": 22,
-            "updatedAt": 0
-          }
+            }
+          },
+          "avatarUrl": ""
         },
         {
           "id": "prof-1794773258268",
@@ -209,17 +209,16 @@
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
             "blurPx": 22,
-            "updatedAt": 1794776500000,
+            "updatedAt": 0,
             "categories": {
               "sex": true,
               "violence": false,
               "profanity": false,
               "drugs": false,
               "horror": false
-            },
-            "blurPx": 22,
-            "updatedAt": 0
-          }
+            }
+          },
+          "avatarUrl": ""
         },
         {
           "id": "prof-1794773265526",
@@ -235,17 +234,16 @@
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
             "blurPx": 22,
-            "updatedAt": 1794776500000,
+            "updatedAt": 0,
             "categories": {
               "sex": true,
               "violence": false,
               "profanity": false,
               "drugs": false,
               "horror": false
-            },
-            "blurPx": 22,
-            "updatedAt": 0
-          }
+            }
+          },
+          "avatarUrl": ""
         },
         {
           "id": "prof-1794773270494",
@@ -261,17 +259,16 @@
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
             "blurPx": 22,
-            "updatedAt": 1794776500000,
+            "updatedAt": 0,
             "categories": {
               "sex": true,
               "violence": false,
               "profanity": false,
               "drugs": false,
               "horror": false
-            },
-            "blurPx": 22,
-            "updatedAt": 0
-          }
+            }
+          },
+          "avatarUrl": ""
         }
       ],
       "profileData": {
