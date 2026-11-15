@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794776862386,
+      "updatedTs": 1794776882147,
       "subUsersUpdatedAt": 1794774698606,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -314,12 +314,12 @@
               "imdbId": "tt22091076",
               "tmdbId": "226637",
               "title": "פוטנציאל גבוה",
-              "currentTime": 15,
+              "currentTime": 35,
               "duration": 2490,
               "percent": 3,
               "season": 1,
               "episode": 8,
-              "updatedAt": 1794776862386,
+              "updatedAt": 1794776882147,
               "snapshot": {
                 "id": "series-226637",
                 "imdbId": "tt22091076",
