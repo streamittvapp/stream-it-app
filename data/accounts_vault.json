@@ -132,17 +132,18 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794772301091,
-      "subUsersUpdatedAt": 1794772301091,
+      "updatedTs": 1794772327539,
+      "subUsersUpdatedAt": 1794772301939,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
         "prof-bedroom": 1794494898603,
         "prof-kids": 1794494905106,
         "prof-1794772211399": 1794772250535,
         "prof-1794772219833": 1794772251715,
-        "prof-1794772225879": 1794772301090
+        "prof-1794772225879": 1794772301090,
+        "prof-1794772238633": 1794772301939
       },
-      "activeSubUserId": "prof-1794772238633",
+      "activeSubUserId": "prof-main",
       "subUsers": [
         {
           "id": "prof-main",
@@ -150,26 +151,6 @@
           "color": "#b91c1c",
           "isKids": false,
           "isPrimary": true,
-          "parentalControl": {
-            "enabled": false,
-            "actionMode": "skip",
-            "profanityMode": "mute_censor",
-            "sensitivity": "balanced",
-            "categories": {
-              "sex": true,
-              "violence": true,
-              "profanity": true,
-              "drugs": true,
-              "horror": false
-            }
-          }
-        },
-        {
-          "id": "prof-1794772238633",
-          "name": "אלדר",
-          "color": "#52525b",
-          "isKids": false,
-          "isPrimary": false,
           "parentalControl": {
             "enabled": false,
             "actionMode": "skip",
@@ -234,46 +215,6 @@
                   "מסתורין",
                   "מותחן",
                   "דרמה"
-                ],
-                "seasonsCount": 0
-              }
-            },
-            "movie-550": {
-              "id": "movie-550",
-              "imdbId": "tt0137523",
-              "tmdbId": "550",
-              "title": "מועדון קרב",
-              "currentTime": 2437,
-              "duration": 8348,
-              "percent": 29,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794771429719,
-              "snapshot": {
-                "id": "movie-550",
-                "imdbId": "tt0137523",
-                "tmdbId": "550",
-                "type": "movie",
-                "title": "מועדון קרב",
-                "originalTitle": "Fight Club",
-                "year": "1999",
-                "rating": "8.4",
-                "runtimeHe": "שעתיים",
-                "ageRating": "14+",
-                "overview": "בהשפעתו של גבר כריזמטי אותו פגש בטיסה, עוזב פקיד אפרורי את עבודתו ואת ביתו המלוקק, ופותח מועדון קרבות מחתרתי. בהדרגה העניינים יוצאים משליטה.",
-                "poster": "https://image.tmdb.org/t/p/w500/7Tmjr0jgVj8hHcd3UJD6HIilMKM.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/c6OLXfKAk5BKeR6broC8pYiCquX.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/c6OLXfKAk5BKeR6broC8pYiCquX.jpg",
-                "genres": [
-                  "drama",
-                  "thriller",
-                  "tpb",
-                  "netflix"
-                ],
-                "genresHe": [
-                  "דרמה",
-                  "מותחנים",
-                  "PirateBay & YTS 4K"
                 ],
                 "seasonsCount": 0
               }
@@ -466,6 +407,7 @@
           "deletedProgressIds": {
             "27": 1794432189831,
             "278": 1794686259883,
+            "550": 1794772327539,
             "1396": 1794686263135,
             "1413": 1794686264301,
             "10580": 1794770938868,
@@ -551,7 +493,10 @@
             "series-157336": 1794770988551,
             "movie-1011985": 1794770989183,
             "tt21692408": 1794770989183,
-            "series-1011985": 1794770989183
+            "series-1011985": 1794770989183,
+            "movie-550": 1794772327539,
+            "tt0137523": 1794772327539,
+            "series-550": 1794772327539
           },
           "progressClearedAt": 1794432225027
         },
@@ -752,14 +697,6 @@
           },
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
-          "deletedProgressIds": {},
-          "progressClearedAt": 0
-        },
-        "prof-1794772238633": {
-          "watchlist": [],
-          "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0,
-          "progress": {},
           "deletedProgressIds": {},
           "progressClearedAt": 0
         }
