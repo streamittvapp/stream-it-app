@@ -15,11 +15,16 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
-  <link rel="stylesheet" href="styles.css?v=9.9.93" />
+  <link rel="stylesheet" href="styles.css?v=9.9.94" />
   <script>
     (function () {
       try {
         try { window.open = function () { return null; }; } catch (e) {}
+        try {
+          if (typeof window !== 'undefined' && !window.MediaSource && window.ManagedMediaSource) {
+            window.MediaSource = window.ManagedMediaSource;
+          }
+        } catch (eMseAlias) {}
         if (window.history && window.history.replaceState && /\/index\.html$/i.test(window.location.pathname)) {
           window.history.replaceState(null, '', window.location.pathname.replace(/\/index\.html$/i, '/') + window.location.search + window.location.hash);
         }
@@ -34,13 +39,13 @@
           });
         }
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (!otaVer || otaVer <= '9.9.92') {
+        if (!otaVer || otaVer <= '9.9.93') {
           localStorage.removeItem('streamit_ota_css_v9');
           localStorage.removeItem('streamit_ota_app_js_v9');
           localStorage.removeItem('streamit_ota_tv_nav_v9');
         }
         var otaCss = localStorage.getItem('streamit_ota_css_v9') || '';
-        if (otaVer && otaVer > '9.9.92' && otaCss.length > 500) {
+        if (otaVer && otaVer > '9.9.93' && otaCss.length > 500) {
           var st = document.createElement('style');
           st.id = 'streamit-ota-live-style-v9';
           st.textContent = otaCss;
@@ -884,7 +889,7 @@
   <!-- ===================================================================== -->
   <div id="playerModal" class="modal-overlay player-modal hidden" role="dialog" aria-modal="true" aria-label="נגן וידאו">
     <div class="player-stage">
-      <video id="videoElement" class="video-element" playsinline crossorigin="anonymous"></video>
+      <video id="videoElement" class="video-element" playsinline disableremoteplayback crossorigin="anonymous"></video>
 
       <div id="embedPlayerContainer" class="embed-player-container hidden"></div>
 
@@ -911,18 +916,27 @@
         </div>
       </div>
 
-      <!-- SafeWatch Fullscreen Blur/Blackout Shield Overlay (#parentalShieldOverlay) -->
+      <!-- SafeWatch Fullscreen Optical Blur Shield Overlay (#parentalShieldOverlay) -->
       <div id="parentalShieldOverlay" class="parental-shield-overlay hidden" dir="rtl" aria-live="assertive">
         <div class="parental-shield-card">
-          <svg viewBox="0 0 24 24" class="parental-shield-svg" aria-hidden="true">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-            <path d="M9 12l2 2 4-4" />
-          </svg>
-          <h3 id="parentalShieldHeading" class="parental-shield-heading">קטע מוסתר ע״י בקרת הורים (SafeWatch)</h3>
-          <p id="parentalShieldDesc" class="parental-shield-desc">זוהתה סצנה לא הולמת בהתאם להגדרות הפרופיל הפעיל</p>
-          <button type="button" id="parentalShieldSkipNowBtn" class="btn-primary parental-shield-skip-btn tv-focusable">
-            <span>דלג מיד לסוף הקטע</span>
-          </button>
+          <div class="parental-shield-header-row">
+            <svg viewBox="0 0 24 24" class="parental-shield-svg" aria-hidden="true">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              <path d="M9 12l2 2 4-4" />
+            </svg>
+            <div class="parental-shield-text-col">
+              <h3 id="parentalShieldHeading" class="parental-shield-heading">המסך מטושטש ע״י בקרת הורים (SafeWatch)</h3>
+              <p id="parentalShieldDesc" class="parental-shield-desc">התמונה מטושטשת והשמע מושתק בהתאם להגדרות הפרופיל הפעיל</p>
+            </div>
+          </div>
+          <div class="parental-shield-actions-row">
+            <button type="button" id="parentalShieldSkipNowBtn" class="btn-primary parental-shield-skip-btn tv-focusable">
+              <span>דלג מיד לסוף הקטע ⏭</span>
+            </button>
+            <button type="button" id="parentalShieldDismissBtn" class="btn-secondary parental-shield-dismiss-btn tv-focusable">
+              <span>בטל טשטוש לקטע זה 👁️</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1194,6 +1208,17 @@
           </div>
           <div id="playerParentalActiveStatus" class="player-parental-status-box"></div>
           <div id="playerParentalQuickToggles" class="player-parental-quick-toggles"></div>
+          <div id="playerParentalBlurRow" class="subs-control-section player-parental-blur-section">
+            <div class="subs-control-label">עוצמת טשטוש מסך <span id="playerParentalBlurBadge" class="subs-value-readout" dir="ltr">22px</span></div>
+            <div class="subs-options-row">
+              <button type="button" id="playerParentalBlurMinusBtn" class="subs-chip-btn tv-focusable" aria-label="הפחת עוצמת טשטוש">-</button>
+              <button type="button" class="subs-chip-btn tv-focusable" data-parental-blur-preset="10">עדין</button>
+              <button type="button" class="subs-chip-btn active tv-focusable" data-parental-blur-preset="22">בינוני</button>
+              <button type="button" class="subs-chip-btn tv-focusable" data-parental-blur-preset="36">חזק</button>
+              <button type="button" class="subs-chip-btn tv-focusable" data-parental-blur-preset="52">מלא</button>
+              <button type="button" id="playerParentalBlurPlusBtn" class="subs-chip-btn tv-focusable" aria-label="הגבר עוצמת טשטוש">+</button>
+            </div>
+          </div>
           <div class="subs-control-section">
             <div class="subs-control-label">פעולות מהירות בזמן צפייה</div>
             <div class="player-parental-quick-actions">
@@ -1546,6 +1571,45 @@
           </div>
         </div>
 
+        <!-- 4B. Optical Blur Intensity Control (Active in Blur + Mute Mode) -->
+        <div id="parentalBlurControlBox" class="parental-blur-control-box">
+          <div class="parental-blur-header-row">
+            <div class="parental-blur-title-col">
+              <strong class="parental-blur-title">עוצמת טשטוש המסך (במצב טשטוש + השתקת קול):</strong>
+              <span class="parental-blur-sub">שלוט ברמת הטשטוש האופטי על הווידאו בזמן סצנה מסוננת (טשטוש אמיתי ללא מסך שחור)</span>
+            </div>
+            <div class="parental-blur-preview-wrap">
+              <div class="parental-blur-sample-box" aria-hidden="true">
+                <span id="parentalBlurPreviewSample" class="parental-blur-sample-inner">דוגמת טשטוש וידאו</span>
+              </div>
+              <span id="parentalBlurValueBadge" class="parental-blur-value-badge" dir="ltr">22px (בינוני)</span>
+            </div>
+          </div>
+          <div class="parental-blur-controls-row">
+            <div class="parental-blur-presets">
+              <button type="button" class="parental-seg-btn parental-blur-preset-btn tv-focusable" data-parental-blur-preset="10">עדין (10px)</button>
+              <button type="button" class="parental-seg-btn parental-blur-preset-btn tv-focusable active" data-parental-blur-preset="22">בינוני (22px)</button>
+              <button type="button" class="parental-seg-btn parental-blur-preset-btn tv-focusable" data-parental-blur-preset="36">חזק (36px)</button>
+              <button type="button" class="parental-seg-btn parental-blur-preset-btn tv-focusable" data-parental-blur-preset="52">מקסימלי (52px)</button>
+            </div>
+            <div class="parental-blur-slider-wrap">
+              <button type="button" id="parentalBlurMinusBtn" class="btn-secondary parental-blur-step-btn tv-focusable" aria-label="הפחת עוצמת טשטוש">-</button>
+              <input
+                type="range"
+                id="parentalBlurRangeInput"
+                class="parental-blur-range-input tv-focusable"
+                min="4"
+                max="60"
+                step="2"
+                value="22"
+                dir="ltr"
+                aria-label="בורר עוצמת טשטוש בפיקסלים"
+              />
+              <button type="button" id="parentalBlurPlusBtn" class="btn-secondary parental-blur-step-btn tv-focusable" aria-label="הגבר עוצמת טשטוש">+</button>
+            </div>
+          </div>
+        </div>
+
         <!-- 5. Optional Parental PIN Lock (So Sub-Users Cannot Turn It Off) -->
         <div class="parental-pin-setup-bar">
           <div class="parental-pin-setup-text">
@@ -1849,13 +1913,13 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Core Application & Smart TV Navigation Scripts -->
-  <script src="tv-navigation.js?v=9.9.93"></script>
-  <script src="app.js?v=9.9.93"></script>
+  <script src="tv-navigation.js?v=9.9.94"></script>
+  <script src="app.js?v=9.9.94"></script>
   <script>
     (function () {
       try {
         var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
-        if (otaVer && otaVer > '9.9.93') {
+        if (otaVer && otaVer > '9.9.94') {
           window.__STREAMIT_OTA_INJECTED_RUNNING = true;
           var otaCssBottom = localStorage.getItem('streamit_ota_css_v9') || '';
           if (otaCssBottom.length > 200 && !document.getElementById('streamit-ota-css')) {

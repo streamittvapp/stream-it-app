@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.9.93';
+  var APP_VERSION = '9.9.94';
 
   function ensureOtaStylesheetInjected() {
     try {
@@ -74,8 +74,10 @@
     window.__STREAMIT_V999_BOOTED ||
     window.__STREAMIT_V9991_BOOTED ||
     window.__STREAMIT_V9992_BOOTED ||
-    window.__STREAMIT_V9993_BOOTED
+    window.__STREAMIT_V9993_BOOTED ||
+    window.__STREAMIT_V9994_BOOTED
   );
+  window.__STREAMIT_V9994_BOOTED = true;
   window.__STREAMIT_V9993_BOOTED = true;
   window.__STREAMIT_V9992_BOOTED = true;
   window.__STREAMIT_V9991_BOOTED = true;
@@ -121,7 +123,8 @@
   window.__STREAMIT_V968_BOOTED = true;
   window.__STREAMIT_V969_BOOTED = true;
   window.__STREAMIT_V970_BOOTED = true;
-  // Synchronously block any older bundled v9.7.0-v9.9.92 script from firing its DOMContentLoaded boot handler after OTA loads!
+  // Synchronously block any older bundled v9.7.0-v9.9.93 script from firing its DOMContentLoaded boot handler after OTA loads!
+  window.__STREAMIT_V9993_BOOT_DONE = true;
   window.__STREAMIT_V9992_BOOT_DONE = true;
   window.__STREAMIT_V9991_BOOT_DONE = true;
   window.__STREAMIT_V999_BOOT_DONE = true;
@@ -1703,12 +1706,56 @@
     lastParentalSkipAt: 0,
     parentalTempMuted: false,
     parentalShieldActiveSegment: null,
+    parentalDismissedSegmentSig: '',
     parentalSkippedCountThisSession: 0,
     parentalSkipBannerTimer: null,
     parentalEmbedSeekTargetSec: 0,
     parentalEmbedSeekUntilTs: 0,
     parentalGuardTimer: null
   };
+
+  function normalizeParentalBlurPx(val) {
+    var n = Number(val);
+    if (!isFinite(n) || n <= 0) return 22;
+    return Math.max(4, Math.min(60, Math.round(n / 2) * 2));
+  }
+
+  function getParentalBlurLevelLabel(px) {
+    var b = normalizeParentalBlurPx(px);
+    if (b <= 14) return b + 'px (עדין)';
+    if (b <= 28) return b + 'px (בינוני)';
+    if (b <= 42) return b + 'px (חזק)';
+    return b + 'px (מקסימלי)';
+  }
+
+  function applyParentalBlurIntensityCss(blurPx) {
+    var px = normalizeParentalBlurPx(blurPx);
+    try {
+      if (document.documentElement) {
+        document.documentElement.style.setProperty('--parental-blur-px', px + 'px');
+      }
+      var pm = document.getElementById('playerModal');
+      if (pm) {
+        pm.style.setProperty('--parental-blur-px', px + 'px');
+        if (pm.classList.contains('parental-blur-active')) {
+          var blurTargets = ['videoElement', 'embedPlayerContainer', 'streamEmbedIframe'];
+          for (var i = 0; i < blurTargets.length; i++) {
+            var el = document.getElementById(blurTargets[i]);
+            if (el) {
+              el.style.filter = 'blur(' + px + 'px)';
+              el.style.webkitFilter = 'blur(' + px + 'px)';
+            }
+          }
+        }
+      }
+      var sampleEl = document.getElementById('parentalBlurPreviewSample');
+      if (sampleEl) {
+        var sampleBlur = Math.max(1.5, Math.round(px * 0.22 * 10) / 10);
+        sampleEl.style.filter = 'blur(' + sampleBlur + 'px)';
+        sampleEl.style.webkitFilter = 'blur(' + sampleBlur + 'px)';
+      }
+    } catch (e) {}
+  }
 
   function ensureProfileParentalConfig(su) {
     if (!su || typeof su !== 'object') return null;
@@ -1735,11 +1782,13 @@
         actionMode: 'skip', // 'skip' | 'blur_mute'
         profanityMode: 'mute_censor', // 'mute_censor' | 'skip'
         sensitivity: isKids ? 'strict' : 'balanced', // 'balanced' | 'strict'
+        blurPx: 22,
+        updatedAt: 0,
         categories: {
           sex: true,
-          violence: true,
-          profanity: true,
-          drugs: true,
+          violence: isKids,
+          profanity: isKids,
+          drugs: isKids,
           horror: isKids
         }
       };
@@ -1754,12 +1803,14 @@
       if (su.parentalControl.sensitivity !== 'balanced' && su.parentalControl.sensitivity !== 'strict') {
         su.parentalControl.sensitivity = isKids ? 'strict' : 'balanced';
       }
+      su.parentalControl.blurPx = normalizeParentalBlurPx(su.parentalControl.blurPx);
+      su.parentalControl.updatedAt = Number(su.parentalControl.updatedAt || 0);
       var cats = su.parentalControl.categories || {};
       su.parentalControl.categories = {
         sex: typeof cats.sex === 'boolean' ? cats.sex : true,
-        violence: typeof cats.violence === 'boolean' ? cats.violence : true,
-        profanity: typeof cats.profanity === 'boolean' ? cats.profanity : true,
-        drugs: typeof cats.drugs === 'boolean' ? cats.drugs : true,
+        violence: typeof cats.violence === 'boolean' ? cats.violence : false,
+        profanity: typeof cats.profanity === 'boolean' ? cats.profanity : false,
+        drugs: typeof cats.drugs === 'boolean' ? cats.drugs : false,
         horror: typeof cats.horror === 'boolean' ? cats.horror : isKids
       };
     }
@@ -2491,8 +2542,21 @@
       if (!baseSu.length) {
         baseSu = buildDefaultSubUsersForAccount(state.deletedSubUserIds);
       }
+      // Per-profile Parental Control merge: always keep whichever profile config has the newer parentalControl.updatedAt!
       for (var m = 0; m < baseSu.length; m++) {
-        ensureProfileParentalConfig(baseSu[m]);
+        var bProf = baseSu[m];
+        ensureProfileParentalConfig(bProf);
+        for (var o = 0; o < otherSu.length; o++) {
+          if (otherSu[o] && otherSu[o].id === bProf.id && otherSu[o].parentalControl) {
+            ensureProfileParentalConfig(otherSu[o]);
+            var bParTs = Number(bProf.parentalControl.updatedAt || (suCloudIsNewer ? cloudSuTs : localSuTs) || 0);
+            var oParTs = Number(otherSu[o].parentalControl.updatedAt || (suCloudIsNewer ? localSuTs : cloudSuTs) || 0);
+            if (oParTs > bParTs) {
+              bProf.parentalControl = JSON.parse(JSON.stringify(otherSu[o].parentalControl));
+            }
+            break;
+          }
+        }
       }
       state.subUsers = baseSu;
       state.subUsersUpdatedAt = Math.max(localSuTs, cloudSuTs);
@@ -8918,14 +8982,27 @@
     });
   }
 
+  async function ensureCloudStreamsMapLoaded() {
+    if (state.cloudStreamsMap && typeof state.cloudStreamsMap === 'object') {
+      return state.cloudStreamsMap;
+    }
+    state.cloudStreamsMap = {};
+    try {
+      var csUrl = (window.AndroidTvBridge || window.__STREAMIT_OTA_INJECTED_RUNNING)
+        ? ('https://streamittvapp.github.io/stream-it-app/data/cloud_streams.json?v=' + encodeURIComponent(APP_VERSION))
+        : ('data/cloud_streams.json?v=' + encodeURIComponent(APP_VERSION));
+      var r = await fetch(csUrl);
+      if (r && r.ok) {
+        var d = await r.json();
+        if (d && d.streams && typeof d.streams === 'object') {
+          state.cloudStreamsMap = d.streams;
+        }
+      }
+    } catch (eCs) {}
+    return state.cloudStreamsMap;
+  }
+
   async function resolveDirect1080pHlsUrl(item, imdbId, season, episode) {
-    if (!hasLocalBackend()) {
-      await probeLocalPythonBackend();
-    }
-    if (!hasLocalBackend()) {
-      return null;
-    }
-    var apiBase = getApiBase();
     var mediaType = item.type === 'series' ? 'series' : 'movie';
     var tmdbId = String(item.tmdbId || '').replace(/\D/g, '');
     var origLang = String(item.originalLanguage || (item.isIsraeli ? 'he' : 'en')).toLowerCase();
@@ -8933,12 +9010,60 @@
     var preferHebAudio = Boolean((activeProf && activeProf.isKids) || item.isHebrewDubbed);
     var expectedTitle = String(item.originalTitle || item.title || '').trim();
     var expectedYear = String(item.year || '').slice(0, 4);
+    var sNum = season || 1;
+    var eNum = episode || 1;
+
+    var hevcDashSupported = false;
+    try {
+      if (typeof window !== 'undefined' && !window.MediaSource && window.ManagedMediaSource) {
+        window.MediaSource = window.ManagedMediaSource;
+      }
+      var mseConstructors = [window.MediaSource, window.ManagedMediaSource].filter(function (c) {
+        return c && typeof c.isTypeSupported === 'function';
+      });
+      var codecCandidates = [
+        'video/mp4; codecs="hev1.1.6.L120.90"',
+        'video/mp4; codecs="hev1.1.6.L93.90"',
+        'video/mp4; codecs="hvc1.1.6.L93.90"'
+      ];
+      for (var mc = 0; mc < mseConstructors.length; mc++) {
+        for (var cc = 0; cc < codecCandidates.length; cc++) {
+          if (mseConstructors[mc].isTypeSupported(codecCandidates[cc])) {
+            hevcDashSupported = true;
+            break;
+          }
+        }
+        if (hevcDashSupported) break;
+      }
+    } catch (eMse) {}
+
+    if (!hasLocalBackend()) {
+      await probeLocalPythonBackend();
+    }
+
+    // Mobile / Web Cloud Direct Stream Resolver (`data/cloud_streams.json` — zero local server required!)
+    if (!hasLocalBackend()) {
+      if (tmdbId && hevcDashSupported && !item._dashFailedOnDevice) {
+        var csMap = await ensureCloudStreamsMapLoaded();
+        var csKey = mediaType === 'series'
+          ? ('tv:' + tmdbId + ':' + sNum + ':' + eNum)
+          : ('movie:' + tmdbId);
+        var csHit = csMap && csMap[csKey];
+        if (csHit && csHit.url && csHit.url.indexOf('dash-mpd') !== -1 && csHit.url.indexOf('blob=') !== -1) {
+          var mobileDashBlobUrl = await unwrapAndPrepareCloudFrontDashMpd(csHit.url, origLang, preferHebAudio);
+          if (mobileDashBlobUrl) {
+            return mobileDashBlobUrl;
+          }
+        }
+      }
+      return null;
+    }
+
+    var apiBase = getApiBase();
 
     // Fast non-blocking `/api/direct-stream` on `127.0.0.1:8092` (works on BOTH Streamer APK EmbeddedServer and Desktop Python Server!)
     // Combines `p9fx` (Vertex 1080p CloudFront DASH — responds in ~1.0s) and `w7dn` (Nebula 1080p Original Audio HLS)
     // and strictly blocks `vjej` (720p foreign-dubbed server)!
-    var sNum = season || 1;
-    var eNum = episode || 1;
     var buildSourcePriorityUrl = function (srcCode) {
       return (mediaType === 'series')
         ? (apiBase + '/api/direct-stream?type=tv' +
@@ -8970,13 +9095,6 @@
       '&orig_lang=' + encodeURIComponent(origLang) +
       '&expected_title=' + encodeURIComponent(expectedTitle) +
       '&expected_year=' + encodeURIComponent(expectedYear);
-
-    var hevcDashSupported = true;
-    try {
-      if (typeof window.MediaSource !== 'undefined' && typeof window.MediaSource.isTypeSupported === 'function') {
-        hevcDashSupported = window.MediaSource.isTypeSupported('video/mp4; codecs="hev1.1.6.L120.90"');
-      }
-    } catch (eMse) {}
 
     var candidateCalls;
     if (!tmdbId) {
@@ -9393,6 +9511,13 @@
           return;
         }
         try {
+          if (typeof window !== 'undefined' && !window.MediaSource && window.ManagedMediaSource) {
+            window.MediaSource = window.ManagedMediaSource;
+          }
+          try {
+            video.disableRemotePlayback = true;
+            video.setAttribute('disableremoteplayback', '');
+          } catch (eDrp) {}
           var cleanMpdUrl = streamUrl.split('#')[0];
           var dashPlayer = window.dashjs.MediaPlayer().create();
           state.dashInstance = dashPlayer;
@@ -9446,18 +9571,24 @@
             if (ev && ev.error && (ev.error.code || ev.error === 'capability' || ev.error === 'mediasource')) {
               try { dashPlayer.reset(); } catch (eRst) {}
               state.dashInstance = null;
+              if (state.playingItem) {
+                state.playingItem._dashFailedOnDevice = true;
+              }
               if (fallbackQueue.length > 0) {
                 playDirectHlsOrMp4(fallbackQueue[0], startOffsetSec, fallbackQueue.slice(1), activeSession);
               } else if (state.playingItem && state.playingItem.type !== 'channel') {
-                playCleanEmbedStream(state.playingItem, state.activeSeason, state.activeEpisode, startOffsetSec, 'embed1', activeSession);
+                playCleanEmbedStream(state.playingItem, state.activeSeason, state.activeEpisode, startOffsetSec, 'embed2', activeSession);
               }
             }
           });
         } catch (eDashInit) {
+          if (state.playingItem) {
+            state.playingItem._dashFailedOnDevice = true;
+          }
           if (fallbackQueue.length > 0) {
             playDirectHlsOrMp4(fallbackQueue[0], startOffsetSec, fallbackQueue.slice(1), activeSession);
           } else if (state.playingItem && state.playingItem.type !== 'channel') {
-            playCleanEmbedStream(state.playingItem, state.activeSeason, state.activeEpisode, startOffsetSec, 'embed1', activeSession);
+            playCleanEmbedStream(state.playingItem, state.activeSeason, state.activeEpisode, startOffsetSec, 'embed2', activeSession);
           }
         }
       });
@@ -9681,10 +9812,35 @@
         '&start=' + Math.floor(state.embedStartOffsetSec || 0) +
         '&server=' + encodeURIComponent(state.embedActiveServerKey || 'embed1');
     } else {
-      if (item.type === 'series') {
-        embedUrl = 'https://cdn.vidspark.to/tv/' + encodeURIComponent(mediaId) + '/' + (season || 1) + '/' + (episode || 1) + queryStr;
+      var sNumEmbed = season || 1;
+      var eNumEmbed = episode || 1;
+      var csKeyEmbed = item.type === 'series'
+        ? ('tv:' + tmdbId + ':' + sNumEmbed + ':' + eNumEmbed)
+        : ('movie:' + tmdbId);
+      var isP9fxTitleInVault = Boolean(state.cloudStreamsMap && state.cloudStreamsMap[csKeyEmbed]);
+      // If we are on a mobile browser where HEVC DASH is unsupported (e.g. older iOS) and the title is p9fx-only,
+      // cdn.vidspark.to will fail and redirect to broken player.vidprime.top — so route directly to Mirror #2 (vidlink.pro H.264 HLS)!
+      if (state.embedActiveServerKey === 'embed1' && (item._dashFailedOnDevice || isP9fxTitleInVault)) {
+        state.embedActiveServerKey = 'embed2';
+      }
+      if (state.embedActiveServerKey === 'embed2') {
+        if (item.type === 'series') {
+          embedUrl = 'https://vidlink.pro/tv/' + encodeURIComponent(mediaId) + '/' + sNumEmbed + '/' + eNumEmbed + '?autoplay=true&primaryColor=e50914&title=false&poster=false';
+        } else {
+          embedUrl = 'https://vidlink.pro/movie/' + encodeURIComponent(mediaId) + '?autoplay=true&primaryColor=e50914&title=false&poster=false';
+        }
+      } else if (state.embedActiveServerKey === 'swarm') {
+        if (item.type === 'series') {
+          embedUrl = 'https://vidfast.pro/tv/' + encodeURIComponent(mediaId) + '/' + sNumEmbed + '/' + eNumEmbed + '?autoPlay=true';
+        } else {
+          embedUrl = 'https://vidfast.pro/movie/' + encodeURIComponent(mediaId) + '?autoPlay=true';
+        }
       } else {
-        embedUrl = 'https://cdn.vidspark.to/movie/' + encodeURIComponent(mediaId) + queryStr;
+        if (item.type === 'series') {
+          embedUrl = 'https://cdn.vidspark.to/tv/' + encodeURIComponent(mediaId) + '/' + sNumEmbed + '/' + eNumEmbed + queryStr;
+        } else {
+          embedUrl = 'https://cdn.vidspark.to/movie/' + encodeURIComponent(mediaId) + queryStr;
+        }
       }
     }
 
@@ -10394,35 +10550,35 @@
   var ENGLISH_PROFANITY_REGEX = /\b(motherfuck(?:er|ing|ers)?|fuck(?:ing|ed|er|s)?|shit(?:ty|s|ting)?|bullshit|bitch(?:es|ing)?|asshole(?:s)?|dickhead|cocksucker|cunt(?:s)?|whore(?:s)?|slut(?:s)?|bastard(?:s)?|pussy)\b/gi;
   var ENGLISH_STRICT_PROFANITY_REGEX = /\b(damn(?:it)?|goddamn|hell|crap|piss(?:ed)?|dick|cock)\b/gi;
 
+  // High-precision scene detection patterns (ONLY explicit stage directions & unambiguous sexual/graphic markers — zero false positives on normal sighs/gasps/dialogue)
   var SEX_CUE_PATTERNS = [
-    /\[[^\]]*(?:moan|groan|passion|sex|making love|nudity|naked|undress|heavy breathing|climax|orgasm|panting|kiss|kissing|make out|making out|sensual|intimate|erotic|seduct|gasps|sighs|אנחות|גניחות|נאנח|נאנחת|מתפשט|מתפשטת|עירום|מין|נשיקה|מתנשקים|נשימות כבדות)[^\]]*\]/i,
-    /\([^\)]*(?:moan|groan|passion|sex|making love|nudity|naked|undress|heavy breathing|climax|orgasm|panting|kiss|kissing|make out|making out|sensual|intimate|erotic|seduct|gasps|sighs|אנחות|גניחות|נאנח|נאנחת|מתפשט|מתפשטת|עירום|מין|נשיקה|מתנשקים|נשימות כבדות)[^\)]*\)/i,
-    /\b(?:have sex|having sex|make love|making love|fuck me|fucking me|take off your clothes|take your clothes off|take off my clothes|take off your shirt|take off your dress|take off your pants|get naked|strip for me|blowjob|handjob|orgasm|climax|undress(?:ing)?|naked body|kissing passionately|making out|make out with|come to bed|get into bed|in my bed|touch my body|touch me there|feel so good|don't stop|oh god yes|bra|panties|lingerie|boobs|breasts|nipples)\b/i,
-    /(?:שכב איתי|תשכב איתי|תשכבי איתי|לשכב איתך|לשכב איתה|לשכב איתו|שכבנו|נעשה סקס|עושים סקס|לעשות סקס|יחסי מין|אורגזמה|תתפשטי|תתפשט|מתפשטים|מתפשטת|בעירום|עירום מלא|ערומה|ערום|תורידי את הבגדים|תוריד את הבגדים|תוריד את החולצה|תורידי את השמלה|בוא למיטה|בואי למיטה|ניכנס למיטה|נשיקה לוהטת|מתנשקים בלהט|מתנשקים|תנשק אותי|תנשקי אותי|מתמזמזים|להתמזמז|חזייה|תחתונים|הלבשה תחתונה|תגע בי|תיגע בי|תגעי בי|לגעת בך|אני רוצה אותך עכשיו)/
+    /\[[^\]]*(?:sex scene|having sex|making love|explicit nudity|full nudity|both naked|undressing each other|moaning passionately|moans passionately|sexual moaning|erotic moaning|climaxing|orgasming|סצנת מין|מקיימים יחסי מין|עירום מלא|מתפשטים בלהט|גניחות מיניות|אנחות מיניות)[^\]]*\]/i,
+    /\([^\)]*(?:sex scene|having sex|making love|explicit nudity|full nudity|both naked|undressing each other|moaning passionately|moans passionately|sexual moaning|erotic moaning|climaxing|orgasming|סצנת מין|מקיימים יחסי מין|עירום מלא|מתפשטים בלהט|גניחות מיניות|אנחות מיניות)[^\)]*\)/i,
+    /\b(?:let's have sex|having sex right now|make love to me|take all your clothes off|strip naked for me|full frontal nudity)\b/i,
+    /(?:בוא נעשה סקס|בואי נעשה סקס|עושים סקס עכשיו|תתפשטי לגמרי|תתפשט לגמרי|תורידי את כל הבגדים|תוריד את כל הבגדים)/
   ];
   var SEX_STRICT_PATTERNS = [
-    /\[[^\]]*(?:kiss|kissing|sigh|gasp|נשיקה|מתנשקים|אנחה)[^\]]*\]/i,
-    /(?:לנשק אותך|נשיקה|תשוקה|חושני|מפתה|מיטה)/,
-    /\b(?:kiss me|kissing|passionate|seductive|into bed|bedroom)\b/i
+    /\[[^\]]*(?:kissing passionately|making out|passionate kiss|heavy kissing|מתנשקים בלהט|נשיקה לוהטת|מתמזמזים)[^\]]*\]/i,
+    /\([^\)]*(?:kissing passionately|making out|passionate kiss|heavy kissing|מתנשקים בלהט|נשיקה לוהטת|מתמזמזים)[^\)]*\)/i,
+    /(?:נשיקה לוהטת|מתנשקים בלהט|מתמזמזים במיטה|בואי נשכב|בוא נשכב)/,
+    /\b(?:kissing passionately|making out passionately|come make love)\b/i
   ];
 
   var VIOLENCE_CUE_PATTERNS = [
-    /\[[^\]]*(?:gunshot|gunfire|screaming in pain|screaming in agony|bones crunch|flesh tear|blood splatter|stabbing|choking|strangl|יריות|צרחות כאב|צרחות אימה|דוקר|משסף|דם)[^\]]*\]/i,
-    /\([^\)]*(?:gunshot|gunfire|screaming in pain|screaming in agony|bones crunch|flesh tear|blood splatter|stabbing|choking|יריות|צרחות כאב|צרחות אימה|דוקר|משסף)[^\)]*\)/i,
-    /\b(?:slit (?:his|her|your) throat|cut (?:his|her|your) head off|blow (?:his|her|your) brains out|torture (?:him|her)|bleed to death)\b/i,
-    /(?:לשחוט אותו|לחתוך לו את הגרון|דם ניתז|עינויים קשים|יריתי בו|תירה בו|תירי בו)/
+    /\[[^\]]*(?:graphic violence|blood splatters|blood gushing|bones crunching|flesh tearing|brutal stabbing|slitting throat|decapitat|torturing|screaming in agony|דם ניתז|שיסוף גרון|עינויים קשים|אלימות גרפית|צרחות ייסורים)[^\]]*\]/i,
+    /\([^\)]*(?:graphic violence|blood splatters|blood gushing|bones crunching|flesh tearing|brutal stabbing|slitting throat|decapitat|torturing|screaming in agony|דם ניתז|שיסוף גרון|עינויים קשים|אלימות גרפית|צרחות ייסורים)[^\)]*\)/i,
+    /\b(?:slit (?:his|her) throat|cut (?:his|her) head off|torture (?:him|her) to death)\b/i,
+    /(?:לחתוך לו את הגרון|דם ניתז לכל עבר|עינויים קשים)/
   ];
 
   var DRUGS_CUE_PATTERNS = [
-    /\[[^\]]*(?:snort|cocaine|heroin|bong|joint|injecting|מסניף|קוקאין|הרואין|מזריק)[^\]]*\]/i,
-    /\b(?:snort(?:ing)?|cocaine|heroin|crystal meth|methamphetamine|crack pipe|smoke a joint|smoking weed|drug overdose|fentanyl)\b/i,
-    /(?:להסניף|מסניף|קוקאין|הרואין|נגלגל ג׳וינט|נגלגל ג'וינט|מנת יתר|סמים קשים|קריסטל מת׳)/
+    /\[[^\]]*(?:snorting cocaine|snorts cocaine|injecting heroin|shoots up heroin|smoking crack|smoking meth|smoking a bong|מסניף קוקאין|מזריק הרואין|מעשן קראק|מעשן באנג)[^\]]*\]/i,
+    /\([^\)]*(?:snorting cocaine|snorts cocaine|injecting heroin|shoots up heroin|smoking crack|smoking meth|smoking a bong|מסניף קוקאין|מזריק הרואין|מעשן קראק|מעשן באנג)[^\)]*\)/i
   ];
 
   var HORROR_CUE_PATTERNS = [
-    /\[[^\]]*(?:demonic|blood-curdling|terrifying scream|possessed|eerie shriek|צרחה מקפיאת דם|קול שטני|דיבוק)[^\]]*\]/i,
-    /\([^\)]*(?:demonic|blood-curdling|terrifying scream|possessed|eerie shriek|צרחה מקפיאת דם|דיבוק)[^\)]*\)/i,
-    /(?:רוח רפאים|דיבוק שטני|גירוש שדים|שטן|מפלצת)/
+    /\[[^\]]*(?:blood-curdling scream|terrifying shriek|demonic growl|demonic voice|possessed screaming|צרחה מקפיאת דם|קול שטני|דיבוק שטני)[^\]]*\]/i,
+    /\([^\)]*(?:blood-curdling scream|terrifying shriek|demonic growl|demonic voice|possessed screaming|צרחה מקפיאת דם|קול שטני|דיבוק שטני)[^\)]*\)/i
   ];
 
   function getMediaParentalKey(item, season, episode) {
@@ -10433,6 +10589,11 @@
       return baseId + ':S' + (season || 1) + ':E' + (episode || 1);
     }
     return baseId;
+  }
+
+  function getSegmentSignature(seg) {
+    if (!seg) return '';
+    return String(seg.category || 'x') + ':' + Math.round(Number(seg.start || 0)) + ':' + Math.round(Number(seg.end || 0));
   }
 
   function censorProfanityInText(text, sensitivity) {
@@ -10493,10 +10654,12 @@
     var merged = [];
     for (var i = 0; i < sorted.length; i++) {
       var seg = sorted[i];
+      var isCuratedOrUser = (seg.source === 'curated' || seg.source === 'user');
+      var minDur = seg.category === 'profanity' ? 0.5 : (isCuratedOrUser ? 1.0 : minSceneDurationSec);
       if (!merged.length) {
         merged.push({
           start: Math.max(0, seg.start),
-          end: Math.max(seg.end, seg.start + (seg.category === 'profanity' ? 0.5 : minSceneDurationSec)),
+          end: Math.max(seg.end, seg.start + minDur),
           category: seg.category,
           severity: seg.severity || 'balanced',
           label: seg.label || PARENTAL_CATEGORY_LABELS[seg.category] || 'קטע לא הולם',
@@ -10512,7 +10675,7 @@
         } else {
           merged.push({
             start: Math.max(0, seg.start),
-            end: Math.max(seg.end, seg.start + (seg.category === 'profanity' ? 0.5 : minSceneDurationSec)),
+            end: Math.max(seg.end, seg.start + minDur),
             category: seg.category,
             severity: seg.severity || 'balanced',
             label: seg.label || PARENTAL_CATEGORY_LABELS[seg.category] || 'קטע לא הולם',
@@ -10525,18 +10688,33 @@
   }
 
   function rebuildParentalSkipTimelineForCurrentMedia() {
+    var activeProf = getActiveSubUser();
+    var pCfg = activeProf ? ensureProfileParentalConfig(activeProf) : null;
+    if (pCfg) {
+      applyParentalBlurIntensityCss(pCfg.blurPx);
+    }
+
     var item = state.playingItem;
-    if (!item || item.type === 'channel' || item.type === 'youtube') {
+    if (!item || item.type === 'channel' || item.type === 'youtube' || !pCfg || !pCfg.enabled || countEnabledParentalCategories(pCfg) === 0) {
       state.activeSkipSegments = [];
+      if (state.parentalShieldActiveSegment) {
+        state.parentalShieldActiveSegment = null;
+        hideParentalShieldOverlay();
+      }
+      if (state.parentalTempMuted) {
+        setParentalTemporaryMute(false);
+      }
       return;
     }
 
+    var cats = pCfg.categories || {};
+    var isStrictMode = pCfg.sensitivity === 'strict';
     var rawList = [];
     var imdbKey = String(item.imdbId || '').trim();
     var tmdbKey = String(item.tmdbId || '').replace(/\D/g, '');
     var mediaKey = getMediaParentalKey(item, state.activeSeason, state.activeEpisode);
 
-    // 1. Curated DB entries by IMDb ID / TMDB ID / Episode Key
+    // 1. Curated DB entries by IMDb ID / TMDB ID / Episode Key (ONLY for categories explicitly checked by the user!)
     var dbKeys = [mediaKey, imdbKey, tmdbKey].filter(Boolean);
     var seenDb = {};
     for (var k = 0; k < dbKeys.length; k++) {
@@ -10544,6 +10722,8 @@
       if (Array.isArray(arr)) {
         for (var d = 0; d < arr.length; d++) {
           var sEntry = arr[d];
+          if (!sEntry || !cats[sEntry.category]) continue;
+          if (sEntry.severity === 'strict' && !isStrictMode) continue;
           var sig = sEntry.category + ':' + Math.round(sEntry.start);
           if (!seenDb[sig]) {
             seenDb[sig] = true;
@@ -10560,17 +10740,18 @@
       }
     }
 
-    // 2. User-saved custom skip segments for this movie/episode
+    // 2. User-saved custom skip segments for this movie/episode (ONLY if that segment's category is enabled!)
     if (mediaKey && state.parentalMaster && state.parentalMaster.customSkipSegments) {
       var customArr = state.parentalMaster.customSkipSegments[mediaKey];
       if (Array.isArray(customArr)) {
         for (var c = 0; c < customArr.length; c++) {
           var cs = customArr[c];
-          if (cs && isFinite(cs.start) && isFinite(cs.end) && cs.end > cs.start) {
+          var csCat = (cs && cs.category) ? cs.category : 'sex';
+          if (cs && cats[csCat] && isFinite(cs.start) && isFinite(cs.end) && cs.end > cs.start) {
             rawList.push({
               start: cs.start,
               end: cs.end,
-              category: cs.category || 'sex',
+              category: csCat,
               severity: 'balanced',
               label: cs.label || 'קטע שסומן ע״י המשתמש',
               source: 'user'
@@ -10580,8 +10761,19 @@
       }
     }
 
-    // 3. Automatic Deep Subtitle & SDH Cue Scanner (Hebrew + English SDH)
-    var allCuePools = [state.parsedCues || [], state.englishSdhCues || []];
+    // 3. High-Precision Subtitle & SDH Cue Scanner — ONLY scans categories that are explicitly checked in `cats`!
+    var allCuePools = [state.parsedCues || []];
+    if (Array.isArray(state.englishSdhCues) && state.englishSdhCues.length) {
+      // Only include English SDH pool if there are no Hebrew cues or if its timeline span matches the Hebrew track within 15%
+      var hebCues = state.parsedCues || [];
+      var engCues = state.englishSdhCues;
+      var hebMaxEnd = hebCues.length ? hebCues[hebCues.length - 1].end : 0;
+      var engMaxEnd = engCues.length ? engCues[engCues.length - 1].end : 0;
+      if (!hebMaxEnd || (engMaxEnd > 0 && Math.abs(engMaxEnd - hebMaxEnd) / Math.max(hebMaxEnd, 1) <= 0.15)) {
+        allCuePools.push(engCues);
+      }
+    }
+
     for (var p = 0; p < allCuePools.length; p++) {
       var cues = allCuePools[p];
       for (var i = 0; i < cues.length; i++) {
@@ -10589,58 +10781,27 @@
         if (!cue || !cue.text) continue;
         var txt = String(cue.text);
 
-        // A. Sex & Nudity detection (Balanced & Strict merged + Intimate Lead-In + Visual Action Gap Bridging)
-        var isSexBalanced = matchesAnyRegexList(txt, SEX_CUE_PATTERNS);
-        var isSexStrict = !isSexBalanced && matchesAnyRegexList(txt, SEX_STRICT_PATTERNS);
-        var isIntimateLeadIn = !isSexBalanced && !isSexStrict && (
-          /(?:אני רוצה אותך|רוצה אותך|תישאר הלילה|תישארי הלילה|תישאר איתי|תישארי איתי|בוא אליי|בואי אליי|בחדר השינה|במיטה|את כל כך יפה|אתה כל כך חתיך|תסגור את הדלת|תסגרי את הדלת|אנחנו לבד|אל תפסיק|אל תפסיקי|תוריד|תורידי|חולצה|שמלה|בגדים|מקלחת|הגוף שלך|שפתיים|נאנח|נאנחת|מתנשף|מתנשפת)/i.test(txt) ||
-          /\b(?:I want you|want you so|stay the night|stay with me tonight|in my bedroom|close the door|lock the door|you're so hot|you're so sexy|don't stop|take it off|your lips|your skin|your body|in the shower)\b/i.test(txt)
-        );
-        if (isSexBalanced || isSexStrict || isIntimateLeadIn) {
-          var segStart = Math.max(0, cue.start - 3.5);
-          var segEnd = cue.end + (isSexBalanced ? 26.0 : (isSexStrict ? 18.0 : 8.0));
-          var foundActionGap = false;
-          // Movie sex scenes often have a 5s–60s dialogue-free visual gap right after an intimate/bedroom/undressing cue:
-          var lookIdx = i + 1;
-          while (lookIdx < cues.length && lookIdx <= i + 5) {
-            var nextCue = cues[lookIdx];
-            if (!nextCue) break;
-            var gapAfter = nextCue.start - (lookIdx === i + 1 ? cue.end : cues[lookIdx - 1].end);
-            var nextTxt = String(nextCue.text || '').trim();
-            var isShortBreathOrMusic = nextTxt.length <= 24 || /^[\[\(♪♫]/.test(nextTxt) || /(?:אה+|אוה+|אלוהים|כן+|אל תפסיק|נשיקה|אנחה|oh+|ah+|god|yes+|mm+|kiss|moan|sigh|gasp|breath)/i.test(nextTxt);
-            if (gapAfter >= 5.0 && gapAfter <= 65.0) {
-              foundActionGap = true;
-              segEnd = Math.max(segEnd, Math.min(cue.end + 55.0, nextCue.start + 6.0));
-              if (isShortBreathOrMusic) {
-                segEnd = Math.max(segEnd, nextCue.end + 15.0);
-                lookIdx++;
-                continue;
-              }
-            } else if (isShortBreathOrMusic && gapAfter < 5.0) {
-              foundActionGap = true;
-              segEnd = Math.max(segEnd, nextCue.end + 16.0);
-              lookIdx++;
-              continue;
-            }
-            break;
-          }
-          if (isSexBalanced || isSexStrict || foundActionGap) {
+        // A. Sex & Nudity detection (ONLY if `cats.sex === true`)
+        if (cats.sex) {
+          var isSexBalanced = matchesAnyRegexList(txt, SEX_CUE_PATTERNS);
+          var isSexStrict = !isSexBalanced && isStrictMode && matchesAnyRegexList(txt, SEX_STRICT_PATTERNS);
+          if (isSexBalanced || isSexStrict) {
             rawList.push({
-              start: segStart,
-              end: segEnd,
+              start: Math.max(0, cue.start - 0.8),
+              end: cue.end + (isSexBalanced ? 4.5 : 3.0),
               category: 'sex',
-              severity: 'balanced',
-              label: 'סצנה מינית / אינטימית',
+              severity: isSexBalanced ? 'balanced' : 'strict',
+              label: isSexBalanced ? 'סצנת מין ועירום' : 'סצנה אינטימית / נשיקה',
               source: 'sub_ai'
             });
           }
         }
 
-        // B. Violence & Gore detection
-        if (matchesAnyRegexList(txt, VIOLENCE_CUE_PATTERNS)) {
+        // B. Violence & Gore detection (ONLY if `cats.violence === true`)
+        if (cats.violence && matchesAnyRegexList(txt, VIOLENCE_CUE_PATTERNS)) {
           rawList.push({
-            start: Math.max(0, cue.start - 1.5),
-            end: cue.end + 3.5,
+            start: Math.max(0, cue.start - 0.8),
+            end: cue.end + 3.0,
             category: 'violence',
             severity: 'balanced',
             label: 'סצנת אלימות קשה',
@@ -10648,11 +10809,11 @@
           });
         }
 
-        // C. Drugs & Alcohol detection
-        if (matchesAnyRegexList(txt, DRUGS_CUE_PATTERNS)) {
+        // C. Drugs & Alcohol detection (ONLY if `cats.drugs === true`)
+        if (cats.drugs && matchesAnyRegexList(txt, DRUGS_CUE_PATTERNS)) {
           rawList.push({
-            start: Math.max(0, cue.start - 1.5),
-            end: cue.end + 3.5,
+            start: Math.max(0, cue.start - 0.8),
+            end: cue.end + 3.0,
             category: 'drugs',
             severity: 'balanced',
             label: 'סצנת שימוש בסמים',
@@ -10660,11 +10821,11 @@
           });
         }
 
-        // D. Horror & Frightening scenes detection
-        if (matchesAnyRegexList(txt, HORROR_CUE_PATTERNS)) {
+        // D. Horror & Frightening scenes detection (ONLY if `cats.horror === true`)
+        if (cats.horror && matchesAnyRegexList(txt, HORROR_CUE_PATTERNS)) {
           rawList.push({
-            start: Math.max(0, cue.start - 1.5),
-            end: cue.end + 3.5,
+            start: Math.max(0, cue.start - 0.8),
+            end: cue.end + 3.0,
             category: 'horror',
             severity: 'balanced',
             label: 'קטע אימה מפחיד',
@@ -10672,30 +10833,32 @@
           });
         }
 
-        // E. Profanity detection (Strict & Balanced)
-        if (containsProfanityCue(txt, 'balanced')) {
-          rawList.push({
-            start: Math.max(0, cue.start - 0.15),
-            end: cue.end + 0.2,
-            category: 'profanity',
-            severity: 'balanced',
-            label: 'שפה בוטה',
-            source: 'sub_ai'
-          });
-        } else if (containsProfanityCue(txt, 'strict')) {
-          rawList.push({
-            start: Math.max(0, cue.start - 0.15),
-            end: cue.end + 0.2,
-            category: 'profanity',
-            severity: 'strict',
-            label: 'שפה לא הולמת',
-            source: 'sub_ai'
-          });
+        // E. Profanity detection (ONLY if `cats.profanity === true`)
+        if (cats.profanity) {
+          if (containsProfanityCue(txt, 'balanced')) {
+            rawList.push({
+              start: Math.max(0, cue.start - 0.15),
+              end: cue.end + 0.2,
+              category: 'profanity',
+              severity: 'balanced',
+              label: 'שפה בוטה',
+              source: 'sub_ai'
+            });
+          } else if (isStrictMode && containsProfanityCue(txt, 'strict')) {
+            rawList.push({
+              start: Math.max(0, cue.start - 0.15),
+              end: cue.end + 0.2,
+              category: 'profanity',
+              severity: 'strict',
+              label: 'שפה לא הולמת',
+              source: 'sub_ai'
+            });
+          }
         }
       }
     }
 
-    state.activeSkipSegments = clusterAndMergeSceneSegments(rawList, 22, 9);
+    state.activeSkipSegments = clusterAndMergeSceneSegments(rawList, 5.0, 3.5);
   }
 
   function setParentalTemporaryMute(shouldMute, forceReassert) {
@@ -10744,6 +10907,11 @@
   }
 
   function showParentalShieldOverlay(seg, remainingSec) {
+    var activeProf = getActiveSubUser();
+    var pCfg = activeProf ? ensureProfileParentalConfig(activeProf) : null;
+    var blurPx = normalizeParentalBlurPx(pCfg ? pCfg.blurPx : 22);
+    applyParentalBlurIntensityCss(blurPx);
+
     var shield = document.getElementById('parentalShieldOverlay');
     var heading = document.getElementById('parentalShieldHeading');
     var desc = document.getElementById('parentalShieldDesc') || document.getElementById('parentalShieldSub');
@@ -10751,12 +10919,20 @@
     var playerStage = document.querySelector('#playerModal .player-stage');
     if (playerModal) playerModal.classList.add('parental-blur-active');
     if (playerStage) playerStage.classList.add('parental-blur-active');
+    var blurTargets = ['videoElement', 'embedPlayerContainer', 'streamEmbedIframe'];
+    for (var i = 0; i < blurTargets.length; i++) {
+      var el = document.getElementById(blurTargets[i]);
+      if (el) {
+        el.style.filter = 'blur(' + blurPx + 'px)';
+        el.style.webkitFilter = 'blur(' + blurPx + 'px)';
+      }
+    }
     if (!shield) return;
     var catName = (seg && (seg.label || PARENTAL_CATEGORY_LABELS[seg.category])) || 'תוכן לא הולם';
-    if (heading) heading.textContent = 'המסך מטושטש ע״י בקרת הורים (' + catName + ')';
+    if (heading) heading.textContent = 'טשטוש בקרת הורים פעיל (' + catName + ')';
     if (desc) {
       var rem = Math.max(1, Math.ceil(remainingSec || 5));
-      desc.textContent = 'התמונה מטושטשת והשמע מושתק בהתאם להגדרות הפרופיל • הקטע יסתיים בעוד ' + rem + ' שניות';
+      desc.textContent = 'עוצמת טשטוש: ' + blurPx + 'px • השמע מושתק • הקטע יסתיים בעוד ' + rem + ' שניות';
     }
     shield.classList.remove('hidden');
   }
@@ -10766,6 +10942,14 @@
     var playerStage = document.querySelector('#playerModal .player-stage');
     if (playerModal) playerModal.classList.remove('parental-blur-active');
     if (playerStage) playerStage.classList.remove('parental-blur-active');
+    var blurTargets = ['videoElement', 'embedPlayerContainer', 'streamEmbedIframe'];
+    for (var i = 0; i < blurTargets.length; i++) {
+      var el = document.getElementById(blurTargets[i]);
+      if (el) {
+        el.style.filter = '';
+        el.style.webkitFilter = '';
+      }
+    }
     var shield = document.getElementById('parentalShieldOverlay');
     if (shield && !shield.classList.contains('hidden')) {
       shield.classList.add('hidden');
@@ -10832,7 +11016,7 @@
     if (!state.playingItem || state.playingItem.type === 'channel' || state.playingItem.type === 'youtube') return;
     var activeProf = getActiveSubUser();
     var pCfg = ensureProfileParentalConfig(activeProf);
-    if (!pCfg || !pCfg.enabled) {
+    if (!pCfg || !pCfg.enabled || countEnabledParentalCategories(pCfg) === 0) {
       if (state.parentalTempMuted) setParentalTemporaryMute(false);
       if (state.parentalShieldActiveSegment) {
         state.parentalShieldActiveSegment = null;
@@ -10842,7 +11026,14 @@
     }
 
     var segments = state.activeSkipSegments || [];
-    if (!segments.length) return;
+    if (!segments.length) {
+      if (state.parentalTempMuted) setParentalTemporaryMute(false);
+      if (state.parentalShieldActiveSegment) {
+        state.parentalShieldActiveSegment = null;
+        hideParentalShieldOverlay();
+      }
+      return;
+    }
 
     var t = currentTimeSec - (state.subOffsetSec || 0);
     var matchedVisualSeg = null;
@@ -10850,10 +11041,14 @@
 
     for (var i = 0; i < segments.length; i++) {
       var seg = segments[i];
-      if (!pCfg.categories || !pCfg.categories[seg.category]) continue;
+      // Strictly enforce ONLY the categories whose checkboxes are enabled (`true`)!
+      if (!pCfg.categories || pCfg.categories[seg.category] !== true) continue;
       if (seg.severity === 'strict' && pCfg.sensitivity !== 'strict') continue;
 
       if (t >= seg.start && t < seg.end - 0.25) {
+        if (state.parentalDismissedSegmentSig && getSegmentSignature(seg) === state.parentalDismissedSegmentSig) {
+          continue;
+        }
         if (seg.category === 'profanity' && pCfg.profanityMode === 'mute_censor') {
           matchedProfanityMuteSeg = seg;
         } else {
@@ -10871,7 +11066,7 @@
         performParentalJumpTo(matchedVisualSeg.end + 0.35, matchedVisualSeg);
         return;
       } else {
-        // 'blur_mute' mode: keep shield overlay and continuously enforce mute until segment ends
+        // 'blur_mute' mode: keep optical blur overlay and continuously enforce mute until segment ends
         var wasAlreadyShielded = Boolean(state.parentalShieldActiveSegment);
         state.parentalShieldActiveSegment = matchedVisualSeg;
         setParentalTemporaryMute(true, !wasAlreadyShielded || (Math.floor(t * 2) % 2 === 0));
@@ -10930,10 +11125,9 @@
         cfg.enabled = true;
         if (countEnabledParentalCategories(cfg) === 0) {
           cfg.categories.sex = true;
-          cfg.categories.violence = true;
-          cfg.categories.profanity = true;
         }
-        saveSubUsersState();
+        cfg.updatedAt = Date.now();
+        saveSubUsersState({ markSubUsersUpdated: true, cloudDelayMs: 300 });
       }
     }
     var pMenu = document.getElementById('playerParentalMenu');
@@ -10944,7 +11138,7 @@
       start: curT,
       end: curT + 25,
       category: 'sex',
-      label: 'הדגמת SafeWatch — סצנה לא הולמת (סקס / אלימות)'
+      label: 'הדגמת SafeWatch — בדיקת טשטוש / דילוג'
     };
 
     var activeCfg = curProf ? ensureProfileParentalConfig(curProf) : null;
@@ -10991,7 +11185,7 @@
     var keys = ['sex', 'violence', 'profanity', 'drugs', 'horror'];
     var count = 0;
     for (var i = 0; i < keys.length; i++) {
-      if (pCfg.categories[keys[i]]) count++;
+      if (pCfg.categories[keys[i]] === true) count++;
     }
     return count;
   }
@@ -11000,13 +11194,19 @@
     if (!pCfg || !pCfg.enabled) return 'כבוי — ללא סינון';
     var count = countEnabledParentalCategories(pCfg);
     if (count === 0) return 'פעיל (ללא קטגוריות מסומנות)';
-    var modeTxt = pCfg.actionMode === 'blur_mute' ? 'טשטוש מסך והשתקה' : 'דילוג אוטומטי';
+    var blurPx = normalizeParentalBlurPx(pCfg.blurPx);
+    var modeTxt = pCfg.actionMode === 'blur_mute'
+      ? ('טשטוש מסך ' + blurPx + 'px והשתקה')
+      : 'דילוג אוטומטי';
     return 'פעיל • ' + modeTxt + ' (' + count + ' קטגוריות)';
   }
 
   function updateUserMenuParentalSummary() {
     var activeProf = getActiveSubUser();
     var pCfg = activeProf ? ensureProfileParentalConfig(activeProf) : null;
+    if (pCfg) {
+      applyParentalBlurIntensityCss(pCfg.blurPx);
+    }
     var subEl = document.getElementById('userMenuParentalSub');
     var tvMoreDescEl = document.getElementById('tvMoreParentalSubLabel') || document.getElementById('tvMoreParentalDesc');
     var tvMoreTitleEl = document.getElementById('tvMoreParentalLabel');
@@ -11039,10 +11239,29 @@
     }
   }
 
+  function setProfileParentalBlurPx(targetProf, nextBlurPx) {
+    var prof = targetProf || getEditingParentalProfile() || getActiveSubUser();
+    if (!prof) return;
+    var cfg = ensureProfileParentalConfig(prof);
+    cfg.blurPx = normalizeParentalBlurPx(nextBlurPx);
+    cfg.updatedAt = Date.now();
+    applyParentalBlurIntensityCss(cfg.blurPx);
+    saveSubUsersState({ markSubUsersUpdated: true, cloudDelayMs: 300 });
+    renderParentalControlModal();
+    updateInPlayerParentalUi();
+    updateUserMenuParentalSummary();
+    if (state.parentalShieldActiveSegment) {
+      var curT = getCurrentPlaybackTimeSec() - (state.subOffsetSec || 0);
+      showParentalShieldOverlay(state.parentalShieldActiveSegment, Math.max(1, state.parentalShieldActiveSegment.end - curT));
+    }
+  }
+
   function updateInPlayerParentalUi() {
     var activeProf = getActiveSubUser();
     var pCfg = activeProf ? ensureProfileParentalConfig(activeProf) : getActiveProfileParentalConfig();
     var isEn = Boolean(pCfg && pCfg.enabled);
+    var curBlurPx = normalizeParentalBlurPx(pCfg ? pCfg.blurPx : 22);
+    applyParentalBlurIntensityCss(curBlurPx);
 
     var topBtn = document.getElementById('playerTopParentalBtn');
     var topLabel = document.getElementById('playerTopParentalLabel');
@@ -11053,13 +11272,24 @@
       topLabel.textContent = isEn ? 'SafeWatch פעיל' : 'SafeWatch';
     }
 
+    var inPlayerBlurBadge = document.getElementById('playerParentalBlurBadge');
+    if (inPlayerBlurBadge) {
+      inPlayerBlurBadge.textContent = curBlurPx + 'px';
+    }
+    var inPlayerBlurPresets = document.querySelectorAll('#playerParentalMenu [data-parental-blur-preset]');
+    for (var bp = 0; bp < inPlayerBlurPresets.length; bp++) {
+      var presetVal = Number(inPlayerBlurPresets[bp].getAttribute('data-parental-blur-preset') || 22);
+      inPlayerBlurPresets[bp].classList.toggle('active', Math.abs(curBlurPx - presetVal) <= 3);
+    }
+
     var statusBox = document.getElementById('playerParentalActiveStatus');
     if (statusBox) {
       var profName = activeProf ? activeProf.name : 'ראשי';
       var segCount = (state.activeSkipSegments && state.activeSkipSegments.length) ? state.activeSkipSegments.length : 0;
       var skippedCount = state.parentalSkippedCountThisSession || 0;
+      var catCount = countEnabledParentalCategories(pCfg);
       if (isEn) {
-        statusBox.textContent = 'פרופיל "' + profName + '" מוגן • זוהו ' + segCount + ' קטעים לסינון' + (skippedCount > 0 ? (' (דולגו ' + skippedCount + ')') : '');
+        statusBox.textContent = 'פרופיל "' + profName + '" מוגן (' + catCount + ' קטגוריות) • זוהו ' + segCount + ' קטעים לסינון' + (skippedCount > 0 ? (' (דולגו ' + skippedCount + ')') : '');
       } else {
         statusBox.textContent = 'פרופיל "' + profName + '" — סינון כבוי כעת (לחץ להפעלה מיידית)';
       }
@@ -11113,8 +11343,6 @@
             cfg.enabled = !cfg.enabled;
             if (cfg.enabled && countEnabledParentalCategories(cfg) === 0) {
               cfg.categories.sex = true;
-              cfg.categories.violence = true;
-              cfg.categories.profanity = true;
             }
           } else if (cfg.categories && Object.prototype.hasOwnProperty.call(cfg.categories, tKey)) {
             if (!cfg.enabled) {
@@ -11125,8 +11353,10 @@
             }
           }
 
-          saveSubUsersState();
+          cfg.updatedAt = Date.now();
+          saveSubUsersState({ markSubUsersUpdated: true, cloudDelayMs: 300 });
           rebuildParentalSkipTimelineForCurrentMedia();
+          enforceParentalSceneGuard(getCurrentPlaybackTimeSec());
           updateInPlayerParentalUi();
           updateUserMenuParentalSummary();
           updateActiveSubtitleCue(getCurrentPlaybackTimeSec());
@@ -11145,6 +11375,8 @@
     if (!editingProf) return;
     state.editingParentalProfileId = editingProf.id;
     var pCfg = ensureProfileParentalConfig(editingProf);
+    var curBlurPx = normalizeParentalBlurPx(pCfg.blurPx);
+    applyParentalBlurIntensityCss(curBlurPx);
 
     // 1. Render Profiles Selector Row (Main User + All Sub-Users)
     var profRow = document.getElementById('parentalProfilesSelectorRow');
@@ -11221,7 +11453,7 @@
     var catCards = document.querySelectorAll('#parentalCategoriesGrid [data-parental-cat]');
     for (var c = 0; c < catCards.length; c++) {
       var catKey = catCards[c].getAttribute('data-parental-cat');
-      var isCatOn = Boolean(pCfg.categories && pCfg.categories[catKey]);
+      var isCatOn = Boolean(pCfg.categories && pCfg.categories[catKey] === true);
       catCards[c].classList.toggle('active', isCatOn);
       catCards[c].setAttribute('aria-pressed', isCatOn ? 'true' : 'false');
     }
@@ -11243,6 +11475,21 @@
     for (var sn = 0; sn < sensBtns.length; sn++) {
       var isSensMatch = sensBtns[sn].getAttribute('data-parental-sensitivity') === (pCfg.sensitivity || 'balanced');
       sensBtns[sn].classList.toggle('active', isSensMatch);
+    }
+
+    // 4B. Update Blur Intensity Slider, Badge & Preset Buttons
+    var blurRangeEl = document.getElementById('parentalBlurRangeInput');
+    if (blurRangeEl) {
+      blurRangeEl.value = String(curBlurPx);
+    }
+    var blurBadgeEl = document.getElementById('parentalBlurValueBadge');
+    if (blurBadgeEl) {
+      blurBadgeEl.textContent = getParentalBlurLevelLabel(curBlurPx);
+    }
+    var blurPresets = document.querySelectorAll('#parentalControlModal [data-parental-blur-preset]');
+    for (var bp = 0; bp < blurPresets.length; bp++) {
+      var pVal = Number(blurPresets[bp].getAttribute('data-parental-blur-preset') || 22);
+      blurPresets[bp].classList.toggle('active', Math.abs(curBlurPx - pVal) <= 3);
     }
 
     // 5. Update PIN Setup Bar

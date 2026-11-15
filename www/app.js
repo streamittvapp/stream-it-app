@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.9.93';
+  var APP_VERSION = '9.9.94';
 
   function ensureOtaStylesheetInjected() {
     try {
@@ -74,8 +74,10 @@
     window.__STREAMIT_V999_BOOTED ||
     window.__STREAMIT_V9991_BOOTED ||
     window.__STREAMIT_V9992_BOOTED ||
-    window.__STREAMIT_V9993_BOOTED
+    window.__STREAMIT_V9993_BOOTED ||
+    window.__STREAMIT_V9994_BOOTED
   );
+  window.__STREAMIT_V9994_BOOTED = true;
   window.__STREAMIT_V9993_BOOTED = true;
   window.__STREAMIT_V9992_BOOTED = true;
   window.__STREAMIT_V9991_BOOTED = true;
@@ -121,7 +123,8 @@
   window.__STREAMIT_V968_BOOTED = true;
   window.__STREAMIT_V969_BOOTED = true;
   window.__STREAMIT_V970_BOOTED = true;
-  // Synchronously block any older bundled v9.7.0-v9.9.92 script from firing its DOMContentLoaded boot handler after OTA loads!
+  // Synchronously block any older bundled v9.7.0-v9.9.93 script from firing its DOMContentLoaded boot handler after OTA loads!
+  window.__STREAMIT_V9993_BOOT_DONE = true;
   window.__STREAMIT_V9992_BOOT_DONE = true;
   window.__STREAMIT_V9991_BOOT_DONE = true;
   window.__STREAMIT_V999_BOOT_DONE = true;
@@ -1703,12 +1706,56 @@
     lastParentalSkipAt: 0,
     parentalTempMuted: false,
     parentalShieldActiveSegment: null,
+    parentalDismissedSegmentSig: '',
     parentalSkippedCountThisSession: 0,
     parentalSkipBannerTimer: null,
     parentalEmbedSeekTargetSec: 0,
     parentalEmbedSeekUntilTs: 0,
     parentalGuardTimer: null
   };
+
+  function normalizeParentalBlurPx(val) {
+    var n = Number(val);
+    if (!isFinite(n) || n <= 0) return 22;
+    return Math.max(4, Math.min(60, Math.round(n / 2) * 2));
+  }
+
+  function getParentalBlurLevelLabel(px) {
+    var b = normalizeParentalBlurPx(px);
+    if (b <= 14) return b + 'px (עדין)';
+    if (b <= 28) return b + 'px (בינוני)';
+    if (b <= 42) return b + 'px (חזק)';
+    return b + 'px (מקסימלי)';
+  }
+
+  function applyParentalBlurIntensityCss(blurPx) {
+    var px = normalizeParentalBlurPx(blurPx);
+    try {
+      if (document.documentElement) {
+        document.documentElement.style.setProperty('--parental-blur-px', px + 'px');
+      }
+      var pm = document.getElementById('playerModal');
+      if (pm) {
+        pm.style.setProperty('--parental-blur-px', px + 'px');
+        if (pm.classList.contains('parental-blur-active')) {
+          var blurTargets = ['videoElement', 'embedPlayerContainer', 'streamEmbedIframe'];
+          for (var i = 0; i < blurTargets.length; i++) {
+            var el = document.getElementById(blurTargets[i]);
+            if (el) {
+              el.style.filter = 'blur(' + px + 'px)';
+              el.style.webkitFilter = 'blur(' + px + 'px)';
+            }
+          }
+        }
+      }
+      var sampleEl = document.getElementById('parentalBlurPreviewSample');
+      if (sampleEl) {
+        var sampleBlur = Math.max(1.5, Math.round(px * 0.22 * 10) / 10);
+        sampleEl.style.filter = 'blur(' + sampleBlur + 'px)';
+        sampleEl.style.webkitFilter = 'blur(' + sampleBlur + 'px)';
+      }
+    } catch (e) {}
+  }
 
   function ensureProfileParentalConfig(su) {
     if (!su || typeof su !== 'object') return null;
@@ -1735,11 +1782,13 @@
         actionMode: 'skip', // 'skip' | 'blur_mute'
         profanityMode: 'mute_censor', // 'mute_censor' | 'skip'
         sensitivity: isKids ? 'strict' : 'balanced', // 'balanced' | 'strict'
+        blurPx: 22,
+        updatedAt: 0,
         categories: {
           sex: true,
-          violence: true,
-          profanity: true,
-          drugs: true,
+          violence: isKids,
+          profanity: isKids,
+          drugs: isKids,
           horror: isKids
         }
       };
@@ -1754,12 +1803,14 @@
       if (su.parentalControl.sensitivity !== 'balanced' && su.parentalControl.sensitivity !== 'strict') {
         su.parentalControl.sensitivity = isKids ? 'strict' : 'balanced';
       }
+      su.parentalControl.blurPx = normalizeParentalBlurPx(su.parentalControl.blurPx);
+      su.parentalControl.updatedAt = Number(su.parentalControl.updatedAt || 0);
       var cats = su.parentalControl.categories || {};
       su.parentalControl.categories = {
         sex: typeof cats.sex === 'boolean' ? cats.sex : true,
-        violence: typeof cats.violence === 'boolean' ? cats.violence : true,
-        profanity: typeof cats.profanity === 'boolean' ? cats.profanity : true,
-        drugs: typeof cats.drugs === 'boolean' ? cats.drugs : true,
+        violence: typeof cats.violence === 'boolean' ? cats.violence : false,
+        profanity: typeof cats.profanity === 'boolean' ? cats.profanity : false,
+        drugs: typeof cats.drugs === 'boolean' ? cats.drugs : false,
         horror: typeof cats.horror === 'boolean' ? cats.horror : isKids
       };
     }
@@ -2491,8 +2542,21 @@
       if (!baseSu.length) {
         baseSu = buildDefaultSubUsersForAccount(state.deletedSubUserIds);
       }
+      // Per-profile Parental Control merge: always keep whichever profile config has the newer parentalControl.updatedAt!
       for (var m = 0; m < baseSu.length; m++) {
-        ensureProfileParentalConfig(baseSu[m]);
+        var bProf = baseSu[m];
+        ensureProfileParentalConfig(bProf);
+        for (var o = 0; o < otherSu.length; o++) {
+          if (otherSu[o] && otherSu[o].id === bProf.id && otherSu[o].parentalControl) {
+            ensureProfileParentalConfig(otherSu[o]);
+            var bParTs = Number(bProf.parentalControl.updatedAt || (suCloudIsNewer ? cloudSuTs : localSuTs) || 0);
+            var oParTs = Number(otherSu[o].parentalControl.updatedAt || (suCloudIsNewer ? localSuTs : cloudSuTs) || 0);
+            if (oParTs > bParTs) {
+              bProf.parentalControl = JSON.parse(JSON.stringify(otherSu[o].parentalControl));
+            }
+            break;
+          }
+        }
       }
       state.subUsers = baseSu;
       state.subUsersUpdatedAt = Math.max(localSuTs, cloudSuTs);
@@ -8918,14 +8982,27 @@
     });
   }
 
+  async function ensureCloudStreamsMapLoaded() {
+    if (state.cloudStreamsMap && typeof state.cloudStreamsMap === 'object') {
+      return state.cloudStreamsMap;
+    }
+    state.cloudStreamsMap = {};
+    try {
+      var csUrl = (window.AndroidTvBridge || window.__STREAMIT_OTA_INJECTED_RUNNING)
+        ? ('https://streamittvapp.github.io/stream-it-app/data/cloud_streams.json?v=' + encodeURIComponent(APP_VERSION))
+        : ('data/cloud_streams.json?v=' + encodeURIComponent(APP_VERSION));
+      var r = await fetch(csUrl);
+      if (r && r.ok) {
+        var d = await r.json();
+        if (d && d.streams && typeof d.streams === 'object') {
+          state.cloudStreamsMap = d.streams;
+        }
+      }
+    } catch (eCs) {}
+    return state.cloudStreamsMap;
+  }
+
   async function resolveDirect1080pHlsUrl(item, imdbId, season, episode) {
-    if (!hasLocalBackend()) {
-      await probeLocalPythonBackend();
-    }
-    if (!hasLocalBackend()) {
-      return null;
-    }
-    var apiBase = getApiBase();
     var mediaType = item.type === 'series' ? 'series' : 'movie';
     var tmdbId = String(item.tmdbId || '').replace(/\D/g, '');
     var origLang = String(item.originalLanguage || (item.isIsraeli ? 'he' : 'en')).toLowerCase();
@@ -8933,12 +9010,60 @@
     var preferHebAudio = Boolean((activeProf && activeProf.isKids) || item.isHebrewDubbed);
     var expectedTitle = String(item.originalTitle || item.title || '').trim();
     var expectedYear = String(item.year || '').slice(0, 4);
+    var sNum = season || 1;
+    var eNum = episode || 1;
+
+    var hevcDashSupported = false;
+    try {
+      if (typeof window !== 'undefined' && !window.MediaSource && window.ManagedMediaSource) {
+        window.MediaSource = window.ManagedMediaSource;
+      }
+      var mseConstructors = [window.MediaSource, window.ManagedMediaSource].filter(function (c) {
+        return c && typeof c.isTypeSupported === 'function';
+      });
+      var codecCandidates = [
+        'video/mp4; codecs="hev1.1.6.L120.90"',
+        'video/mp4; codecs="hev1.1.6.L93.90"',
+        'video/mp4; codecs="hvc1.1.6.L93.90"'
+      ];
+      for (var mc = 0; mc < mseConstructors.length; mc++) {
+        for (var cc = 0; cc < codecCandidates.length; cc++) {
+          if (mseConstructors[mc].isTypeSupported(codecCandidates[cc])) {
+            hevcDashSupported = true;
+            break;
+          }
+        }
+        if (hevcDashSupported) break;
+      }
+    } catch (eMse) {}
+
+    if (!hasLocalBackend()) {
+      await probeLocalPythonBackend();
+    }
+
+    // Mobile / Web Cloud Direct Stream Resolver (`data/cloud_streams.json` — zero local server required!)
+    if (!hasLocalBackend()) {
+      if (tmdbId && hevcDashSupported && !item._dashFailedOnDevice) {
+        var csMap = await ensureCloudStreamsMapLoaded();
+        var csKey = mediaType === 'series'
+          ? ('tv:' + tmdbId + ':' + sNum + ':' + eNum)
+          : ('movie:' + tmdbId);
+        var csHit = csMap && csMap[csKey];
+        if (csHit && csHit.url && csHit.url.indexOf('dash-mpd') !== -1 && csHit.url.indexOf('blob=') !== -1) {
+          var mobileDashBlobUrl = await unwrapAndPrepareCloudFrontDashMpd(csHit.url, origLang, preferHebAudio);
+          if (mobileDashBlobUrl) {
+            return mobileDashBlobUrl;
+          }
+        }
+      }
+      return null;
+    }
+
+    var apiBase = getApiBase();
 
     // Fast non-blocking `/api/direct-stream` on `127.0.0.1:8092` (works on BOTH Streamer APK EmbeddedServer and Desktop Python Server!)
     // Combines `p9fx` (Vertex 1080p CloudFront DASH — responds in ~1.0s) and `w7dn` (Nebula 1080p Original Audio HLS)
     // and strictly blocks `vjej` (720p foreign-dubbed server)!
-    var sNum = season || 1;
-    var eNum = episode || 1;
     var buildSourcePriorityUrl = function (srcCode) {
       return (mediaType === 'series')
         ? (apiBase + '/api/direct-stream?type=tv' +
@@ -8970,13 +9095,6 @@
       '&orig_lang=' + encodeURIComponent(origLang) +
       '&expected_title=' + encodeURIComponent(expectedTitle) +
       '&expected_year=' + encodeURIComponent(expectedYear);
-
-    var hevcDashSupported = true;
-    try {
-      if (typeof window.MediaSource !== 'undefined' && typeof window.MediaSource.isTypeSupported === 'function') {
-        hevcDashSupported = window.MediaSource.isTypeSupported('video/mp4; codecs="hev1.1.6.L120.90"');
-      }
-    } catch (eMse) {}
 
     var candidateCalls;
     if (!tmdbId) {
@@ -9393,6 +9511,13 @@
           return;
         }
         try {
+          if (typeof window !== 'undefined' && !window.MediaSource && window.ManagedMediaSource) {
+            window.MediaSource = window.ManagedMediaSource;
+          }
+          try {
+            video.disableRemotePlayback = true;
+            video.setAttribute('disableremoteplayback', '');
+          } catch (eDrp) {}
           var cleanMpdUrl = streamUrl.split('#')[0];
           var dashPlayer = window.dashjs.MediaPlayer().create();
           state.dashInstance = dashPlayer;
@@ -9446,18 +9571,24 @@
             if (ev && ev.error && (ev.error.code || ev.error === 'capability' || ev.error === 'mediasource')) {
               try { dashPlayer.reset(); } catch (eRst) {}
               state.dashInstance = null;
+              if (state.playingItem) {
+                state.playingItem._dashFailedOnDevice = true;
+              }
               if (fallbackQueue.length > 0) {
                 playDirectHlsOrMp4(fallbackQueue[0], startOffsetSec, fallbackQueue.slice(1), activeSession);
               } else if (state.playingItem && state.playingItem.type !== 'channel') {
-                playCleanEmbedStream(state.playingItem, state.activeSeason, state.activeEpisode, startOffsetSec, 'embed1', activeSession);
+                playCleanEmbedStream(state.playingItem, state.activeSeason, state.activeEpisode, startOffsetSec, 'embed2', activeSession);
               }
             }
           });
         } catch (eDashInit) {
+          if (state.playingItem) {
+            state.playingItem._dashFailedOnDevice = true;
+          }
           if (fallbackQueue.length > 0) {
             playDirectHlsOrMp4(fallbackQueue[0], startOffsetSec, fallbackQueue.slice(1), activeSession);
           } else if (state.playingItem && state.playingItem.type !== 'channel') {
-            playCleanEmbedStream(state.playingItem, state.activeSeason, state.activeEpisode, startOffsetSec, 'embed1', activeSession);
+            playCleanEmbedStream(state.playingItem, state.activeSeason, state.activeEpisode, startOffsetSec, 'embed2', activeSession);
           }
         }
       });
@@ -9681,10 +9812,35 @@
         '&start=' + Math.floor(state.embedStartOffsetSec || 0) +
         '&server=' + encodeURIComponent(state.embedActiveServerKey || 'embed1');
     } else {
-      if (item.type === 'series') {
-        embedUrl = 'https://cdn.vidspark.to/tv/' + encodeURIComponent(mediaId) + '/' + (season || 1) + '/' + (episode || 1) + queryStr;
+      var sNumEmbed = season || 1;
+      var eNumEmbed = episode || 1;
+      var csKeyEmbed = item.type === 'series'
+        ? ('tv:' + tmdbId + ':' + sNumEmbed + ':' + eNumEmbed)
+        : ('movie:' + tmdbId);
+      var isP9fxTitleInVault = Boolean(state.cloudStreamsMap && state.cloudStreamsMap[csKeyEmbed]);
+      // If we are on a mobile browser where HEVC DASH is unsupported (e.g. older iOS) and the title is p9fx-only,
+      // cdn.vidspark.to will fail and redirect to broken player.vidprime.top — so route directly to Mirror #2 (vidlink.pro H.264 HLS)!
+      if (state.embedActiveServerKey === 'embed1' && (item._dashFailedOnDevice || isP9fxTitleInVault)) {
+        state.embedActiveServerKey = 'embed2';
+      }
+      if (state.embedActiveServerKey === 'embed2') {
+        if (item.type === 'series') {
+          embedUrl = 'https://vidlink.pro/tv/' + encodeURIComponent(mediaId) + '/' + sNumEmbed + '/' + eNumEmbed + '?autoplay=true&primaryColor=e50914&title=false&poster=false';
+        } else {
+          embedUrl = 'https://vidlink.pro/movie/' + encodeURIComponent(mediaId) + '?autoplay=true&primaryColor=e50914&title=false&poster=false';
+        }
+      } else if (state.embedActiveServerKey === 'swarm') {
+        if (item.type === 'series') {
+          embedUrl = 'https://vidfast.pro/tv/' + encodeURIComponent(mediaId) + '/' + sNumEmbed + '/' + eNumEmbed + '?autoPlay=true';
+        } else {
+          embedUrl = 'https://vidfast.pro/movie/' + encodeURIComponent(mediaId) + '?autoPlay=true';
+        }
       } else {
-        embedUrl = 'https://cdn.vidspark.to/movie/' + encodeURIComponent(mediaId) + queryStr;
+        if (item.type === 'series') {
+          embedUrl = 'https://cdn.vidspark.to/tv/' + encodeURIComponent(mediaId) + '/' + sNumEmbed + '/' + eNumEmbed + queryStr;
+        } else {
+          embedUrl = 'https://cdn.vidspark.to/movie/' + encodeURIComponent(mediaId) + queryStr;
+        }
       }
     }
 

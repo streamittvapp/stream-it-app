@@ -1,10 +1,10 @@
 {
-  "version": "9.9.93",
-  "native_apk_version": "9.9.93",
+  "version": "9.9.94",
+  "native_apk_version": "9.9.94",
   "apk_download_url": "https://streamittvapp.github.io/stream-it-app/StreamIt-AndroidTV.apk",
   "apk_short_url": "https://is.gd/streamitapk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-15T21:25:00Z",
-  "notes": "v9.9.93 — Global 1080p CloudFront DASH (p9fx) + HLS (w7dn) native player with dash.js, strict anti-dub enforcement on Israeli/foreign titles, and verified Israeli catalog & YouTube episodes."
+  "updated_at": "2026-11-15T22:05:00Z",
+  "notes": "v9.9.94 — Mobile & Web Cloud Stream Vault (data/cloud_streams.json) + iOS ManagedMediaSource + vidlink/vidfast H.264 HLS mobile failover alongside Desktop & Streamer 1080p DASH/HLS."
 }
