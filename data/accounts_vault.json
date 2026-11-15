@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794773270494,
+      "updatedTs": 1794773442245,
       "subUsersUpdatedAt": 1794773270494,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -775,7 +775,47 @@
           "watchlist": [],
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
-          "progress": {},
+          "progress": {
+            "tt15398776": {
+              "id": "tt15398776",
+              "imdbId": "tt15398776",
+              "tmdbId": "872585",
+              "title": "אופנהיימר",
+              "currentTime": 1902,
+              "duration": 10822,
+              "percent": 18,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794773442245,
+              "snapshot": {
+                "id": "tt15398776",
+                "imdbId": "tt15398776",
+                "tmdbId": "872585",
+                "type": "movie",
+                "title": "אופנהיימר",
+                "originalTitle": "Oppenheimer",
+                "year": "2023",
+                "rating": "8.9",
+                "runtimeHe": "3 שעות ו-00 דק'",
+                "ageRating": "16+",
+                "overview": "סיפורו המטלטל של הפיזיקאי האמריקאי ג'יי רוברט אופנהיימר ותפקידו המרכזי בפרויקט מנהטן הסודי לפיתוח הפצצה האטומית הראשונה במלחמת העולם השנייה.",
+                "poster": "https://images.metahub.space/poster/medium/tt15398776/img",
+                "backdrop": "https://images.metahub.space/background/medium/tt15398776/img",
+                "cardBackdrop": "https://images.metahub.space/background/medium/tt15398776/img",
+                "genres": [
+                  "drama",
+                  "docu",
+                  "war",
+                  "telegram"
+                ],
+                "genresHe": [
+                  "דרמה",
+                  "ביוגרפיה והיסטוריה"
+                ],
+                "seasonsCount": 0
+              }
+            }
+          },
           "deletedProgressIds": {},
           "progressClearedAt": 0
         }
