@@ -132,14 +132,14 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794772154961,
-      "subUsersUpdatedAt": 1794694857976,
+      "updatedTs": 1794772211399,
+      "subUsersUpdatedAt": 1794772211399,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
         "prof-bedroom": 1794494898603,
         "prof-kids": 1794494905106
       },
-      "activeSubUserId": "prof-main",
+      "activeSubUserId": "prof-1794772211399",
       "subUsers": [
         {
           "id": "prof-main",
@@ -148,15 +148,35 @@
           "isKids": false,
           "isPrimary": true,
           "parentalControl": {
-            "enabled": true,
-            "actionMode": "blur_mute",
+            "enabled": false,
+            "actionMode": "skip",
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
             "categories": {
               "sex": true,
-              "violence": false,
-              "profanity": false,
-              "drugs": false,
+              "violence": true,
+              "profanity": true,
+              "drugs": true,
+              "horror": false
+            }
+          }
+        },
+        {
+          "id": "prof-1794772211399",
+          "name": "איה",
+          "color": "#334155",
+          "isKids": false,
+          "isPrimary": false,
+          "parentalControl": {
+            "enabled": false,
+            "actionMode": "skip",
+            "profanityMode": "mute_censor",
+            "sensitivity": "balanced",
+            "categories": {
+              "sex": true,
+              "violence": true,
+              "profanity": true,
+              "drugs": true,
               "horror": false
             }
           }
@@ -174,6 +194,129 @@
             "tt10577736",
             "series-1413"
           ],
+          "progress": {
+            "tt32261958": {
+              "id": "tt32261958",
+              "imdbId": "tt32261958",
+              "tmdbId": "1283515",
+              "title": "תעתוע",
+              "currentTime": 235,
+              "duration": 7200,
+              "percent": 3,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794771587533,
+              "snapshot": {
+                "id": "tt32261958",
+                "imdbId": "tt32261958",
+                "tmdbId": "1283515",
+                "type": "movie",
+                "title": "תעתוע",
+                "originalTitle": "Verity",
+                "year": "2026",
+                "rating": "7.4",
+                "runtimeHe": "שעה ו-58 דק'",
+                "ageRating": "16+",
+                "overview": "סופרת מתקשה עוברת להתגורר באחוזת קרופורד המבודדת כדי לכתוב בשמה של וריטי. לאחר שלואן מגלה מה שנראה כרשימות אוטוביוגרפיות מצמררות של וריטי, היא מתמודדת עם וידויים מטרידים ומעוותים הנוגעים לבעלה של וריטי, ג'רמי ומתקשה להבחין בין דמיון למציאות, בין מניפולציה למשיכה, ובין הזדמנות לאובססיה.",
+                "poster": "https://image.tmdb.org/t/p/w500/fhkXXgxth4IxoplvQvQZ0BSo3F4.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/original/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
+                "genres": [
+                  "mystery",
+                  "thriller",
+                  "drama",
+                  "telegram"
+                ],
+                "genresHe": [
+                  "מסתורין",
+                  "מותחן",
+                  "דרמה"
+                ],
+                "seasonsCount": 0
+              }
+            },
+            "movie-550": {
+              "id": "movie-550",
+              "imdbId": "tt0137523",
+              "tmdbId": "550",
+              "title": "מועדון קרב",
+              "currentTime": 2437,
+              "duration": 8348,
+              "percent": 29,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794771429719,
+              "snapshot": {
+                "id": "movie-550",
+                "imdbId": "tt0137523",
+                "tmdbId": "550",
+                "type": "movie",
+                "title": "מועדון קרב",
+                "originalTitle": "Fight Club",
+                "year": "1999",
+                "rating": "8.4",
+                "runtimeHe": "שעתיים",
+                "ageRating": "14+",
+                "overview": "בהשפעתו של גבר כריזמטי אותו פגש בטיסה, עוזב פקיד אפרורי את עבודתו ואת ביתו המלוקק, ופותח מועדון קרבות מחתרתי. בהדרגה העניינים יוצאים משליטה.",
+                "poster": "https://image.tmdb.org/t/p/w500/7Tmjr0jgVj8hHcd3UJD6HIilMKM.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/c6OLXfKAk5BKeR6broC8pYiCquX.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/c6OLXfKAk5BKeR6broC8pYiCquX.jpg",
+                "genres": [
+                  "drama",
+                  "thriller",
+                  "tpb",
+                  "netflix"
+                ],
+                "genresHe": [
+                  "דרמה",
+                  "מותחנים",
+                  "PirateBay & YTS 4K"
+                ],
+                "seasonsCount": 0
+              }
+            },
+            "series-1399": {
+              "id": "series-1399",
+              "imdbId": "tt0944947",
+              "tmdbId": "1399",
+              "title": "משחקי הכס",
+              "currentTime": 1493,
+              "duration": 3697,
+              "percent": 40,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794771905745,
+              "snapshot": {
+                "id": "series-1399",
+                "imdbId": "tt0944947",
+                "tmdbId": "1399",
+                "type": "series",
+                "title": "משחקי הכס",
+                "originalTitle": "Game of Thrones",
+                "year": "2011",
+                "rating": "8.5",
+                "runtimeHe": "45 דק׳ לפרק",
+                "ageRating": "14+",
+                "overview": "הקיץ נמשך על פני עשורים, החורף יכול להימשך דור והמאבק על כס הברזל החל. הוא ישתרע מן הדרום, בו החום מוליד מזימות, תאוות וקנוניות; אל אדמות המזרח הנרחבות והפראיות; כל הדרך אל הצפון הקפוא, שם חומת קרח אדירה מגנה על הממלכה מפני כוחות האופל השוכנים מצדה השני. מלכים ומלכות, אבירים ופורעי חוק, שקרנים, אדונים ואנשים ישרים. עולם בו מתבשלות קנוניות בצורת ניסיונות רצח ומגעים אסורים.",
+                "poster": "https://image.tmdb.org/t/p/w500/7f98ZRtsSByqbI4aUlyrWbfTsxx.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/zZqpAXxVSBtxV9qPBcscfXBcL2w.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/zZqpAXxVSBtxV9qPBcscfXBcL2w.jpg",
+                "genres": [
+                  "scifi",
+                  "drama",
+                  "action",
+                  "hbo"
+                ],
+                "genresHe": [
+                  "מדע בדיוני ופנטזיה",
+                  "דרמה",
+                  "אקשן והרפתקאות",
+                  "HBO / Max"
+                ],
+                "seasonsCount": 8
+              }
+            }
+          },
           "watchlistSnapshots": {
             "tt10577736": {
               "id": "tt10577736",
@@ -317,129 +460,6 @@
             }
           },
           "watchlistUpdatedAt": 1794685001388,
-          "progress": {
-            "tt32261958": {
-              "id": "tt32261958",
-              "imdbId": "tt32261958",
-              "tmdbId": "1283515",
-              "title": "תעתוע",
-              "currentTime": 235,
-              "duration": 7200,
-              "percent": 3,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794771587533,
-              "snapshot": {
-                "id": "tt32261958",
-                "imdbId": "tt32261958",
-                "tmdbId": "1283515",
-                "type": "movie",
-                "title": "תעתוע",
-                "originalTitle": "Verity",
-                "year": "2026",
-                "rating": "7.4",
-                "runtimeHe": "שעה ו-58 דק'",
-                "ageRating": "16+",
-                "overview": "סופרת מתקשה עוברת להתגורר באחוזת קרופורד המבודדת כדי לכתוב בשמה של וריטי. לאחר שלואן מגלה מה שנראה כרשימות אוטוביוגרפיות מצמררות של וריטי, היא מתמודדת עם וידויים מטרידים ומעוותים הנוגעים לבעלה של וריטי, ג'רמי ומתקשה להבחין בין דמיון למציאות, בין מניפולציה למשיכה, ובין הזדמנות לאובססיה.",
-                "poster": "https://image.tmdb.org/t/p/w500/fhkXXgxth4IxoplvQvQZ0BSo3F4.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/original/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
-                "genres": [
-                  "mystery",
-                  "thriller",
-                  "drama",
-                  "telegram"
-                ],
-                "genresHe": [
-                  "מסתורין",
-                  "מותחן",
-                  "דרמה"
-                ],
-                "seasonsCount": 0
-              }
-            },
-            "movie-550": {
-              "id": "movie-550",
-              "imdbId": "tt0137523",
-              "tmdbId": "550",
-              "title": "מועדון קרב",
-              "currentTime": 2437,
-              "duration": 8348,
-              "percent": 29,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794771429719,
-              "snapshot": {
-                "id": "movie-550",
-                "imdbId": "tt0137523",
-                "tmdbId": "550",
-                "type": "movie",
-                "title": "מועדון קרב",
-                "originalTitle": "Fight Club",
-                "year": "1999",
-                "rating": "8.4",
-                "runtimeHe": "שעתיים",
-                "ageRating": "14+",
-                "overview": "בהשפעתו של גבר כריזמטי אותו פגש בטיסה, עוזב פקיד אפרורי את עבודתו ואת ביתו המלוקק, ופותח מועדון קרבות מחתרתי. בהדרגה העניינים יוצאים משליטה.",
-                "poster": "https://image.tmdb.org/t/p/w500/7Tmjr0jgVj8hHcd3UJD6HIilMKM.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/c6OLXfKAk5BKeR6broC8pYiCquX.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/c6OLXfKAk5BKeR6broC8pYiCquX.jpg",
-                "genres": [
-                  "drama",
-                  "thriller",
-                  "tpb",
-                  "netflix"
-                ],
-                "genresHe": [
-                  "דרמה",
-                  "מותחנים",
-                  "PirateBay & YTS 4K"
-                ],
-                "seasonsCount": 0
-              }
-            },
-            "series-1399": {
-              "id": "series-1399",
-              "imdbId": "tt0944947",
-              "tmdbId": "1399",
-              "title": "משחקי הכס",
-              "currentTime": 1493,
-              "duration": 3697,
-              "percent": 40,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794771905745,
-              "snapshot": {
-                "id": "series-1399",
-                "imdbId": "tt0944947",
-                "tmdbId": "1399",
-                "type": "series",
-                "title": "משחקי הכס",
-                "originalTitle": "Game of Thrones",
-                "year": "2011",
-                "rating": "8.5",
-                "runtimeHe": "45 דק׳ לפרק",
-                "ageRating": "14+",
-                "overview": "הקיץ נמשך על פני עשורים, החורף יכול להימשך דור והמאבק על כס הברזל החל. הוא ישתרע מן הדרום, בו החום מוליד מזימות, תאוות וקנוניות; אל אדמות המזרח הנרחבות והפראיות; כל הדרך אל הצפון הקפוא, שם חומת קרח אדירה מגנה על הממלכה מפני כוחות האופל השוכנים מצדה השני. מלכים ומלכות, אבירים ופורעי חוק, שקרנים, אדונים ואנשים ישרים. עולם בו מתבשלות קנוניות בצורת ניסיונות רצח ומגעים אסורים.",
-                "poster": "https://image.tmdb.org/t/p/w500/7f98ZRtsSByqbI4aUlyrWbfTsxx.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/zZqpAXxVSBtxV9qPBcscfXBcL2w.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/zZqpAXxVSBtxV9qPBcscfXBcL2w.jpg",
-                "genres": [
-                  "scifi",
-                  "drama",
-                  "action",
-                  "hbo"
-                ],
-                "genresHe": [
-                  "מדע בדיוני ופנטזיה",
-                  "דרמה",
-                  "אקשן והרפתקאות",
-                  "HBO / Max"
-                ],
-                "seasonsCount": 8
-              }
-            }
-          },
           "deletedProgressIds": {
             "27": 1794432189831,
             "278": 1794686259883,
@@ -467,6 +487,9 @@
             "tt0411705": 1794432189831,
             "movie-27": 1794432189831,
             "series-27": 1794432189831,
+            "tt0079118": 1794770938868,
+            "movie-10580": 1794770938868,
+            "series-10580": 1794770938868,
             "tt37287335": 1794432202875,
             "movie-1339713": 1794432202875,
             "series-1339713": 1794432202875,
@@ -514,9 +537,6 @@
             "movie-1283515": 1794731391181,
             "tt32261958": 1794731391181,
             "series-1283515": 1794731391181,
-            "tt0079118": 1794770938868,
-            "movie-10580": 1794770938868,
-            "series-10580": 1794770938868,
             "movie-1290417": 1794770985537,
             "tt32362890": 1794770985537,
             "series-1290417": 1794770985537,
@@ -534,40 +554,38 @@
         },
         "prof-1794166536010": {
           "watchlist": [],
+          "progress": {},
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
-          "progress": {},
           "deletedProgressIds": {},
           "progressClearedAt": 0
         },
         "prof-1794166543582": {
           "watchlist": [],
+          "progress": {},
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
-          "progress": {},
           "deletedProgressIds": {},
           "progressClearedAt": 0
         },
         "prof-1794166553435": {
           "watchlist": [],
+          "progress": {},
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
-          "progress": {},
           "deletedProgressIds": {},
           "progressClearedAt": 0
         },
         "prof-1794166559616": {
           "watchlist": [],
+          "progress": {},
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
-          "progress": {},
           "deletedProgressIds": {},
           "progressClearedAt": 0
         },
         "prof-1794166564722": {
           "watchlist": [],
-          "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0,
           "progress": {
             "27": {
               "id": "27",
@@ -729,6 +747,16 @@
               }
             }
           },
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0,
+          "deletedProgressIds": {},
+          "progressClearedAt": 0
+        },
+        "prof-1794772211399": {
+          "watchlist": [],
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0,
+          "progress": {},
           "deletedProgressIds": {},
           "progressClearedAt": 0
         }
