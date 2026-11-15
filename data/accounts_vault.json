@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794777008613,
+      "updatedTs": 1794777020516,
       "subUsersUpdatedAt": 1794774698606,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -314,12 +314,12 @@
               "imdbId": "tt0088559",
               "tmdbId": "2875",
               "title": "מקגייוור",
-              "currentTime": 15,
+              "currentTime": 772,
               "duration": 2493,
-              "percent": 3,
+              "percent": 31,
               "season": 1,
               "episode": 4,
-              "updatedAt": 1794777008613,
+              "updatedAt": 1794777020516,
               "snapshot": {
                 "id": "series-2875",
                 "imdbId": "tt0088559",
