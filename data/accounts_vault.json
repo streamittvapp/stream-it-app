@@ -132,8 +132,8 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794773258268,
-      "subUsersUpdatedAt": 1794773258268,
+      "updatedTs": 1794773265526,
+      "subUsersUpdatedAt": 1794773265526,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
         "prof-bedroom": 1794494898603,
@@ -143,7 +143,7 @@
         "prof-1794772225879": 1794772301090,
         "prof-1794772238633": 1794772301939
       },
-      "activeSubUserId": "prof-1794773258268",
+      "activeSubUserId": "prof-1794773265526",
       "subUsers": [
         {
           "id": "prof-main",
@@ -189,6 +189,26 @@
           "id": "prof-1794773258268",
           "name": "אלדר",
           "color": "#3f3f46",
+          "isKids": false,
+          "isPrimary": false,
+          "parentalControl": {
+            "enabled": false,
+            "actionMode": "skip",
+            "profanityMode": "mute_censor",
+            "sensitivity": "balanced",
+            "categories": {
+              "sex": true,
+              "violence": true,
+              "profanity": true,
+              "drugs": true,
+              "horror": false
+            }
+          }
+        },
+        {
+          "id": "prof-1794773265526",
+          "name": "שקד",
+          "color": "#475569",
           "isKids": false,
           "isPrimary": false,
           "parentalControl": {
@@ -716,6 +736,14 @@
           "progressClearedAt": 0
         },
         "prof-1794773258268": {
+          "watchlist": [],
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0,
+          "progress": {},
+          "deletedProgressIds": {},
+          "progressClearedAt": 0
+        },
+        "prof-1794773265526": {
           "watchlist": [],
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
