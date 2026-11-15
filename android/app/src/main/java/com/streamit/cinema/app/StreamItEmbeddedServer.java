@@ -130,7 +130,7 @@ public class StreamItEmbeddedServer {
             Map<String, String> params = parseQuery(query);
 
             if ("/api/health".equals(path)) {
-                byte[] body = "{\"ok\":true,\"mode\":\"android_embedded_server\",\"version\":\"9.9.1\",\"ota_ver_url\":\"https://is.gd/streamittv_ver\",\"ota_apk_url\":\"https://is.gd/streamittv_apk\"}"
+                byte[] body = "{\"ok\":true,\"mode\":\"android_embedded_server\",\"version\":\"9.9.8\",\"ota_ver_url\":\"https://is.gd/streamittv_ver\",\"ota_apk_url\":\"https://is.gd/streamittv_apk\"}"
                         .getBytes(StandardCharsets.UTF_8);
                 sendResponse(out, 200, "application/json; charset=utf-8", body);
             } else if ("/api/ota".equals(path)) {
@@ -203,11 +203,18 @@ public class StreamItEmbeddedServer {
             String rawExpectedTitle,
             String rawExpectedYear
     ) {
-        String itemType = (rawType != null && !rawType.trim().isEmpty()) ? rawType.trim() : "movie";
+        String rawTypeStr = (rawType != null && !rawType.trim().isEmpty()) ? rawType.trim() : "movie";
+        String rawSeasonStr = (rawSeason != null && !rawSeason.trim().isEmpty()) ? rawSeason.trim() : "1";
+        String rawEpisodeStr = (rawEpisode != null && !rawEpisode.trim().isEmpty()) ? rawEpisode.trim() : "1";
+        String itemType = rawSeasonStr.toLowerCase().contains("movie")
+                ? "movie"
+                : (("series".equalsIgnoreCase(rawTypeStr) || "tv".equalsIgnoreCase(rawTypeStr)) ? "series" : "movie");
         String imdbId = (rawImdbId != null && !rawImdbId.trim().isEmpty()) ? rawImdbId.split(":")[0].trim() : "";
         String tmdbId = (rawTmdbId != null) ? rawTmdbId.replaceAll("\\D", "") : "";
-        String season = (rawSeason != null && !rawSeason.trim().isEmpty()) ? rawSeason.trim() : "1";
-        String episode = (rawEpisode != null && !rawEpisode.trim().isEmpty()) ? rawEpisode.trim() : "1";
+        String season = rawSeasonStr.split("\\?")[0].replaceAll("\\D", "");
+        if (season.isEmpty()) season = "1";
+        String episode = rawEpisodeStr.split("\\?")[0].replaceAll("\\D", "");
+        if (episode.isEmpty()) episode = "1";
         String origLang = (rawOrigLang != null && !rawOrigLang.trim().isEmpty()) ? rawOrigLang.trim().toLowerCase() : "en";
         String expectedTitle = (rawExpectedTitle != null) ? rawExpectedTitle.trim() : "";
         String expectedYear = (rawExpectedYear != null) ? rawExpectedYear.replaceAll("\\D", "") : "";
@@ -224,9 +231,10 @@ public class StreamItEmbeddedServer {
         if (!tmdbId.isEmpty()) {
             String[] vidoraHosts = new String[]{"https://cdn.vidspark.to"};
             String[] vidoraSources = "en".equals(origLang)
-                    ? new String[]{"w7dn", "p9fx", "vjej"}
-                    : new String[]{"w7dn", "p9fx"};
-            for (String srcKey : vidoraSources) {
+                    ? new String[]{"w7dn", "w7dn", "vjej"}
+                    : new String[]{"w7dn", "w7dn"};
+            for (int attemptIdx = 0; attemptIdx < vidoraSources.length; attemptIdx++) {
+                String srcKey = vidoraSources[attemptIdx];
                 for (String host : vidoraHosts) {
                     try {
                         String vpPath = ("series".equalsIgnoreCase(itemType) || "tv".equalsIgnoreCase(itemType))
@@ -237,7 +245,8 @@ public class StreamItEmbeddedServer {
                         hVp.put("Referer", host + "/");
                         hVp.put("Origin", host);
                         hVp.put("x-player-key", "f3b72e73c80c9a996574379798703796a1936efa3516a7105cb0e43048b46b5a");
-                        String vpRaw = new String(httpGetBytes(host + vpPath, hVp, 3600), StandardCharsets.UTF_8);
+                        int reqTimeout = "w7dn".equals(srcKey) ? 5200 : 3800;
+                        String vpRaw = new String(httpGetBytes(host + vpPath, hVp, reqTimeout), StandardCharsets.UTF_8);
                         JSONObject vpObj = new JSONObject(vpRaw);
                         if (!vpObj.optBoolean("result", true)) continue;
                         String retTitle = vpObj.optString("title", "");
@@ -253,7 +262,7 @@ public class StreamItEmbeddedServer {
                             if (!"en".equals(origLang) && "vjej".equalsIgnoreCase(actualSrc)) {
                                 continue;
                             }
-                            if ("w7dn".equals(srcKey) && !"w7dn".equalsIgnoreCase(actualSrc)) {
+                            if ("w7dn".equals(srcKey) && !"w7dn".equalsIgnoreCase(actualSrc) && attemptIdx == 0) {
                                 continue;
                             }
                             String rawStreamUrl = s0.optString("url", "");
@@ -501,6 +510,10 @@ public class StreamItEmbeddedServer {
                 return;
             }
 
+            if (rawBytes.length > 64 && rawBytes[0] == (byte) 0x89 && rawBytes[1] == (byte) 0x50
+                    && rawBytes[2] == (byte) 0x4E && rawBytes[3] == (byte) 0x47 && rawBytes[64] == (byte) 0x47) {
+                rawBytes = Arrays.copyOfRange(rawBytes, 64, rawBytes.length);
+            }
             sendResponse(out, 200, "video/mp2t", rawBytes);
         } catch (Exception e) {
             byte[] err = ("{\"ok\":false,\"error\":\"" + e.getMessage() + "\"}").getBytes(StandardCharsets.UTF_8);

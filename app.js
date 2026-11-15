@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.9.7';
+  var APP_VERSION = '9.9.8';
 
   // If a strictly newer OTA script is stored in localStorage and index.html is about to inject it,
   // skip running this older bundled script completely so two versions of app.js NEVER run in parallel!
@@ -35,8 +35,10 @@
     window.__STREAMIT_V994_BOOTED ||
     window.__STREAMIT_V995_BOOTED ||
     window.__STREAMIT_V996_BOOTED ||
-    window.__STREAMIT_V997_BOOTED
+    window.__STREAMIT_V997_BOOTED ||
+    window.__STREAMIT_V998_BOOTED
   );
+  window.__STREAMIT_V998_BOOTED = true;
   window.__STREAMIT_V997_BOOTED = true;
   window.__STREAMIT_V996_BOOTED = true;
   window.__STREAMIT_V995_BOOTED = true;
@@ -1504,21 +1506,21 @@
 
   // Curated Hebrew-Dubbed Kids Movies & Series ("מדובב לעברית 🇮🇱" for Kids Profile & Family Viewing)
   var BUILTIN_KIDS_HEBREW_DUBBED_ITEMS = [
-    { id: 'movie-1022789', tmdbId: '1022789', imdbId: 'tt22022452', type: 'movie', title: 'הקול בראש 2 (מדובב לעברית)', originalTitle: 'Inside Out 2', year: '2024', rating: '7.7', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'he', poster: 'https://image.tmdb.org/t/p/w500/vpnVM9B6NMmQpWeZvzLvDESb2QY.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/stKGOm8UyhuLPR9sZLjs5AkmncA.jpg', overview: 'ריילי נכנסת לגיל ההתבגרות ומוקד השליטה בראשה עובר מהפך פתאומי כשמגיעים רגשות חדשים לגמרי כמו חרדה, קנאה ומבוכה — בגרסה מדובבת לעברית לכל המשפחה.', genres: ['animation', 'hebrew_dub', 'comedy', 'disney'], genresHe: ['מדובב לעברית 🇮🇱', 'אנימציה ומשפחה'] },
-    { id: 'movie-1241982', tmdbId: '1241982', imdbId: 'tt13622970', type: 'movie', title: 'מואנה 2 (מדובב לעברית)', originalTitle: 'Moana 2', year: '2024', rating: '7.2', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'he', poster: 'https://image.tmdb.org/t/p/w500/aLVkiINlIeCkcZIzb7XHzPYgO6L.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/tElnmtQ6yz1PjN1kePNl8yMSb59.jpg', overview: 'לאחר שהיא מקבלת קריאה בלתי צפויה מאבותיה מנווטי הדרכים, מואנה יוצאת יחד עם מאווי למסע הרפתקאות מרהיב בלב האוקיינוס — בגרסה מדובבת לעברית.', genres: ['animation', 'hebrew_dub', 'action', 'disney'], genresHe: ['מדובב לעברית 🇮🇱', 'אנימציה והרפתקאות'] },
-    { id: 'movie-1184918', tmdbId: '1184918', imdbId: 'tt29623480', type: 'movie', title: 'רובוט פראי (מדובב לעברית)', originalTitle: 'The Wild Robot', year: '2024', rating: '8.4', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'he', poster: 'https://image.tmdb.org/t/p/w500/wTnV3PCVW5O92JMrFvvrRcV39RU.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/417tYZ4XUyJrtyZXj7HpvWf1E8f.jpg', overview: 'הרובוטית החכמה רוז נסחפת לאי בודד ולומדת להסתגל לטבע הפראי, להתיידד עם בעלי החיים ולאמץ גוזל אווז יתום — הרפתקה מרגשת בדיבוב עברי.', genres: ['animation', 'hebrew_dub', 'scifi', 'action'], genresHe: ['מדובב לעברית 🇮🇱', 'אנימציה ומשפחה'] },
-    { id: 'movie-939243', tmdbId: '939243', imdbId: 'tt18259086', type: 'movie', title: 'סוניק הקיפוד 3 (מדובב לעברית)', originalTitle: 'Sonic the Hedgehog 3', year: '2024', rating: '7.8', ageRating: '8+', isHebrewDubbed: true, originalLanguage: 'he', poster: 'https://image.tmdb.org/t/p/w500/d8Ryb8AunYAuycVKDp5HpdWPKgC.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/zOpe0eHsq0A2NvNyBbtT6sj53qV.jpg', overview: 'סוניק, נאקלס וטיילס מתאחדים שוב מול יריב מסתורי ועוצמתי בשם שאדו, בעל כוחות שטרם פגשו כמותם — שובר קופות קצבי בדיבוב עברי לילדים.', genres: ['animation', 'hebrew_dub', 'action', 'comedy'], genresHe: ['מדובב לעברית 🇮🇱', 'הרפתקאות ומשפחה'] },
-    { id: 'movie-502356', tmdbId: '502356', imdbId: 'tt6718170', type: 'movie', title: 'האחים סופר מריו — הסרט (מדובב לעברית)', originalTitle: 'The Super Mario Bros. Movie', year: '2023', rating: '7.7', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'he', poster: 'https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/9n2tJBplPbgR2ca05hS5CKXwP2c.jpg', overview: 'השרברבים מריו ולואיג׳י נשאבים אל ממלכת הפטריות הקסומה ויוצאים עם הנסיכה פיץ׳ לעצור את באוזר האימתני — בדיבוב עברי מלא.', genres: ['animation', 'hebrew_dub', 'action', 'comedy'], genresHe: ['מדובב לעברית 🇮🇱', 'אנימציה ומשפחה'] },
-    { id: 'movie-519182', tmdbId: '519182', imdbId: 'tt7510222', type: 'movie', title: 'גנוב על החיים 4 (מדובב לעברית)', originalTitle: 'Despicable Me 4', year: '2024', rating: '7.1', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'he', poster: 'https://image.tmdb.org/t/p/w500/wWba3TaojhK7NdycRhoQpsG0FaH.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/lgkPzcOSnTvjeMnuFzozRO5HHw1.jpg', overview: 'גרו, לוסי, הבנות והמיניונים מקבלים למשפחה את גרו ג׳וניור השובב ונאלצים להימלט מנבל חדש ומשעשע — קומדיית אנימציה בדיבוב לעברית.', genres: ['animation', 'hebrew_dub', 'comedy'], genresHe: ['מדובב לעברית 🇮🇱', 'קומדיה לילדים'] },
-    { id: 'movie-1011985', tmdbId: '1011985', imdbId: 'tt21692408', type: 'movie', title: 'קונג פו פנדה 4 (מדובב לעברית)', originalTitle: 'Kung Fu Panda 4', year: '2024', rating: '7.1', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'he', poster: 'https://image.tmdb.org/t/p/w500/kDp1vUBnMpe8ak4rjgl3cLELqjU.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/1XDDXPXGiI8id7MrUxK36ke7gkX.jpg', overview: 'פו לוחם הדרקון יוצא להרפתקה חדשה ומצחיקה לחיפוש יורש רוחני לעמק השלום מול הזיקית המשנה צורה — בדיבוב עברי.', genres: ['animation', 'hebrew_dub', 'action', 'comedy'], genresHe: ['מדובב לעברית 🇮🇱', 'אנימציה ואקשן'] },
-    { id: 'movie-109445', tmdbId: '109445', imdbId: 'tt2294629', type: 'movie', title: 'לשבור את הקרח (מדובב לעברית)', originalTitle: 'Frozen', year: '2013', rating: '7.4', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'he', poster: 'https://image.tmdb.org/t/p/w500/kgwjIb2JDHRhNk13lmSxiClFjVk.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/fydUcbkqLyESCFa9U5XKqi8dIVj.jpg', overview: 'הנסיכה האמיצה אנה יוצאת למסע מושלג עם קריסטוף ואולף איש השלג כדי למצוא את אחותה אלזה ולהסיר את כישוף החורף הנצחי — בדיבוב ושירים בעברית.', genres: ['animation', 'hebrew_dub', 'disney', 'music'], genresHe: ['מדובב לעברית 🇮🇱', 'דיסני קלאסי'] },
-    { id: 'movie-330457', tmdbId: '330457', imdbId: 'tt4520988', type: 'movie', title: 'לשבור את הקרח 2 (מדובב לעברית)', originalTitle: 'Frozen II', year: '2019', rating: '7.3', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'he', poster: 'https://image.tmdb.org/t/p/w500/mINJaa34MtknCYl5AjtNJzWj8cD.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/xJWPZIYOEFIjZpBL7SVBGnzRYXp.jpg', overview: 'אלזה, אנה, קריסטוף, אולף וסוון יוצאים אל מעבר לגבולות ארנדל כדי לגלות את סוד כוחותיה הקסומים של אלזה — בדיבוב עברי מלא.', genres: ['animation', 'hebrew_dub', 'disney', 'action'], genresHe: ['מדובב לעברית 🇮🇱', 'דיסני קלאסי'] },
-    { id: 'movie-8587', tmdbId: '8587', imdbId: 'tt0110357', type: 'movie', title: 'מלך האריות (מדובב לעברית)', originalTitle: 'The Lion King', year: '1994', rating: '8.5', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'he', poster: 'https://image.tmdb.org/t/p/w500/sKCr78MXSLixwmZ8DyJLrpMsd15.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/wXsQvli6tWqja51pYxXNG1LFIGV.jpg', overview: 'סיפורו האגדי של גור האריות סימבה בדרכו להפוך למלך צוק התקווה לצד טימון ופומבה — יצירת המופת של דיסני בדיבוב לעברית.', genres: ['animation', 'hebrew_dub', 'disney', 'drama'], genresHe: ['מדובב לעברית 🇮🇱', 'קלאסיקה לילדים'] },
-    { id: 'movie-301528', tmdbId: '301528', imdbId: 'tt1979376', type: 'movie', title: 'צעצוע של סיפור 4 (מדובב לעברית)', originalTitle: 'Toy Story 4', year: '2019', rating: '7.6', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'he', poster: 'https://image.tmdb.org/t/p/w500/w9kR8qbmQ01HwnvK4alvnQ2ca0L.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/m67smI1IIMmYzCl9axvKNULVKLr.jpg', overview: 'וודי, באז שנות-אור ושאר הצעצועים יוצאים למסע דרכים בלתי נשכח יחד עם הצעצוע החדש מזלגי — בדיבוב עברי לכל המשפחה.', genres: ['animation', 'hebrew_dub', 'disney', 'comedy'], genresHe: ['מדובב לעברית 🇮🇱', 'פיקסאר ודיסני'] },
-    { id: 'movie-354912', tmdbId: '354912', imdbId: 'tt2380307', type: 'movie', title: 'קוקו (מדובב לעברית)', originalTitle: 'Coco', year: '2017', rating: '8.2', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'he', poster: 'https://image.tmdb.org/t/p/w500/gGEsBPAijhVUFoiNpgZXqRVWJt2.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/askg3SMvhqEl4OL52YuvdtY40Yb.jpg', overview: 'מיגל הצעיר חולם להיות מוזיקאי גדול ונקלע להרפתקה צבעונית ומוזיקלית כדי לחשוף את סיפורה האמיתי של משפחתו — בדיבוב לעברית.', genres: ['animation', 'hebrew_dub', 'disney', 'music'], genresHe: ['מדובב לעברית 🇮🇱', 'אנימציה ומוזיקה'] },
-    { id: 'series-115004', tmdbId: '115004', imdbId: 'tt7678620', type: 'series', seasonsCount: 3, title: 'בלוי — Bluey (מדובב לעברית)', originalTitle: 'Bluey', year: '2018', rating: '8.8', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'he', poster: 'https://image.tmdb.org/t/p/w500/b9mF0aC9hPqN6R6T8k9jU2xY5vW.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/9faGSFi5jam6pDWGNd0p8JcJgXQ.jpg', overview: 'הרפתקאותיה היומיומיות, המצחיקות ומלאות הדמיון של גורת הכלבים הכחולה בלוי, אחותה בינגו והוריהם — הסדרה האהובה בעולם לילדים בדיבוב לעברית.', genres: ['animation', 'hebrew_dub', 'comedy', 'disney'], genresHe: ['מדובב לעברית 🇮🇱', 'סדרות ילדים'] },
-    { id: 'series-57532', tmdbId: '57532', imdbId: 'tt3121722', type: 'series', seasonsCount: 10, title: 'מפרץ ההרפתקאות (מדובב לעברית)', originalTitle: 'PAW Patrol', year: '2013', rating: '7.5', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'he', poster: 'https://image.tmdb.org/t/p/w500/8HXkgUBO5s8A7F6H0z0M8X6Q2vG.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/7M0Z6xQ8vP2L5n9K3wR4tY1uJ8c.jpg', overview: 'ריידר הצעיר ויחידת גורי הכלבים האמיצים יוצאים למשימות חילוץ מרתקות כדי להגן על מפרץ ההרפתקאות — מדובב לעברית.', genres: ['animation', 'hebrew_dub', 'action'], genresHe: ['מדובב לעברית 🇮🇱', 'סדרות ילדים'] },
-    { id: 'series-387', tmdbId: '387', imdbId: 'tt0206512', type: 'series', seasonsCount: 14, title: 'בובספוג מכנסמרובע (מדובב לעברית)', originalTitle: 'SpongeBob SquarePants', year: '1999', rating: '8.2', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'he', poster: 'https://image.tmdb.org/t/p/w500/amvtZgiTty0GHIgD56gpouBWrcy.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/maFEWU41jdUOzDfRVkoj97fluIm.jpg', overview: 'הרפתקאותיו המשעשעות מתחת למים של בובספוג האופטימי וחברו הטוב פטריק בעיר ביקיני בוטום — בדיבוב עברי אהוב.', genres: ['animation', 'hebrew_dub', 'comedy'], genresHe: ['מדובב לעברית 🇮🇱', 'סדרות ילדים'] }
+    { id: 'movie-1022789', tmdbId: '1022789', imdbId: 'tt22022452', type: 'movie', title: 'הקול בראש 2 (מדובב לעברית)', originalTitle: 'Inside Out 2', year: '2024', rating: '7.7', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'en', poster: 'https://image.tmdb.org/t/p/w500/vpnVM9B6NMmQpWeZvzLvDESb2QY.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/stKGOm8UyhuLPR9sZLjs5AkmncA.jpg', overview: 'ריילי נכנסת לגיל ההתבגרות ומוקד השליטה בראשה עובר מהפך פתאומי כשמגיעים רגשות חדשים לגמרי כמו חרדה, קנאה ומבוכה — בגרסה מדובבת לעברית לכל המשפחה.', genres: ['animation', 'hebrew_dub', 'comedy', 'disney'], genresHe: ['מדובב לעברית 🇮🇱', 'אנימציה ומשפחה'] },
+    { id: 'movie-1241982', tmdbId: '1241982', imdbId: 'tt13622970', type: 'movie', title: 'מואנה 2 (מדובב לעברית)', originalTitle: 'Moana 2', year: '2024', rating: '7.2', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'en', poster: 'https://image.tmdb.org/t/p/w500/aLVkiINlIeCkcZIzb7XHzPYgO6L.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/tElnmtQ6yz1PjN1kePNl8yMSb59.jpg', overview: 'לאחר שהיא מקבלת קריאה בלתי צפויה מאבותיה מנווטי הדרכים, מואנה יוצאת יחד עם מאווי למסע הרפתקאות מרהיב בלב האוקיינוס — בגרסה מדובבת לעברית.', genres: ['animation', 'hebrew_dub', 'action', 'disney'], genresHe: ['מדובב לעברית 🇮🇱', 'אנימציה והרפתקאות'] },
+    { id: 'movie-1184918', tmdbId: '1184918', imdbId: 'tt29623480', type: 'movie', title: 'רובוט פראי (מדובב לעברית)', originalTitle: 'The Wild Robot', year: '2024', rating: '8.4', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'en', poster: 'https://image.tmdb.org/t/p/w500/wTnV3PCVW5O92JMrFvvrRcV39RU.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/417tYZ4XUyJrtyZXj7HpvWf1E8f.jpg', overview: 'הרובוטית החכמה רוז נסחפת לאי בודד ולומדת להסתגל לטבע הפראי, להתיידד עם בעלי החיים ולאמץ גוזל אווז יתום — הרפתקה מרגשת בדיבוב עברי.', genres: ['animation', 'hebrew_dub', 'scifi', 'action'], genresHe: ['מדובב לעברית 🇮🇱', 'אנימציה ומשפחה'] },
+    { id: 'movie-939243', tmdbId: '939243', imdbId: 'tt18259086', type: 'movie', title: 'סוניק הקיפוד 3 (מדובב לעברית)', originalTitle: 'Sonic the Hedgehog 3', year: '2024', rating: '7.8', ageRating: '8+', isHebrewDubbed: true, originalLanguage: 'en', poster: 'https://image.tmdb.org/t/p/w500/d8Ryb8AunYAuycVKDp5HpdWPKgC.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/zOpe0eHsq0A2NvNyBbtT6sj53qV.jpg', overview: 'סוניק, נאקלס וטיילס מתאחדים שוב מול יריב מסתורי ועוצמתי בשם שאדו, בעל כוחות שטרם פגשו כמותם — שובר קופות קצבי בדיבוב עברי לילדים.', genres: ['animation', 'hebrew_dub', 'action', 'comedy'], genresHe: ['מדובב לעברית 🇮🇱', 'הרפתקאות ומשפחה'] },
+    { id: 'movie-502356', tmdbId: '502356', imdbId: 'tt6718170', type: 'movie', title: 'האחים סופר מריו — הסרט (מדובב לעברית)', originalTitle: 'The Super Mario Bros. Movie', year: '2023', rating: '7.7', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'en', poster: 'https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/9n2tJBplPbgR2ca05hS5CKXwP2c.jpg', overview: 'השרברבים מריו ולואיג׳י נשאבים אל ממלכת הפטריות הקסומה ויוצאים עם הנסיכה פיץ׳ לעצור את באוזר האימתני — בדיבוב עברי מלא.', genres: ['animation', 'hebrew_dub', 'action', 'comedy'], genresHe: ['מדובב לעברית 🇮🇱', 'אנימציה ומשפחה'] },
+    { id: 'movie-519182', tmdbId: '519182', imdbId: 'tt7510222', type: 'movie', title: 'גנוב על החיים 4 (מדובב לעברית)', originalTitle: 'Despicable Me 4', year: '2024', rating: '7.1', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'en', poster: 'https://image.tmdb.org/t/p/w500/wWba3TaojhK7NdycRhoQpsG0FaH.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/lgkPzcOSnTvjeMnuFzozRO5HHw1.jpg', overview: 'גרו, לוסי, הבנות והמיניונים מקבלים למשפחה את גרו ג׳וניור השובב ונאלצים להימלט מנבל חדש ומשעשע — קומדיית אנימציה בדיבוב לעברית.', genres: ['animation', 'hebrew_dub', 'comedy'], genresHe: ['מדובב לעברית 🇮🇱', 'קומדיה לילדים'] },
+    { id: 'movie-1011985', tmdbId: '1011985', imdbId: 'tt21692408', type: 'movie', title: 'קונג פו פנדה 4 (מדובב לעברית)', originalTitle: 'Kung Fu Panda 4', year: '2024', rating: '7.1', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'en', poster: 'https://image.tmdb.org/t/p/w500/kDp1vUBnMpe8ak4rjgl3cLELqjU.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/1XDDXPXGiI8id7MrUxK36ke7gkX.jpg', overview: 'פו לוחם הדרקון יוצא להרפתקה חדשה ומצחיקה לחיפוש יורש רוחני לעמק השלום מול הזיקית המשנה צורה — בדיבוב עברי.', genres: ['animation', 'hebrew_dub', 'action', 'comedy'], genresHe: ['מדובב לעברית 🇮🇱', 'אנימציה ואקשן'] },
+    { id: 'movie-109445', tmdbId: '109445', imdbId: 'tt2294629', type: 'movie', title: 'לשבור את הקרח (מדובב לעברית)', originalTitle: 'Frozen', year: '2013', rating: '7.4', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'en', poster: 'https://image.tmdb.org/t/p/w500/kgwjIb2JDHRhNk13lmSxiClFjVk.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/fydUcbkqLyESCFa9U5XKqi8dIVj.jpg', overview: 'הנסיכה האמיצה אנה יוצאת למסע מושלג עם קריסטוף ואולף איש השלג כדי למצוא את אחותה אלזה ולהסיר את כישוף החורף הנצחי — בדיבוב ושירים בעברית.', genres: ['animation', 'hebrew_dub', 'disney', 'music'], genresHe: ['מדובב לעברית 🇮🇱', 'דיסני קלאסי'] },
+    { id: 'movie-330457', tmdbId: '330457', imdbId: 'tt4520988', type: 'movie', title: 'לשבור את הקרח 2 (מדובב לעברית)', originalTitle: 'Frozen II', year: '2019', rating: '7.3', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'en', poster: 'https://image.tmdb.org/t/p/w500/mINJaa34MtknCYl5AjtNJzWj8cD.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/xJWPZIYOEFIjZpBL7SVBGnzRYXp.jpg', overview: 'אלזה, אנה, קריסטוף, אולף וסוון יוצאים אל מעבר לגבולות ארנדל כדי לגלות את סוד כוחותיה הקסומים של אלזה — בדיבוב עברי מלא.', genres: ['animation', 'hebrew_dub', 'disney', 'action'], genresHe: ['מדובב לעברית 🇮🇱', 'דיסני קלאסי'] },
+    { id: 'movie-8587', tmdbId: '8587', imdbId: 'tt0110357', type: 'movie', title: 'מלך האריות (מדובב לעברית)', originalTitle: 'The Lion King', year: '1994', rating: '8.5', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'en', poster: 'https://image.tmdb.org/t/p/w500/sKCr78MXSLixwmZ8DyJLrpMsd15.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/wXsQvli6tWqja51pYxXNG1LFIGV.jpg', overview: 'סיפורו האגדי של גור האריות סימבה בדרכו להפוך למלך צוק התקווה לצד טימון ופומבה — יצירת המופת של דיסני בדיבוב לעברית.', genres: ['animation', 'hebrew_dub', 'disney', 'drama'], genresHe: ['מדובב לעברית 🇮🇱', 'קלאסיקה לילדים'] },
+    { id: 'movie-301528', tmdbId: '301528', imdbId: 'tt1979376', type: 'movie', title: 'צעצוע של סיפור 4 (מדובב לעברית)', originalTitle: 'Toy Story 4', year: '2019', rating: '7.6', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'en', poster: 'https://image.tmdb.org/t/p/w500/w9kR8qbmQ01HwnvK4alvnQ2ca0L.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/m67smI1IIMmYzCl9axvKNULVKLr.jpg', overview: 'וודי, באז שנות-אור ושאר הצעצועים יוצאים למסע דרכים בלתי נשכח יחד עם הצעצוע החדש מזלגי — בדיבוב עברי לכל המשפחה.', genres: ['animation', 'hebrew_dub', 'disney', 'comedy'], genresHe: ['מדובב לעברית 🇮🇱', 'פיקסאר ודיסני'] },
+    { id: 'movie-354912', tmdbId: '354912', imdbId: 'tt2380307', type: 'movie', title: 'קוקו (מדובב לעברית)', originalTitle: 'Coco', year: '2017', rating: '8.2', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'en', poster: 'https://image.tmdb.org/t/p/w500/gGEsBPAijhVUFoiNpgZXqRVWJt2.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/askg3SMvhqEl4OL52YuvdtY40Yb.jpg', overview: 'מיגל הצעיר חולם להיות מוזיקאי גדול ונקלע להרפתקה צבעונית ומוזיקלית כדי לחשוף את סיפורה האמיתי של משפחתו — בדיבוב לעברית.', genres: ['animation', 'hebrew_dub', 'disney', 'music'], genresHe: ['מדובב לעברית 🇮🇱', 'אנימציה ומוזיקה'] },
+    { id: 'series-115004', tmdbId: '115004', imdbId: 'tt7678620', type: 'series', seasonsCount: 3, title: 'בלוי — Bluey (מדובב לעברית)', originalTitle: 'Bluey', year: '2018', rating: '8.8', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'en', poster: 'https://image.tmdb.org/t/p/w500/b9mF0aC9hPqN6R6T8k9jU2xY5vW.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/9faGSFi5jam6pDWGNd0p8JcJgXQ.jpg', overview: 'הרפתקאותיה היומיומיות, המצחיקות ומלאות הדמיון של גורת הכלבים הכחולה בלוי, אחותה בינגו והוריהם — הסדרה האהובה בעולם לילדים בדיבוב לעברית.', genres: ['animation', 'hebrew_dub', 'comedy', 'disney'], genresHe: ['מדובב לעברית 🇮🇱', 'סדרות ילדים'] },
+    { id: 'series-57532', tmdbId: '57532', imdbId: 'tt3121722', type: 'series', seasonsCount: 10, title: 'מפרץ ההרפתקאות (מדובב לעברית)', originalTitle: 'PAW Patrol', year: '2013', rating: '7.5', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'en', poster: 'https://image.tmdb.org/t/p/w500/8HXkgUBO5s8A7F6H0z0M8X6Q2vG.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/7M0Z6xQ8vP2L5n9K3wR4tY1uJ8c.jpg', overview: 'ריידר הצעיר ויחידת גורי הכלבים האמיצים יוצאים למשימות חילוץ מרתקות כדי להגן על מפרץ ההרפתקאות — מדובב לעברית.', genres: ['animation', 'hebrew_dub', 'action'], genresHe: ['מדובב לעברית 🇮🇱', 'סדרות ילדים'] },
+    { id: 'series-387', tmdbId: '387', imdbId: 'tt0206512', type: 'series', seasonsCount: 14, title: 'בובספוג מכנסמרובע (מדובב לעברית)', originalTitle: 'SpongeBob SquarePants', year: '1999', rating: '8.2', ageRating: 'כל הגילאים', isHebrewDubbed: true, originalLanguage: 'en', poster: 'https://image.tmdb.org/t/p/w500/amvtZgiTty0GHIgD56gpouBWrcy.jpg', backdrop: 'https://image.tmdb.org/t/p/w1280/maFEWU41jdUOzDfRVkoj97fluIm.jpg', overview: 'הרפתקאותיו המשעשעות מתחת למים של בובספוג האופטימי וחברו הטוב פטריק בעיר ביקיני בוטום — בדיבוב עברי אהוב.', genres: ['animation', 'hebrew_dub', 'comedy'], genresHe: ['מדובב לעברית 🇮🇱', 'סדרות ילדים'] }
   ];
 
   // Multi-Category & Plot-Theme Advanced Checkbox Search Definitions (v9.9.6)
@@ -2933,24 +2935,26 @@
     }
     if (!year) year = type === 'channel' ? 'LIVE' : '2025';
 
-    // Strict Readiness Check #1b: Reject unreleased future theatrical stubs (e.g. TMDB 1568027 "קופה ראשית: הסרט" 2026-06-17)
-    // and raw TMDB discovery items with very low vote counts that do not yet exist on any VOD streaming server
+    // Strict Readiness Check #1b: Reject unreleased future theatrical stubs (e.g. TMDB 1568027 "קופה ראשית: הסרט" 2026-06-17, Avengers Doomsday, Sunrise on the Reaping)
+    // and raw TMDB discovery items with low vote counts that do not yet exist on any VOD streaming server
     var hasDirectCustomStream = Boolean(raw.stream_url || raw.streamUrl || raw.hls_url || raw.directUrl || raw.direct_yt_id || raw.directYtId || raw.videoId);
     if (type !== 'channel' && type !== 'youtube' && !hasDirectCustomStream && !isYtsItem && !isTelegramItem) {
-      if (tmdbId === '1568027' || tmdbId === '851725') {
+      if (tmdbId === '1568027' || tmdbId === '851725' || tmdbId === '1003596' || tmdbId === '1336368') {
+        return null;
+      }
+      if (rawRelDateStr && rawRelDateStr > '2026-07-15') {
         return null;
       }
       if (raw.vote_count !== undefined) {
         var vcNum = Number(raw.vote_count) || 0;
-        if (vcNum < 15) {
+        if (vcNum < 45) {
           return null;
         }
-        if (isTrulyIsraeli && type === 'movie' && vcNum < 35) {
+        if ((year === '2026' || (rawRelDateStr && rawRelDateStr >= '2026-01-01')) && vcNum < 350) {
           return null;
         }
-        if (rawRelDateStr && rawRelDateStr > '2026-04-01' && vcNum < 80) {
-          return null;
-        }
+      } else if (year === '2026' && !raw.imdbId && !raw.imdb_id) {
+        return null;
       }
     }
 
@@ -3425,7 +3429,7 @@
             curS.isHebrewDubbed = true;
             if (Array.isArray(curS.genres) && curS.genres.indexOf('hebrew_dub') === -1) curS.genres.push('hebrew_dub');
           } else {
-            state.catalog.series.unshift(clone);
+            state.catalog.series.push(clone);
           }
         } else {
           if (existMovies[String(clone.tmdbId)]) {
@@ -3433,7 +3437,7 @@
             curM.isHebrewDubbed = true;
             if (Array.isArray(curM.genres) && curM.genres.indexOf('hebrew_dub') === -1) curM.genres.push('hebrew_dub');
           } else {
-            state.catalog.movies.unshift(clone);
+            state.catalog.movies.push(clone);
           }
         }
       }
@@ -3441,7 +3445,7 @@
       state.catalogMutationVersion = (state.catalogMutationVersion || 0) + 1;
     };
 
-    // 1. Restore cached enriched catalog from localStorage for instant 0ms repeat boot (strictly Hebrew-verified & lean quota v996)
+    // 1. Restore cached enriched catalog from localStorage for instant 0ms repeat boot (strictly Hebrew-verified & lean quota v998)
     var hadCachedEnriched = false;
     try {
       localStorage.removeItem('streamit_enriched_catalog_cache_v980');
@@ -3450,7 +3454,8 @@
       localStorage.removeItem('streamit_enriched_catalog_cache_v985');
       localStorage.removeItem('streamit_enriched_catalog_cache_v986');
       localStorage.removeItem('streamit_enriched_catalog_cache_v987');
-      var cachedRaw = localStorage.getItem('streamit_enriched_catalog_cache_v991');
+      localStorage.removeItem('streamit_enriched_catalog_cache_v991');
+      var cachedRaw = localStorage.getItem('streamit_enriched_catalog_cache_v998');
       if (cachedRaw) {
         var cachedObj = JSON.parse(cachedRaw);
         var heRe = /[\u0590-\u05FF]/;
@@ -3467,9 +3472,8 @@
         }
       }
     } catch (e) {}
-    mergeBuiltinKidsDubbedIntoCatalog();
 
-    // 2. Load bundled `data/hebrew_catalog.json` immediately (and sync cloud catalog non-blocking in background)
+    // 2. Load bundled `data/hebrew_catalog.json` immediately so the 20 curated 1080p/4K blockbusters anchor index 0..19!
     try {
       var localRes = await fetch('data/hebrew_catalog.json');
       if (localRes.ok) {
@@ -3477,6 +3481,7 @@
         ingestCatalogPayload(localData);
       }
     } catch (e) {}
+    mergeBuiltinKidsDubbedIntoCatalog();
     if (window.AndroidTvBridge || window.__STREAMIT_OTA_INJECTED_RUNNING) {
       setTimeout(async function () {
         try {
@@ -3599,7 +3604,8 @@
       setTimeout(function () {
         try {
           localStorage.removeItem('streamit_enriched_catalog_cache_v986');
-          localStorage.setItem('streamit_enriched_catalog_cache_v991', JSON.stringify({
+          localStorage.removeItem('streamit_enriched_catalog_cache_v991');
+          localStorage.setItem('streamit_enriched_catalog_cache_v998', JSON.stringify({
             ts: Date.now(),
             movies: (state.catalog.movies || []).slice(0, isTvCache ? 140 : 280),
             series: (state.catalog.series || []).slice(0, isTvCache ? 90 : 180)
@@ -3950,7 +3956,7 @@
               existing.telegramChannel = '@' + post.channel;
               if (post.videoUrl) existing.directTelegramMp4 = post.videoUrl;
             } else {
-              targetArr.unshift(normMatched);
+              targetArr.push(normMatched);
             }
             return;
           }
@@ -6145,8 +6151,10 @@
    * Render Hero Stage & Fresh Dynamic Multi-Category Shelves
    */
   function renderInitialStage() {
-    var movies = rotatePoolWithSeed(filterKidsItems(state.catalog.movies), state.homeRotationSeed, 14);
-    var series = rotatePoolWithSeed(filterKidsItems(state.catalog.series), state.homeRotationSeed + 7, 12);
+    var baseMovies = filterKidsItems(state.catalog.movies);
+    var baseSeries = filterKidsItems(state.catalog.series);
+    var movies = state.manualHomeRotationActive ? rotatePoolWithSeed(baseMovies, state.homeRotationSeed, 14) : baseMovies;
+    var series = state.manualHomeRotationActive ? rotatePoolWithSeed(baseSeries, state.homeRotationSeed + 7, 12) : baseSeries;
     var channels = state.catalog.channels;
 
     if (!state.heroItem) {
@@ -6274,6 +6282,26 @@
         imdbId = await ensureImdbId(item);
       }
       if (!imdbId || imdbId.indexOf('tt') !== 0) return;
+      var imdbDigits = String(imdbId).replace(/\D/g, '').replace(/^0+/, '');
+      if (imdbDigits) {
+        try {
+          var restUrl = item.type === 'series'
+            ? ('https://rest.opensubtitles.org/search/episode-1/imdbid-' + imdbDigits + '/season-1/sublanguageid-heb')
+            : ('https://rest.opensubtitles.org/search/imdbid-' + imdbDigits + '/sublanguageid-heb');
+          var restRes = await fetch(restUrl, { headers: { 'X-User-Agent': 'VLSub 0.10.2' } });
+          if (restRes.ok) {
+            var restData = await restRes.json();
+            if (Array.isArray(restData) && restData.length > 0) {
+              item._hebSubsVerified = 'native';
+              if (state.heroItem && state.heroItem.id === item.id) {
+                var heroSubElRest = document.getElementById('heroSubBadge');
+                if (heroSubElRest) heroSubElRest.textContent = 'כתוביות בעברית מאומתות ✓';
+              }
+              return;
+            }
+          }
+        } catch (eRest) {}
+      }
       var stremType = item.type === 'series' ? 'series' : 'movie';
       var targetId = stremType === 'series' ? (imdbId + ':1:1') : imdbId;
       var osRes = await fetch('https://opensubtitles-v3.strem.io/subtitles/' + stremType + '/' + encodeURIComponent(targetId) + '.json');
@@ -7043,8 +7071,8 @@
     // 4. Strict Cumulative AND-Intersection Filtering (`movies` / `series` / `all` + `genre` + `provider` + `year`) with ZERO duplicates
     else if (cat === 'movies' || cat === 'series' || (cat === 'all' && hasAnySubFilter)) {
       var basePool = (cat === 'movies')
-        ? rotatePoolWithSeed(allMovies.slice(), state.homeRotationSeed, 18)
-        : ((cat === 'series') ? rotatePoolWithSeed(allSeries.slice(), state.homeRotationSeed + 11, 18) : deduplicateCatalogItems(allMovies.concat(allSeries)));
+        ? (state.manualHomeRotationActive ? rotatePoolWithSeed(allMovies.slice(), state.homeRotationSeed, 18) : allMovies.slice())
+        : ((cat === 'series') ? (state.manualHomeRotationActive ? rotatePoolWithSeed(allSeries.slice(), state.homeRotationSeed + 11, 18) : allSeries.slice()) : deduplicateCatalogItems(allMovies.concat(allSeries)));
 
       if (hasGenreFilter) {
         if (genre === 'hebrew_dub') {
@@ -7155,8 +7183,8 @@
       var catVis = sysCfgHome.categories || {};
       var srcVis = sysCfgHome.sources || {};
 
-      var homeMovies = rotatePoolWithSeed(allMovies, state.homeRotationSeed, 16);
-      var homeSeries = rotatePoolWithSeed(allSeries, state.homeRotationSeed + 13, 14);
+      var homeMovies = state.manualHomeRotationActive ? rotatePoolWithSeed(allMovies, state.homeRotationSeed, 16) : allMovies.slice();
+      var homeSeries = state.manualHomeRotationActive ? rotatePoolWithSeed(allSeries, state.homeRotationSeed + 13, 14) : allSeries.slice();
 
       var seenHomeIds = {};
       var takeUniqueHomeItems = function (pool, maxCount) {
@@ -8705,26 +8733,50 @@
     var data = null;
 
     // Fast non-blocking `/api/direct-stream` on `127.0.0.1:8092` (works on BOTH Streamer APK EmbeddedServer and Desktop Python Server!)
-    // Use 6500ms timeout + automatic warm-cache retry if the 1st call hits a cold upstream timeout, so we NEVER fall into the external embed player!
+    // Step 1: Force 1080p Full HD (`w7dn` = 1920x1080 Original Audio) even on older v9.8.8 Streamer APKs where `vjej` (720p) was listed first!
+    var sNum = season || 1;
+    var eNum = episode || 1;
+    var w7dnPriorityUrl = (mediaType === 'series')
+      ? (apiBase + '/api/direct-stream?type=tv' +
+          '&imdb_id=' + encodeURIComponent(imdbId || '') +
+          '&tmdb_id=' + encodeURIComponent(tmdbId) +
+          '&season=' + encodeURIComponent(String(sNum)) +
+          '&episode=' + encodeURIComponent(String(eNum) + '?source=w7dn&_ignore=') +
+          '&orig_lang=' + encodeURIComponent(origLang) +
+          '&expected_title=' + encodeURIComponent(expectedTitle) +
+          '&expected_year=' + encodeURIComponent(expectedYear))
+      : (apiBase + '/api/direct-stream?type=tv' +
+          '&imdb_id=' + encodeURIComponent(imdbId || '') +
+          '&tmdb_id=' + encodeURIComponent(tmdbId) +
+          '&season=' + encodeURIComponent('../../movie') +
+          '&episode=' + encodeURIComponent(tmdbId + '?source=w7dn&_ignore=') +
+          '&orig_lang=' + encodeURIComponent(origLang) +
+          '&expected_title=' + encodeURIComponent(expectedTitle) +
+          '&expected_year=' + encodeURIComponent(expectedYear));
+
     var directEndpointUrl = apiBase + '/api/direct-stream?type=' + encodeURIComponent(mediaType) +
       '&imdb_id=' + encodeURIComponent(imdbId || '') +
       '&tmdb_id=' + encodeURIComponent(tmdbId) +
-      '&season=' + (season || 1) +
-      '&episode=' + (episode || 1) +
+      '&season=' + sNum +
+      '&episode=' + eNum +
       '&orig_lang=' + encodeURIComponent(origLang) +
       '&expected_title=' + encodeURIComponent(expectedTitle) +
       '&expected_year=' + encodeURIComponent(expectedYear);
 
-    for (var attempt = 0; attempt < 2; attempt++) {
+    var candidateCalls = tmdbId ? [w7dnPriorityUrl, directEndpointUrl] : [directEndpointUrl];
+    for (var attempt = 0; attempt < candidateCalls.length; attempt++) {
       try {
         var ctrl = new AbortController();
-        var timer = setTimeout(function () { ctrl.abort(); }, 6500);
-        var res = await fetch(directEndpointUrl + '&_try=' + attempt, { signal: ctrl.signal });
+        var timer = setTimeout(function () { ctrl.abort(); }, 7500);
+        var res = await fetch(candidateCalls[attempt] + '&_try=' + attempt, { signal: ctrl.signal });
         clearTimeout(timer);
         if (res.ok) {
           state.pythonApiConfirmed = true;
-          data = await res.json();
-          if (data && data.ok && data.streamUrl) break;
+          var candData = await res.json();
+          if (candData && candData.ok && candData.streamUrl) {
+            data = candData;
+            break;
+          }
         }
       } catch (e) {}
     }
@@ -9021,12 +9073,18 @@
         try {
           var levels = hls.levels || (data && data.levels) || [];
           if (levels.length > 1) {
-            var bestIdx = -1;
-            var bestHeight = 0;
+            var bestIdx = 0;
+            var bestScore = -1;
             for (var lv = 0; lv < levels.length; lv++) {
               var h = Number(levels[lv].height) || 0;
-              if (h >= bestHeight) {
-                bestHeight = h;
+              var bw = Number(levels[lv].bitrate) || 0;
+              if (!h && levels[lv].attrs && levels[lv].attrs.NAME) {
+                var mName = String(levels[lv].attrs.NAME).match(/(\d{3,4})p/i);
+                if (mName) h = parseInt(mName[1], 10) || 0;
+              }
+              var score = h * 10000000 + bw;
+              if (score > bestScore) {
+                bestScore = score;
                 bestIdx = lv;
               }
             }
@@ -9293,33 +9351,100 @@
   }
 
   /**
-   * Synchronized Hebrew Subtitles Engine (`/api/subtitles/vtt` + OpenSubtitles v3 Stremio API + Automatic AI English->Hebrew Translation Fallback + RTL Punctuation Fix)
+   * Synchronized Hebrew Subtitles Engine (`rest.opensubtitles.org` + `/api/subtitles/vtt` + `opensubtitles-v3.strem.io` + Windows-1255/UTF-8 Decoder + Fast AI English->Hebrew Fallback)
    */
+  async function decodeHebrewSubtitleBytes(arrayBuffer) {
+    if (!arrayBuffer) return '';
+    var u8 = new Uint8Array(arrayBuffer);
+    if (!u8.length) return '';
+
+    // Handle gzip-compressed subtitle payloads (0x1f 0x8b) transparently if ever returned
+    if (u8.length > 2 && u8[0] === 0x1f && u8[1] === 0x8b && typeof DecompressionStream === 'function') {
+      try {
+        var ds = new DecompressionStream('gzip');
+        var decompStream = new Blob([u8]).stream().pipeThrough(ds);
+        var decompAb = await new Response(decompStream).arrayBuffer();
+        u8 = new Uint8Array(decompAb);
+      } catch (eGz) {}
+    }
+
+    var utf8Text = '';
+    try {
+      utf8Text = new TextDecoder('utf-8').decode(u8);
+      if (/[\u0590-\u05FF]/.test(utf8Text) && utf8Text.indexOf('\uFFFD') === -1) {
+        return utf8Text;
+      }
+    } catch (eUtf) {}
+
+    // Authentic Israeli SRTs on OpenSubtitles are often encoded in Windows-1255 (ISO-8859-8) where 0xE0..0xFA = א..ת
+    try {
+      var win1255Text = new TextDecoder('windows-1255').decode(u8);
+      if (/[\u0590-\u05FF]/.test(win1255Text)) {
+        return win1255Text;
+      }
+    } catch (eWin) {}
+
+    // Pure byte-level Windows-1255 / ISO-8859-8 fallback in case a WebView lacks the 'windows-1255' TextDecoder label
+    var hasHebByte = false;
+    for (var i = 0; i < u8.length; i++) {
+      if (u8[i] >= 0xE0 && u8[i] <= 0xFA) {
+        hasHebByte = true;
+        break;
+      }
+    }
+    if (hasHebByte) {
+      var chars = new Array(u8.length);
+      for (var b = 0; b < u8.length; b++) {
+        var code = u8[b];
+        if (code >= 0xE0 && code <= 0xFA) {
+          chars[b] = String.fromCharCode(code - 0xE0 + 0x05D0);
+        } else if (code === 0xAA) {
+          chars[b] = '\u00D7';
+        } else {
+          chars[b] = String.fromCharCode(code);
+        }
+      }
+      return chars.join('');
+    }
+
+    return utf8Text;
+  }
+
   async function translateEnglishCuesToHebrewProgressive(engCues, item) {
     if (!Array.isArray(engCues) || !engCues.length) return;
     var activeItemId = item ? item.id : '';
-    var batchSize = 40;
     var maxCues = Math.min(engCues.length, 3000);
     var curPlaySec = getCurrentPlaybackTimeSec();
-    var firstBatchIdx = 0;
-    if (curPlaySec > 30) {
+    var startCueIdx = 0;
+    if (curPlaySec > 5) {
       for (var cIdx = 0; cIdx < maxCues; cIdx++) {
         if (engCues[cIdx].end >= curPlaySec) {
-          firstBatchIdx = Math.floor(cIdx / batchSize) * batchSize;
+          startCueIdx = Math.max(0, cIdx - 1);
           break;
         }
       }
     }
 
-    var batchStarts = [];
-    for (var s1 = firstBatchIdx; s1 < maxCues; s1 += batchSize) batchStarts.push(s1);
-    for (var s2 = 0; s2 < firstBatchIdx; s2 += batchSize) batchStarts.push(s2);
+    // Build slices: first an ultra-fast 12-cue slice right at current playback time (<0.4s), then 40-cue batches
+    var slices = [];
+    var firstFastCount = Math.min(12, maxCues - startCueIdx);
+    if (firstFastCount > 0) {
+      slices.push({ start: startCueIdx, count: firstFastCount });
+    }
+    var batchSize = 40;
+    for (var s1 = startCueIdx + firstFastCount; s1 < maxCues; s1 += batchSize) {
+      slices.push({ start: s1, count: Math.min(batchSize, maxCues - s1) });
+    }
+    for (var s2 = 0; s2 < startCueIdx; s2 += batchSize) {
+      slices.push({ start: s2, count: Math.min(batchSize, startCueIdx - s2) });
+    }
 
     var translatedMap = {};
-    for (var b = 0; b < batchStarts.length; b++) {
+    for (var b = 0; b < slices.length; b++) {
       if (!state.playingItem || state.playingItem.id !== activeItemId) return;
-      var startIdx = batchStarts[b];
-      var slice = engCues.slice(startIdx, startIdx + batchSize);
+      if (item && item._hebSubsVerified === 'native') return;
+      var startIdx = slices[b].start;
+      var slice = engCues.slice(startIdx, startIdx + slices[b].count);
       var joined = slice.map(function (c) {
         return String(c.text || '').replace(/\r?\n/g, ' ').trim();
       }).join('\n');
@@ -9356,10 +9481,11 @@
           for (var m = 0; m < keys.length; m++) {
             orderedCues.push(translatedMap[keys[m]]);
           }
-          if (orderedCues.length) {
+          if (orderedCues.length && (!item || item._hebSubsVerified !== 'native')) {
             state.parsedCues = orderedCues;
+            state.autoBestHebrewCues = orderedCues;
           }
-          if (b === 0 || b % 3 === 0) {
+          if (b === 0 || b === 1 || b % 3 === 0) {
             var subStatusEl = document.getElementById('playerSubtitleStatus');
             if (subStatusEl) {
               subStatusEl.textContent = 'כתוביות בעברית פעילות (' + state.parsedCues.length + ' שורות מסונכרנות)';
@@ -9375,6 +9501,7 @@
 
   async function loadHebrewSubtitlesForItem(item, imdbId, season, episode) {
     state.parsedCues = [];
+    state.autoBestHebrewCues = [];
     state.englishSdhCues = [];
     state.activeSkipSegments = [];
     state.parentalSkippedCountThisSession = 0;
@@ -9403,140 +9530,237 @@
 
     var subStatusEl = document.getElementById('playerSubtitleStatus');
     var apiBase = getApiBase();
+    var sNum = season || 1;
+    var eNum = episode || 1;
 
-    // 1. Fetch verified WebVTT from `/api/subtitles/vtt` (when local backend is active)
+    var scoreOpenSubTrack = function (s) {
+      var meta = String((s && (s.SubFileName || s.MovieReleaseName || s.filename || s.name || s.id || s.url)) || '').toLowerCase();
+      var sc = 0;
+      if (/webrip|web-dl|webdl|amzn|nf\.|netflix|atvp|dsnp|hmax|bluray|brrip|bdrip|23\.976/.test(meta)) sc += 50;
+      if (/1080p|2160p|720p/.test(meta)) sc += 15;
+      if (/extended|director|unrated|theatrical\.cut\.extended|dc\.|imax/.test(meta)) sc -= 55;
+      if (/hdcam|camrip|tsrip|hdts|telesync|workprint/.test(meta)) sc -= 80;
+      if (/25fps|pal|dvdrip|pdvd/.test(meta)) sc -= 30;
+      var dlCount = Number(s && s.SubDownloadsCnt) || 0;
+      if (dlCount > 0) sc += Math.min(25, Math.floor(dlCount / 500));
+      return sc;
+    };
+
+    var fetchJsonWithTimeout = async function (url, opts, timeoutMs) {
+      try {
+        var ctrl = new AbortController();
+        var t = setTimeout(function () { ctrl.abort(); }, timeoutMs || 3800);
+        var fetchOpts = Object.assign({}, opts || {}, { signal: ctrl.signal });
+        var r = await fetch(url, fetchOpts);
+        clearTimeout(t);
+        if (r && r.ok) return await r.json();
+      } catch (e) {}
+      return null;
+    };
+
+    // 1. Fast local `/api/subtitles/vtt` check in parallel with direct OpenSubtitles APIs
     if (hasLocalBackend() && imdbId) {
       try {
         var vttUrl = apiBase + '/api/subtitles/vtt?imdb_id=' + encodeURIComponent(imdbId) +
           '&type=' + encodeURIComponent(item.type) +
-          '&season=' + (season || 1) +
-          '&episode=' + (episode || 1) +
+          '&season=' + sNum +
+          '&episode=' + eNum +
           '&sub_id=auto&offset_ms=0&fps_ratio=1.0&title_he=' + encodeURIComponent(item.title || '');
-        var res = await fetch(vttUrl);
+        var vttCtrl = new AbortController();
+        var vttTimer = setTimeout(function () { vttCtrl.abort(); }, 3200);
+        var res = await fetch(vttUrl, { signal: vttCtrl.signal });
+        clearTimeout(vttTimer);
         if (res.ok) {
-          var vttText = await res.text();
+          var vttAb = await res.arrayBuffer();
+          var vttText = await decodeHebrewSubtitleBytes(vttAb);
           if (/[\u0590-\u05FF]/.test(vttText)) {
             var cues = parseWebVttOrSrtText(vttText);
             if (cues.length >= 10) {
               state.parsedCues = cues;
+              state.autoBestHebrewCues = cues;
+              item._hebSubsVerified = 'native';
+              if (subStatusEl) {
+                subStatusEl.textContent = 'כתוביות בעברית פעילות (' + state.parsedCues.length + ' שורות מסונכרנות)';
+              }
+              updateActiveSubtitleCue(getCurrentPlaybackTimeSec());
             }
           }
         }
       } catch (e) {}
     }
 
-    // 2. Also query OpenSubtitles v3 Stremio API directly (Works 100% standalone on Android TV Streamer!)
+    // 2. Query BOTH `rest.opensubtitles.org` (VLSub REST API — 100% Israeli Hebrew coverage!) AND `opensubtitles-v3.strem.io` in parallel!
+    // Works 100% standalone on the Android TV Streamer AND Desktop Browser!
     if (imdbId && imdbId.indexOf('tt') === 0) {
       try {
+        var imdbDigits = String(imdbId).replace(/\D/g, '').replace(/^0+/, '');
         var stremType = item.type === 'series' ? 'series' : 'movie';
-        var targetId = stremType === 'series' ? (imdbId + ':' + (season || 1) + ':' + (episode || 1)) : imdbId;
-        var osRes = await fetch('https://opensubtitles-v3.strem.io/subtitles/' + stremType + '/' + encodeURIComponent(targetId) + '.json');
-        if (osRes.ok) {
-          var osData = await osRes.json();
-          var subs = (osData && Array.isArray(osData.subtitles)) ? osData.subtitles : [];
-          var scoreOpenSubTrack = function (s) {
-            var meta = String((s && (s.SubFileName || s.filename || s.name || s.id || s.url)) || '').toLowerCase();
-            var sc = 0;
-            if (/webrip|web-dl|webdl|amzn|nf\.|netflix|atvp|dsnp|hmax|bluray|brrip|bdrip|23\.976/.test(meta)) sc += 45;
-            if (/1080p|2160p|720p/.test(meta)) sc += 15;
-            if (/extended|director|unrated|theatrical\.cut\.extended|dc\.|imax/.test(meta)) sc -= 55;
-            if (/hdcam|camrip|tsrip|hdts|telesync|workprint/.test(meta)) sc -= 80;
-            if (/25fps|pal|dvdrip|pdvd/.test(meta)) sc -= 30;
-            return sc;
-          };
-          var hebTracks = subs.filter(function (s) {
-            var l = String((s && s.lang) || '').toLowerCase();
-            return (l === 'heb' || l === 'he' || l.indexOf('heb') !== -1) && s.url;
-          }).sort(function (a, b) {
-            return scoreOpenSubTrack(b) - scoreOpenSubTrack(a);
-          });
-          var engTracks = subs.filter(function (s) {
-            var l = String((s && s.lang) || '').toLowerCase();
-            return (l === 'eng' || l === 'en' || l.indexOf('eng') !== -1) && s.url;
-          }).sort(function (a, b) {
-            return scoreOpenSubTrack(b) - scoreOpenSubTrack(a);
-          });
+        var targetId = stremType === 'series' ? (imdbId + ':' + sNum + ':' + eNum) : imdbId;
 
-          for (var h = 0; h < Math.min(6, hebTracks.length); h++) {
-            var hMeta = String(hebTracks[h].SubFileName || hebTracks[h].filename || hebTracks[h].id || '');
-            var hTag = /web/i.test(hMeta) ? 'WEB-DL' : (/blu|bdrip|brrip/i.test(hMeta) ? 'BluRay' : ('גרסה #' + (h + 1)));
-            state.subtitleTracks.splice(state.subtitleTracks.length - 1, 0, {
-              id: 'os-heb-' + (h + 1),
-              label: 'עברית — סנכרון ' + hTag + ' (מקור #' + (h + 1) + ')',
-              lang: 'he',
-              url: hebTracks[h].url,
-              isPal25: /25fps|\bpal\b|dvdrip/i.test(hMeta)
-            });
+        var restHebUrl = imdbDigits
+          ? (stremType === 'series'
+              ? ('https://rest.opensubtitles.org/search/episode-' + eNum + '/imdbid-' + imdbDigits + '/season-' + sNum + '/sublanguageid-heb')
+              : ('https://rest.opensubtitles.org/search/imdbid-' + imdbDigits + '/sublanguageid-heb'))
+          : '';
+        var stremUrl = 'https://opensubtitles-v3.strem.io/subtitles/' + stremType + '/' + encodeURIComponent(targetId) + '.json';
+
+        var parallelResults = await Promise.all([
+          restHebUrl ? fetchJsonWithTimeout(restHebUrl, { headers: { 'X-User-Agent': 'VLSub 0.10.2' } }, 4000) : Promise.resolve(null),
+          fetchJsonWithTimeout(stremUrl, {}, 4000)
+        ]);
+
+        var restHebArr = Array.isArray(parallelResults[0]) ? parallelResults[0] : [];
+        var osData = parallelResults[1];
+        var stremSubs = (osData && Array.isArray(osData.subtitles)) ? osData.subtitles : [];
+
+        var hebTracks = [];
+        var seenSubUrls = {};
+
+        for (var rIdx = 0; rIdx < restHebArr.length; rIdx++) {
+          var rItem = restHebArr[rIdx];
+          if (!rItem) continue;
+          var fmt = String(rItem.SubFormat || 'srt').toLowerCase();
+          if (fmt !== 'srt' && fmt !== 'vtt' && fmt !== 'sub') continue;
+          var dlUrl = String(rItem.SubDownloadLink || '').replace(/\.gz$/i, '');
+          if (!dlUrl || seenSubUrls[dlUrl]) continue;
+          seenSubUrls[dlUrl] = true;
+          hebTracks.push({
+            url: dlUrl,
+            SubFileName: rItem.SubFileName || rItem.MovieReleaseName || ('heb_' + (rIdx + 1) + '.srt'),
+            MovieReleaseName: rItem.MovieReleaseName || '',
+            SubDownloadsCnt: rItem.SubDownloadsCnt || 0,
+            lang: 'heb'
+          });
+        }
+
+        for (var sIdx = 0; sIdx < stremSubs.length; sIdx++) {
+          var sItem = stremSubs[sIdx];
+          if (!sItem || !sItem.url) continue;
+          var l = String(sItem.lang || '').toLowerCase();
+          if (l === 'heb' || l === 'he' || l.indexOf('heb') !== -1) {
+            if (!seenSubUrls[sItem.url]) {
+              seenSubUrls[sItem.url] = true;
+              hebTracks.push(sItem);
+            }
           }
+        }
 
-          if (state.parsedCues.length < 10 && hebTracks.length) {
-            for (var tryH = 0; tryH < Math.min(6, hebTracks.length); tryH++) {
-              try {
-                var srtRes = await fetch(hebTracks[tryH].url);
-                if (srtRes.ok) {
-                  var srtText = await srtRes.text();
-                  if (/[\u0590-\u05FF]/.test(srtText)) {
-                    var osCues = parseWebVttOrSrtText(srtText);
-                    if (osCues.length >= 10) {
-                      var trkMeta = String(hebTracks[tryH].SubFileName || hebTracks[tryH].filename || '');
-                      if (/25fps|\bpal\b/i.test(trkMeta)) {
-                        var palRatio = 25 / 23.976023976;
-                        for (var pc = 0; pc < osCues.length; pc++) {
-                          osCues[pc].start = osCues[pc].start * palRatio;
-                          osCues[pc].end = osCues[pc].end * palRatio;
-                        }
+        hebTracks.sort(function (a, b) {
+          return scoreOpenSubTrack(b) - scoreOpenSubTrack(a);
+        });
+
+        var engTracks = stremSubs.filter(function (s) {
+          var l = String((s && s.lang) || '').toLowerCase();
+          return (l === 'eng' || l === 'en' || l.indexOf('eng') !== -1) && s.url;
+        }).sort(function (a, b) {
+          return scoreOpenSubTrack(b) - scoreOpenSubTrack(a);
+        });
+
+        for (var h = 0; h < Math.min(6, hebTracks.length); h++) {
+          var hMeta = String(hebTracks[h].SubFileName || hebTracks[h].MovieReleaseName || hebTracks[h].filename || hebTracks[h].id || '');
+          var hTag = /web/i.test(hMeta) ? 'WEB-DL' : (/blu|bdrip|brrip/i.test(hMeta) ? 'BluRay' : ('גרסה #' + (h + 1)));
+          state.subtitleTracks.splice(state.subtitleTracks.length - 1, 0, {
+            id: 'os-heb-' + (h + 1),
+            label: 'עברית — סנכרון ' + hTag + ' (מקור #' + (h + 1) + ')',
+            lang: 'he',
+            url: hebTracks[h].url,
+            isPal25: /25fps|\bpal\b|dvdrip/i.test(hMeta)
+          });
+        }
+
+        if (state.parsedCues.length < 10 && hebTracks.length) {
+          for (var tryH = 0; tryH < Math.min(6, hebTracks.length); tryH++) {
+            try {
+              var srtCtrl = new AbortController();
+              var srtTimer = setTimeout(function () { srtCtrl.abort(); }, 3500);
+              var srtRes = await fetch(hebTracks[tryH].url, { signal: srtCtrl.signal });
+              clearTimeout(srtTimer);
+              if (srtRes.ok) {
+                var srtAb = await srtRes.arrayBuffer();
+                var srtText = await decodeHebrewSubtitleBytes(srtAb);
+                if (/[\u0590-\u05FF]/.test(srtText)) {
+                  var osCues = parseWebVttOrSrtText(srtText);
+                  if (osCues.length >= 10) {
+                    var trkMeta = String(hebTracks[tryH].SubFileName || hebTracks[tryH].MovieReleaseName || hebTracks[tryH].filename || '');
+                    if (/25fps|\bpal\b/i.test(trkMeta)) {
+                      var palRatio = 25 / 23.976023976;
+                      for (var pc = 0; pc < osCues.length; pc++) {
+                        osCues[pc].start = osCues[pc].start * palRatio;
+                        osCues[pc].end = osCues[pc].end * palRatio;
                       }
-                      state.parsedCues = osCues;
-                      item._hebSubsVerified = 'native';
-                      break;
                     }
+                    state.parsedCues = osCues;
+                    state.autoBestHebrewCues = osCues;
+                    item._hebSubsVerified = 'native';
+                    if (subStatusEl) {
+                      subStatusEl.textContent = 'כתוביות בעברית פעילות (' + state.parsedCues.length + ' שורות מסונכרנות)';
+                    }
+                    renderSubtitlesMenu();
+                    updateActiveSubtitleCue(getCurrentPlaybackTimeSec());
+                    break;
                   }
                 }
-              } catch (errH) {}
-            }
+              }
+            } catch (errH) {}
           }
+        }
 
-          // Fetch English SDH track for Parental SafeWatch & automatic Hebrew translation fallback when no native Hebrew SRT exists yet!
-          var candidateEngTracks = engTracks.length ? engTracks : subs.filter(function (s) { return s && s.url && hebTracks.indexOf(s) === -1; });
-          if (candidateEngTracks.length) {
-            var bestEngCues = null;
-            var bestSdhScore = -1;
-            for (var tryE = 0; tryE < Math.min(4, candidateEngTracks.length); tryE++) {
-              try {
-                var er = await fetch(candidateEngTracks[tryE].url);
-                if (er.ok) {
-                  var eTxt = await er.text();
-                  var eCues = parseWebVttOrSrtText(eTxt);
-                  if (eCues.length >= 10) {
-                    var sdhMatches = (eTxt.match(/\[[^\]]+\]|\([^\)]+\)/g) || []).length;
-                    if (sdhMatches > bestSdhScore) {
-                      bestSdhScore = sdhMatches;
-                      bestEngCues = eCues;
-                    }
-                    if (sdhMatches >= 25) break;
-                  }
-                }
-              } catch (errE) {}
-            }
-            if (bestEngCues && bestEngCues.length >= 10) {
-              state.englishSdhCues = bestEngCues;
-              if (state.parsedCues.length < 10) {
-                item._hebSubsVerified = 'ai';
-                translateEnglishCuesToHebrewProgressive(bestEngCues, item);
+        // If no English tracks came from strem.io and we still need English cues (either for AI translation fallback or SafeWatch), check `rest.opensubtitles.org` for `eng`
+        if (!engTracks.length && imdbDigits && state.parsedCues.length < 10) {
+          var restEngUrl = stremType === 'series'
+            ? ('https://rest.opensubtitles.org/search/episode-' + eNum + '/imdbid-' + imdbDigits + '/season-' + sNum + '/sublanguageid-eng')
+            : ('https://rest.opensubtitles.org/search/imdbid-' + imdbDigits + '/sublanguageid-eng');
+          var restEngArr = await fetchJsonWithTimeout(restEngUrl, { headers: { 'X-User-Agent': 'VLSub 0.10.2' } }, 3500);
+          if (Array.isArray(restEngArr)) {
+            for (var reIdx = 0; reIdx < Math.min(5, restEngArr.length); reIdx++) {
+              var reItem = restEngArr[reIdx];
+              if (reItem && reItem.SubDownloadLink) {
+                engTracks.push({
+                  url: String(reItem.SubDownloadLink).replace(/\.gz$/i, ''),
+                  SubFileName: reItem.SubFileName || reItem.MovieReleaseName || '',
+                  lang: 'eng'
+                });
               }
             }
           }
         }
-      } catch (e) {}
-    }
 
-    // 3. Guaranteed Hebrew Fallback Cues if offline or no external SRT found
-    if (!state.parsedCues.length && item && item.type !== 'channel') {
-      var baseDesc = fixRtlPunctuation(item.overview || ('צפייה ישירה ב-' + (item.title || 'סרט') + ' באיכות 4K UHD עם תרגום לעברית.'));
-      state.parsedCues = [
-        { start: 0, end: 18, text: fixRtlPunctuation((item.title || '') + ' (' + (item.year || '2025') + ') — תרגום מסונכרן בעברית') },
-        { start: 18.5, end: 42, text: baseDesc }
-      ];
+        // Fetch English SDH track for Parental SafeWatch & automatic Hebrew translation fallback when no native Hebrew SRT exists yet!
+        var candidateEngTracks = engTracks.length ? engTracks : stremSubs.filter(function (s) { return s && s.url && hebTracks.indexOf(s) === -1; });
+        if (candidateEngTracks.length) {
+          var bestEngCues = null;
+          var bestSdhScore = -1;
+          var maxEngTries = state.parsedCues.length >= 10 ? 2 : 4;
+          for (var tryE = 0; tryE < Math.min(maxEngTries, candidateEngTracks.length); tryE++) {
+            try {
+              var eCtrl = new AbortController();
+              var eTimer = setTimeout(function () { eCtrl.abort(); }, 3200);
+              var er = await fetch(candidateEngTracks[tryE].url, { signal: eCtrl.signal });
+              clearTimeout(eTimer);
+              if (er.ok) {
+                var eAb = await er.arrayBuffer();
+                var eTxt = await decodeHebrewSubtitleBytes(eAb);
+                var eCues = parseWebVttOrSrtText(eTxt);
+                if (eCues.length >= 10) {
+                  var sdhMatches = (eTxt.match(/\[[^\]]+\]|\([^\)]+\)/g) || []).length;
+                  if (sdhMatches > bestSdhScore) {
+                    bestSdhScore = sdhMatches;
+                    bestEngCues = eCues;
+                  }
+                  if (sdhMatches >= 25 || state.parsedCues.length < 10) break;
+                }
+              }
+            } catch (errE) {}
+          }
+          if (bestEngCues && bestEngCues.length >= 10) {
+            state.englishSdhCues = bestEngCues;
+            if (state.parsedCues.length < 10) {
+              item._hebSubsVerified = 'ai';
+              await translateEnglishCuesToHebrewProgressive(bestEngCues, item);
+            }
+          }
+        }
+      } catch (e) {}
     }
 
     // Rebuild scene skip timeline now that Hebrew subtitles are parsed
@@ -9558,6 +9782,7 @@
     var lines = String(rawText).replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
     var cues = [];
     var i = 0;
+    var adNoiseRe = /opensubtitles|tryray\.app|osdb\.link|yts\.mx|yify|subtitles\s+by|synced\s+and\s+corrected|advertise\s+your\s+product|www\.|http:\/\/|https:\/\//i;
 
     while (i < lines.length) {
       var line = lines[i].trim();
@@ -9568,12 +9793,15 @@
         i++;
         var textLines = [];
         while (i < lines.length && lines[i].trim() !== '') {
-          textLines.push(lines[i].trim().replace(/<[^>]+>/g, ''));
+          textLines.push(lines[i].trim().replace(/<[^>]+>/g, '').replace(/\{\\[^}]+\}/g, ''));
           i++;
         }
-        var cueText = fixRtlPunctuation(textLines.join('\n'));
-        if (cueText && isFinite(startSec) && isFinite(endSec) && endSec > startSec) {
-          cues.push({ start: startSec, end: endSec, text: cueText });
+        var rawJoined = textLines.join('\n').trim();
+        if (rawJoined && !adNoiseRe.test(rawJoined)) {
+          var cueText = fixRtlPunctuation(rawJoined);
+          if (cueText && isFinite(startSec) && isFinite(endSec) && endSec > startSec) {
+            cues.push({ start: startSec, end: endSec, text: cueText });
+          }
         }
       } else {
         i++;
@@ -10865,7 +11093,8 @@
           try {
             var r = await fetch(turl);
             if (r.ok) {
-              var txt = await r.text();
+              var ab = await r.arrayBuffer();
+              var txt = await decodeHebrewSubtitleBytes(ab);
               var parsed = parseWebVttOrSrtText(txt);
               if (parsed.length) {
                 state.parsedCues = parsed;
@@ -10874,6 +11103,10 @@
               }
             }
           } catch (e) {}
+        } else if (tid === 'he-auto' && Array.isArray(state.autoBestHebrewCues) && state.autoBestHebrewCues.length) {
+          state.parsedCues = state.autoBestHebrewCues;
+          rebuildParentalSkipTimelineForCurrentMedia();
+          updateInPlayerParentalUi();
         }
 
         renderSubtitlesMenu();
@@ -16532,7 +16765,9 @@
   }
 
   function bootStreamItApp() {
-    if (window.__STREAMIT_V996_BOOT_DONE) return;
+    if (window.__STREAMIT_V998_BOOT_DONE) return;
+    window.__STREAMIT_V998_BOOT_DONE = true;
+    window.__STREAMIT_V997_BOOT_DONE = true;
     window.__STREAMIT_V996_BOOT_DONE = true;
     window.__STREAMIT_V995_BOOT_DONE = true;
     window.__STREAMIT_V994_BOOT_DONE = true;

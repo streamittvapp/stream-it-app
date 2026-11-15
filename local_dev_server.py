@@ -56,9 +56,9 @@ def resolve_vidspark_original_hls(media_type: str, tmdb_id: str, season: str, ep
         return cached[1]
 
     hosts = ["https://cdn.vidspark.to"]
-    # Prioritize w7dn (Nebula — 1080p Original Audio HLS), then p9fx (Vertex Original Audio), then vjej on English titles
-    sources = ["w7dn", "p9fx", "vjej"] if lang == "en" else ["w7dn", "p9fx"]
-    for src_code in sources:
+    # Prioritize w7dn (Nebula — 1080p Original Audio HLS) with retry so cold cache never falls back to 720p vjej
+    sources = ["w7dn", "w7dn", "vjej"] if lang == "en" else ["w7dn", "w7dn"]
+    for attempt_idx, src_code in enumerate(sources):
         for host in hosts:
             if media_type == "series":
                 vp_path = f"/api/vidora/v1/tv/{tmdb_id}/{season}/{episode}?source={src_code}"
@@ -75,7 +75,8 @@ def resolve_vidspark_original_hls(media_type: str, tmdb_id: str, season: str, ep
                         "x-player-key": PLAYER_KEY,
                     },
                 )
-                with urllib.request.urlopen(req, timeout=3.8) as resp:
+                req_timeout = 5.5 if src_code == "w7dn" else 4.0
+                with urllib.request.urlopen(req, timeout=req_timeout) as resp:
                     if resp.status != 200:
                         continue
                     data = json.loads(resp.read().decode("utf-8", errors="ignore"))
@@ -92,7 +93,7 @@ def resolve_vidspark_original_hls(media_type: str, tmdb_id: str, season: str, ep
                 actual_src = str(s0.get("source") or src_code).lower()
                 if lang != "en" and actual_src == "vjej":
                     continue
-                if src_code == "w7dn" and actual_src != "w7dn":
+                if src_code == "w7dn" and actual_src != "w7dn" and attempt_idx == 0:
                     continue
                 raw_stream_url = str(s0.get("url") or "").strip()
                 # If p9fx returns DASH .mpd in url, use its direct MP4 from qualities[] if available
@@ -181,7 +182,7 @@ class StreamItDevHandler(SimpleHTTPRequestHandler):
         qs = urllib.parse.parse_qs(parsed.query)
 
         if path == "/api/health":
-            return self._send_json({"ok": True, "engine": "streamit-local-dev-v9.9.1", "port": 8092})
+            return self._send_json({"ok": True, "engine": "streamit-local-dev-v9.9.8", "version": "9.9.8", "port": 8092})
 
         if path == "/api/catalog":
             cat_file = os.path.join(ROOT_DIR, "data", "hebrew_catalog.json")
@@ -197,10 +198,16 @@ class StreamItDevHandler(SimpleHTTPRequestHandler):
             return self._send_json({"movies": [], "series": []})
 
         if path == "/api/direct-stream":
-            media_type = (qs.get("type") or ["movie"])[0]
+            raw_type = (qs.get("type") or ["movie"])[0]
+            raw_season = (qs.get("season") or ["1"])[0]
+            raw_episode = (qs.get("episode") or ["1"])[0]
+            if "movie" in raw_season.lower():
+                media_type = "movie"
+            else:
+                media_type = "series" if raw_type.lower() in ("series", "tv") else "movie"
             tmdb_id = re.sub(r"\D", "", (qs.get("tmdb_id") or [""])[0])
-            season = (qs.get("season") or ["1"])[0]
-            episode = (qs.get("episode") or ["1"])[0]
+            season = re.sub(r"\D", "", raw_season.split("?")[0]) or "1"
+            episode = re.sub(r"\D", "", raw_episode.split("?")[0]) or "1"
             orig_lang = (qs.get("orig_lang") or ["en"])[0]
             expected_title = (qs.get("expected_title") or [""])[0]
             expected_year = (qs.get("expected_year") or [""])[0]
@@ -211,6 +218,54 @@ class StreamItDevHandler(SimpleHTTPRequestHandler):
             if hit:
                 return self._send_json(hit)
             return self._send_json({"ok": False, "reason": "no_verified_original_hls"})
+
+        if path == "/api/subtitles/vtt":
+            import gzip
+            imdb_raw = re.sub(r"\D", "", (qs.get("imdb_id") or [""])[0])
+            media_type = (qs.get("type") or ["movie"])[0]
+            season = re.sub(r"\D", "", (qs.get("season") or ["1"])[0]) or "1"
+            episode = re.sub(r"\D", "", (qs.get("episode") or ["1"])[0]) or "1"
+            if not imdb_raw:
+                self.send_response(404)
+                self.end_headers()
+                return
+            os_url = (
+                f"https://rest.opensubtitles.org/search/episode-{episode}/imdbid-{imdb_raw}/season-{season}/sublanguageid-heb"
+                if media_type in ("series", "tv")
+                else f"https://rest.opensubtitles.org/search/imdbid-{imdb_raw}/sublanguageid-heb"
+            )
+            try:
+                req = urllib.request.Request(os_url, headers={"User-Agent": UA, "X-User-Agent": "VLSub 0.10.2"})
+                with urllib.request.urlopen(req, timeout=4.5) as resp:
+                    items = json.loads(resp.read().decode("utf-8", errors="ignore"))
+                if isinstance(items, list):
+                    for sub_item in items[:4]:
+                        dl = str((sub_item or {}).get("SubDownloadLink") or "").replace(".gz", "")
+                        if not dl.startswith("http"):
+                            continue
+                        with urllib.request.urlopen(urllib.request.Request(dl, headers={"User-Agent": UA}), timeout=4.5) as dl_resp:
+                            raw_bytes = dl_resp.read()
+                        if raw_bytes[:2] == b"\x1f\x8b":
+                            raw_bytes = gzip.decompress(raw_bytes)
+                        try:
+                            srt_txt = raw_bytes.decode("utf-8")
+                            if not re.search(r"[\u0590-\u05ff]", srt_txt):
+                                srt_txt = raw_bytes.decode("windows-1255", errors="ignore")
+                        except UnicodeDecodeError:
+                            srt_txt = raw_bytes.decode("windows-1255", errors="ignore")
+                        if "-->" in srt_txt and re.search(r"[\u0590-\u05ff]", srt_txt):
+                            out_bytes = srt_txt.encode("utf-8")
+                            self.send_response(200)
+                            self.send_header("Content-Type", "text/plain; charset=utf-8")
+                            self.send_header("Content-Length", str(len(out_bytes)))
+                            self.end_headers()
+                            self.wfile.write(out_bytes)
+                            return
+            except Exception:
+                pass
+            self.send_response(404)
+            self.end_headers()
+            return
 
         if path.startswith("/api/vidora/"):
             upstream_url = "https://cdn.vidspark.to" + self.path
@@ -324,6 +379,12 @@ class StreamItDevHandler(SimpleHTTPRequestHandler):
                                 continue
                             line = re.sub(r',SUBTITLES="[^"]*"', "", line, flags=re.IGNORECASE)
                             line = re.sub(r',CLOSED-CAPTIONS="[^"]*"', "", line, flags=re.IGNORECASE)
+                            if upper_line.startswith("#EXT-X-STREAM-INF:") and "RESOLUTION=" not in upper_line:
+                                m_res = re.search(r'NAME="(\d{3,4})p"', line, flags=re.IGNORECASE)
+                                if m_res:
+                                    h_val = int(m_res.group(1))
+                                    w_val = round(h_val * 16 / 9 / 2) * 2
+                                    line = line + f",RESOLUTION={w_val}x{h_val}"
                             # Rewrite URI="..." inside #EXT-X-MEDIA or #EXT-X-KEY
                             def _repl_uri(m):
                                 inner = urllib.parse.urljoin(target_url, m.group(1))
@@ -353,8 +414,10 @@ class StreamItDevHandler(SimpleHTTPRequestHandler):
                     self.wfile.write(rewritten)
                     return
                 else:
+                    if len(body) > 256 and body[:4] == b"\x89PNG" and body[64] == 0x47 and body[252] == 0x47:
+                        body = body[64:]
                     self.send_response(200)
-                    self.send_header("Content-Type", ctype)
+                    self.send_header("Content-Type", "video/mp2t")
                     self.send_header("Content-Length", str(len(body)))
                     self.end_headers()
                     self.wfile.write(body)
