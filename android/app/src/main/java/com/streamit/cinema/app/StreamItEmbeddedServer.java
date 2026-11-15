@@ -222,10 +222,10 @@ public class StreamItEmbeddedServer {
         // Priority 1: Original-Language 1080p HLS source ("w7dn" = Nebula Original Audio) across verified hosts!
         // Never allow "vjej" (Russian/foreign-dubbed mirror) on non-English titles (Israeli he, Turkish tr, Spanish es, Korean ko, etc.)!
         if (!tmdbId.isEmpty()) {
-            String[] vidoraHosts = new String[]{"https://cdn.vidspark.to", "https://vidsrc.pm"};
+            String[] vidoraHosts = new String[]{"https://cdn.vidspark.to"};
             String[] vidoraSources = "en".equals(origLang)
-                    ? new String[]{"w7dn", "vjej"}
-                    : new String[]{"w7dn"};
+                    ? new String[]{"w7dn", "p9fx", "vjej"}
+                    : new String[]{"w7dn", "p9fx"};
             for (String srcKey : vidoraSources) {
                 for (String host : vidoraHosts) {
                     try {
@@ -237,7 +237,7 @@ public class StreamItEmbeddedServer {
                         hVp.put("Referer", host + "/");
                         hVp.put("Origin", host);
                         hVp.put("x-player-key", "f3b72e73c80c9a996574379798703796a1936efa3516a7105cb0e43048b46b5a");
-                        String vpRaw = new String(httpGetBytes(host + vpPath, hVp, 3200), StandardCharsets.UTF_8);
+                        String vpRaw = new String(httpGetBytes(host + vpPath, hVp, 3600), StandardCharsets.UTF_8);
                         JSONObject vpObj = new JSONObject(vpRaw);
                         if (!vpObj.optBoolean("result", true)) continue;
                         String retTitle = vpObj.optString("title", "");
@@ -257,6 +257,23 @@ public class StreamItEmbeddedServer {
                                 continue;
                             }
                             String rawStreamUrl = s0.optString("url", "");
+                            if (!rawStreamUrl.startsWith("http") || rawStreamUrl.contains(".mpd") || rawStreamUrl.contains("/dash-")) {
+                                JSONArray quals = s0.optJSONArray("qualities");
+                                if (quals == null) quals = vpObj.optJSONArray("qualities");
+                                rawStreamUrl = "";
+                                if (quals != null) {
+                                    for (int qi = 0; qi < quals.length(); qi++) {
+                                        JSONObject qObj = quals.optJSONObject(qi);
+                                        if (qObj != null) {
+                                            String qUrl = qObj.optString("url", "");
+                                            if (qUrl.startsWith("http") && !qUrl.contains(".mpd")) {
+                                                rawStreamUrl = qUrl;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                             if (rawStreamUrl.startsWith("http")) {
                                 String finalStreamUrl = rawStreamUrl;
                                 if (rawStreamUrl.contains("url=")) {
@@ -457,6 +474,13 @@ public class StreamItEmbeddedServer {
                         continue;
                     }
                     if (line.startsWith("#")) {
+                        String upperLine = line.toUpperCase();
+                        if (upperLine.startsWith("#EXT-X-MEDIA:") &&
+                                (upperLine.contains("TYPE=SUBTITLES") || upperLine.contains("TYPE=CLOSED-CAPTIONS"))) {
+                            continue;
+                        }
+                        line = line.replaceAll("(?i),SUBTITLES=\"[^\"]*\"", "")
+                                   .replaceAll("(?i),CLOSED-CAPTIONS=\"[^\"]*\"", "");
                         if (line.contains("URI=\"")) {
                             Matcher m = uriPattern.matcher(line);
                             StringBuffer sb = new StringBuffer();

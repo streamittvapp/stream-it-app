@@ -1,0 +1,1876 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>STREAM IT — קולנוע, סדרות ושידורים חיים</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.css" />
+  <link rel="stylesheet" href="styles.css?v=9.9.7" />
+  <script>
+    (function () {
+      try {
+        try { window.open = function () { return null; }; } catch (e) {}
+        if (window.history && window.history.replaceState && /\/index\.html$/i.test(window.location.pathname)) {
+          window.history.replaceState(null, '', window.location.pathname.replace(/\/index\.html$/i, '/') + window.location.search + window.location.hash);
+        }
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function (regs) {
+            regs.forEach(function (r) { r.unregister(); });
+          });
+        }
+        if ('caches' in window) {
+          caches.keys().then(function (keys) {
+            keys.forEach(function (k) { caches.delete(k); });
+          });
+        }
+        var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
+        if (!otaVer || otaVer <= '9.9.6') {
+          localStorage.removeItem('streamit_ota_css_v9');
+          localStorage.removeItem('streamit_ota_app_js_v9');
+          localStorage.removeItem('streamit_ota_tv_nav_v9');
+        }
+        var otaCss = localStorage.getItem('streamit_ota_css_v9') || '';
+        if (otaVer && otaVer > '9.9.7' && otaCss.length > 500) {
+          var st = document.createElement('style');
+          st.id = 'streamit-ota-live-style-v9';
+          st.textContent = otaCss;
+          document.head.appendChild(st);
+        }
+        var ua = (navigator.userAgent || '').toLowerCase();
+        var params = new URLSearchParams(window.location.search);
+        var isTvParam = params.get('tv') === '1';
+        var isNotTvParam = params.get('tv') === '0';
+        var isNativeTv = Boolean(window.AndroidTvBridge && typeof window.AndroidTvBridge.isAndroidTv === 'function') ||
+          /android tv|smarttv|smart-tv|googletv|bravia|aft|shield|mibox|chromecast|leanback|tizen|web0s|webos|netcast|vidaa|hisense|viera|aquos|wv/i.test(ua);
+        if (!isNotTvParam && (isTvParam || isNativeTv)) {
+          document.documentElement.classList.add('tv-mode-html');
+          if (!isNativeTv && isTvParam) {
+            document.documentElement.classList.add('tv-desktop-simulator');
+          }
+          var vpMeta = document.querySelector('meta[name="viewport"]');
+          if (vpMeta && isNativeTv) {
+            vpMeta.setAttribute('content', 'width=1280, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover');
+          }
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/plyr@3.7.8/dist/plyr.polyfilled.min.js" defer></script>
+</head>
+<body>
+
+  <!-- ===================================================================== -->
+  <!-- ARCHITECTURAL STARTUP BOOT LOADER WITH PROGRESS BAR (#appBootLoader)  -->
+  <!-- ===================================================================== -->
+  <div id="appBootLoader" class="app-boot-loader" role="status" aria-live="polite" aria-label="טוען את מערכת STREAM IT">
+    <div class="boot-loader-card">
+      <div class="boot-loader-brand" dir="ltr">
+        <svg viewBox="0 0 128 128" class="boot-loader-emblem" aria-hidden="true">
+          <rect width="128" height="128" rx="12" fill="#FFFFFF" />
+          <rect x="3" y="3" width="122" height="122" rx="10" fill="none" stroke="#E2E8F0" stroke-width="3" />
+          <rect x="14" y="3" width="100" height="6" rx="3" fill="#E50914" />
+          <rect x="20" y="22" width="88" height="84" rx="12" fill="#E50914" />
+          <polygon points="50,42 86,64 50,86" fill="#FFFFFF" />
+        </svg>
+        <div class="boot-loader-wordmark-wrap">
+          <div class="boot-loader-wordmark">
+            <span class="boot-word-stream">STREAM</span>
+            <span class="boot-word-it">IT</span>
+          </div>
+          <span class="boot-loader-tagline" dir="rtl">מערכת קולנוע, סדרות ושידורים חיים ב-4K UHD</span>
+        </div>
+      </div>
+
+      <div class="boot-loader-progress-section">
+        <div class="boot-loader-status-row">
+          <span id="bootLoaderStatusText" class="boot-loader-status-text">מאתחל ליבת מערכת ומאמת חשבון ענן...</span>
+          <span id="bootLoaderPercent" class="boot-loader-percent" dir="ltr">12%</span>
+        </div>
+        <div class="boot-loader-bar-track" dir="ltr">
+          <div id="bootLoaderBarFill" class="boot-loader-bar-fill" style="width: 12%;"></div>
+        </div>
+        <div class="boot-loader-steps">
+          <span id="bootStepCloud" class="boot-step-pill active">סנכרון פרופילים וענן</span>
+          <span id="bootStepCatalog" class="boot-step-pill">קטלוג סרטים וסדרות</span>
+          <span id="bootStepSafeWatch" class="boot-step-pill">מנוע בקרת הורים SafeWatch</span>
+          <span id="bootStepReady" class="boot-step-pill">התייצבות מערכת</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- DESKTOP FLOATING TOP HEADER (#topHeader)                              -->
+  <!-- ===================================================================== -->
+  <header id="topHeader" class="top-header" role="banner">
+    <div class="header-inner">
+      <div class="header-right">
+        <a href="#home" id="brandLogo" class="brand-logo tv-focusable" data-category="all" dir="ltr" aria-label="STREAM IT דף הבית">
+          <svg viewBox="0 0 128 128" class="brand-logo-emblem" aria-hidden="true">
+            <rect width="128" height="128" rx="12" fill="#FFFFFF" />
+            <rect x="3" y="3" width="122" height="122" rx="10" fill="none" stroke="#CBD5E1" stroke-width="3" />
+            <rect x="14" y="3" width="100" height="6" rx="3" fill="#E50914" />
+            <rect x="20" y="22" width="88" height="84" rx="12" fill="#E50914" />
+            <polygon points="50,42 86,64 50,86" fill="#FFFFFF" />
+          </svg>
+          <span class="brand-logo-wordmark">
+            <span class="brand-word-stream">STREAM</span>
+            <span class="brand-word-it">IT</span>
+          </span>
+        </a>
+
+        <nav class="main-nav" aria-label="ניווט ראשי">
+          <button type="button" class="nav-link active tv-focusable" data-category="all" aria-label="ראשי">ראשי</button>
+          <button type="button" class="nav-link tv-focusable" data-category="movies" aria-label="סרטים">סרטים</button>
+          <button type="button" class="nav-link tv-focusable" data-category="series" aria-label="סדרות">סדרות</button>
+          <button type="button" class="nav-link tv-focusable" data-category="viva" aria-label="ויוה, דרמות טורקיות וטלנובלות">ויוה וטורקיות</button>
+          <button type="button" class="nav-link tv-focusable" data-category="telegram" aria-label="סרטים וסדרות מטלגרם">טלגרם VOD</button>
+          <button type="button" class="nav-link tv-focusable" data-category="channels" aria-label="ערוצים">ערוצים</button>
+          <button type="button" class="nav-link tv-focusable" data-category="youtube" aria-label="יוטיוב">יוטיוב</button>
+          <button type="button" class="nav-link tv-focusable" data-category="mylist" aria-label="הרשימה שלי">הרשימה שלי</button>
+          <span id="tvTopClock" class="tv-top-clock" dir="ltr" aria-label="שעה נוכחית"></span>
+          <span id="appVersionBadge" class="app-version-badge" dir="ltr" aria-label="גרסת מערכת">v9.9.6</span>
+        </nav>
+      </div>
+
+      <div class="header-left">
+        <!-- Expanded Top Search Field (#headerSearchBox) -->
+        <div id="headerSearchBox" class="header-search-box" role="search" aria-label="חיפוש רחב בקטלוג">
+          <svg viewBox="0 0 24 24" class="icon-svg header-search-icon" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="M20 20l-4.2-4.2" />
+          </svg>
+          <input
+            type="text"
+            id="headerQuickSearchInput"
+            class="header-quick-search-input tv-focusable"
+            placeholder="חפש סרט, סדרה, שחקן או ערוץ..."
+            aria-label="חפש סרט, סדרה, שחקן או ערוץ"
+            autocomplete="off"
+          />
+          <button type="button" id="headerVoiceSearchBtn" class="voice-search-btn tv-focusable" data-voice-target="catalog" title="חיפוש קולי" aria-label="חיפוש קולי">
+            <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+              <rect x="9" y="2" width="6" height="12" rx="3" />
+              <path d="M5 10a7 7 0 0 0 14 0M12 19v3M8 22h8" />
+            </svg>
+          </button>
+          <button type="button" id="openSearchBtn" class="header-search-submit-btn tv-focusable" aria-label="חיפוש קטלוג">
+            <span class="header-btn-text">חיפוש</span>
+          </button>
+        </div>
+
+        <!-- User Settings Menu Dropdown on the Left of Top Menu (#userSettingsDropdownWrap) -->
+        <div id="userSettingsDropdownWrap" class="user-settings-dropdown-wrap">
+          <button type="button" id="userSettingsMenuBtn" class="header-auth-btn header-user-settings-btn tv-focusable" aria-haspopup="menu" aria-expanded="false" aria-label="תפריט הגדרות משתמש ופרופילים">
+            <span id="headerUserAvatarBadge" class="header-user-avatar-badge" aria-hidden="true">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </span>
+            <span id="authBtnLabel">התחברות</span>
+            <svg viewBox="0 0 24 24" class="icon-svg user-settings-gear-icon" aria-hidden="true">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.77 1.02 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+            <svg viewBox="0 0 24 24" class="icon-svg dropdown-chevron" aria-hidden="true">
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </button>
+
+          <div id="userSettingsDropdownPanel" class="user-settings-dropdown-panel hidden" role="menu" aria-label="תפריט הגדרות משתמש">
+            <div class="user-menu-header-card">
+              <div class="user-menu-profile-info">
+                <div id="userMenuAvatarCircle" class="user-menu-avatar-circle">S</div>
+                <div class="user-menu-profile-meta">
+                  <strong id="userMenuActiveProfileName" class="user-menu-profile-name">פרופיל ראשי</strong>
+                  <span id="userMenuAccountEmail" class="user-menu-account-email" dir="ltr">STREAM IT VIP</span>
+                </div>
+              </div>
+              <div id="userMenuProfilesQuickRow" class="user-menu-profiles-quick-row" aria-label="החלפה מהירה בין פרופילים"></div>
+            </div>
+
+            <div class="user-menu-divider"></div>
+
+            <!-- Telegram Channels Button Inside User Settings Menu (#openTelegramHubBtn) -->
+            <button type="button" id="openTelegramHubBtn" class="user-menu-item user-menu-tg-btn header-tg-btn tv-focusable" role="menuitem" aria-label="חיבור וניהול ערוצי טלגרם VOD">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M22 2L11 13" />
+                <path d="M22 2L15 22l-4-9-9-4 20-7z" />
+              </svg>
+              <div class="user-menu-item-text">
+                <span class="user-menu-item-title">+ ערוצי טלגרם</span>
+                <span class="user-menu-item-sub">חיבור וניהול ערוצי טלגרם VOD</span>
+              </div>
+            </button>
+
+            <button type="button" id="openAuthModalBtn" class="user-menu-item tv-focusable" role="menuitem" aria-label="מי צופה עכשיו וניהול פרופילים">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              <div class="user-menu-item-text">
+                <span class="user-menu-item-title">מי צופה עכשיו? (ניהול פרופילים)</span>
+                <span class="user-menu-item-sub">החלפת צופה, מצב ילדים ופרטי מנוי</span>
+              </div>
+            </button>
+
+            <button type="button" id="userMenuParentalBtn" class="user-menu-item user-menu-parental-btn tv-focusable" role="menuitem" aria-label="בקרת הורים וסינון סצנות לא הולמות">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                <path d="M9 12l2 2 4-4" />
+              </svg>
+              <div class="user-menu-item-text">
+                <span id="userMenuParentalTitle" class="user-menu-item-title">בקרת הורים וסינון סצנות (SafeWatch)</span>
+                <span id="userMenuParentalSub" class="user-menu-item-sub">דילוג אוטומטי על סקס, אלימות ושפה בוטה לעצמך ולתתי-היוזרים</span>
+              </div>
+            </button>
+
+            <button type="button" id="userMenuWatchlistBtn" class="user-menu-item tv-focusable" role="menuitem" aria-label="הרשימה שלי">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+              </svg>
+              <div class="user-menu-item-text">
+                <span class="user-menu-item-title">הרשימה שלי והמשך צפייה</span>
+                <span class="user-menu-item-sub">כל הסרטים והסדרות ששמרת</span>
+              </div>
+            </button>
+
+            <button type="button" id="userMenuSubsSettingsBtn" class="user-menu-item tv-focusable" role="menuitem" aria-label="העדפות כתוביות ונגן">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <path d="M6 12h4M12 12h6M6 16h8M16 16h2" />
+              </svg>
+              <div class="user-menu-item-text">
+                <span id="userMenuSubsTitle" class="user-menu-item-title">העדפות כתוביות: עברית (רגיל)</span>
+                <span class="user-menu-item-sub">לחץ לשינוי גודל גופן ברירת מחדל</span>
+              </div>
+            </button>
+
+            <button type="button" id="userMenuRefreshBtn" class="user-menu-item tv-focusable" role="menuitem" aria-label="סנכרון ורענון קטלוג">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M23 4v6h-6M1 20v-6h6" />
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+              </svg>
+              <div class="user-menu-item-text">
+                <span class="user-menu-item-title">סנכרון ורענון קטלוג וערוצים</span>
+                <span class="user-menu-item-sub">עדכון מיידי של תכנים, ערוצים ומבזקים</span>
+              </div>
+            </button>
+
+            <button type="button" id="userMenuInstallApkUpdateBtn" class="user-menu-item tv-focusable" role="menuitem" aria-label="עדכן אפליקציה בסטרימר">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              <div class="user-menu-item-text">
+                <span class="user-menu-item-title">⬇️ עדכן אפליקציה בסטרימר (גרסה חדשה)</span>
+                <span class="user-menu-item-sub">התקנת עדכון APK מלא כולל לוגו ומנוע מעודכן</span>
+              </div>
+            </button>
+
+            <div class="user-menu-divider"></div>
+
+            <button type="button" id="userMenuLogoutBtn" class="user-menu-item user-menu-logout-item tv-focusable" role="menuitem" aria-label="התנתק מהחשבון">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+              <div class="user-menu-item-text">
+                <span class="user-menu-item-title">התנתק מהחשבון</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================================================================== -->
+  <!-- SMART TV RIGHT SIDE MENU (#tvSideRail — 2.5x Expanded Inline Lists)   -->
+  <!-- ===================================================================== -->
+  <aside id="tvSideRail" class="tv-side-rail" role="navigation" aria-label="תפריט צד ימני לסטרימר">
+    <!-- 1. Top Search Field + Inline Compact Mini-Keyboard -->
+    <div id="tvRailSearchSection" class="tv-rail-search-section">
+      <div class="tv-rail-search-row">
+        <button type="button" id="tvRailSearchBtn" class="tv-rail-search-btn tv-focusable" aria-expanded="false" aria-label="חיפוש סרטים, סדרות ושחקנים">
+          <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="M20 20l-4.2-4.2" />
+          </svg>
+          <span id="tvRailSearchText" class="tv-rail-search-text">חיפוש...</span>
+        </button>
+        <button type="button" id="tvRailVoiceSearchBtn" class="tv-rail-voice-btn voice-search-btn tv-focusable" data-voice-target="tv-rail" title="חיפוש קולי" aria-label="חיפוש קולי">
+          <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+            <rect x="9" y="2" width="6" height="12" rx="3" />
+            <path d="M5 10a7 7 0 0 0 14 0M12 19v3M8 22h8" />
+          </svg>
+        </button>
+        <button type="button" id="tvRailSearchClearBtn" class="tv-rail-search-clear-btn tv-focusable hidden" aria-label="נקה חיפוש">✕</button>
+      </div>
+      <div class="tv-rail-quick-tools-row">
+        <button type="button" id="tvRailAdvSearchBtn" class="tv-rail-adv-search-btn tv-focusable" aria-label="חיפוש מתקדם לפי קטגוריות בצ'קבוקסים">
+          <span>☑ חיפוש מתקדם</span>
+          <span id="tvRailAdvCountBadge" class="adv-count-pill hidden">0</span>
+        </button>
+        <button type="button" id="tvRailRefreshHomeBtn" class="tv-rail-refresh-home-btn tv-focusable" title="רענן המלצות וסדר דף הבית" aria-label="רענן המלצות דף הבית">↻</button>
+      </div>
+      <div id="tvRailMiniKeyboard" class="tv-rail-mini-keyboard hidden" dir="ltr" aria-label="מקלדת חיפוש מהירה"></div>
+    </div>
+
+    <!-- 2. Inline Soft-Accordion Lists: קטגוריות | לפי שנה | שחקנים | פלטפורמות (2 עמודות פתוחות למטה) -->
+    <div id="tvRailListsScroll" class="tv-rail-lists-scroll">
+      <div class="tv-rail-section" data-rail-section="categories">
+        <button type="button" id="tvRailSecCategoriesBtn" class="tv-rail-sec-header tv-focusable" aria-expanded="false">
+          <span>קטגוריות</span>
+          <span class="tv-rail-sec-arrow">◂</span>
+        </button>
+        <div id="tvRailCategoriesList" class="tv-rail-sec-list"></div>
+      </div>
+
+      <div class="tv-rail-section" data-rail-section="years">
+        <button type="button" id="tvRailSecYearsBtn" class="tv-rail-sec-header tv-focusable" aria-expanded="false">
+          <span>לפי שנה</span>
+          <span class="tv-rail-sec-arrow">◂</span>
+        </button>
+        <div id="tvRailYearsList" class="tv-rail-sec-list"></div>
+      </div>
+
+      <div class="tv-rail-section" data-rail-section="actors">
+        <button type="button" id="tvRailSecActorsBtn" class="tv-rail-sec-header tv-focusable" aria-expanded="false">
+          <span>שחקנים</span>
+          <span class="tv-rail-sec-arrow">◂</span>
+        </button>
+        <div id="tvRailActorsList" class="tv-rail-sec-list"></div>
+      </div>
+
+      <div class="tv-rail-section tv-rail-platforms-section" data-rail-section="platforms">
+        <button type="button" id="tvRailSecPlatformsBtn" class="tv-rail-sec-header open tv-focusable" aria-expanded="true">
+          <span>פלטפורמות</span>
+          <span class="tv-rail-sec-arrow">◂</span>
+        </button>
+        <div id="tvRailPlatformsList" class="tv-rail-sec-list tv-rail-platforms-grid open"></div>
+      </div>
+    </div>
+
+    <!-- 3. Bottom Bar: User Profile & Settings Icon -->
+    <div id="tvRailBottomBar" class="tv-rail-bottom-bar">
+      <button type="button" id="tvRailProfileBtn" class="tv-rail-bottom-btn tv-rail-profile-btn tv-focusable" aria-label="פרופיל משתמש">
+        <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+        <span id="tvRailProfileName" class="tv-rail-profile-name">ראשי</span>
+      </button>
+      <span id="tvRailVersionBadge" class="tv-rail-version-badge" dir="ltr">v9.9.6</span>
+      <button type="button" id="tvRailSettingsBtn" class="tv-rail-bottom-btn tv-rail-settings-btn tv-focusable" aria-label="הגדרות">
+        <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ===================================================================== -->
+  <!-- MAIN STAGE: HERO BILLBOARD + CATALOG EXPLORER + SHELVES (#mainStage)  -->
+  <!-- ===================================================================== -->
+  <main id="mainStage" class="main-stage" role="main">
+
+    <!-- HERO BILLBOARD STAGE (#heroBillboard) -->
+    <section id="heroBillboard" class="hero-billboard" aria-label="כותר מרכזי">
+      <div id="heroBackdrop" class="hero-backdrop"></div>
+      <div class="hero-vignette"></div>
+
+      <div class="hero-content">
+        <div class="hero-tag-row">
+          <span class="hero-brand-mark" aria-hidden="true">STREAM IT</span>
+          <span id="heroCategoryTag" class="hero-category-tag">סרט קולנוע</span>
+        </div>
+
+        <h1 id="heroTitle" class="hero-title">חולית: חלק שני</h1>
+
+        <div id="heroMeta" class="hero-meta">
+          <span>2024</span>
+          <span class="meta-dot">•</span>
+          <span>IMDb 8.5</span>
+          <span class="meta-dot">•</span>
+          <span>4K UHD</span>
+          <span class="meta-dot">•</span>
+          <span>כתוביות בעברית</span>
+        </div>
+
+        <p id="heroOverview" class="hero-overview">
+          פול אטריידיס מתאחד עם צ'אני ועם שבטי הדרשנים במדבר העמוק של אראקיס, ויוצא למסע גורלי נגד הקושרים שהחריבו את בית משפחתו.
+        </p>
+
+        <div class="hero-actions">
+          <button type="button" id="heroPlayBtn" class="btn-primary tv-focusable" aria-label="הפעל כותר">
+            <svg viewBox="0 0 24 24" class="icon-svg icon-fill" aria-hidden="true">
+              <path d="M7 4v16l13-8z" />
+            </svg>
+            <span>הפעל</span>
+          </button>
+
+          <button type="button" id="heroInfoBtn" class="btn-secondary tv-focusable" aria-label="מידע נוסף ופרקים">
+            <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 16v-4M12 8h.01" />
+            </svg>
+            <span>מידע נוסף</span>
+          </button>
+
+          <button type="button" id="heroWatchlistBtn" class="btn-secondary tv-focusable" aria-label="הוסף לרשימה שלי">
+            <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            <span>הרשימה שלי</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CATALOG SHELVES & MULTI-ROW WALL (#catalogMain) -->
+    <section id="catalogMain" class="catalog-main" aria-label="קטלוג כותרים">
+
+      <!-- Reorganized Catalog Explorer (#catalogExplorerBar): Open Genres Strip + Sleek Dropdowns for Streaming Companies, Years & Actors -->
+      <div id="catalogExplorerBar" class="catalog-explorer-bar">
+        <!-- Row 1 (Always Open): Pure Genres Strip (#genreFilterStrip) -->
+        <nav id="genreFilterStrip" class="genre-filter-strip" aria-label="סינון לפי סוגה (ז'אנר)"></nav>
+
+        <!-- Row 2: Sleek Cinema Dropdowns (Streaming Companies, Years, Actors with Photos) + Live Actor Search -->
+        <div id="explorerDropdownsBar" class="explorer-dropdowns-bar">
+          <!-- Dropdown 1: Streaming Giants & Global Catalogs -->
+          <div id="providerDropdownWrap" class="explorer-dropdown-wrap">
+            <button type="button" id="providerDropdownBtn" class="explorer-dropdown-btn tv-focusable" aria-expanded="false" aria-label="סינון לפי חברת סטרימינג או מאגר">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <rect x="2" y="4" width="20" height="14" rx="2" />
+                <path d="M8 21h8M12 18v3" />
+              </svg>
+              <span class="dropdown-prefix">חברות סטרימינג:</span>
+              <span id="activeProviderLabel" class="dropdown-value">כל הפלטפורמות</span>
+              <svg viewBox="0 0 24 24" class="icon-svg dropdown-chevron" aria-hidden="true">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+            <div id="providerDropdownPanel" class="explorer-dropdown-panel hidden" role="menu" aria-label="חברות סטרימינג ומאגרים">
+              <div id="providerFilterStrip" class="dropdown-options-grid"></div>
+            </div>
+          </div>
+
+          <!-- Dropdown 2: Release Years -->
+          <div id="yearDropdownWrap" class="explorer-dropdown-wrap">
+            <button type="button" id="yearDropdownBtn" class="explorer-dropdown-btn tv-focusable" aria-expanded="false" aria-label="סינון לפי שנת יציאה">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <path d="M16 2v4M8 2v4M3 10h18" />
+              </svg>
+              <span class="dropdown-prefix">לפי שנה:</span>
+              <span id="activeYearLabel" class="dropdown-value">כל השנים</span>
+              <svg viewBox="0 0 24 24" class="icon-svg dropdown-chevron" aria-hidden="true">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+            <div id="yearDropdownPanel" class="explorer-dropdown-panel hidden" role="menu" aria-label="בחירת שנת יציאה">
+              <div id="yearFilterStrip" class="dropdown-options-grid years-grid"></div>
+            </div>
+          </div>
+
+          <!-- Dropdown 3: Actors Gallery with Portrait Photos -->
+          <div id="actorDropdownWrap" class="explorer-dropdown-wrap">
+            <button type="button" id="actorDropdownBtn" class="explorer-dropdown-btn tv-focusable" aria-expanded="false" aria-label="בחירת שחקן מתוך גלריית שחקנים עם תמונות">
+              <img id="activeActorBtnAvatar" class="dropdown-actor-mini-avatar hidden" src="" alt="" />
+              <svg id="activeActorBtnIcon" viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              <span class="dropdown-prefix">שחקנים:</span>
+              <span id="activeActorLabel" class="dropdown-value">כל השחקנים</span>
+              <svg viewBox="0 0 24 24" class="icon-svg dropdown-chevron" aria-hidden="true">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+            <div id="actorDropdownPanel" class="explorer-dropdown-panel actor-dropdown-panel hidden" role="menu" aria-label="גלריית שחקנים עם תמונות">
+              <div id="mobileActorSearchBox" class="mobile-actor-search-box">
+                <svg viewBox="0 0 24 24" class="icon-svg actor-search-icon" aria-hidden="true">
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="M20 20l-4.2-4.2" />
+                </svg>
+                <input
+                  type="search"
+                  id="mobileActorSearchInput"
+                  class="actor-search-input mobile-actor-search-input"
+                  placeholder="חפש שחקן (ברוס ויליס, גל גדות)..."
+                  aria-label="חיפוש שחקן במובייל"
+                  autocomplete="off"
+                />
+                <button type="button" id="mobileActorVoiceSearchBtn" class="voice-search-btn" data-voice-target="actor-mobile" title="חיפוש שחקן קולי" aria-label="חיפוש שחקן קולי">
+                  <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                    <rect x="9" y="2" width="6" height="12" rx="3" />
+                    <path d="M5 10a7 7 0 0 0 14 0M12 19v3M8 22h8" />
+                  </svg>
+                </button>
+                <button type="button" id="mobileActorSearchBtn" class="actor-search-submit-btn" aria-label="חפש שחקן">חפש</button>
+              </div>
+              <div class="actor-panel-header">בחר שחקן לצפייה בכל הסרטים והסדרות שלו:</div>
+              <div id="actorFilterStrip" class="actor-photo-grid"></div>
+            </div>
+          </div>
+
+          <!-- Direct Working Actor Search Box (Hebrew & English) -->
+          <div class="actor-search-box">
+            <svg viewBox="0 0 24 24" class="icon-svg actor-search-icon" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" />
+              <path d="M20 20l-4.2-4.2" />
+            </svg>
+            <input
+              type="text"
+              id="actorSearchInput"
+              class="actor-search-input tv-focusable"
+              placeholder="חפש שחקן (למשל: ברוס ויליס, גל גדות)..."
+              aria-label="חיפוש סרטים וסדרות לפי שחקן"
+              autocomplete="off"
+            />
+            <button type="button" id="actorVoiceSearchBtn" class="voice-search-btn tv-focusable" data-voice-target="actor" title="חיפוש שחקן קולי" aria-label="חיפוש שחקן קולי">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <rect x="9" y="2" width="6" height="12" rx="3" />
+                <path d="M5 10a7 7 0 0 0 14 0M12 19v3M8 22h8" />
+              </svg>
+            </button>
+            <button type="button" id="actorSearchSubmitBtn" class="actor-search-submit-btn tv-focusable" aria-label="חפש שחקן">חפש</button>
+          </div>
+
+          <!-- Multi-Category Checkbox Advanced Search & Dynamic Home Refresh Controls -->
+          <div id="explorerSmartActionsWrap" class="explorer-smart-actions-wrap">
+            <button type="button" id="openAdvancedSearchBtn" class="explorer-dropdown-btn adv-search-trigger-btn tv-focusable" aria-haspopup="dialog" aria-label="חיפוש מתקדם לפי שילוב קטגוריות בצ'קבוקסים">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <rect x="3" y="4" width="7" height="7" rx="1.5" />
+                <path d="M5 7.5l1.5 1.5L9 6" />
+                <line x1="14" y1="7.5" x2="21" y2="7.5" />
+                <rect x="3" y="13" width="7" height="7" rx="1.5" />
+                <path d="M5 16.5l1.5 1.5L9 15" />
+                <line x1="14" y1="16.5" x2="21" y2="16.5" />
+              </svg>
+              <span>חיפוש מתקדם</span>
+              <span id="advSearchCountBadge" class="adv-count-pill hidden">0</span>
+            </button>
+
+            <button type="button" id="refreshHomeOrderBtn" class="explorer-dropdown-btn refresh-home-trigger-btn tv-focusable" title="רענן המלצות וסדר אריחים בדף הבית" aria-label="רענן המלצות בדף הבית">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M23 4v6h-6M1 20v-6h6" />
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+              </svg>
+              <span>רענן המלצות</span>
+            </button>
+          </div>
+
+          <!-- Live Running News & Cinema Ticker (#liveNewsTickerBar) — Symmetrical Full-Width Balance -->
+          <div id="liveNewsTickerBar" class="live-news-ticker-bar" aria-label="פיד מבזקי חדשות ועדכונים בזמן אמת">
+            <div class="news-ticker-badge">
+              <span class="news-live-dot"></span>
+              <span>מבזקים LIVE</span>
+            </div>
+            <div class="news-ticker-viewport">
+              <div id="liveNewsTickerTrack" class="news-ticker-track">
+                <span class="news-ticker-item">טוען מבזקי חדשות ועדכוני שידורים בזמן אמת...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Continue Watching Row -->
+      <div id="continueWatchingSection" class="netflix-row hidden">
+        <div class="row-header cw-row-header">
+          <h2 class="row-title">המשך צפייה</h2>
+          <button type="button" id="clearContinueWatchingBtn" class="cw-clear-all-btn tv-focusable" aria-label="נקה את כל רשימת המשך הצפייה">
+            <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m5 0V4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2" />
+            </svg>
+            <span>נקה רשימת המשך צפייה</span>
+          </button>
+        </div>
+        <div id="continueWatchingRow" class="row-track"></div>
+      </div>
+
+      <!-- Dynamic Category Shelves & Full Multi-Row/Column Poster Wall Container -->
+      <div id="catalogRowsContainer" class="catalog-rows-container"></div>
+    </section>
+
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- MOBILE BOTTOM NAVIGATION (#mobileBottomNav)                           -->
+  <!-- ===================================================================== -->
+  <nav id="mobileBottomNav" class="mobile-bottom-nav" aria-label="ניווט תחתון לנייד">
+    <button type="button" class="mobile-nav-btn active" data-category="all" aria-label="ראשי">
+      <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+        <path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5.5v-6h-5v6H4a1 1 0 0 1-1-1v-9.5z" />
+      </svg>
+      <span>ראשי</span>
+    </button>
+
+    <button type="button" class="mobile-nav-btn" data-category="movies" aria-label="סרטים">
+      <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+        <rect x="2" y="3" width="20" height="18" rx="1" />
+        <path d="M7 3v18M17 3v18M2 8h5M2 12h20M2 16h5M17 8h5M17 16h5" />
+      </svg>
+      <span>סרטים</span>
+    </button>
+
+    <button type="button" class="mobile-nav-btn" data-category="series" aria-label="סדרות">
+      <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+        <rect x="2" y="6" width="20" height="14" rx="1" />
+        <path d="M7 3h10M9 11l6 3-6 3v-6z" />
+      </svg>
+      <span>סדרות</span>
+    </button>
+
+    <button type="button" class="mobile-nav-btn" data-category="viva" aria-label="ויוה ודרמות טורקיות">
+      <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+        <path d="M12 21s-7-4.35-9.5-8.5C.5 9.1 2.4 5 6.4 5c2.1 0 3.9 1.2 5.6 3.1C13.7 6.2 15.5 5 17.6 5c4 0 5.9 4.1 3.9 7.5C19 16.65 12 21 12 21z" />
+      </svg>
+      <span>ויוה</span>
+    </button>
+
+    <button type="button" class="mobile-nav-btn" data-category="channels" aria-label="ערוצים">
+      <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+        <circle cx="12" cy="12" r="2.5" />
+        <path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14" />
+      </svg>
+      <span>ערוצים</span>
+    </button>
+  </nav>
+
+  <!-- ===================================================================== -->
+  <!-- SEARCH MODAL (#searchModal)                                           -->
+  <!-- ===================================================================== -->
+  <div id="searchModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-label="חיפוש בקטלוג">
+    <div class="search-modal-sheet">
+      <div class="search-top-bar">
+        <div class="search-input-wrap">
+          <svg viewBox="0 0 24 24" class="icon-svg search-field-icon" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="M20 20l-4.2-4.2" />
+          </svg>
+          <input
+            type="text"
+            id="searchInput"
+            class="search-modal-input tv-focusable"
+            placeholder="חפש סרט, סדרה, שחקן, שנה או ערוץ..."
+            aria-label="חיפוש סרט, סדרה או ערוץ"
+            autocomplete="off"
+          />
+          <button type="button" id="modalVoiceSearchBtn" class="voice-search-btn tv-focusable" data-voice-target="modal" title="חיפוש קולי" aria-label="חיפוש קולי">
+            <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+              <rect x="9" y="2" width="6" height="12" rx="3" />
+              <path d="M5 10a7 7 0 0 0 14 0M12 19v3M8 22h8" />
+            </svg>
+          </button>
+          <button type="button" id="clearSearchBtn" class="icon-btn tv-focusable" aria-label="נקה שדה חיפוש">
+            <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <button type="button" id="closeSearchBtn" class="modal-close-btn tv-focusable" aria-label="סגור חיפוש">
+          <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+          <span>סגור</span>
+        </button>
+      </div>
+
+      <div id="searchFilterTabs" class="search-filter-tabs" role="tablist" aria-label="סינון תוצאות חיפוש">
+        <button type="button" class="filter-tab active tv-focusable" data-search-filter="all" aria-label="הכל">הכל</button>
+        <button type="button" class="filter-tab tv-focusable" data-search-filter="movies" aria-label="סרטים">סרטים</button>
+        <button type="button" class="filter-tab tv-focusable" data-search-filter="series" aria-label="סדרות">סדרות</button>
+        <button type="button" class="filter-tab tv-focusable" data-search-filter="channels" aria-label="ערוצים">ערוצים</button>
+        <button type="button" class="filter-tab tv-focusable" data-search-filter="youtube" aria-label="יוטיוב">יוטיוב</button>
+        <button type="button" id="searchOpenAdvancedBtn" class="filter-tab search-adv-tab-btn tv-focusable" aria-label="חיפוש מתקדם לפי שילוב קטגוריות">☑ חיפוש מתקדם (שילוב קטגוריות)</button>
+      </div>
+
+      <div id="searchTvKeyboardMount" class="search-tv-keyboard-mount"></div>
+
+      <div id="searchStatusText" class="search-status-text" aria-live="polite">הקלד לחיפוש בכל הקטלוג</div>
+
+      <div id="searchResultsGrid" class="search-results-grid"></div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MULTI-CATEGORY CHECKBOX ADVANCED SEARCH MODAL (#advancedSearchModal)  -->
+  <!-- ===================================================================== -->
+  <div id="advancedSearchModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="advSearchTitle" dir="rtl">
+    <div class="adv-search-modal-card">
+      <div class="adv-search-header">
+        <div class="adv-search-title-wrap">
+          <span class="adv-search-kicker">STREAM IT SMART DISCOVERY</span>
+          <h2 id="advSearchTitle" class="adv-search-title">חיפוש מתקדם לפי שילוב קטגוריות ונושאים</h2>
+          <p class="adv-search-subtitle">סמן מספר צ'קבוקסים במקביל לשילוב מדויק — למשל: <strong>הרפתקאות + חטיפה + טבע</strong> או <strong>אימה + קומדיה</strong></p>
+        </div>
+        <button type="button" id="closeAdvancedSearchBtn" class="modal-close-btn adv-close-btn tv-focusable" aria-label="סגור חיפוש מתקדם">
+          <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+          <span>סגור</span>
+        </button>
+      </div>
+
+      <div class="adv-search-body">
+        <!-- Content Type Filter -->
+        <div class="adv-section-block">
+          <div class="adv-section-label">סוג תוכן</div>
+          <div id="advTypeTabsRow" class="adv-type-tabs-row">
+            <button type="button" class="adv-type-btn active tv-focusable" data-adv-type="all">הכל (סרטים וסדרות)</button>
+            <button type="button" class="adv-type-btn tv-focusable" data-adv-type="movie">סרטים בלבד</button>
+            <button type="button" class="adv-type-btn tv-focusable" data-adv-type="tv">סדרות בלבד</button>
+          </div>
+        </div>
+
+        <!-- Quick Popular Presets -->
+        <div class="adv-section-block adv-presets-block">
+          <div class="adv-section-label">שילובים מהירים בלחיצה</div>
+          <div id="advPresetsRow" class="adv-presets-row">
+            <button type="button" class="adv-preset-pill tv-focusable" data-preset-genres="adventure" data-preset-themes="kidnapping,nature">🌿 הרפתקאות + חטיפה + טבע</button>
+            <button type="button" class="adv-preset-pill tv-focusable" data-preset-genres="horror,comedy" data-preset-themes="">👻 אימה + קומדיה</button>
+            <button type="button" class="adv-preset-pill tv-focusable" data-preset-genres="action,thriller" data-preset-themes="heist">💰 אקשן + מתח + שוד ועוקץ</button>
+            <button type="button" class="adv-preset-pill tv-focusable" data-preset-genres="scifi,thriller" data-preset-themes="time_travel">⏳ מד"ב + מתח + מסע בזמן</button>
+            <button type="button" class="adv-preset-pill tv-focusable" data-preset-genres="crime,mystery" data-preset-themes="serial_killer">🕵️ פשע + מסתורין + חקירת רצח</button>
+          </div>
+        </div>
+
+        <!-- Multi-Select Genre Checkboxes -->
+        <div class="adv-section-block">
+          <div class="adv-section-label">ז'אנרים וסוגות <span class="adv-label-hint">(ניתן לסמן מספר צ'קבוקסים יחד)</span></div>
+          <div id="advGenreCheckboxesGrid" class="adv-checkbox-grid"></div>
+        </div>
+
+        <!-- Multi-Select Plot / Theme Checkboxes -->
+        <div class="adv-section-block">
+          <div class="adv-section-label">עלילה, אווירה ונושאים מיוחדים <span class="adv-label-hint">(חטיפה, טבע, נקמה, שוד, חלל ועוד)</span></div>
+          <div id="advThemeCheckboxesGrid" class="adv-checkbox-grid"></div>
+        </div>
+      </div>
+
+      <div class="adv-search-footer">
+        <div id="advSearchLiveSummary" class="adv-search-live-summary">בחר קטגוריות או נושאים לסינון משולב</div>
+        <div class="adv-search-footer-actions">
+          <button type="button" id="advSearchResetBtn" class="btn-secondary adv-footer-btn tv-focusable">נקה הכל</button>
+          <button type="button" id="advSearchApplyBtn" class="btn-primary adv-footer-btn tv-focusable">הצג תוצאות מותאמות</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- DETAILS MODAL (#detailsModal)                                         -->
+  <!-- ===================================================================== -->
+  <div id="detailsModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="detailsTitle">
+    <div class="details-modal-sheet">
+      <button type="button" id="closeDetailsBtn" class="modal-close-btn details-close-btn tv-focusable" aria-label="סגור חלון פרטים">
+        <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+          <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
+      </button>
+
+      <div class="details-hero">
+        <div id="detailsBackdrop" class="details-backdrop"></div>
+        <div class="details-hero-vignette"></div>
+
+        <div class="details-hero-content">
+          <span id="detailsCategoryTag" class="hero-category-tag">כותר</span>
+          <h2 id="detailsTitle" class="details-title">שם הכותר</h2>
+          <p id="detailsOriginalTitle" class="details-original-title" dir="ltr"></p>
+          <div id="detailsMeta" class="details-meta"></div>
+
+          <div class="details-actions">
+            <button type="button" id="detailsPlayBtn" class="btn-primary tv-focusable" aria-label="הפעל כותר">
+              <svg viewBox="0 0 24 24" class="icon-svg icon-fill" aria-hidden="true">
+                <path d="M7 4v16l13-8z" />
+              </svg>
+              <span>הפעל עכשיו</span>
+            </button>
+
+            <button type="button" id="detailsTrailerBtn" class="btn-secondary tv-focusable" aria-label="צפה בטריילר רשמי ביוטיוב">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <rect x="2" y="5" width="20" height="14" rx="2" />
+                <path d="M10 9l5 3-5 3V9z" />
+              </svg>
+              <span>טריילר רשמי (YouTube)</span>
+            </button>
+
+            <button type="button" id="detailsWatchlistBtn" class="btn-secondary tv-focusable" aria-label="הוסף לרשימה שלי">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              <span>הרשימה שלי</span>
+            </button>
+
+            <button type="button" id="detailsRemoveCwBtn" class="btn-secondary details-remove-cw-btn tv-focusable hidden" aria-label="הסר מרשימת המשך הצפייה">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+              <span>הסר מהמשך צפייה</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="details-body">
+        <div class="details-info-grid">
+          <div class="details-main-col">
+            <p id="detailsOverview" class="details-overview"></p>
+          </div>
+          <div class="details-side-col">
+            <div class="details-fact-row">
+              <span class="details-fact-label">ז׳אנרים:</span>
+              <span id="detailsGenres" class="details-fact-value"></span>
+            </div>
+            <div class="details-fact-row">
+              <span class="details-fact-label">שחקנים ויוצרים:</span>
+              <span id="detailsCast" class="details-fact-value"></span>
+            </div>
+          </div>
+        </div>
+
+        <div id="detailsEpisodesSection" class="details-episodes-section">
+          <div class="episodes-header">
+            <div class="episodes-header-right">
+              <div id="detailsSourcesDropdownWrap" class="details-sources-dropdown-wrap">
+                <button type="button" id="detailsSourcesDropdownBtn" class="explorer-dropdown-btn details-sources-btn tv-focusable" aria-haspopup="listbox" aria-expanded="false">
+                  <svg class="dropdown-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                    <polyline points="2 17 12 22 22 17" />
+                    <polyline points="2 12 12 17 22 12" />
+                  </svg>
+                  <span>מקורות</span>
+                  <svg class="dropdown-chevron" viewBox="0 0 24 24" aria-hidden="true">
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </button>
+                <div id="detailsStreamsDropdownPanel" class="details-sources-dropdown-panel hidden" role="listbox" aria-label="בחירת מקור שידור">
+                  <div id="detailsStreamsList" class="details-streams-list"></div>
+                </div>
+              </div>
+              <h3 id="detailsSectionHeading" class="episodes-section-title">עונות ופרקים</h3>
+            </div>
+            <div id="seasonSelector" class="season-selector" role="tablist" aria-label="בחירת עונה"></div>
+          </div>
+          <div id="episodesGrid" class="episodes-grid"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- VIDEO PLAYER MODAL (#playerModal) — PLYR + HLS + RTL SUBTITLE STAGE   -->
+  <!-- ===================================================================== -->
+  <div id="playerModal" class="modal-overlay player-modal hidden" role="dialog" aria-modal="true" aria-label="נגן וידאו">
+    <div class="player-stage">
+      <video id="videoElement" class="video-element" playsinline crossorigin="anonymous"></video>
+
+      <div id="embedPlayerContainer" class="embed-player-container hidden"></div>
+
+      <!-- Custom RTL Cinema Subtitle Stage (#customSubtitleOverlay) -->
+      <div id="customSubtitleOverlay" class="custom-subtitle-overlay sub-size-normal sub-color-white sub-bg-none" dir="rtl" aria-live="off">
+        <span id="customSubtitleText" class="custom-subtitle-text"></span>
+      </div>
+
+      <!-- Auto-Resume Playback Floating Banner (#resumePlaybackToast) -->
+      <div id="resumePlaybackToast" class="resume-playback-toast hidden" dir="rtl" aria-live="polite">
+        <span id="resumePlaybackToastText">ממשיך צפייה מנקודת העצירה...</span>
+        <button type="button" id="resumeRestartFromZeroBtn" class="resume-restart-btn tv-focusable">התחל מהתחלה (00:00)</button>
+      </div>
+
+      <!-- SafeWatch Parental Scene Skip Floating Banner (#parentalSkipBanner) -->
+      <div id="parentalSkipBanner" class="parental-skip-banner hidden" dir="rtl" aria-live="polite">
+        <svg viewBox="0 0 24 24" class="icon-svg parental-banner-icon" aria-hidden="true">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          <path d="M9 12l2 2 4-4" />
+        </svg>
+        <div class="parental-banner-content">
+          <strong id="parentalSkipBannerTitle" class="parental-banner-title">בקרת הורים (SafeWatch)</strong>
+          <span id="parentalSkipBannerSub" class="parental-banner-sub">דולג אוטומטית קטע לא הולם</span>
+        </div>
+      </div>
+
+      <!-- SafeWatch Fullscreen Blur/Blackout Shield Overlay (#parentalShieldOverlay) -->
+      <div id="parentalShieldOverlay" class="parental-shield-overlay hidden" dir="rtl" aria-live="assertive">
+        <div class="parental-shield-card">
+          <svg viewBox="0 0 24 24" class="parental-shield-svg" aria-hidden="true">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            <path d="M9 12l2 2 4-4" />
+          </svg>
+          <h3 id="parentalShieldHeading" class="parental-shield-heading">קטע מוסתר ע״י בקרת הורים (SafeWatch)</h3>
+          <p id="parentalShieldDesc" class="parental-shield-desc">זוהתה סצנה לא הולמת בהתאם להגדרות הפרופיל הפעיל</p>
+          <button type="button" id="parentalShieldSkipNowBtn" class="btn-primary parental-shield-skip-btn tv-focusable">
+            <span>דלג מיד לסוף הקטע</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Player Back / Exit Confirmation Dialog (#playerExitConfirmModal) -->
+      <div id="playerExitConfirmModal" class="player-exit-confirm-modal player-exit-confirm-overlay hidden" dir="rtl" role="alertdialog" aria-modal="true" aria-labelledby="playerExitConfirmHeading">
+        <div class="player-exit-confirm-card">
+          <div class="player-exit-confirm-badge">יציאה מהנגן</div>
+          <h3 id="playerExitConfirmHeading" class="player-exit-confirm-heading player-exit-confirm-title">לצאת מהצפייה?</h3>
+          <p id="playerExitConfirmDesc" class="player-exit-confirm-desc player-exit-confirm-sub">האם אתה בטוח שברצונך לצאת מהסרט? נקודת העצירה שלך נשמרה אוטומטית.</p>
+          <div class="player-exit-confirm-actions">
+            <button type="button" id="playerExitCancelBtn" class="btn-primary player-exit-btn tv-focusable" aria-label="המשך צפייה">
+              <span>המשך צפייה</span>
+            </button>
+            <button type="button" id="playerExitConfirmBtn" class="btn-secondary player-exit-btn player-exit-leave-btn tv-focusable" aria-label="צא מהסרט">
+              <span>צא מהסרט</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Netflix-Style Seek Thumbnail & Subtitle Preview Card (#seekThumbnailPreview) — Outside Controls Overlay so Never Hidden -->
+      <div id="seekThumbnailPreview" class="seek-thumbnail-preview hidden" dir="ltr" aria-hidden="true">
+        <div id="seekThumbImageBox" class="seek-thumb-image-box">
+          <canvas id="seekThumbCanvas" class="seek-thumb-canvas hidden" width="320" height="180"></canvas>
+          <img id="seekThumbImg" class="seek-thumb-img" src="" alt="" />
+          <div id="seekThumbBackdrop" class="seek-thumb-backdrop"></div>
+          <span id="seekThumbSceneBadge" class="seek-thumb-scene-badge">תצוגת סצנה</span>
+          <span id="seekThumbTimeBadge" class="seek-thumb-time-badge">00:00</span>
+        </div>
+        <div id="seekThumbCueText" class="seek-thumb-cue-text" dir="rtl"></div>
+      </div>
+
+      <div id="playerLoadingSpinner" class="player-loading-spinner hidden" aria-live="polite">
+        <svg viewBox="0 0 50 50" class="spinner-svg" aria-hidden="true">
+          <circle cx="25" cy="25" r="20" fill="none" stroke-width="4" />
+        </svg>
+        <div id="playerLoadingText" class="player-loading-text">טוען שידור באיכות גבוהה...</div>
+      </div>
+
+      <button type="button" id="skipIntroOverlayBtn" class="skip-intro-btn tv-focusable hidden" dir="ltr" aria-label="דלג על הפתיח">
+        <svg viewBox="0 0 24 24" class="icon-svg icon-fill" aria-hidden="true">
+          <path d="M5 4l10 8-10 8V4zM19 5v14" />
+        </svg>
+        <span>דלג על הפתיח</span>
+      </button>
+
+      <!-- Mobile Touch Wake-Up Shield when Cross-Origin Embed Controls Auto-Hide -->
+      <div id="mobilePlayerTouchWakeZone" class="mobile-player-touch-wake-zone" aria-hidden="true"></div>
+
+      <div id="playerControlsOverlay" class="player-controls-overlay">
+        <!-- Top Bar: Title + Multi-Source Switcher (#playerSourceTabs) + Close Button -->
+        <div class="player-top-bar">
+          <div class="player-title-group">
+            <h2 id="playerTitle" class="player-title">STREAM IT</h2>
+            <span id="playerSubtitleStatus" class="player-subtitle-status">כתוביות בעברית פעילות</span>
+          </div>
+
+          <div class="player-top-actions">
+            <button type="button" id="playerTopParentalBtn" class="explorer-dropdown-btn details-sources-btn player-top-parental-btn tv-focusable" aria-label="בקרת הורים וסינון סצנות בנגן">
+              <svg class="dropdown-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                <path d="M9 12l2 2 4-4" />
+              </svg>
+              <span id="playerTopParentalLabel">בקרת הורים</span>
+            </button>
+
+            <button type="button" id="playerTopSubsBtn" class="explorer-dropdown-btn details-sources-btn player-top-subs-btn tv-focusable" aria-label="הגדרות כתוביות בעברית וסנכרון">
+              <svg class="dropdown-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <path d="M6 12h4M12 12h6M6 16h8M16 16h2" />
+              </svg>
+              <span>כתוביות עברית<span class="player-top-subs-extra"> (הגדרות)</span></span>
+            </button>
+
+            <div id="playerSourcesDropdownWrap" class="details-sources-dropdown-wrap player-sources-dropdown-wrap">
+              <button type="button" id="playerSourcesDropdownBtn" class="explorer-dropdown-btn details-sources-btn tv-focusable" aria-haspopup="listbox" aria-expanded="false">
+                <svg class="dropdown-icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                  <polyline points="2 17 12 22 22 17" />
+                  <polyline points="2 12 12 17 22 12" />
+                </svg>
+                <span>מקורות</span>
+                <svg class="dropdown-chevron" viewBox="0 0 24 24" aria-hidden="true">
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
+              <div id="playerSourceTabs" class="player-source-tabs details-sources-dropdown-panel hidden" role="listbox" aria-label="בחירת מקור שידור">
+                <div class="subs-menu-header-row player-sources-mobile-header">
+                  <div class="subs-menu-header">בחירת מקור שידור ואיכות</div>
+                  <button type="button" id="closePlayerSourcesMenuBtn" class="player-menu-close-x tv-focusable" aria-label="סגור תפריט מקורות">✕</button>
+                </div>
+                <button type="button" class="source-tab-btn tv-focusable active" data-source-mode="direct" aria-label="נגן חכם 4K UHD אוטומטי">נגן חכם 4K UHD (אוטומטי)</button>
+                <button type="button" class="source-tab-btn tv-focusable" data-source-mode="embed1" aria-label="שרת ענן 1 4K VIP">שרת ענן 1 (4K VIP)</button>
+                <button type="button" class="source-tab-btn tv-focusable" data-source-mode="embed2" aria-label="שרת ענן 2 4K Mirror">שרת ענן 2 (4K Mirror)</button>
+                <button type="button" class="source-tab-btn tv-focusable" data-source-mode="swarm" aria-label="טלגרם או PirateBay 4K">טלגרם / PirateBay 4K</button>
+                <button type="button" class="source-tab-btn tv-focusable" data-source-mode="trailer" aria-label="שידור או טריילר יוטיוב">שידור / טריילר יוטיוב</button>
+              </div>
+            </div>
+
+            <button type="button" id="playerTopFullscreenBtn" class="explorer-dropdown-btn details-sources-btn tv-focusable" aria-label="מסך מלא">
+              <svg class="dropdown-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+              </svg>
+              <span id="playerTopFullscreenLabel">מסך מלא</span>
+            </button>
+
+            <button type="button" id="closePlayerBtn" class="player-btn player-close-btn tv-focusable" aria-label="סגור נגן וחזור">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+              <span>יציאה</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Bottom Bar (STRICT LTR PHYSICAL DIRECTION) -->
+        <div id="playerBottomBar" class="player-bottom-bar" dir="ltr">
+          <!-- Timeline Row (00:00 Left -> Total Right) -->
+          <div id="playerTimelineRow" class="player-timeline-row" dir="ltr">
+            <span id="playerCurrentTime" class="player-time-label" dir="ltr">00:00</span>
+            <input
+              type="range"
+              id="playerSeekSlider"
+              class="player-seek-slider tv-focusable"
+              dir="ltr"
+              min="0"
+              max="1000"
+              value="0"
+              aria-label="ציר זמן וידאו"
+            />
+            <span id="playerTotalTime" class="player-time-label" dir="ltr">00:00</span>
+          </div>
+
+          <!-- Transport Row (STRICT LTR PHYSICAL ORDER) -->
+          <div id="playerTransportRow" class="player-transport-row" dir="ltr">
+            <div class="transport-left-group" dir="ltr">
+              <button type="button" id="playerPlayPauseBtn" class="player-btn player-primary-btn tv-focusable" aria-label="הפעל או השהה">
+                <svg viewBox="0 0 24 24" class="icon-svg icon-fill" aria-hidden="true">
+                  <path d="M7 4v16l13-8z" />
+                </svg>
+                <span>Play / Pause</span>
+              </button>
+
+              <button type="button" id="playerRewindBtn" class="player-btn tv-focusable" aria-label="חזור 10 שניות אחורה">
+                <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                  <path d="M11 17l-5-5 5-5M18 17l-5-5 5-5" />
+                </svg>
+                <span>-10s</span>
+              </button>
+
+              <button type="button" id="playerForwardBtn" class="player-btn tv-focusable" aria-label="קדם 10 שניות קדימה">
+                <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                  <path d="M13 17l5-5-5-5M6 17l5-5-5-5" />
+                </svg>
+                <span>+10s</span>
+              </button>
+
+              <button type="button" id="playerNextEpBtn" class="player-btn tv-focusable hidden" aria-label="הפרק הבא">
+                <svg viewBox="0 0 24 24" class="icon-svg icon-fill" aria-hidden="true">
+                  <path d="M5 4l10 8-10 8V4zM19 5v14" />
+                </svg>
+                <span>הפרק הבא</span>
+              </button>
+            </div>
+
+            <div class="transport-right-group" dir="ltr">
+              <button type="button" id="playerSubsBtn" class="player-btn tv-focusable" aria-label="בחירת כתוביות וסנכרון">
+                <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                  <rect x="2" y="4" width="20" height="16" rx="1" />
+                  <path d="M6 12h4M12 12h6M6 16h8M16 16h2" />
+                </svg>
+                <span>כתוביות עברית</span>
+              </button>
+
+              <button type="button" id="playerFullscreenBtn" class="player-btn tv-focusable" aria-label="מסך מלא">
+                <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                  <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+                </svg>
+                <span>מסך מלא</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Embed Timeline Hover & Scrub Strip (#embedTimelineHoverStrip) for Netflix Thumbnail Preview -->
+        <div id="embedTimelineHoverStrip" class="embed-timeline-hover-strip" dir="ltr" title="גרור או לחץ להרצה קדימה/אחורה עם תצוגת סצנות מקדימה">
+          <div class="embed-timeline-rail">
+            <div id="embedTimelineProgressFill" class="embed-timeline-progress-fill"></div>
+            <div id="embedTimelineHoverDot" class="embed-timeline-hover-dot"></div>
+          </div>
+        </div>
+
+        <!-- Targeted Hebrew CC Button Covering ONLY the Embed's Foreign CC Icon -->
+        <button type="button" id="embedCcOverlayBtn" class="embed-cc-overlay-btn tv-focusable" dir="rtl" title="הגדרות כתוביות עברית" aria-label="הגדרות כתוביות עברית">
+          <span>עברית</span>
+        </button>
+
+        <!-- Targeted Fullscreen Button Covering the Embed's Bottom-Right Fullscreen Icon so Fullscreen & Subtitles Work 100% Together -->
+        <button type="button" id="embedFullscreenOverlayBtn" class="embed-fullscreen-overlay-btn tv-focusable" dir="ltr" title="מסך מלא (עם כתוביות בעברית)" aria-label="מסך מלא">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+          </svg>
+        </button>
+
+        <!-- Subtitles & Sync Control Panel Popover (#playerSubsMenu) — Always Accessible in BOTH Video & Embed Modes -->
+        <div id="playerSubsMenu" class="player-subs-menu hidden" dir="rtl" role="menu" aria-label="תפריט כתוביות וסנכרון בעברית בלבד">
+          <div class="subs-menu-header-row">
+            <div class="subs-menu-header">הגדרות כתוביות וסנכרון (עברית בלבד)</div>
+            <button type="button" id="closePlayerSubsMenuBtn" class="player-menu-close-x tv-focusable" aria-label="סגור הגדרות כתוביות">✕</button>
+          </div>
+
+          <div id="subsListContainer" class="subs-list-container"></div>
+
+          <div class="subs-control-section">
+            <div class="subs-control-label">סנכרון תזמון כתוביות (אוטומטי + כוונון עדין)</div>
+            <div class="subs-sync-row" dir="ltr">
+              <button type="button" id="subSyncMinusBtn" class="subs-chip-btn tv-focusable" dir="ltr" aria-label="הקדם כתוביות בחצי שנייה">-0.5s</button>
+              <button type="button" id="subSyncFineMinusBtn" class="subs-chip-btn subs-fine-btn tv-focusable" dir="ltr" aria-label="הקדם כתוביות בעשירית שנייה">-0.1s</button>
+              <span id="subSyncValueBadge" class="subs-value-readout" dir="ltr" aria-live="polite">0.0s</span>
+              <button type="button" id="subSyncFinePlusBtn" class="subs-chip-btn subs-fine-btn tv-focusable" dir="ltr" aria-label="אחר כתוביות בעשירית שנייה">+0.1s</button>
+              <button type="button" id="subSyncPlusBtn" class="subs-chip-btn tv-focusable" dir="ltr" aria-label="אחר כתוביות בחצי שנייה">+0.5s</button>
+              <button type="button" id="subSyncZeroBtn" class="subs-chip-btn subs-mini-reset-btn tv-focusable" dir="rtl" aria-label="אפס תזמון ל-0">אפס</button>
+            </div>
+          </div>
+
+          <div class="subs-control-section">
+            <div class="subs-control-label">גודל גופן</div>
+            <div class="subs-options-row">
+              <button type="button" class="subs-chip-btn sub-size-btn tv-focusable" data-sub-size="small" aria-label="גודל קטן">קטן</button>
+              <button type="button" class="subs-chip-btn sub-size-btn active tv-focusable" data-sub-size="normal" aria-label="גודל רגיל">רגיל</button>
+              <button type="button" class="subs-chip-btn sub-size-btn tv-focusable" data-sub-size="large" aria-label="גודל גדול">גדול</button>
+            </div>
+            <div class="subs-options-row" dir="ltr" style="margin-top:4px;">
+              <button type="button" id="subFontMinusBtn" class="subs-chip-btn tv-focusable" dir="ltr" aria-label="הקטן גודל גופן">−</button>
+              <span id="subFontValueBadge" class="subs-value-readout" dir="ltr" aria-live="polite">25px</span>
+              <button type="button" id="subFontPlusBtn" class="subs-chip-btn tv-focusable" dir="ltr" aria-label="הגדל גודל גופן">+</button>
+            </div>
+          </div>
+
+          <div class="subs-control-section">
+            <div class="subs-control-label">צבע ורקע כתוביות</div>
+            <div class="subs-options-row">
+              <button type="button" class="subs-chip-btn sub-color-btn active tv-focusable" data-sub-color="white" aria-label="צבע לבן">לבן</button>
+              <button type="button" class="subs-chip-btn sub-color-btn tv-focusable" data-sub-color="yellow" aria-label="צבע צהוב">צהוב</button>
+              <button type="button" class="subs-chip-btn sub-bg-btn active tv-focusable" data-sub-bg="none" aria-label="ללא רקע שקוף">שקוף</button>
+              <button type="button" class="subs-chip-btn sub-bg-btn tv-focusable" data-sub-bg="dark" aria-label="רקע כהה">רקע כהה</button>
+            </div>
+          </div>
+
+          <div class="subs-control-section">
+            <div class="subs-control-label">מיקום כתוביות במסך</div>
+            <div class="subs-options-row">
+              <button type="button" id="subPosDownBtn" class="subs-chip-btn tv-focusable" aria-label="הורד כתוביות למטה">למטה ▼</button>
+              <span id="subPosValueBadge" class="subs-value-readout" dir="ltr" aria-live="polite">9%</span>
+              <button type="button" id="subPosUpBtn" class="subs-chip-btn tv-focusable" aria-label="הרם כתוביות למעלה">למעלה ▲</button>
+            </div>
+          </div>
+
+          <div class="subs-control-section subs-reset-footer">
+            <button type="button" id="resetAllSubPrefsBtn" class="subs-chip-btn subs-reset-all-btn tv-focusable" aria-label="איפוס כל הגדרות הכתוביות לברירת מחדל">איפוס להגדרות ברירת מחדל</button>
+          </div>
+        </div>
+
+        <!-- In-Player SafeWatch Parental Control Quick Popover (#playerParentalMenu) -->
+        <div id="playerParentalMenu" class="player-subs-menu player-parental-menu hidden" dir="rtl" role="menu" aria-label="בקרת הורים וסינון סצנות בנגן">
+          <div class="subs-menu-header-row">
+            <div class="subs-menu-header">בקרת הורים (SafeWatch) — סינון סצנות חי</div>
+            <button type="button" id="closePlayerParentalMenuBtn" class="player-menu-close-x tv-focusable" aria-label="סגור בקרת הורים">✕</button>
+          </div>
+          <div id="playerParentalActiveStatus" class="player-parental-status-box"></div>
+          <div id="playerParentalQuickToggles" class="player-parental-quick-toggles"></div>
+          <div class="subs-control-section">
+            <div class="subs-control-label">פעולות מהירות בזמן צפייה</div>
+            <div class="player-parental-quick-actions">
+              <button type="button" id="playerMarkAndSkipSceneBtn" class="subs-chip-btn parental-mark-skip-btn tv-focusable" aria-label="דלג על סצנה לא הולמת כעת ושמור בזיכרון">
+                <span>דלג על קטע זה כעת (+30 שנ׳) ושמור</span>
+              </button>
+              <button type="button" id="playerTestParentalSkipBtn" class="subs-chip-btn tv-focusable" aria-label="בדיקת סינון חי והדגמת בקרת הורים">
+                <span>בדיקת סינון חי (הדגמת SafeWatch)</span>
+              </button>
+              <button type="button" id="playerOpenFullParentalModalBtn" class="subs-chip-btn tv-focusable" aria-label="פתח ניהול בקרת הורים לכל הפרופילים">
+                <span>ניהול בקרת הורים ופרופילים מלא</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- AUTH, SUB-USERS ("מי צופה עכשיו?") & QUICK LOGIN MODAL (#authModal)    -->
+  <!-- ===================================================================== -->
+  <div id="authModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="authModalHeading">
+    <div class="auth-modal-card">
+      <div class="auth-card-header">
+        <h2 id="authModalHeading" class="auth-heading">פרופילים וחשבון STREAM IT</h2>
+        <button type="button" id="closeAuthModalBtn" class="modal-close-btn tv-focusable" aria-label="סגור חלון פרופילים והתחברות">
+          <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Netflix Sub-Users ("מי צופה עכשיו?") Section -->
+      <section id="subUsersSection" class="sub-users-section" aria-label="מי צופה עכשיו">
+        <h3 class="sub-users-heading">מי צופה עכשיו?</h3>
+
+        <div id="subUsersGrid" class="sub-users-grid"></div>
+
+        <div class="sub-users-actions">
+          <button type="button" id="addSubUserToggleBtn" class="btn-secondary sub-user-action-btn tv-focusable" aria-label="הוספת תת-יוזר חדש">
+            <span>+ הוספת תת-יוזר</span>
+          </button>
+          <button type="button" id="manageSubUsersToggleBtn" class="btn-secondary sub-user-action-btn tv-focusable" aria-label="ניהול תתי-יוזרים">
+            <span>ניהול תתי-יוזרים</span>
+          </button>
+          <button type="button" id="authOpenParentalModalBtn" class="btn-secondary sub-user-action-btn auth-parental-btn tv-focusable" aria-label="בקרת הורים וסינון סצנות לתתי-יוזרים">
+            <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              <path d="M9 12l2 2 4-4" />
+            </svg>
+            <span>בקרת הורים וסינון סצנות</span>
+          </button>
+        </div>
+
+        <!-- Inline Add Sub-User Form -->
+        <div id="addSubUserForm" class="add-sub-user-form hidden">
+          <input
+            type="text"
+            id="newSubUserNameInput"
+            class="form-input sub-user-name-input tv-focusable"
+            dir="rtl"
+            value=""
+            placeholder="שם הפרופיל החדש..."
+            aria-label="שם הפרופיל החדש"
+            autocomplete="off"
+          />
+
+          <button type="button" id="newSubUserKidsBtn" class="btn-secondary kids-toggle-btn tv-focusable" aria-pressed="false" aria-label="סמן כפרופיל ילדים">
+            <span>מצב ילדים: כבוי</span>
+          </button>
+
+          <div class="add-sub-user-form-btns">
+            <button type="button" id="saveNewSubUserBtn" class="btn-primary tv-focusable" aria-label="שמור תת-יוזר">
+              <span>שמור פרופיל</span>
+            </button>
+            <button type="button" id="cancelNewSubUserBtn" class="btn-secondary tv-focusable" aria-label="בטל הוספת תת-יוזר">
+              <span>ביטול</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <div class="auth-divider">
+        <span>כניסת מנויים מאושרים</span>
+      </div>
+
+      <form id="authForm" class="auth-form" autocomplete="off" novalidate>
+        <div id="qrMobileApproveBanner" class="qr-mobile-approve-banner hidden">
+          <div class="qr-mobile-approve-badge">📱 חיבור מהיר של מסך באמצעות QR</div>
+          <p id="qrMobileApproveDesc" class="qr-mobile-approve-desc">הזן את פרטי המנוי שלך בטלפון ולחץ על <strong>"התחבר לחשבון"</strong> כדי לחבר את המסך שסרקת באופן אוטומטי.</p>
+        </div>
+
+        <div class="form-group">
+          <label for="authEmailInput" class="form-label">כתובת אימייל</label>
+          <input
+            type="email"
+            id="authEmailInput"
+            name="streamit_login_email"
+            class="form-input tv-focusable"
+            dir="ltr"
+            value=""
+            autocomplete="username"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="authPasswordInput" class="form-label">סיסמה</label>
+          <input
+            type="password"
+            id="authPasswordInput"
+            name="streamit_login_pass"
+            class="form-input tv-focusable"
+            dir="ltr"
+            value=""
+            autocomplete="current-password"
+          />
+        </div>
+
+        <button type="submit" id="authSubmitBtn" class="btn-primary auth-submit-btn tv-focusable" aria-label="התחבר לחשבון">
+          <span id="authSubmitBtnText">התחבר לחשבון</span>
+        </button>
+
+        <div id="authQrPairBox" class="auth-qr-pair-box">
+          <div class="auth-qr-img-wrap">
+            <img id="authQrCodeImg" class="auth-qr-img" src="" alt="קוד QR להתחברות מהירה מהטלפון" />
+          </div>
+          <div class="auth-qr-info">
+            <div class="auth-qr-title">התחברות מהירה באמצעות QR מהטלפון</div>
+            <p class="auth-qr-sub">סרוק את קוד ה-QR עם מצלמת הטלפון והתחבר מהנייד — המסך בסטרימר יתחבר אוטומטית תוך שניות.</p>
+            <div class="auth-qr-code-pill">קוד צימוד מסך: <strong id="authQrPairCodeLabel" dir="ltr">----</strong></div>
+          </div>
+        </div>
+      </form>
+
+      <div id="qrMobilePairedSuccessBox" class="qr-mobile-paired-success-box hidden">
+        <div id="qrMobilePairedIcon" class="qr-mobile-paired-icon">⏳</div>
+        <h3 id="qrMobilePairedTitle" class="qr-mobile-paired-title">מחבר את הטלוויזיה שלך...</h3>
+        <p id="qrMobilePairedDesc" class="qr-mobile-paired-desc">מאמת את חיבור המסך מול שרת הענן של STREAM IT, נא להמתין שנייה...</p>
+        <div class="qr-mobile-paired-code-badge">קוד צימוד מסך: <strong id="qrMobilePairedCodeVal" dir="ltr">----</strong></div>
+        <div class="qr-mobile-paired-actions">
+          <button type="button" id="qrMobileContinueToAppBtn" class="btn-primary qr-mobile-action-btn tv-focusable">
+            <span>המשך לאפליקציה בטלפון</span>
+          </button>
+          <button type="button" id="qrMobileSwitchAccountBtn" class="btn-secondary qr-mobile-action-btn tv-focusable">
+            <span>התחבר עם חשבון אחר</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="authStatusMsg" class="auth-status-msg" aria-live="polite"></div>
+
+      <div id="authAccountBox" class="auth-account-box hidden">
+        <div class="auth-logged-info">
+          <span class="auth-logged-label">מחובר כעת בתור:</span>
+          <strong id="authUserDisplay" class="auth-user-display" dir="ltr"></strong>
+        </div>
+        <button type="button" id="openTelegramFromAuthBtn" class="btn-secondary auth-tg-manage-btn tv-focusable" aria-label="חיבור וניהול ערוצי טלגרם VOD">
+          <span>חיבור וניהול ערוצי טלגרם VOD (חינמי)</span>
+        </button>
+        <button type="button" id="logoutBtn" class="btn-secondary auth-logout-btn tv-focusable" aria-label="התנתק מהחשבון">
+          <span>התנתק מהחשבון</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- SAFEWATCH PARENTAL CONTROL & SCENE SKIPPING MODAL (#parentalControlModal) -->
+  <!-- ===================================================================== -->
+  <div id="parentalControlModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="parentalModalHeading">
+    <div class="auth-modal-card parental-modal-card">
+      <div class="auth-card-header">
+        <div>
+          <h2 id="parentalModalHeading" class="auth-heading">בקרת הורים וסינון סצנות (SafeWatch)</h2>
+          <p class="tg-modal-sub">ניהול מרכזי עבור עצמך ועבור כל אחד מתתי-היוזרים שלך • דילוג אוטומטי על סקס, אלימות, שפה בוטה וסמים בזמן צפייה</p>
+        </div>
+        <button type="button" id="closeParentalModalBtn" class="modal-close-btn tv-focusable" aria-label="סגור חלון בקרת הורים">
+          <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Optional PIN Gate when Parental Settings are PIN-Protected -->
+      <div id="parentalPinVerifyGate" class="parental-pin-gate hidden">
+        <div class="parental-pin-gate-card">
+          <svg viewBox="0 0 24 24" class="parental-shield-svg" aria-hidden="true">
+            <rect x="3" y="11" width="18" height="11" rx="0" ry="0" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+          <h3 class="parental-pin-title">הגדרות בקרת הורים מוגנות בקוד PIN</h3>
+          <p class="parental-pin-desc">הזן את קוד ה-PIN של המשתמש הראשי (4 ספרות) כדי לערוך את הגדרות הסינון של הפרופילים</p>
+          <div class="parental-pin-input-row">
+            <input
+              type="password"
+              id="parentalPinVerifyInput"
+              class="form-input parental-pin-input tv-focusable"
+              dir="ltr"
+              maxlength="4"
+              inputmode="numeric"
+              placeholder="••••"
+              aria-label="קוד PIN בן 4 ספרות"
+              autocomplete="off"
+            />
+            <button type="button" id="parentalPinVerifyBtn" class="btn-primary tv-focusable">פתח נעילה</button>
+          </div>
+          <div id="parentalPinGateError" class="parental-pin-error hidden" aria-live="polite">קוד PIN שגוי. נסה שנית.</div>
+        </div>
+      </div>
+
+      <!-- Main Parental Control Configuration Body -->
+      <div id="parentalControlMainContent" class="parental-config-body">
+        <!-- 1. Select Profile to Configure (Main User + Sub-Users) -->
+        <div class="parental-section-block">
+          <div class="parental-section-header-row">
+            <h3 class="sub-users-heading">1. בחר פרופיל להגדרת סינון (עצמך או תת-יוזר):</h3>
+            <div class="parental-bulk-actions">
+              <button type="button" id="parentalApplySubUsersBtn" class="btn-secondary parental-bulk-btn tv-focusable" aria-label="החל הגדרות אלו על כל תתי-היוזרים">
+                <span>החל על כל תתי-היוזרים</span>
+              </button>
+              <button type="button" id="parentalApplyAllBtn" class="btn-secondary parental-bulk-btn tv-focusable" aria-label="החל הגדרות אלו על כל הפרופילים בחשבון">
+                <span>החל על כל החשבון</span>
+              </button>
+            </div>
+          </div>
+          <div id="parentalProfilesSelectorRow" class="parental-profiles-row" role="tablist" aria-label="בחירת פרופיל לעריכת בקרת הורים"></div>
+        </div>
+
+        <!-- 2. Master Toggle for Selected Profile -->
+        <div id="parentalMasterToggleCard" class="parental-master-toggle-card">
+          <div class="parental-master-info">
+            <div class="parental-master-badge-wrap">
+              <svg viewBox="0 0 24 24" class="icon-svg parental-master-icon" aria-hidden="true">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                <path d="M9 12l2 2 4-4" />
+              </svg>
+              <div>
+                <h4 id="parentalEditingProfileTitle" class="parental-selected-title">בקרת הורים עבור: ראשי (החשבון שלי)</h4>
+                <p id="parentalEditingProfileSub" class="parental-selected-desc">כבוי — כל התכנים מתנגנים ללא סינון וללא דילוגים</p>
+              </div>
+            </div>
+            <button type="button" id="parentalMasterToggleBtn" class="parental-switch-btn tv-focusable" aria-pressed="false">
+              <span id="parentalMasterToggleLabel">כבוי — לחץ להפעלה</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. Select Inappropriate Content Categories to Skip/Filter -->
+        <div class="parental-section-block">
+          <h3 class="sub-users-heading">2. בחר את סוגי התכנים הלא הולמים לדילוג/סינון אוטומטי:</h3>
+          <div id="parentalCategoriesGrid" class="parental-categories-grid">
+            <button type="button" class="parental-cat-card tv-focusable active" data-parental-cat="sex" aria-pressed="true">
+              <div class="parental-cat-icon-box">
+                <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                  <line x1="1" y1="1" x2="23" y2="23" />
+                </svg>
+              </div>
+              <div class="parental-cat-text">
+                <strong class="parental-cat-title">סקס, מיניות ועירום</strong>
+                <span class="parental-cat-desc">דילוג אוטומטי על סצנות מין, עירום ואינטימיות מפורשת</span>
+              </div>
+              <span class="parental-cat-check" aria-hidden="true">✓</span>
+            </button>
+
+            <button type="button" class="parental-cat-card tv-focusable active" data-parental-cat="violence" aria-pressed="true">
+              <div class="parental-cat-icon-box">
+                <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                </svg>
+              </div>
+              <div class="parental-cat-text">
+                <strong class="parental-cat-title">אלימות קשה, דם וזוועה</strong>
+                <span class="parental-cat-desc">דילוג אוטומטי על סצנות אלימות גרפית, יריות קשות ועינויים</span>
+              </div>
+              <span class="parental-cat-check" aria-hidden="true">✓</span>
+            </button>
+
+            <button type="button" class="parental-cat-card tv-focusable active" data-parental-cat="profanity" aria-pressed="true">
+              <div class="parental-cat-icon-box">
+                <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                  <line x1="23" y1="9" x2="17" y2="15" />
+                  <line x1="17" y1="9" x2="23" y2="15" />
+                </svg>
+              </div>
+              <div class="parental-cat-text">
+                <strong class="parental-cat-title">שפה בוטה וקללות</strong>
+                <span class="parental-cat-desc">השתקת סאונד אוטומטית וצנזור מילים גסות בכתוביות (או דילוג)</span>
+              </div>
+              <span class="parental-cat-check" aria-hidden="true">✓</span>
+            </button>
+
+            <button type="button" class="parental-cat-card tv-focusable active" data-parental-cat="drugs" aria-pressed="true">
+              <div class="parental-cat-icon-box">
+                <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+                </svg>
+              </div>
+              <div class="parental-cat-text">
+                <strong class="parental-cat-title">סמים, אלכוהול ועישון</strong>
+                <span class="parental-cat-desc">דילוג אוטומטי על סצנות שימוש בסמים והתמכרויות</span>
+              </div>
+              <span class="parental-cat-check" aria-hidden="true">✓</span>
+            </button>
+
+            <button type="button" class="parental-cat-card tv-focusable" data-parental-cat="horror" aria-pressed="false">
+              <div class="parental-cat-icon-box">
+                <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                  <line x1="12" y1="9" x2="12" y2="13" />
+                  <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
+              </div>
+              <div class="parental-cat-text">
+                <strong class="parental-cat-title">אימה וקטעים מפחידים</strong>
+                <span class="parental-cat-desc">דילוג אוטומטי על סצנות הפחדה קיצוניות וטראומטיות</span>
+              </div>
+              <span class="parental-cat-check" aria-hidden="true">✓</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. Action Mode, Profanity Mode & Sensitivity -->
+        <div class="parental-options-columns">
+          <div class="parental-option-box">
+            <span class="parental-option-label">אופן הפעולה בקטעי וידאו (סקס / אלימות / סמים):</span>
+            <div class="parental-segmented-row">
+              <button type="button" class="parental-seg-btn tv-focusable active" data-parental-action="skip">דילוג אוטומטי על הקטע</button>
+              <button type="button" class="parental-seg-btn tv-focusable" data-parental-action="blur_mute">טשטוש מסך + השתקת קול</button>
+            </div>
+          </div>
+
+          <div class="parental-option-box">
+            <span class="parental-option-label">אופן הפעולה בשפה בוטה וקללות:</span>
+            <div class="parental-segmented-row">
+              <button type="button" class="parental-seg-btn tv-focusable active" data-parental-profanity="mute_censor">השתקת קול + צנזור כתובית (****)</button>
+              <button type="button" class="parental-seg-btn tv-focusable" data-parental-profanity="skip">דילוג מלא על המשפט</button>
+            </div>
+          </div>
+
+          <div class="parental-option-box">
+            <span class="parental-option-label">רמת רגישות וסינון:</span>
+            <div class="parental-segmented-row">
+              <button type="button" class="parental-seg-btn tv-focusable active" data-parental-sensitivity="balanced">מאוזן (סצנות מובהקות)</button>
+              <button type="button" class="parental-seg-btn tv-focusable" data-parental-sensitivity="strict">מחמיר (כולל נשיקות ורמיזות)</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Optional Parental PIN Lock (So Sub-Users Cannot Turn It Off) -->
+        <div class="parental-pin-setup-bar">
+          <div class="parental-pin-setup-text">
+            <strong>נעילת הגדרות בקוד PIN (רשות — למניעת כיבוי ע״י תתי-יוזרים):</strong>
+            <span id="parentalPinCurrentStatus">כרגע אין קוד PIN מוגדר (כל פרופיל יכול לערוך הגדרות)</span>
+          </div>
+          <div class="parental-pin-setup-controls">
+            <input
+              type="password"
+              id="parentalPinNewInput"
+              class="form-input parental-pin-small-input tv-focusable"
+              dir="ltr"
+              maxlength="4"
+              inputmode="numeric"
+              placeholder="קוד 4 ספרות"
+              aria-label="הגדר קוד PIN בן 4 ספרות"
+              autocomplete="off"
+            />
+            <button type="button" id="parentalSavePinBtn" class="btn-secondary parental-pin-btn tv-focusable">שמור קוד PIN</button>
+            <button type="button" id="parentalClearPinBtn" class="btn-secondary parental-pin-btn tv-focusable hidden">בטל נעילת PIN</button>
+          </div>
+        </div>
+
+        <div id="parentalStatusFeedback" class="parental-status-feedback hidden" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- ZERO-ACCOUNT PUBLIC TELEGRAM VOD CONNECTOR MODAL (#telegramModal)     -->
+  <!-- ===================================================================== -->
+  <div id="telegramModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="telegramModalHeading">
+    <div class="auth-modal-card tg-modal-card">
+      <div class="auth-card-header">
+        <div>
+          <h2 id="telegramModalHeading" class="auth-heading">טלגרם קולנוע VOD — חיבור ערוצים חינמי</h2>
+          <p class="tg-modal-sub">ללא חשבון אישי וללא מספר טלפון • שאיבה אוטומטית של סרטים, סדרות ווידאו מערוצי טלגרם ציבוריים</p>
+        </div>
+        <button type="button" id="closeTelegramModalBtn" class="modal-close-btn tv-focusable" aria-label="סגור חלון טלגרם">
+          <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="tg-add-channel-bar">
+        <input
+          type="text"
+          id="tgChannelInput"
+          class="form-input tg-channel-input tv-focusable"
+          dir="ltr"
+          placeholder="@channel_name או https://t.me/BoxOffice..."
+          aria-label="שם ערוץ טלגרם או קישור לערוץ"
+          autocomplete="off"
+        />
+        <button type="button" id="tgAddChannelBtn" class="btn-primary tg-add-btn tv-focusable" aria-label="חבר ערוץ טלגרם">
+          <span>+ חבר ערוץ</span>
+        </button>
+        <button type="button" id="tgSyncAllBtn" class="btn-secondary tg-sync-btn tv-focusable" aria-label="סנכרן את כל הערוצים">
+          <span>סנכרן הכל</span>
+        </button>
+      </div>
+
+      <div id="tgSyncStatusMsg" class="tg-sync-status" aria-live="polite"></div>
+
+      <div class="tg-section-header">
+        <h3 class="sub-users-heading">ערוצי טלגרם מחוברים כעת:</h3>
+        <button type="button" id="tgFilterCatalogBtn" class="btn-secondary tg-filter-cat-btn tv-focusable" aria-label="הצג את כל תכני הטלגרם בקטלוג">
+          <span>הצג בקטלוג הראשי</span>
+        </button>
+      </div>
+
+      <div id="tgConnectedChannelsList" class="tg-channels-grid"></div>
+
+      <div class="tg-section-header">
+        <h3 class="sub-users-heading">תכנים אחרונים שנשאבו מערוצי הטלגרם:</h3>
+      </div>
+
+      <div id="tgRecentPostsGrid" class="tg-recent-posts-grid"></div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- STREAMER "MORE" HUB MODAL (#tvMoreModal) — TABBED SETTINGS & ACTORS   -->
+  <!-- ===================================================================== -->
+  <div id="tvMoreModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="tvMoreModalHeading">
+    <div class="auth-modal-card tv-more-modal-card">
+      <div class="auth-card-header">
+        <div>
+          <h2 id="tvMoreModalHeading" class="auth-heading">מרכז הגדרות, פרופילים וניהול מערכת</h2>
+          <p class="tg-modal-sub">ניהול משתמשים, בקרת הורים (SafeWatch), ערוצי טלגרם VOD, כתוביות וחיפוש שחקנים</p>
+        </div>
+        <button type="button" id="closeTvMoreModalBtn" class="modal-close-btn tv-focusable" aria-label="סגור חלון הגדרות">
+          <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Top Tab Bar: Settings & Profiles vs. Actor Search -->
+      <div class="tv-more-tabs-bar" role="tablist" aria-label="כרטיסיות מרכז הגדרות">
+        <button type="button" id="tvMoreTabSettingsBtn" class="tv-more-tab-btn active tv-focusable" data-more-tab="settings" role="tab" aria-selected="true">
+          <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+          <span>הגדרות, פרופילים וניהול</span>
+        </button>
+        <button type="button" id="tvMoreTabActorsBtn" class="tv-more-tab-btn tv-focusable" data-more-tab="actors" role="tab" aria-selected="false">
+          <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+          <span>חיפוש וגלריית שחקנים</span>
+        </button>
+      </div>
+
+      <!-- TAB 1: Settings, Profiles, Parental Control & Telegram Cards -->
+      <div id="tvMoreTabSettingsPanel" class="tv-more-tab-panel">
+        <div class="tv-more-actions-grid">
+          <button type="button" id="tvMoreProfilesBtn" class="tv-more-action-card tv-focusable">
+            <span class="tv-more-icon">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+            </span>
+            <div class="tv-more-text">
+              <strong>מי צופה עכשיו? (פרופילים ויוזרים)</strong>
+              <span>החלפת פרופיל פעיל, הוספת תת-יוזר וניהול מנויים</span>
+            </div>
+          </button>
+
+          <button type="button" id="tvMoreParentalBtn" class="tv-more-action-card tv-more-parental-card tv-focusable">
+            <span class="tv-more-icon">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /><path d="M9 12l2 2 4-4" /></svg>
+            </span>
+            <div class="tv-more-text">
+              <strong id="tvMoreParentalLabel">בקרת הורים וסינון סצנות (SafeWatch)</strong>
+              <span id="tvMoreParentalSubLabel">דילוג אוטומטי על סקס, אלימות, שפה בוטה וסמים לפי פרופיל</span>
+            </div>
+          </button>
+
+          <button type="button" id="tvMoreTelegramCatBtn" class="tv-more-action-card tv-focusable">
+            <span class="tv-more-icon">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M22 2L11 13" /><path d="M22 2L15 22l-4-9-9-4 20-7z" /></svg>
+            </span>
+            <div class="tv-more-text">
+              <strong>קטלוג טלגרם VOD</strong>
+              <span>הצג את כל הסרטים והסדרות שנשאבו מערוצי הטלגרם</span>
+            </div>
+          </button>
+
+          <button type="button" id="tvMoreTelegramHubBtn" class="tv-more-action-card tv-focusable">
+            <span class="tv-more-icon">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+            </span>
+            <div class="tv-more-text">
+              <strong>חיבור וניהול ערוצי טלגרם</strong>
+              <span>הוספת ערוצים ציבוריים חדשים וסנכרון תוכן מיידי</span>
+            </div>
+          </button>
+
+          <button type="button" id="tvMoreSubsBtn" class="tv-more-action-card tv-focusable">
+            <span class="tv-more-icon">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="0" /><path d="M6 12h4M12 12h6M6 16h8M16 16h2" /></svg>
+            </span>
+            <div class="tv-more-text">
+              <strong id="tvMoreSubsLabel">כתוביות: עברית (רגיל)</strong>
+              <span>החלף גודל כתוביות ברירת מחדל (רגיל / גדול / קטן)</span>
+            </div>
+          </button>
+
+          <button type="button" id="tvMoreYoutubeBtn" class="tv-more-action-card tv-focusable">
+            <span class="tv-more-icon">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="0" /><path d="M10 9l5 3-5 3V9z" /></svg>
+            </span>
+            <div class="tv-more-text">
+              <strong>יוטיוב וטריילרים</strong>
+              <span>עבור למסך הטריילרים ותכני הווידאו מיוטיוב</span>
+            </div>
+          </button>
+
+          <button type="button" id="tvMoreRefreshBtn" class="tv-more-action-card tv-focusable">
+            <span class="tv-more-icon">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M23 4v6h-6M1 20v-6h6" /><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" /></svg>
+            </span>
+            <div class="tv-more-text">
+              <strong>סנכרון ורענון קטלוג</strong>
+              <span>משיכת תכנים חדשים, עדכון פוסטרים ובדיקת גרסה</span>
+            </div>
+          </button>
+
+          <button type="button" id="tvMoreInstallApkUpdateBtn" class="tv-more-action-card tv-focusable">
+            <span class="tv-more-icon">
+              <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+            </span>
+            <div class="tv-more-text">
+              <strong>⬇️ עדכן אפליקציה בסטרימר (גרסה חדשה)</strong>
+              <span>הורדה והתקנה ישירה של גרסת ה-APK והלוגו העדכניים</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 2: Actor Search & Filmography Grid -->
+      <div id="tvMoreTabActorsPanel" class="tv-more-tab-panel hidden">
+        <div class="tv-more-actors-section">
+          <div class="tv-more-actors-header">
+            <h3 class="sub-users-heading">שחקנים ופילמוגרפיה (בחר שחקן מהרשימה או חפש לפי שם)</h3>
+            <div class="tv-more-actor-search-bar">
+              <input
+                type="text"
+                id="tvMoreActorSearchInput"
+                class="form-input tv-more-actor-input tv-focusable"
+                dir="rtl"
+                placeholder="חפש שחקן (למשל: ברוס ויליס, גל גדות)..."
+                aria-label="חיפוש לפי שם שחקן"
+                autocomplete="off"
+              />
+              <button type="button" id="tvMoreActorVoiceSearchBtn" class="voice-search-btn tv-focusable" data-voice-target="actor-tvmore" title="חיפוש שחקן קולי" aria-label="חיפוש שחקן קולי">
+                <svg viewBox="0 0 24 24" class="icon-svg" aria-hidden="true">
+                  <rect x="9" y="2" width="6" height="12" rx="3" />
+                  <path d="M5 10a7 7 0 0 0 14 0M12 19v3M8 22h8" />
+                </svg>
+              </button>
+              <button type="button" id="tvMoreActorSearchBtn" class="btn-primary tv-more-actor-btn tv-focusable">חפש שחקן</button>
+            </div>
+          </div>
+          <div id="tvMoreActorsGrid" class="actor-photo-grid tv-more-actors-grid"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- UNIVERSAL TV ON-SCREEN KEYBOARD (#tvVirtualKeyboard) — STRICT LTR     -->
+  <!-- ===================================================================== -->
+  <div id="tvVirtualKeyboard" class="tv-virtual-keyboard hidden" dir="ltr" role="dialog" aria-label="מקלדת על המסך">
+    <div class="vk-container" dir="ltr">
+      <div class="vk-header" dir="ltr">
+        <span id="vkFieldBadge" class="vk-field-badge" dir="rtl">שדה הקלדה</span>
+        <div id="vkPreviewText" class="vk-preview-text" dir="ltr"></div>
+        <div class="vk-header-actions" dir="rtl">
+          <button type="button" id="vkVoiceBtn" class="vk-top-act-btn vk-voice-btn voice-search-btn tv-focusable" data-vk-action="voice" aria-label="חיפוש והכתבה קולית">🎤 קולי</button>
+          <button type="button" id="vkTopPassBtn" class="vk-top-act-btn tv-focusable hidden" data-vk-action="toggle-pass">הצג/הסתר</button>
+          <button type="button" id="vkTopBackspaceBtn" class="vk-top-act-btn vk-top-del-btn tv-focusable" data-vk-action="backspace">⌫ מחק אות</button>
+          <button type="button" id="vkTopClearBtn" class="vk-top-act-btn vk-top-clear-btn tv-focusable" data-vk-action="clear">נקה הכל</button>
+          <button type="button" id="vkTopCloseBtn" class="vk-top-act-btn vk-top-close-btn tv-focusable" data-vk-action="close">סגור ✕</button>
+        </div>
+      </div>
+
+      <div id="vkKeysGrid" class="vk-grid ltr-mode" dir="ltr"></div>
+
+      <div class="vk-actions-row" dir="ltr">
+        <button type="button" id="vkLangBtn" class="vk-action-btn tv-focusable" data-vk-action="lang" aria-label="החלף שפה">EN / עברית</button>
+        <button type="button" id="vkSpaceBtn" class="vk-action-btn vk-space-btn tv-focusable" data-vk-action="space" aria-label="רווח">רווח / SPACE</button>
+        <button type="button" id="vkBackspaceBtn" class="vk-action-btn vk-del-action-btn tv-focusable" data-vk-action="backspace" aria-label="מחק תו אחרון">⌫ מחיקה</button>
+        <button type="button" id="vkClearBtn" class="vk-action-btn vk-clear-action-btn tv-focusable" data-vk-action="clear" aria-label="נקה הכל">נקה הכל</button>
+        <button type="button" id="vkDoneBtn" class="vk-action-btn vk-done-btn tv-focusable" data-vk-action="done" aria-label="סיום והמשך">✓ אישור</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- CLEAR CONTINUE WATCHING CONFIRMATION MODAL (#clearCwConfirmModal)     -->
+  <!-- ===================================================================== -->
+  <div id="clearCwConfirmModal" class="player-exit-confirm-overlay clear-cw-confirm-overlay hidden" dir="rtl" role="dialog" aria-modal="true" aria-labelledby="clearCwConfirmHeading">
+    <div class="player-exit-confirm-card">
+      <h3 id="clearCwConfirmHeading" class="player-exit-confirm-title">ניקוי רשימת המשך צפייה?</h3>
+      <p class="player-exit-confirm-sub">האם אתה בטוח שברצונך למחוק את כל הסרטים והסדרות מרשימת המשך הצפייה ולאפס את נקודות העצירה שלהם?</p>
+      <div class="player-exit-confirm-actions">
+        <button type="button" id="clearCwCancelBtn" class="btn-primary player-exit-btn tv-focusable">ביטול</button>
+        <button type="button" id="clearCwConfirmBtn" class="btn-secondary player-exit-btn tv-focusable">כן, נקה הכל</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- APP EXIT CONFIRMATION MODAL (#appExitConfirmModal)                    -->
+  <!-- Prevents Back button at Home root from abruptly killing the app       -->
+  <!-- ===================================================================== -->
+  <div id="appExitConfirmModal" class="player-exit-confirm-overlay app-exit-confirm-overlay hidden" dir="rtl" role="dialog" aria-modal="true" aria-labelledby="appExitConfirmHeading">
+    <div class="player-exit-confirm-card">
+      <h3 id="appExitConfirmHeading" class="player-exit-confirm-title">לצאת מ-STREAM IT?</h3>
+      <p class="player-exit-confirm-sub">אתה נמצא במסך הראשי של STREAM IT. האם ברצונך להישאר באפליקציה או לצאת למסך הראשי של הסטרימר?</p>
+      <div class="player-exit-confirm-actions">
+        <button type="button" id="appExitCancelBtn" class="btn-primary player-exit-btn tv-focusable">הישאר באפליקציה</button>
+        <button type="button" id="appExitConfirmBtn" class="btn-secondary player-exit-btn tv-focusable">צא למסך הסטרימר</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Voice Search Listening HUD (#voiceListeningBanner) -->
+  <div id="voiceListeningBanner" class="voice-listening-banner hidden" dir="rtl" role="status" aria-live="polite">
+    <span class="voice-pulse-dot" aria-hidden="true"></span>
+    <span id="voiceListeningText" class="voice-listening-text">מקשיב... אמור שם סרט, סדרה, שחקן או ערוץ</span>
+    <button type="button" id="voiceListeningStopBtn" class="voice-listening-stop-btn tv-focusable" aria-label="עצור הקלטה קולית">ביטול ✕</button>
+  </div>
+
+  <!-- Toast Notifications Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- Core Application & Smart TV Navigation Scripts -->
+  <script src="tv-navigation.js?v=9.9.7"></script>
+  <script src="app.js?v=9.9.7"></script>
+  <script>
+    (function () {
+      try {
+        var otaVer = localStorage.getItem('streamit_ota_version_v9') || '';
+        if (otaVer && otaVer > '9.9.7') {
+          window.__STREAMIT_OTA_INJECTED_RUNNING = true;
+          var navCode = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
+          if (navCode.length > 500) {
+            var s1 = document.createElement('script');
+            s1.textContent = navCode;
+            document.body.appendChild(s1);
+          }
+          var appCode = localStorage.getItem('streamit_ota_app_js_v9') || '';
+          if (appCode.length > 2000) {
+            var s2 = document.createElement('script');
+            s2.textContent = appCode;
+            document.body.appendChild(s2);
+          }
+        }
+      } catch (e) {}
+    })();
+  </script>
+</body>
+</html>

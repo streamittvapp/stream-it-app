@@ -55,9 +55,9 @@ def resolve_vidspark_original_hls(media_type: str, tmdb_id: str, season: str, ep
     if cached and (now - cached[0]) < 900:
         return cached[1]
 
-    hosts = ["https://cdn.vidspark.to", "https://vidsrc.pm"]
-    # Prioritize w7dn (Nebula — 1080p Original Audio HLS). Never allow vjej (Russian/foreign dubs) on non-English titles!
-    sources = ["w7dn", "vjej"] if lang == "en" else ["w7dn"]
+    hosts = ["https://cdn.vidspark.to"]
+    # Prioritize w7dn (Nebula — 1080p Original Audio HLS), then p9fx (Vertex Original Audio), then vjej on English titles
+    sources = ["w7dn", "p9fx", "vjej"] if lang == "en" else ["w7dn", "p9fx"]
     for src_code in sources:
         for host in hosts:
             if media_type == "series":
@@ -75,7 +75,7 @@ def resolve_vidspark_original_hls(media_type: str, tmdb_id: str, season: str, ep
                         "x-player-key": PLAYER_KEY,
                     },
                 )
-                with urllib.request.urlopen(req, timeout=4.2) as resp:
+                with urllib.request.urlopen(req, timeout=3.8) as resp:
                     if resp.status != 200:
                         continue
                     data = json.loads(resp.read().decode("utf-8", errors="ignore"))
@@ -95,8 +95,19 @@ def resolve_vidspark_original_hls(media_type: str, tmdb_id: str, season: str, ep
                 if src_code == "w7dn" and actual_src != "w7dn":
                     continue
                 raw_stream_url = str(s0.get("url") or "").strip()
-                if not raw_stream_url.startswith("http") or ".mpd" in raw_stream_url:
-                    continue
+                # If p9fx returns DASH .mpd in url, use its direct MP4 from qualities[] if available
+                if (not raw_stream_url.startswith("http")) or (".mpd" in raw_stream_url) or ("/dash-" in raw_stream_url):
+                    quals = s0.get("qualities") or data.get("qualities") or []
+                    mp4_candidate = ""
+                    for q_item in quals:
+                        q_url = str((q_item or {}).get("url") or "").strip()
+                        if q_url.startswith("http") and ".mpd" not in q_url:
+                            mp4_candidate = q_url
+                            break
+                    if mp4_candidate:
+                        raw_stream_url = mp4_candidate
+                    else:
+                        continue
                 final_stream_url = raw_stream_url
                 if "url=" in raw_stream_url:
                     parsed_w = urllib.parse.urlparse(raw_stream_url)
@@ -201,6 +212,81 @@ class StreamItDevHandler(SimpleHTTPRequestHandler):
                 return self._send_json(hit)
             return self._send_json({"ok": False, "reason": "no_verified_original_hls"})
 
+        if path.startswith("/api/vidora/"):
+            upstream_url = "https://cdn.vidspark.to" + self.path
+            try:
+                req = urllib.request.Request(
+                    upstream_url,
+                    headers={
+                        "User-Agent": UA,
+                        "Accept": "application/json, */*",
+                        "Origin": "https://cdn.vidspark.to",
+                        "Referer": "https://cdn.vidspark.to/",
+                        "x-player-key": PLAYER_KEY,
+                    },
+                )
+                with urllib.request.urlopen(req, timeout=6) as upstream:
+                    data = json.loads(upstream.read().decode("utf-8", errors="ignore"))
+                if isinstance(data, dict):
+                    data["tracks"] = []
+                    for s_item in (data.get("sources") or []):
+                        if isinstance(s_item, dict):
+                            s_item["tracks"] = []
+                return self._send_json(data)
+            except Exception as e:
+                return self._send_json({"result": False, "error": str(e)}, status=502)
+
+        if path == "/api/embed-clean":
+            media_type = (qs.get("type") or ["movie"])[0]
+            media_id = (qs.get("id") or [""])[0]
+            season = (qs.get("season") or ["1"])[0]
+            episode = (qs.get("episode") or ["1"])[0]
+            start_sec = (qs.get("start") or ["0"])[0]
+            vp_url = (
+                f"https://cdn.vidspark.to/tv/{media_id}/{season}/{episode}"
+                if media_type == "series"
+                else f"https://cdn.vidspark.to/movie/{media_id}"
+            )
+            if start_sec and start_sec != "0":
+                vp_url += f"?startAt={start_sec}"
+            try:
+                req = urllib.request.Request(vp_url, headers={"User-Agent": UA})
+                with urllib.request.urlopen(req, timeout=6) as upstream:
+                    html = upstream.read().decode("utf-8", errors="ignore")
+                inject_head = (
+                    '<base href="https://cdn.vidspark.to/">'
+                    "<script>"
+                    "try{"
+                    "localStorage.setItem('vp_subtitle_lang','off');"
+                    "localStorage.setItem('vp_server','w7dn');"
+                    "const _of=window.fetch;"
+                    "window.fetch=function(u,o){"
+                    "const s=typeof u==='string'?u:(u&&u.url)||'';"
+                    "if(s.includes('opensubtitles.org')||s.includes('/sub/')){"
+                    "return Promise.resolve(new Response('[]',{status:200,headers:{'Content-Type':'application/json'}}));"
+                    "}"
+                    "if(s.startsWith('/api/vidora/')){"
+                    "return _of(window.location.origin+s,o);"
+                    "}"
+                    "return _of.apply(this,arguments);"
+                    "};"
+                    "}catch(e){}"
+                    "</script>"
+                    "<style>"
+                    ".vds-captions,[class*='captions'],[data-media-captions],track,::cue{display:none!important;opacity:0!important;visibility:hidden!important;font-size:0!important;}"
+                    "</style>"
+                )
+                html = html.replace("<head>", "<head>" + inject_head, 1)
+                raw = html.encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Content-Length", str(len(raw)))
+                self.end_headers()
+                self.wfile.write(raw)
+                return
+            except Exception as e:
+                return self._send_json({"ok": False, "error": str(e)}, status=502)
+
         if path == "/api/hls-proxy":
             target_url = (qs.get("url") or [""])[0]
             origin = (qs.get("origin") or ["https://vidrock.to"])[0]
@@ -231,6 +317,13 @@ class StreamItDevHandler(SimpleHTTPRequestHandler):
                             out_lines.append(line)
                             continue
                         if stripped.startswith("#"):
+                            upper_line = stripped.upper()
+                            if upper_line.startswith("#EXT-X-MEDIA:") and (
+                                "TYPE=SUBTITLES" in upper_line or "TYPE=CLOSED-CAPTIONS" in upper_line
+                            ):
+                                continue
+                            line = re.sub(r',SUBTITLES="[^"]*"', "", line, flags=re.IGNORECASE)
+                            line = re.sub(r',CLOSED-CAPTIONS="[^"]*"', "", line, flags=re.IGNORECASE)
                             # Rewrite URI="..." inside #EXT-X-MEDIA or #EXT-X-KEY
                             def _repl_uri(m):
                                 inner = urllib.parse.urljoin(target_url, m.group(1))

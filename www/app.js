@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.9.6';
+  var APP_VERSION = '9.9.7';
 
   // If a strictly newer OTA script is stored in localStorage and index.html is about to inject it,
   // skip running this older bundled script completely so two versions of app.js NEVER run in parallel!
@@ -34,8 +34,10 @@
     window.__STREAMIT_V993_BOOTED ||
     window.__STREAMIT_V994_BOOTED ||
     window.__STREAMIT_V995_BOOTED ||
-    window.__STREAMIT_V996_BOOTED
+    window.__STREAMIT_V996_BOOTED ||
+    window.__STREAMIT_V997_BOOTED
   );
+  window.__STREAMIT_V997_BOOTED = true;
   window.__STREAMIT_V996_BOOTED = true;
   window.__STREAMIT_V995_BOOTED = true;
   window.__STREAMIT_V994_BOOTED = true;
@@ -3467,7 +3469,7 @@
     } catch (e) {}
     mergeBuiltinKidsDubbedIntoCatalog();
 
-    // 2. Load bundled `data/hebrew_catalog.json` immediately (+ live GitHub Pages catalog sync for Cloud OTA streamers)
+    // 2. Load bundled `data/hebrew_catalog.json` immediately (and sync cloud catalog non-blocking in background)
     try {
       var localRes = await fetch('data/hebrew_catalog.json');
       if (localRes.ok) {
@@ -3476,13 +3478,15 @@
       }
     } catch (e) {}
     if (window.AndroidTvBridge || window.__STREAMIT_OTA_INJECTED_RUNNING) {
-      try {
-        var cloudCatRes = await fetch('https://streamittvapp.github.io/stream-it-app/data/hebrew_catalog.json?v=' + encodeURIComponent(APP_VERSION));
-        if (cloudCatRes && cloudCatRes.ok) {
-          var cloudCatData = await cloudCatRes.json();
-          ingestCatalogPayload(cloudCatData);
-        }
-      } catch (eCloudCat) {}
+      setTimeout(async function () {
+        try {
+          var cloudCatRes = await fetch('https://streamittvapp.github.io/stream-it-app/data/hebrew_catalog.json?v=' + encodeURIComponent(APP_VERSION));
+          if (cloudCatRes && cloudCatRes.ok) {
+            var cloudCatData = await cloudCatRes.json();
+            ingestCatalogPayload(cloudCatData);
+          }
+        } catch (eCloudCat) {}
+      }, 1200);
     }
 
     // 3. Only query `/api/catalog` if a real Python/Node backend is confirmed
@@ -7058,20 +7062,8 @@
 
       if (!hasAnySubFilter && cat === 'movies' && basePool.length >= 10) {
         shelves.push({ title: '10 הסרטים הנצפים ביותר השבוע בישראל', items: basePool.slice(0, 10), isTop10: true });
-        var movieActionTop = filterByGenre(basePool.slice(10), 'action').slice(0, 10);
-        if (movieActionTop.length >= 6) {
-          shelves.push({ title: 'טופ 10 סרטי אקשן, מתח והרפתקאות', items: movieActionTop, isTop10: true });
-        }
-        var movieComedyTop = filterByGenre(basePool.slice(10), 'comedy').slice(0, 10);
-        if (movieComedyTop.length >= 6) {
-          shelves.push({ title: 'טופ 10 קומדיות ושוברי קופות לכל המשפחה', items: movieComedyTop, isTop10: true });
-        }
       } else if (!hasAnySubFilter && cat === 'series' && basePool.length >= 10) {
         shelves.push({ title: '10 הסדרות המובילות לצפייה ישירה בישראל', items: basePool.slice(0, 10), isTop10: true });
-        var seriesCrimeTop = filterByGenre(basePool.slice(10), 'crime').concat(filterByGenre(basePool.slice(10), 'drama')).slice(0, 10);
-        if (seriesCrimeTop.length >= 6) {
-          shelves.push({ title: 'טופ 10 סדרות מתח, פשע ודרמה מומלצות', items: seriesCrimeTop, isTop10: true });
-        }
       }
 
       if (genre === 'viva' && cat !== 'movies') {
@@ -7199,10 +7191,10 @@
       }
 
       // TOP 10 #1 (Row 1): הנצפים ביותר היום בישראל
-      if (showTop10 && catVis.top10_most_watched !== false) {
+      if (showTop10 && catVis.top10_most_watched !== false && !(activeProfile && activeProfile.isKids)) {
         var top10MostWatched = takeUniqueHomeItems(homeMovies.slice(0, 8).concat(homeSeries.slice(0, 6)), 10);
         if (top10MostWatched.length) {
-          shelves.push({ title: 'הנצפים ביותר בישראל היום', items: top10MostWatched, isTop10: true });
+          shelves.push({ title: '10 הנצפים ביותר בישראל היום', items: top10MostWatched, isTop10: true });
         }
       }
 
@@ -7222,18 +7214,7 @@
         }
       }
 
-      // TOP 10 #2 (Row 4): החדשים ביותר (2025–2026)
-      if (showTop10 && catVis.top10_newest !== false) {
-        var newestPool = rotatePoolWithSeed(homeMovies.concat(homeSeries).filter(function (it) {
-          return it && (it.year === '2026' || it.year === '2025' || it.year === '2024');
-        }), state.homeRotationSeed + 29, 14);
-        var top10Newest = takeUniqueHomeItems(newestPool, 10);
-        if (top10Newest.length) {
-          shelves.push({ title: 'החדשים ביותר — הבכורות החמות של השנה', items: top10Newest, isTop10: true });
-        }
-      }
-
-      // Row 5: נטפליקס (Netflix Originals & Top)
+      // Row 4: נטפליקס (Netflix Originals & Top)
       if (catVis.netflix !== false && srcVis.vidsrc_vip !== false) {
         var netflixItems = takeUniqueHomeItems(filterByGenre(homeMovies, 'netflix').concat(filterByGenre(homeSeries, 'netflix')), 18);
         if (netflixItems.length) {
@@ -7241,7 +7222,7 @@
         }
       }
 
-      // Row 6: אפל TV+, HBO Max ואמאזון פריים
+      // Row 5: אפל TV+, HBO Max ואמאזון פריים
       if (catVis.apple_hbo_prime !== false) {
         var appleHboItems = takeUniqueHomeItems(
           filterByGenre(homeMovies, 'apple').concat(filterByGenre(homeSeries, 'apple'), filterByGenre(homeSeries, 'hbo'), filterByGenre(homeMovies, 'amazon'), filterByGenre(homeSeries, 'amazon')),
@@ -7252,15 +7233,7 @@
         }
       }
 
-      // TOP 10 #3 (Row 7): טופ 10 — הסדרות המובילות השבוע
-      if (showTop10 && catVis.top10_series !== false && catVis.series !== false) {
-        var top10SeriesItems = takeUniqueHomeItems(homeSeries, 10);
-        if (top10SeriesItems.length) {
-          shelves.push({ title: 'הסדרות המובילות השבוע', items: top10SeriesItems, isTop10: true });
-        }
-      }
-
-      // Row 8: מדובב לעברית ואנימציה לכל המשפחה (also accessible on main family profiles!)
+      // Row 6: מדובב לעברית ואנימציה לכל המשפחה (also accessible on main family profiles!)
       if (!(activeProfile && activeProfile.isKids) && kidsDubbedPool.length) {
         var famDubItems = takeUniqueHomeItems(kidsDubbedPool.concat(filterByGenre(homeMovies, 'animation')), 16);
         if (famDubItems.length) {
@@ -7268,7 +7241,7 @@
         }
       }
 
-      // Row 8b: טלגרם קולנוע VOD
+      // Row 7: טלגרם קולנוע VOD
       if (catVis.telegram !== false && srcVis.telegram_vod !== false) {
         var rawTgPool = filterByGenre(homeMovies, 'telegram').concat(filterByGenre(homeSeries, 'telegram'));
         var tgUniqueItems = takeUniqueHomeItems(rawTgPool, 18);
@@ -7277,7 +7250,7 @@
         }
       }
 
-      // Row 9: אקשן, הרפתקאות ושוברי קופות
+      // Row 8: אקשן, הרפתקאות ושוברי קופות
       if (catVis.action !== false) {
         var actionMovies = takeUniqueHomeItems(filterByGenre(homeMovies, 'action'), 18);
         if (actionMovies.length) {
@@ -7285,20 +7258,15 @@
         }
       }
 
-      // TOP 10 #4 (Row 10): טופ 10 — אקשן, מתח ושוברי קופות
-      if (showTop10 && catVis.top10_action !== false && catVis.action !== false) {
-        var top10ActionPool = rotatePoolWithSeed(
-          filterByGenre(homeMovies, 'action').concat(filterByGenre(homeMovies, 'thriller'), filterByGenre(homeSeries, 'action')),
-          state.homeRotationSeed + 41,
-          14
-        );
-        var top10ActionItems = takeUniqueHomeItems(top10ActionPool, 10);
-        if (top10ActionItems.length) {
-          shelves.push({ title: 'אקשן, מתח ושוברי קופות — 10 המומלצים', items: top10ActionItems, isTop10: true });
+      // TOP 10 #2 (Spaced after 6–7 regular rows!): 10 הסדרות והבכורות המובילות השבוע
+      if (showTop10 && catVis.top10_series !== false && catVis.series !== false && !(activeProfile && activeProfile.isKids)) {
+        var top10SeriesItems = takeUniqueHomeItems(homeSeries.concat(homeMovies), 10);
+        if (top10SeriesItems.length) {
+          shelves.push({ title: '10 הסדרות והבכורות המובילות השבוע', items: top10SeriesItems, isTop10: true });
         }
       }
 
-      // Row 11: מתח, פשע ומסתורין
+      // Row 10: מתח, פשע ומסתורין
       if (catVis.crime !== false) {
         var crimeItems = takeUniqueHomeItems(filterByGenre(homeMovies, 'crime').concat(filterByGenre(homeMovies, 'thriller'), filterByGenre(homeSeries, 'crime')), 18);
         if (crimeItems.length) {
@@ -7306,20 +7274,7 @@
         }
       }
 
-      // TOP 10 #5: טופ 10 — מדע בדיוני, פנטזיה ועולמות חדשים
-      if (showTop10 && catVis.scifi !== false) {
-        var top10ScifiPool = rotatePoolWithSeed(
-          filterByGenre(homeMovies, 'scifi').concat(filterByGenre(homeSeries, 'scifi')),
-          state.homeRotationSeed + 53,
-          12
-        );
-        var top10ScifiItems = takeUniqueHomeItems(top10ScifiPool, 10);
-        if (top10ScifiItems.length >= 5) {
-          shelves.push({ title: 'מדע בדיוני, פנטזיה ועולמות חדשים — טופ 10', items: top10ScifiItems, isTop10: true });
-        }
-      }
-
-      // Row 12: מדע בדיוני ופנטזיה
+      // Row 11: מדע בדיוני ופנטזיה
       if (catVis.scifi !== false) {
         var scifiItems = takeUniqueHomeItems(filterByGenre(homeMovies, 'scifi').concat(filterByGenre(homeSeries, 'scifi')), 18);
         if (scifiItems.length) {
@@ -7327,7 +7282,7 @@
         }
       }
 
-      // Row 13: יצירה ישראלית וקולנוע ישראלי
+      // Row 12: יצירה ישראלית וקולנוע ישראלי
       if (catVis.israeli !== false) {
         var israeliItems = takeUniqueHomeItems(filterByGenre(homeMovies, 'israeli').concat(filterByGenre(homeSeries, 'israeli')), 20);
         if (israeliItems.length) {
@@ -7335,20 +7290,7 @@
         }
       }
 
-      // TOP 10 #6: טופ 10 — קומדיות והלהיטים שעושים מצב רוח טוב
-      if (showTop10 && catVis.comedy !== false) {
-        var top10ComedyPool = rotatePoolWithSeed(
-          filterByGenre(homeMovies, 'comedy').concat(filterByGenre(homeSeries, 'comedy')),
-          state.homeRotationSeed + 67,
-          12
-        );
-        var top10ComedyItems = takeUniqueHomeItems(top10ComedyPool, 10);
-        if (top10ComedyItems.length >= 5) {
-          shelves.push({ title: 'קומדיות והלהיטים שעושים מצב רוח טוב — טופ 10', items: top10ComedyItems, isTop10: true });
-        }
-      }
-
-      // Row 13b: ויוה, דרמות טורקיות וטלנובלות (Viva & Turkish VOD)
+      // Row 13: ויוה, דרמות טורקיות וטלנובלות (Viva & Turkish VOD)
       if (catVis.viva !== false) {
         var vivaHomeItems = takeUniqueHomeItems(filterByGenre(homeSeries, 'viva').concat(filterByGenre(homeMovies, 'viva')), 20);
         if (vivaHomeItems.length) {
@@ -7361,19 +7303,6 @@
         var comedyItems = takeUniqueHomeItems(filterByGenre(homeMovies, 'comedy').concat(filterByGenre(homeMovies, 'romance')), 18);
         if (comedyItems.length) {
           shelves.push({ title: 'קומדיות ורומנטיקה', items: comedyItems });
-        }
-      }
-
-      // TOP 10 #7: טופ 10 — דירוג המבקרים ודרמות עטורות פרסים (IMDb 8.0+)
-      if (showTop10) {
-        var acclaimedPool = rotatePoolWithSeed(
-          homeMovies.concat(homeSeries).filter(function (it) { return (parseFloat(it && it.rating) || 0) >= 7.8; }),
-          state.homeRotationSeed + 83,
-          14
-        );
-        var top10Acclaimed = takeUniqueHomeItems(acclaimedPool, 10);
-        if (top10Acclaimed.length >= 5) {
-          shelves.push({ title: 'דירוג המבקרים — 10 היצירות עטורות השבחים', items: top10Acclaimed, isTop10: true });
         }
       }
 
@@ -7820,33 +7749,25 @@
     }
     var leadingGenresText = getItemLeadingGenresText(item, 2, ' / ');
 
-    // Netflix-Style Showcase Top 10 Card: Taller Vertical Poster + Giant 3D Metallic Number + Animated Sheen Sweep!
+    // Large Full-Bleed Top 10 Card: Clean Card Layout (No Container Box, No Empty Side Gap, Smooth Card Lift)
     if (rankNum > 0) {
-      var verticalPoster = item.poster || item.backdrop || tileImg;
-      if (verticalPoster) {
-        verticalPoster = String(verticalPoster)
-          .replace('/t/p/original/', isTvCard ? '/t/p/w342/' : '/t/p/w500/')
-          .replace('/t/p/w1280/', isTvCard ? '/t/p/w342/' : '/t/p/w500/');
-      }
+      var top10Img = tileImg || item.poster || item.backdrop;
       return (
-        '<article class="poster-card top10-showcase-card tv-focusable" tabindex="0" role="button" ' +
+        '<article class="poster-card landscape-poster-card top10-poster-card top10-showcase-card tv-focusable" tabindex="0" role="button" ' +
           'data-item-id="' + escapeHtml(item.id) + '" ' +
           'aria-label="' + escapeHtml('מקום ' + rankNum + ': ' + item.title) + '">' +
-          '<span class="top10-giant-rank" data-rank="' + rankNum + '" aria-hidden="true">' + rankNum + '</span>' +
-          '<div class="top10-poster-frame">' +
-            '<img class="poster-img" src="' + escapeHtml(verticalPoster) + '" alt="' + escapeHtml(item.title) + '" loading="lazy" decoding="async" onerror="window.__streamItHandleBrokenPoster && window.__streamItHandleBrokenPoster(this, \'' + escapeHtml(item.id) + '\', \'' + escapeHtml(fallbackPoster) + '\');" />' +
-            '<span class="top10-poster-sheen" aria-hidden="true"></span>' +
-            '<span class="top10-corner-ribbon">TOP 10</span>' +
-            dubBadgeHtml +
-            '<div class="poster-hover-overlay">' +
-              '<span class="poster-hover-title">' + escapeHtml(item.title) + '</span>' +
-              '<div class="poster-hover-meta">' +
-                '<span class="poster-meta-year" dir="rtl">' + escapeHtml(item.year || '2025') + '</span>' +
-                '<span class="poster-meta-type">' + escapeHtml(leadingGenresText) + '</span>' +
-              '</div>' +
+          '<img class="poster-img" src="' + escapeHtml(top10Img) + '" alt="' + escapeHtml(item.title) + '" loading="lazy" decoding="async" onerror="window.__streamItHandleBrokenPoster && window.__streamItHandleBrokenPoster(this, \'' + escapeHtml(item.id) + '\', \'' + escapeHtml(fallbackPoster) + '\');" />' +
+          '<span class="top10-rank-badge" data-rank="' + rankNum + '" aria-hidden="true">' + rankNum + '</span>' +
+          '<span class="top10-corner-ribbon">TOP 10</span>' +
+          dubBadgeHtml +
+          '<div class="poster-hover-overlay">' +
+            '<span class="poster-hover-title">' + escapeHtml(item.title) + '</span>' +
+            '<div class="poster-hover-meta">' +
+              '<span class="poster-meta-year" dir="rtl">' + escapeHtml(item.year || '2025') + '.</span>' +
+              '<span class="poster-meta-type">' + escapeHtml(leadingGenresText) + '</span>' +
             '</div>' +
-            progHtml +
           '</div>' +
+          progHtml +
         '</article>'
       );
     }
@@ -8772,7 +8693,9 @@
   }
 
   async function resolveDirect1080pHlsUrl(item, imdbId, season, episode) {
-    if (!hasLocalBackend()) return '';
+    if (!hasLocalBackend()) {
+      await probeLocalPythonBackend();
+    }
     var apiBase = getApiBase();
     var mediaType = item.type === 'series' ? 'series' : 'movie';
     var tmdbId = String(item.tmdbId || '').replace(/\D/g, '');
@@ -8781,28 +8704,34 @@
     var expectedYear = String(item.year || '').slice(0, 4);
     var data = null;
 
-    // Non-blocking `/api/direct-stream` on `127.0.0.1:8092` (prioritizing `w7dn` 1080p Original-Language HLS + title/year verification)
-    try {
-      var ctrl = new AbortController();
-      var timer = setTimeout(function () { ctrl.abort(); }, 4600);
-      var url = apiBase + '/api/direct-stream?type=' + encodeURIComponent(mediaType) +
-        '&imdb_id=' + encodeURIComponent(imdbId || '') +
-        '&tmdb_id=' + encodeURIComponent(tmdbId) +
-        '&season=' + (season || 1) +
-        '&episode=' + (episode || 1) +
-        '&orig_lang=' + encodeURIComponent(origLang) +
-        '&expected_title=' + encodeURIComponent(expectedTitle) +
-        '&expected_year=' + encodeURIComponent(expectedYear);
-      var res = await fetch(url, { signal: ctrl.signal });
-      clearTimeout(timer);
-      if (res.ok) data = await res.json();
-    } catch (e) {}
+    // Fast non-blocking `/api/direct-stream` on `127.0.0.1:8092` (works on BOTH Streamer APK EmbeddedServer and Desktop Python Server!)
+    // Use 6500ms timeout + automatic warm-cache retry if the 1st call hits a cold upstream timeout, so we NEVER fall into the external embed player!
+    var directEndpointUrl = apiBase + '/api/direct-stream?type=' + encodeURIComponent(mediaType) +
+      '&imdb_id=' + encodeURIComponent(imdbId || '') +
+      '&tmdb_id=' + encodeURIComponent(tmdbId) +
+      '&season=' + (season || 1) +
+      '&episode=' + (episode || 1) +
+      '&orig_lang=' + encodeURIComponent(origLang) +
+      '&expected_title=' + encodeURIComponent(expectedTitle) +
+      '&expected_year=' + encodeURIComponent(expectedYear);
+
+    for (var attempt = 0; attempt < 2; attempt++) {
+      try {
+        var ctrl = new AbortController();
+        var timer = setTimeout(function () { ctrl.abort(); }, 6500);
+        var res = await fetch(directEndpointUrl + '&_try=' + attempt, { signal: ctrl.signal });
+        clearTimeout(timer);
+        if (res.ok) {
+          state.pythonApiConfirmed = true;
+          data = await res.json();
+          if (data && data.ok && data.streamUrl) break;
+        }
+      } catch (e) {}
+    }
 
     if (!data || !data.ok) return '';
-    // Reject legacy (< v9.9.1) embedded server responses that lack `data.source` or point to `vjej` (Russian/foreign-dubbed mirror)
-    if (!data.source) return '';
-    if (origLang !== 'en' && String(data.source).toLowerCase() === 'vjej') return '';
-    if (/hscow|fcxmb/i.test(String(data.streamUrl || ''))) return '';
+    // Only reject if `data.source` is explicitly `'vjej'` on non-English originals (never reject Streamer APK responses that omit `data.source`!)
+    if (data.source && origLang !== 'en' && String(data.source).toLowerCase() === 'vjej') return '';
     if (data.streamUrl) {
       if (data.streamUrl.indexOf('/') === 0 && apiBase) {
         return apiBase + data.streamUrl;
@@ -9248,7 +9177,7 @@
       : String(item.originalLanguage || (item.isIsraeli ? 'he' : 'en')).toLowerCase();
     var embedUrl = '';
 
-    // 100% Verified Original-Language Cloud Mirrors (`cdn.vidspark.to` + `vidsrc.pm/embed/...` + `vidlink.pro`)
+    // 100% Verified Original-Language Cloud Mirrors (`cdn.vidspark.to` + `vidsrc.pm` + `embed.su`)
     // Strictly set native embed player subtitles to NONE (`sub=off&ds_lang=off&captions=0`) so ONLY our custom Hebrew subtitles render!
     var baseParams = 'sub=off&subs=off&ds_lang=off&sub_lang=off&defaultSub=off&captions=0&subtitles=0&cc_load_policy=0&autoplay=1&audio=' + encodeURIComponent(origAudioLang);
     if (state.embedStartOffsetSec > 15) {
@@ -9257,18 +9186,22 @@
     var queryStr = '?' + baseParams;
     if (state.embedActiveServerKey === 'embed2') {
       if (item.type === 'series') {
-        embedUrl = 'https://vidsrc.pm/embed/tv/' + encodeURIComponent(mediaId) + '/' + (season || 1) + '/' + (episode || 1) + queryStr;
+        embedUrl = 'https://vidsrc.pm/tv/' + encodeURIComponent(mediaId) + '/' + (season || 1) + '/' + (episode || 1) + queryStr;
       } else {
-        embedUrl = 'https://vidsrc.pm/embed/movie/' + encodeURIComponent(mediaId) + queryStr;
+        embedUrl = 'https://vidsrc.pm/movie/' + encodeURIComponent(mediaId) + queryStr;
       }
     } else if (state.embedActiveServerKey === 'swarm') {
-      var vlParams = '?autoplay=true&primaryColor=e50914&captions=false&sub_file=&ds_lang=off&sub=off';
-      if (state.embedStartOffsetSec > 15) vlParams += '&startAt=' + Math.floor(state.embedStartOffsetSec);
       if (item.type === 'series') {
-        embedUrl = 'https://vidlink.pro/tv/' + encodeURIComponent(tmdbId || mediaId) + '/' + (season || 1) + '/' + (episode || 1) + vlParams;
+        embedUrl = 'https://embed.su/embed/tv/' + encodeURIComponent(tmdbId || mediaId) + '/' + (season || 1) + '/' + (episode || 1) + queryStr;
       } else {
-        embedUrl = 'https://vidlink.pro/movie/' + encodeURIComponent(tmdbId || mediaId) + vlParams;
+        embedUrl = 'https://embed.su/embed/movie/' + encodeURIComponent(tmdbId || mediaId) + queryStr;
       }
+    } else if ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port === '8092') {
+      embedUrl = '/api/embed-clean?type=' + encodeURIComponent(item.type === 'series' ? 'series' : 'movie') +
+        '&id=' + encodeURIComponent(mediaId) +
+        '&season=' + (season || 1) +
+        '&episode=' + (episode || 1) +
+        '&start=' + Math.floor(state.embedStartOffsetSec || 0);
     } else {
       if (item.type === 'series') {
         embedUrl = 'https://cdn.vidspark.to/tv/' + encodeURIComponent(mediaId) + '/' + (season || 1) + '/' + (episode || 1) + queryStr;
@@ -9280,13 +9213,13 @@
     state.embedResumeSeekDone = !(state.embedStartOffsetSec > 15);
     state.lastEmbedPostMsgTimeAt = 0;
     var startVisible = (state.embedActiveServerKey === 'swarm');
-    var isTvEmbed = Boolean(document.body && document.body.classList.contains('tv-mode'));
 
     embedContainer.innerHTML =
       '<iframe id="streamEmbedIframe" tabindex="-1" src="' + escapeHtml(embedUrl) + '" ' +
       'referrerpolicy="origin" ' +
-      'allow="autoplay; fullscreen; encrypted-media; picture-in-picture"' + (isTvEmbed ? '' : ' allowfullscreen') + ' ' +
-      'style="width:100%;height:100%;border:none;background:#000;opacity:' + (startVisible ? '1' : '0') + ';pointer-events:' + (isTvEmbed ? 'none' : 'auto') + ';transition:opacity 0.25s ease;"></iframe>';
+      'sandbox="allow-scripts allow-same-origin allow-forms allow-presentation" ' +
+      'allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen ' +
+      'style="width:100%;height:100%;border:none;background:#000;opacity:' + (startVisible ? '1' : '0') + ';pointer-events:auto;transition:opacity 0.25s ease;"></iframe>';
 
     var iframe = document.getElementById('streamEmbedIframe');
 
@@ -9304,7 +9237,7 @@
     }, 600);
 
     // Automatic Failover Watchdog: NEVER fall back to random YouTube trailers when watching a movie or series!
-    var watchdogMs = state.embedActiveServerKey === 'embed1' ? 9000 : 8500;
+    var watchdogMs = state.embedActiveServerKey === 'embed1' ? 7500 : 8000;
     state.embedWatchdogTimer = setTimeout(function () {
       if (!isPlaybackSessionActive(activeSession)) {
         stopCurrentMedia();
@@ -9338,8 +9271,13 @@
             iframe.contentWindow.postMessage({ action: 'captions', value: false }, '*');
             iframe.contentWindow.postMessage({ command: 'subtitle', value: -1 }, '*');
           }
-          if (isTvEmbed) {
-            try { window.focus(); } catch (eFoc) {}
+          if (window.AndroidTvBridge && typeof window.AndroidTvBridge.tapCenterOfScreen === 'function') {
+            setTimeout(function () {
+              if (!isPlaybackSessionActive(activeSession)) return;
+              if (state.playingMode === 'embed' && state.embedVerified && !state.embedAutoPlayed) {
+                try { window.AndroidTvBridge.tapCenterOfScreen(); } catch (e) {}
+              }
+            }, 900);
           }
         } catch (e) {}
       });
@@ -16643,9 +16581,8 @@
     updateAuthUi();
     updateVersionBadgesUi();
     initLiveNewsTicker();
-    probeLocalPythonBackend().then(function () {
-      loadCatalog();
-    });
+    probeLocalPythonBackend().catch(function () {});
+    loadCatalog();
     syncAccountStateFromCloudVault().catch(function () {});
     // Continuous Cross-Device Cloud Sync: pull latest Resume Playback & Watchlist when switching devices or returning to the app
     if (!state.cloudPeriodicSyncInterval) {

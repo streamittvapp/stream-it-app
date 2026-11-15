@@ -1,10 +1,10 @@
 {
-  "version": "9.9.6",
+  "version": "9.9.7",
   "native_apk_version": "9.8.8",
   "apk_download_url": "https://streamittvapp.github.io/stream-it-app/StreamIt-AndroidTV.apk",
   "apk_short_url": "https://is.gd/streamitapk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-15T01:25:00Z",
-  "notes": "v9.9.6 — Removed iframe sandbox (fixes Please Disable Sandbox), crash-proof Streamer Back shield during video playback, native player subtitles forced to NONE (zero double subs), accurate 23.976fps/PAL subtitle sync + fine +/-0.1s sync, Kids Hebrew-dubbed catalog & audio preference, synced scrub thumbnail without poster artwork, hardened SafeWatch blur/mute/skip, multi-category & plot-theme Advanced Checkbox Search, Netflix Top 10 showcase rows, and dynamic Home feed refresh."
+  "updated_at": "2026-11-15T07:00:00Z",
+  "notes": "v9.9.7 — Fixed direct 1080p stream playback on Streamer & Desktop (6.5s timeout + warm retry + removed dead vidsrc.pm host), eliminated duplicate native subtitles via /api/hls-proxy track stripping & /api/embed-clean wrapper, redesigned Top 10 rows as clean full-bleed large cards (5 per row, spaced apart with zero boxed container), and restored 60fps Rocket GPU remote navigation."
 }

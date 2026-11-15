@@ -7704,17 +7704,16 @@ body.tv-mode .poster-card:not(.tv-focused) {
    ========================================================================= */
 .netflix-row.top10-row {
   position: relative;
-  padding: 6px 12px 4px 12px;
-  background: linear-gradient(90deg, rgba(17, 21, 32, 0.72) 0%, rgba(12, 15, 23, 0.92) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-right: 3px solid #e50914;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
 }
 
 .netflix-row.top10-row .row-title {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-weight: 600;
+  font-weight: 700;
   color: #ffffff;
 }
 
@@ -8115,13 +8114,11 @@ body.tv-mode .tv-virtual-keyboard {
    ========================================================================= */
 
 body.tv-mode #catalogRowsContainer > .netflix-row {
-  content-visibility: auto;
-  contain-intrinsic-size: 1px 150px;
   contain: layout style;
 }
 
 body.tv-mode .poster-card {
-  transition: transform 0.09s cubic-bezier(0.2, 0, 0, 1) !important;
+  transition: transform 0.11s cubic-bezier(0.2, 0, 0, 1) !important;
   box-shadow: none !important;
   filter: none !important;
   backface-visibility: hidden;
@@ -8134,7 +8131,7 @@ body.tv-mode .poster-card:focus {
   border: 1px solid #e50914 !important;
   box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.85) !important;
   filter: none !important;
-  transform: translate3d(0, -3px, 0) scale(1.04) !important;
+  transform: translate3d(0, -4px, 0) !important;
   z-index: 35 !important;
 }
 
@@ -10073,7 +10070,9 @@ body.tv-mode .netflix-row {
 }
 
 body.tv-mode .netflix-row.top10-row {
-  padding: 3px 6px 2px 6px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
 }
 
 body.tv-mode .row-header {
@@ -10086,8 +10085,7 @@ body.tv-mode .row-track {
 }
 
 /* 6-Column Exact Fit with 5px Gaps (5 gaps × 5px = 25px -> Larger, Sharper Tiles!) */
-body.tv-mode .row-track > .poster-card,
-body.tv-mode .row-track > .poster-card.top10-poster-card {
+body.tv-mode .row-track > .poster-card:not(.top10-showcase-card) {
   flex: 0 0 calc((100% - 25px) / 6) !important;
   width: calc((100% - 25px) / 6) !important;
   max-width: calc((100% - 25px) / 6) !important;
@@ -10097,7 +10095,7 @@ body.tv-mode .row-track > .poster-card.top10-poster-card {
 body.tv-mode .poster-card:hover,
 body.tv-mode .poster-card.tv-focused,
 body.tv-mode .poster-card:focus {
-  transform: scale(1.045) translateY(-2px) !important;
+  transform: translate3d(0, -4px, 0) !important;
 }
 
 body.tv-mode .catalog-wall-section {
@@ -10114,11 +10112,6 @@ body.tv-mode #searchResultsGrid.search-results-grid {
 body.tv-mode #episodesGrid.episodes-grid,
 body.tv-mode .live-channels-grid {
   gap: 7px !important;
-}
-
-/* 2. Streamer (`body.tv-mode`) — Prevent Cross-Origin Embed Iframes from Stealing Remote Back/D-Pad Focus */
-body.tv-mode #playerModal .embed-player-container iframe {
-  pointer-events: none !important;
 }
 
 /* 3. Symmetric, Balanced Subtitle Stage & Non-Resetting Subtitle Menu Readouts */
@@ -10729,216 +10722,172 @@ body.tv-mode #parentalShieldOverlay:not(.hidden) {
   font-weight: 500;
 }
 
-/* 5. Netflix-Style Top 10 Showcase Rows & Cards (.top10-row + .top10-showcase-card) */
+/* 5. Clean Large Card Top 10 Shelves (.top10-row + .top10-showcase-card) — No Container Box, No Wide Gaps, Smooth Card Animation */
 .netflix-row.top10-row {
-  margin: 22px 0 28px !important;
-  padding: 14px 0 10px;
+  margin: 10px 0 14px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
   position: relative;
+}
+
+body.tv-mode .netflix-row.top10-row {
+  margin: 4px 0 6px !important;
+  padding: 0 !important;
 }
 
 .netflix-row.top10-row .row-header {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+body.tv-mode .netflix-row.top10-row .row-header {
+  margin-bottom: 2px !important;
 }
 
 .top10-row-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 3px 9px;
-  border-radius: 6px;
-  background: linear-gradient(135deg, #e50914 0%, #b20710 100%);
+  padding: 2px 8px;
+  border-radius: 5px;
+  background: #e50914;
   color: #ffffff;
   font-size: 0.72rem;
   font-weight: 800;
-  letter-spacing: 0.08em;
-  box-shadow: 0 4px 14px rgba(229, 9, 20, 0.42);
+  letter-spacing: 0.06em;
 }
 
 .netflix-row.top10-row .row-title {
-  font-size: 1.24rem !important;
+  font-size: 1.14rem !important;
   font-weight: 700 !important;
-  background: linear-gradient(90deg, #ffffff 0%, #f1f5f9 65%, #fca5a5 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #ffffff !important;
 }
 
 .netflix-row.top10-row .row-track {
-  gap: 16px !important;
-  padding-top: 8px !important;
-  padding-bottom: 14px !important;
+  gap: 8px !important;
+  padding-top: 4px !important;
+  padding-bottom: 6px !important;
 }
 
-.poster-card.top10-showcase-card,
-body.tv-mode #catalogRowsContainer .netflix-row.top10-row .row-track > .poster-card.top10-showcase-card {
-  flex: 0 0 calc((100% - 48px) / 3.85) !important;
-  width: calc((100% - 48px) / 3.85) !important;
-  max-width: 340px !important;
-  min-width: 235px !important;
+body.tv-mode .netflix-row.top10-row .row-track {
+  gap: 5px !important;
+  padding: 2px 2px 4px 2px !important;
+}
+
+/* 5-Column Larger Card Layout (Zero Empty Side Wrapper, Full-Bleed Image, Smooth Lift) */
+.row-track > .poster-card.top10-showcase-card,
+.poster-card.top10-showcase-card {
+  flex: 0 0 calc((100% - 32px) / 5) !important;
+  width: calc((100% - 32px) / 5) !important;
+  max-width: calc((100% - 32px) / 5) !important;
+  min-width: 0 !important;
   aspect-ratio: 16 / 10.6 !important;
-  background: transparent !important;
-  border: none !important;
-  border-radius: 14px !important;
-  overflow: visible !important;
+  background: #121621 !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
   position: relative;
-  display: flex !important;
-  align-items: stretch;
-  direction: ltr;
-  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), filter 0.28s ease !important;
+  display: block !important;
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.18s ease, box-shadow 0.22s ease !important;
 }
 
-.top10-showcase-stage {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-  direction: ltr;
+body.tv-mode .row-track > .poster-card.top10-showcase-card,
+body.tv-mode #catalogRowsContainer .netflix-row.top10-row .row-track > .poster-card.top10-showcase-card {
+  flex: 0 0 calc((100% - 20px) / 5) !important;
+  width: calc((100% - 20px) / 5) !important;
+  max-width: calc((100% - 20px) / 5) !important;
+  min-width: 0 !important;
+  aspect-ratio: 16 / 10.6 !important;
+  border-radius: 8px !important;
+  transition: transform 0.11s cubic-bezier(0.2, 0, 0, 1) !important;
 }
 
-.top10-giant-rank {
-  position: absolute;
-  left: -4px;
-  bottom: -10px;
-  z-index: 1;
-  font-family: 'Rubik', Impact, system-ui, sans-serif;
-  font-size: clamp(5.8rem, 8.6vw, 8.8rem);
-  font-weight: 900;
-  line-height: 0.82;
-  letter-spacing: -0.08em;
-  color: #090b10;
-  -webkit-text-stroke: 3.2px rgba(255, 255, 255, 0.78);
-  text-shadow:
-    0 10px 26px rgba(0, 0, 0, 0.92),
-    0 0 22px rgba(229, 9, 20, 0.22);
-  user-select: none;
-  pointer-events: none;
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), -webkit-text-stroke-color 0.25s ease, text-shadow 0.25s ease;
+@media (max-width: 1280px) {
+  body:not(.tv-mode) .row-track > .poster-card.top10-showcase-card {
+    flex: 0 0 calc((100% - 24px) / 4) !important;
+    width: calc((100% - 24px) / 4) !important;
+    max-width: calc((100% - 24px) / 4) !important;
+  }
 }
 
-.top10-giant-rank.is-double-digit {
-  font-size: clamp(4.7rem, 7.1vw, 7.2rem);
-  left: -8px;
-  letter-spacing: -0.11em;
+@media (max-width: 768px) {
+  body:not(.tv-mode) .row-track > .poster-card.top10-showcase-card {
+    flex: 0 0 calc((100% - 8px) / 2) !important;
+    width: calc((100% - 8px) / 2) !important;
+    max-width: calc((100% - 8px) / 2) !important;
+  }
 }
 
-.top10-poster-frame {
-  position: relative;
-  z-index: 2;
-  width: 64%;
-  height: 100%;
-  border-radius: 12px;
-  overflow: hidden;
-  background: #121621;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  box-shadow: -12px 12px 28px rgba(0, 0, 0, 0.82), 0 6px 18px rgba(0, 0, 0, 0.6);
-  transition: border-color 0.24s ease, box-shadow 0.24s ease;
-}
-
-.top10-poster-frame .poster-img {
+.poster-card.top10-showcase-card .poster-img {
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
-  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1) !important;
+  display: block !important;
 }
 
-/* Animated luxury sheen sweep across Top 10 poster */
-.top10-poster-sheen {
+.poster-card.top10-showcase-card .top10-rank-badge {
   position: absolute;
-  inset: 0;
-  z-index: 3;
+  top: 8px;
+  right: 8px;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 9px;
+  border-radius: 6px;
+  background: rgba(9, 11, 17, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-bottom: 2px solid #e50914;
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 1.08rem;
+  font-weight: 800;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 8;
   pointer-events: none;
-  background: linear-gradient(
-    115deg,
-    transparent 20%,
-    rgba(255, 255, 255, 0.16) 46%,
-    rgba(255, 255, 255, 0.03) 54%,
-    transparent 75%
-  );
-  transform: translateX(-130%);
-  animation: top10SheenSweep 7.5s ease-in-out infinite;
-}
-
-.poster-card.top10-showcase-card:nth-child(2n) .top10-poster-sheen {
-  animation-delay: 1.8s;
-}
-
-.poster-card.top10-showcase-card:nth-child(3n) .top10-poster-sheen {
-  animation-delay: 3.4s;
-}
-
-@keyframes top10SheenSweep {
-  0%, 72% { transform: translateX(-130%); }
-  92%, 100% { transform: translateX(135%); }
 }
 
 .top10-corner-ribbon {
   position: absolute;
   top: 8px;
-  right: 8px;
-  z-index: 4;
+  left: 8px;
+  z-index: 7;
   padding: 3px 7px;
   border-radius: 5px;
-  background: linear-gradient(135deg, #e50914 0%, #99060d 100%);
+  background: #e50914;
   color: #ffffff;
   font-size: 0.62rem;
   font-weight: 800;
   letter-spacing: 0.06em;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.65);
+  pointer-events: none;
 }
 
-.top10-dub-badge {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  z-index: 4;
-  padding: 2px 7px;
-  border-radius: 5px;
-  background: rgba(14, 116, 144, 0.92);
-  color: #ffffff;
-  font-size: 0.63rem;
-  font-weight: 700;
-}
-
-.top10-poster-frame .poster-overlay {
-  direction: rtl;
-  z-index: 4;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 32%, rgba(6, 8, 14, 0.94) 100%) !important;
-  padding: 10px !important;
-}
-
-.poster-card.top10-showcase-card:hover,
-.poster-card.top10-showcase-card.tv-focused {
-  transform: translateY(-6px) scale(1.045) !important;
+body:not(.tv-mode) .poster-card.top10-showcase-card:hover {
+  transform: translate3d(0, -5px, 0) scale(1.03) !important;
+  border-color: #e50914 !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.85) !important;
   z-index: 18 !important;
 }
 
-.poster-card.top10-showcase-card:hover .top10-giant-rank,
-.poster-card.top10-showcase-card.tv-focused .top10-giant-rank {
-  transform: translateX(-4px) scale(1.06);
-  -webkit-text-stroke-color: #e50914;
-  text-shadow:
-    0 12px 28px rgba(0, 0, 0, 0.95),
-    0 0 28px rgba(229, 9, 20, 0.62);
+body.tv-mode .poster-card.top10-showcase-card.tv-focused,
+body.tv-mode .poster-card.top10-showcase-card:focus {
+  outline: 2px solid #ffffff !important;
+  outline-offset: 0px !important;
+  border: 1px solid #e50914 !important;
+  box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.85) !important;
+  transform: translate3d(0, -4px, 0) !important;
+  z-index: 35 !important;
 }
 
-.poster-card.top10-showcase-card:hover .top10-poster-frame,
-.poster-card.top10-showcase-card.tv-focused .top10-poster-frame {
-  border-color: #ffffff !important;
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.92), 0 0 0 2px #e50914 !important;
-}
-
-.poster-card.top10-showcase-card:hover .top10-poster-frame .poster-img,
-.poster-card.top10-showcase-card.tv-focused .top10-poster-frame .poster-img {
-  transform: scale(1.07) !important;
-}
-
-body.tv-mode .poster-card.top10-showcase-card.tv-focused {
-  outline: none !important;
-  box-shadow: none !important;
+.poster-card.top10-showcase-card:hover .top10-rank-badge,
+.poster-card.top10-showcase-card.tv-focused .top10-rank-badge {
+  background: #e50914;
+  border-color: #ffffff;
+  color: #ffffff;
 }
 
 /* Kids Hebrew-Dubbed Badge on standard poster cards */

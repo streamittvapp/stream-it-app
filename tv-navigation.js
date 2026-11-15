@@ -12,7 +12,7 @@
 (function () {
   'use strict';
 
-  var NAV_VERSION = '9.9.6';
+  var NAV_VERSION = '9.9.7';
   try {
     var pendingOtaVer = localStorage.getItem('streamit_ota_version_v9') || '';
     var pendingOtaNav = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
@@ -3484,15 +3484,11 @@
   if (!window.__streamItTvIframeFocusShieldBound) {
     window.__streamItTvIframeFocusShieldBound = true;
     window.addEventListener('blur', function () {
-      setTimeout(reclaimTvFocusFromIframe, 0);
-      setTimeout(reclaimTvFocusFromIframe, 120);
-    });
-    setInterval(function () {
       var pm = document.getElementById('playerModal');
       if (pm && !pm.classList.contains('hidden')) {
-        reclaimTvFocusFromIframe();
+        setTimeout(reclaimTvFocusFromIframe, 40);
       }
-    }, 350);
+    });
   }
 
   window.ensureStreamItBackHistoryCushion = ensureBackHistoryCushion;

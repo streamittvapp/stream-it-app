@@ -132,8 +132,8 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794694857976,
-      "subUsersUpdatedAt": 1794551843424,
+      "updatedTs": 1794725041218,
+      "subUsersUpdatedAt": 1794694857976,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
         "prof-bedroom": 1794494898603,
@@ -149,114 +149,14 @@
           "isPrimary": true,
           "parentalControl": {
             "enabled": false,
-            "actionMode": "blur_mute",
-            "profanityMode": "mute_censor",
-            "sensitivity": "balanced",
-            "categories": {
-              "sex": false,
-              "violence": false,
-              "profanity": false,
-              "drugs": false,
-              "horror": false
-            }
-          }
-        },
-        {
-          "id": "prof-1794166536010",
-          "name": "אילן",
-          "color": "#334155",
-          "isKids": false,
-          "isPrimary": false,
-          "parentalControl": {
-            "enabled": true,
             "actionMode": "skip",
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
             "categories": {
-              "sex": false,
-              "violence": false,
-              "profanity": false,
-              "drugs": false,
-              "horror": false
-            }
-          }
-        },
-        {
-          "id": "prof-1794166543582",
-          "name": "איה",
-          "color": "#3f3f46",
-          "isKids": false,
-          "isPrimary": false,
-          "parentalControl": {
-            "enabled": false,
-            "actionMode": "skip",
-            "profanityMode": "mute_censor",
-            "sensitivity": "balanced",
-            "categories": {
-              "sex": false,
-              "violence": false,
-              "profanity": false,
-              "drugs": false,
-              "horror": false
-            }
-          }
-        },
-        {
-          "id": "prof-1794166553435",
-          "name": "אלדר",
-          "color": "#475569",
-          "isKids": false,
-          "isPrimary": false,
-          "parentalControl": {
-            "enabled": false,
-            "actionMode": "skip",
-            "profanityMode": "mute_censor",
-            "sensitivity": "balanced",
-            "categories": {
-              "sex": false,
-              "violence": false,
-              "profanity": false,
-              "drugs": false,
-              "horror": false
-            }
-          }
-        },
-        {
-          "id": "prof-1794166559616",
-          "name": "שקד",
-          "color": "#52525b",
-          "isKids": false,
-          "isPrimary": false,
-          "parentalControl": {
-            "enabled": false,
-            "actionMode": "skip",
-            "profanityMode": "mute_censor",
-            "sensitivity": "balanced",
-            "categories": {
-              "sex": false,
-              "violence": false,
-              "profanity": false,
-              "drugs": false,
-              "horror": false
-            }
-          }
-        },
-        {
-          "id": "prof-1794166564722",
-          "name": "שי",
-          "color": "#64748b",
-          "isKids": false,
-          "isPrimary": false,
-          "parentalControl": {
-            "enabled": false,
-            "actionMode": "skip",
-            "profanityMode": "mute_censor",
-            "sensitivity": "balanced",
-            "categories": {
-              "sex": false,
-              "violence": false,
-              "profanity": false,
-              "drugs": false,
+              "sex": true,
+              "violence": true,
+              "profanity": true,
+              "drugs": true,
               "horror": false
             }
           }
@@ -274,239 +174,6 @@
             "tt10577736",
             "series-1413"
           ],
-          "progress": {
-            "1283515": {
-              "id": "1283515",
-              "imdbId": "tt32261958",
-              "tmdbId": "1283515",
-              "title": "תעתוע",
-              "currentTime": 3136,
-              "duration": 7256,
-              "percent": 43,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794434864507,
-              "snapshot": {
-                "id": "1283515",
-                "imdbId": "tt32261958",
-                "tmdbId": "1283515",
-                "type": "movie",
-                "title": "תעתוע",
-                "originalTitle": "Verity",
-                "year": "2026",
-                "rating": "7.0",
-                "runtimeHe": "שעתיים",
-                "ageRating": "14+",
-                "overview": "סופרת מתקשה עוברת להתגורר באחוזת קרופורד המבודדת כדי לכתוב בשמה של וריטי. לאחר שלואן מגלה מה שנראה כרשימות אוטוביוגרפיות מצמררות של וריטי, היא מתמודדת עם וידויים מטרידים ומעוותים הנוגעים לבעלה של וריטי, ג'רמי ומתקשה להבחין בין דמיון למציאות, בין מניפולציה למשיכה, ובין הזדמנות לאובססיה.",
-                "poster": "https://image.tmdb.org/t/p/w500/fhkXXgxth4IxoplvQvQZ0BSo3F4.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
-                "genres": [
-                  "mystery",
-                  "thriller"
-                ],
-                "genresHe": [
-                  "מסתורין ובלשי",
-                  "מותחנים"
-                ],
-                "seasonsCount": 0
-              }
-            },
-            "movie-1283515": {
-              "id": "movie-1283515",
-              "imdbId": "tt32261958",
-              "tmdbId": "1283515",
-              "title": "תעתוע",
-              "currentTime": 2498,
-              "duration": 7200,
-              "percent": 35,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794686149683,
-              "snapshot": {
-                "id": "movie-1283515",
-                "imdbId": "tt32261958",
-                "tmdbId": "1283515",
-                "type": "movie",
-                "title": "תעתוע",
-                "originalTitle": "Verity",
-                "year": "2026",
-                "rating": "7.0",
-                "runtimeHe": "שעתיים",
-                "ageRating": "14+",
-                "overview": "סופרת מתקשה עוברת להתגורר באחוזת קרופורד המבודדת כדי לכתוב בשמה של וריטי. לאחר שלואן מגלה מה שנראה כרשימות אוטוביוגרפיות מצמררות של וריטי, היא מתמודדת עם וידויים מטרידים ומעוותים הנוגעים לבעלה של וריטי, ג'רמי ומתקשה להבחין בין דמיון למציאות, בין מניפולציה למשיכה, ובין הזדמנות לאובססיה.",
-                "poster": "https://image.tmdb.org/t/p/w500/fhkXXgxth4IxoplvQvQZ0BSo3F4.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
-                "genres": [
-                  "mystery",
-                  "thriller"
-                ],
-                "genresHe": [
-                  "מסתורין ובלשי",
-                  "מותחנים"
-                ],
-                "seasonsCount": 0
-              }
-            },
-            "tt15398776": {
-              "id": "tt15398776",
-              "imdbId": "tt15398776",
-              "tmdbId": "872585",
-              "title": "אופנהיימר",
-              "currentTime": 420,
-              "duration": 10786,
-              "percent": 4,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794691488145,
-              "snapshot": {
-                "id": "tt15398776",
-                "imdbId": "tt15398776",
-                "tmdbId": "872585",
-                "type": "movie",
-                "title": "אופנהיימר",
-                "originalTitle": "Oppenheimer",
-                "year": "2023",
-                "rating": "8.9",
-                "runtimeHe": "3 שעות ו-00 דק'",
-                "ageRating": "16+",
-                "overview": "סיפורו המטלטל של הפיזיקאי האמריקאי ג'יי רוברט אופנהיימר ותפקידו המרכזי בפרויקט מנהטן הסודי לפיתוח הפצצה האטומית הראשונה במלחמת העולם השנייה.",
-                "poster": "https://images.metahub.space/poster/medium/tt15398776/img",
-                "backdrop": "https://images.metahub.space/background/medium/tt15398776/img",
-                "cardBackdrop": "https://images.metahub.space/background/medium/tt15398776/img",
-                "genres": [
-                  "drama",
-                  "docu"
-                ],
-                "genresHe": [
-                  "דרמה",
-                  "ביוגרפיה והיסטוריה"
-                ],
-                "seasonsCount": 0
-              }
-            },
-            "tt11280740": {
-              "id": "tt11280740",
-              "imdbId": "tt11280740",
-              "tmdbId": "95396",
-              "title": "ניתוק",
-              "currentTime": 1165,
-              "duration": 3434,
-              "percent": 34,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794693125347,
-              "snapshot": {
-                "id": "tt11280740",
-                "imdbId": "tt11280740",
-                "tmdbId": "95396",
-                "type": "series",
-                "title": "ניתוק",
-                "originalTitle": "Severance",
-                "year": "2022",
-                "rating": "8.7",
-                "runtimeHe": "2 עונות • 19 פרקים",
-                "ageRating": "16+",
-                "overview": "מארק מוביל צוות עובדים בתאגיד 'לומון' שעברו הליך כירורגי המפריד באופן מוחלט בין זיכרונות העבודה שלהם לבין זיכרונות החיים האישיים שמחוץ למשרד.",
-                "poster": "https://images.metahub.space/poster/medium/tt11280740/img",
-                "backdrop": "https://images.metahub.space/background/medium/tt11280740/img",
-                "cardBackdrop": "https://images.metahub.space/background/medium/tt11280740/img",
-                "genres": [
-                  "scifi",
-                  "drama",
-                  "crime",
-                  "thriller",
-                  "telegram"
-                ],
-                "genresHe": [
-                  "מדע בדיוני",
-                  "דרמה ומתח",
-                  "מסתורין"
-                ],
-                "seasonsCount": 2
-              }
-            },
-            "tt10577736": {
-              "id": "tt10577736",
-              "imdbId": "tt10577736",
-              "tmdbId": "103913",
-              "title": "טהרן",
-              "currentTime": 10,
-              "duration": 3013,
-              "percent": 3,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794694665409,
-              "snapshot": {
-                "id": "tt10577736",
-                "imdbId": "tt10577736",
-                "tmdbId": "103913",
-                "type": "series",
-                "title": "טהרן",
-                "originalTitle": "Tehran",
-                "year": "2020",
-                "rating": "7.6",
-                "runtimeHe": "3 עונות • 24 פרקים",
-                "ageRating": "16+",
-                "overview": "תמר רביניאן, האקרית ולוחמת סייבר צעירה במוסד, מוחדרת בזהות בדויה לבירת איראן למשימה מסוכנת של השבתת מערכות המכ\"ם.",
-                "poster": "https://images.metahub.space/poster/medium/tt10577736/img",
-                "backdrop": "https://images.metahub.space/background/medium/tt10577736/img",
-                "cardBackdrop": "https://images.metahub.space/background/medium/tt10577736/img",
-                "genres": [
-                  "israeli",
-                  "drama",
-                  "action",
-                  "telegram"
-                ],
-                "genresHe": [
-                  "יצירה ישראלית",
-                  "מתח וריגול",
-                  "דרמה"
-                ],
-                "seasonsCount": 3
-              }
-            },
-            "movie-293660": {
-              "id": "movie-293660",
-              "imdbId": "tt1431045",
-              "tmdbId": "293660",
-              "title": "דדפול",
-              "currentTime": 1959,
-              "duration": 6486,
-              "percent": 30,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794694857976,
-              "snapshot": {
-                "id": "movie-293660",
-                "imdbId": "tt1431045",
-                "tmdbId": "293660",
-                "type": "movie",
-                "title": "דדפול",
-                "originalTitle": "Deadpool",
-                "year": "2016",
-                "rating": "7.6",
-                "runtimeHe": "שעתיים",
-                "ageRating": "12+",
-                "overview": "איש קומנדו לשעבר הופך ללוחם חסר מעצורים, לאחר שניסוי העניק לו כוחות על. חמוש בחרבות ובלשון עוקצנית, הוא יוצא למסע נקמה באדם שהרס את פניו.",
-                "poster": "https://image.tmdb.org/t/p/w500/fJk1kspZ1Xo3R8sl7NhFziXudqt.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/rFj9IKlL75B2pXhZA60jkNWvxeW.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/rFj9IKlL75B2pXhZA60jkNWvxeW.jpg",
-                "genres": [
-                  "action",
-                  "comedy",
-                  "tpb"
-                ],
-                "genresHe": [
-                  "אקשן והרפתקאות",
-                  "קומדיה",
-                  "PirateBay & YTS 4K"
-                ],
-                "seasonsCount": 0
-              }
-            }
-          },
           "watchlistSnapshots": {
             "tt10577736": {
               "id": "tt10577736",
@@ -650,15 +317,172 @@
             }
           },
           "watchlistUpdatedAt": 1794685001388,
+          "progress": {
+            "1283515": {
+              "id": "1283515",
+              "imdbId": "tt32261958",
+              "tmdbId": "1283515",
+              "title": "תעתוע",
+              "currentTime": 3136,
+              "duration": 7256,
+              "percent": 43,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794434864507,
+              "snapshot": {
+                "id": "1283515",
+                "imdbId": "tt32261958",
+                "tmdbId": "1283515",
+                "type": "movie",
+                "title": "תעתוע",
+                "originalTitle": "Verity",
+                "year": "2026",
+                "rating": "7.0",
+                "runtimeHe": "שעתיים",
+                "ageRating": "14+",
+                "overview": "סופרת מתקשה עוברת להתגורר באחוזת קרופורד המבודדת כדי לכתוב בשמה של וריטי. לאחר שלואן מגלה מה שנראה כרשימות אוטוביוגרפיות מצמררות של וריטי, היא מתמודדת עם וידויים מטרידים ומעוותים הנוגעים לבעלה של וריטי, ג'רמי ומתקשה להבחין בין דמיון למציאות, בין מניפולציה למשיכה, ובין הזדמנות לאובססיה.",
+                "poster": "https://image.tmdb.org/t/p/w500/fhkXXgxth4IxoplvQvQZ0BSo3F4.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
+                "genres": [
+                  "mystery",
+                  "thriller"
+                ],
+                "genresHe": [
+                  "מסתורין ובלשי",
+                  "מותחנים"
+                ],
+                "seasonsCount": 0
+              }
+            },
+            "movie-1283515": {
+              "id": "movie-1283515",
+              "imdbId": "tt32261958",
+              "tmdbId": "1283515",
+              "title": "תעתוע",
+              "currentTime": 3000,
+              "duration": 6668,
+              "percent": 45,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794725041218,
+              "snapshot": {
+                "id": "movie-1283515",
+                "imdbId": "tt32261958",
+                "tmdbId": "1283515",
+                "type": "movie",
+                "title": "תעתוע",
+                "originalTitle": "Verity",
+                "year": "2026",
+                "rating": "7.0",
+                "runtimeHe": "שעתיים",
+                "ageRating": "14+",
+                "overview": "סופרת מתקשה עוברת להתגורר באחוזת קרופורד המבודדת כדי לכתוב בשמה של וריטי. לאחר שלואן מגלה מה שנראה כרשימות אוטוביוגרפיות מצמררות של וריטי, היא מתמודדת עם וידויים מטרידים ומעוותים הנוגעים לבעלה של וריטי, ג'רמי ומתקשה להבחין בין דמיון למציאות, בין מניפולציה למשיכה, ובין הזדמנות לאובססיה.",
+                "poster": "https://image.tmdb.org/t/p/w500/fhkXXgxth4IxoplvQvQZ0BSo3F4.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/cKetrF2dAnQ0AMV5i4BMOs41I5P.jpg",
+                "genres": [
+                  "mystery",
+                  "thriller"
+                ],
+                "genresHe": [
+                  "מסתורין ובלשי",
+                  "מותחנים"
+                ],
+                "seasonsCount": 0
+              }
+            },
+            "tt15398776": {
+              "id": "tt15398776",
+              "imdbId": "tt15398776",
+              "tmdbId": "872585",
+              "title": "אופנהיימר",
+              "currentTime": 420,
+              "duration": 10786,
+              "percent": 4,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794691488145,
+              "snapshot": {
+                "id": "tt15398776",
+                "imdbId": "tt15398776",
+                "tmdbId": "872585",
+                "type": "movie",
+                "title": "אופנהיימר",
+                "originalTitle": "Oppenheimer",
+                "year": "2023",
+                "rating": "8.9",
+                "runtimeHe": "3 שעות ו-00 דק'",
+                "ageRating": "16+",
+                "overview": "סיפורו המטלטל של הפיזיקאי האמריקאי ג'יי רוברט אופנהיימר ותפקידו המרכזי בפרויקט מנהטן הסודי לפיתוח הפצצה האטומית הראשונה במלחמת העולם השנייה.",
+                "poster": "https://images.metahub.space/poster/medium/tt15398776/img",
+                "backdrop": "https://images.metahub.space/background/medium/tt15398776/img",
+                "cardBackdrop": "https://images.metahub.space/background/medium/tt15398776/img",
+                "genres": [
+                  "drama",
+                  "docu"
+                ],
+                "genresHe": [
+                  "דרמה",
+                  "ביוגרפיה והיסטוריה"
+                ],
+                "seasonsCount": 0
+              }
+            },
+            "movie-1011985": {
+              "id": "movie-1011985",
+              "imdbId": "tt21692408",
+              "tmdbId": "1011985",
+              "title": "קונג פו פנדה 4 (מדובב לעברית)",
+              "currentTime": 1221,
+              "duration": 5617,
+              "percent": 22,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794722284673,
+              "snapshot": {
+                "id": "movie-1011985",
+                "imdbId": "tt21692408",
+                "tmdbId": "1011985",
+                "type": "movie",
+                "title": "קונג פו פנדה 4 (מדובב לעברית)",
+                "originalTitle": "Kung Fu Panda 4",
+                "year": "2024",
+                "rating": "7.1",
+                "runtimeHe": "",
+                "ageRating": "כל הגילאים",
+                "overview": "פו לוחם הדרקון יוצא להרפתקה חדשה ומצחיקה לחיפוש יורש רוחני לעמק השלום מול הזיקית המשנה צורה — בדיבוב עברי.",
+                "poster": "https://image.tmdb.org/t/p/w500/kDp1vUBnMpe8ak4rjgl3cLELqjU.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/1XDDXPXGiI8id7MrUxK36ke7gkX.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w1280/1XDDXPXGiI8id7MrUxK36ke7gkX.jpg",
+                "genres": [
+                  "animation",
+                  "hebrew_dub",
+                  "action",
+                  "comedy"
+                ],
+                "genresHe": [
+                  "מדובב לעברית 🇮🇱",
+                  "אנימציה ואקשן"
+                ],
+                "seasonsCount": 0
+              }
+            }
+          },
           "deletedProgressIds": {
             "27": 1794432189831,
             "278": 1794686259883,
             "1396": 1794686263135,
             "1413": 1794686264301,
             "10580": 1794432196249,
-            "103913": 1794432225027,
+            "69557": 1794698934882,
+            "95396": 1794698940923,
+            "103913": 1794698937513,
+            "293660": 1794698940065,
+            "301528": 1794698933987,
             "533535": 1794686262083,
             "693134": 1794686261114,
+            "1236045": 1794698939147,
             "1283515": 1794432225027,
             "1339713": 1794432202875,
             "1381078": 1794432225027,
@@ -677,13 +501,13 @@
             "tt43612870": 1794432217226,
             "movie-1568027": 1794432217226,
             "series-1568027": 1794432217226,
-            "tt4565380": 1794432225027,
+            "tt4565380": 1794698934882,
             "tt8190688": 1794432225027,
             "tt1745960": 1794432225027,
             "tt6263850": 1794686262083,
-            "tt10577736": 1794432225027,
-            "movie-103913": 1794432225027,
-            "series-103913": 1794432225027,
+            "tt10577736": 1794698937513,
+            "movie-103913": 1794698937513,
+            "series-103913": 1794698937513,
             "movie-1560520": 1794686257036,
             "tt32333324": 1794686257036,
             "series-1560520": 1794686257036,
@@ -700,44 +524,60 @@
             "series-1396": 1794686263135,
             "series-1413": 1794686264301,
             "tt1844624": 1794686264301,
-            "movie-1413": 1794686264301
+            "movie-1413": 1794686264301,
+            "movie-301528": 1794698933987,
+            "tt1979376": 1794698933987,
+            "series-301528": 1794698933987,
+            "movie-69557": 1794698934882,
+            "series-69557": 1794698934882,
+            "movie-1236045": 1794698939147,
+            "tt31049299": 1794698939147,
+            "series-1236045": 1794698939147,
+            "movie-293660": 1794698940065,
+            "tt1431045": 1794698940065,
+            "series-293660": 1794698940065,
+            "tt11280740": 1794698940923,
+            "movie-95396": 1794698940923,
+            "series-95396": 1794698940923
           },
           "progressClearedAt": 1794432225027
         },
         "prof-1794166536010": {
           "watchlist": [],
-          "progress": {},
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
+          "progress": {},
           "deletedProgressIds": {},
           "progressClearedAt": 0
         },
         "prof-1794166543582": {
           "watchlist": [],
-          "progress": {},
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
+          "progress": {},
           "deletedProgressIds": {},
           "progressClearedAt": 0
         },
         "prof-1794166553435": {
           "watchlist": [],
-          "progress": {},
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
+          "progress": {},
           "deletedProgressIds": {},
           "progressClearedAt": 0
         },
         "prof-1794166559616": {
           "watchlist": [],
-          "progress": {},
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
+          "progress": {},
           "deletedProgressIds": {},
           "progressClearedAt": 0
         },
         "prof-1794166564722": {
           "watchlist": [],
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0,
           "progress": {
             "27": {
               "id": "27",
@@ -899,8 +739,6 @@
               }
             }
           },
-          "watchlistSnapshots": {},
-          "watchlistUpdatedAt": 0,
           "deletedProgressIds": {},
           "progressClearedAt": 0
         }
@@ -919,11 +757,13 @@
         }
       },
       "subPrefs": {
-        "size": "large",
-        "fontPx": 32,
+        "schemaVer": 2,
+        "updatedAt": 1794699365696,
+        "size": "normal",
+        "fontPx": 25,
         "color": "white",
         "bg": "none",
-        "bottomPct": 6.5
+        "bottomPct": 7.5
       }
     }
   },
