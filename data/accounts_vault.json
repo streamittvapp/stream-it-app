@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794726353834,
+      "updatedTs": 1794726373794,
       "subUsersUpdatedAt": 1794694857976,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -473,12 +473,12 @@
               "imdbId": "tt0816692",
               "tmdbId": "157336",
               "title": "בין כוכבים",
-              "currentTime": 3960,
+              "currentTime": 3980,
               "duration": 10144,
               "percent": 39,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794726353834,
+              "updatedAt": 1794726373794,
               "snapshot": {
                 "id": "tt0816692",
                 "imdbId": "tt0816692",
