@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794731391181,
+      "updatedTs": 1794732654437,
       "subUsersUpdatedAt": 1794694857976,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -430,6 +430,43 @@
                   "מדע בדיוני",
                   "דרמה",
                   "הרפתקאות"
+                ],
+                "seasonsCount": 0
+              }
+            },
+            "movie-1290417": {
+              "id": "movie-1290417",
+              "imdbId": "tt32362890",
+              "tmdbId": "1290417",
+              "title": "הפלישה",
+              "currentTime": 334,
+              "duration": 5168,
+              "percent": 6,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794732654437,
+              "snapshot": {
+                "id": "movie-1290417",
+                "imdbId": "tt32362890",
+                "tmdbId": "1290417",
+                "type": "movie",
+                "title": "הפלישה",
+                "originalTitle": "Thrash",
+                "year": "2026",
+                "rating": "6.1",
+                "runtimeHe": "שעתיים",
+                "ageRating": "16+",
+                "overview": "סופת הוריקן אימתנית מכה בעיירת חוף, והתושבים הלכודים נאלצים להילחם על חייהם אל מול מפלס המים שהולך ועולה – והכרישים הרעבים שפולשים לעיירה.",
+                "poster": "https://image.tmdb.org/t/p/w500/oj6nz6vQ71RLP2lkY3ZMbxWQqJW.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/jlkvoHXKQHsgf15wp1AV1CTk4e7.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/jlkvoHXKQHsgf15wp1AV1CTk4e7.jpg",
+                "genres": [
+                  "thriller",
+                  "horror"
+                ],
+                "genresHe": [
+                  "מותחנים",
+                  "אימה"
                 ],
                 "seasonsCount": 0
               }
