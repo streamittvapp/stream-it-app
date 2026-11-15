@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794774698606,
+      "updatedTs": 1794774751757,
       "subUsersUpdatedAt": 1794774698606,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -307,6 +307,47 @@
                   "דרמה"
                 ],
                 "seasonsCount": 0
+              }
+            },
+            "series-1399": {
+              "id": "series-1399",
+              "imdbId": "tt0944947",
+              "tmdbId": "1399",
+              "title": "משחקי הכס",
+              "currentTime": 74,
+              "duration": 3697,
+              "percent": 3,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794774751757,
+              "snapshot": {
+                "id": "series-1399",
+                "imdbId": "tt0944947",
+                "tmdbId": "1399",
+                "type": "series",
+                "title": "משחקי הכס",
+                "originalTitle": "Game of Thrones",
+                "year": "2011",
+                "rating": "8.5",
+                "runtimeHe": "45 דק׳ לפרק",
+                "ageRating": "14+",
+                "overview": "הקיץ נמשך על פני עשורים, החורף יכול להימשך דור והמאבק על כס הברזל החל. הוא ישתרע מן הדרום, בו החום מוליד מזימות, תאוות וקנוניות; אל אדמות המזרח הנרחבות והפראיות; כל הדרך אל הצפון הקפוא, שם חומת קרח אדירה מגנה על הממלכה מפני כוחות האופל השוכנים מצדה השני. מלכים ומלכות, אבירים ופורעי חוק, שקרנים, אדונים ואנשים ישרים. עולם בו מתבשלות קנוניות בצורת ניסיונות רצח ומגעים אסורים.",
+                "poster": "https://image.tmdb.org/t/p/w500/7f98ZRtsSByqbI4aUlyrWbfTsxx.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/zZqpAXxVSBtxV9qPBcscfXBcL2w.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/zZqpAXxVSBtxV9qPBcscfXBcL2w.jpg",
+                "genres": [
+                  "scifi",
+                  "drama",
+                  "action",
+                  "hbo"
+                ],
+                "genresHe": [
+                  "מדע בדיוני ופנטזיה",
+                  "דרמה",
+                  "אקשן והרפתקאות",
+                  "HBO / Max"
+                ],
+                "seasonsCount": 8
               }
             }
           },
@@ -548,12 +589,12 @@
             "movie-550": 1794772327539,
             "tt0137523": 1794772327539,
             "series-550": 1794772327539,
-            "series-1399": 1794772333743,
-            "tt0944947": 1794772333743,
-            "movie-1399": 1794772333743,
             "tt17526714": 1794772609370,
             "movie-933260": 1794772609370,
-            "series-933260": 1794772609370
+            "series-933260": 1794772609370,
+            "series-1399": 1794772333743,
+            "tt0944947": 1794772333743,
+            "movie-1399": 1794772333743
           },
           "progressClearedAt": 1794432225027
         },
