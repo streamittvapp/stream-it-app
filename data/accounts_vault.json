@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794778563502,
+      "updatedTs": 1794778645477,
       "subUsersUpdatedAt": 1794778521326,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -402,6 +402,45 @@
                   "רומנטיקה",
                   "קומדיה",
                   "יצירה ישראלית"
+                ],
+                "seasonsCount": 0
+              }
+            },
+            "movie-2251": {
+              "id": "movie-2251",
+              "imdbId": "tt0250797",
+              "tmdbId": "2251",
+              "title": "בוגדת",
+              "currentTime": 1485,
+              "duration": 7374,
+              "percent": 20,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1794778645477,
+              "snapshot": {
+                "id": "movie-2251",
+                "imdbId": "tt0250797",
+                "tmdbId": "2251",
+                "type": "movie",
+                "title": "בוגדת",
+                "originalTitle": "Unfaithful",
+                "year": "2002",
+                "rating": "6.7",
+                "runtimeHe": "שעתיים",
+                "ageRating": "12+",
+                "overview": "אדוארד וקוני סאמר הם זוג מאושר הנהנה מנישואין נהדרים וחי בשלווה את החלום האמריקאי. יש להם ילד בן 8, כלב וסוכנת בית ויחד הם חולקים חיים מעוררי קינאה באחד מפרברי העיר ניו יורק. אבל החיים לא עוברים בשקט: הזוג המאושר הזה שחייו נוגעים בשגרת השפע, נופל קורבן לאיש זר, כאשר קוני נתקלת בו לגמרי במקרה, באחד מרחובות הסוהו, מפגש שתוקף אותה עם מסתורין, ספונטניות, קסם וסיכון. וכך היא מוצאת את עצמה נסחפת אל תוך פרשה שתהפוך לאובססיה שלה.",
+                "poster": "https://image.tmdb.org/t/p/w500/k8qn3o8AomSJd91HPpxQrw1KYN3.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/egVj5Y9f79xPnyAQJmeDR0Uwow3.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/egVj5Y9f79xPnyAQJmeDR0Uwow3.jpg",
+                "genres": [
+                  "thriller",
+                  "drama",
+                  "romance"
+                ],
+                "genresHe": [
+                  "מותחנים",
+                  "דרמה",
+                  "רומנטיקה"
                 ],
                 "seasonsCount": 0
               }
