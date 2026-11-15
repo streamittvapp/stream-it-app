@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.9.92';
+  var APP_VERSION = '9.9.93';
 
   function ensureOtaStylesheetInjected() {
     try {
@@ -73,8 +73,10 @@
     window.__STREAMIT_V998_BOOTED ||
     window.__STREAMIT_V999_BOOTED ||
     window.__STREAMIT_V9991_BOOTED ||
-    window.__STREAMIT_V9992_BOOTED
+    window.__STREAMIT_V9992_BOOTED ||
+    window.__STREAMIT_V9993_BOOTED
   );
+  window.__STREAMIT_V9993_BOOTED = true;
   window.__STREAMIT_V9992_BOOTED = true;
   window.__STREAMIT_V9991_BOOTED = true;
   window.__STREAMIT_V999_BOOTED = true;
@@ -119,7 +121,8 @@
   window.__STREAMIT_V968_BOOTED = true;
   window.__STREAMIT_V969_BOOTED = true;
   window.__STREAMIT_V970_BOOTED = true;
-  // Synchronously block any older bundled v9.7.0-v9.9.91 script from firing its DOMContentLoaded boot handler after OTA loads!
+  // Synchronously block any older bundled v9.7.0-v9.9.92 script from firing its DOMContentLoaded boot handler after OTA loads!
+  window.__STREAMIT_V9992_BOOT_DONE = true;
   window.__STREAMIT_V9991_BOOT_DONE = true;
   window.__STREAMIT_V999_BOOT_DONE = true;
   window.__STREAMIT_V998_BOOT_DONE = true;
@@ -2851,6 +2854,21 @@
     '5': ['iL686rbf82M', 'UKww1xabTNQ', 'ihH9gucGRS4', 'OWUaTKTQ-bo', 'hqyK0VQVsPQ', '9m-aRG2DHYk', 'KMR00mcwuHw', 'Pqp5r24VXHI', 'YvxVA7sxdks', 'Np6j5oLwLts', 'f_DGjoiaGVM', '3Pn6rOarD9w', 'sV_prJK6TV4', 'woGDLM3Tdr0', '4eJGg635cGs', 'BWZ9_y3ldK4', 'dB9KFZWOmhw', 'erfGJAvedjg', 'Ssy21RjZjyg', 'FfaGNnDC3fY', 'Gpl22YoFpk0', 'r3ny3GjuvZM', '7lsWf4zhLyI']
   };
 
+  // Verified Original Hebrew Full-Length YouTube Map for Israeli series/movies that are domestic-only or dubbed on foreign servers
+  var ISRAELI_FULL_YT_MAP = {
+    '97177': { directYtId: 'xcXpKgjBxVE', episodes: KUPA_RASHIT_YT_EPISODES },
+    '107013': { directYtId: 'FLZ0vJvNirM', episodes: { '1': ['FLZ0vJvNirM', 'BUSdM6Blxzc', 'qORM-J0PAgk'], '2': ['FLZ0vJvNirM', 'BUSdM6Blxzc'], '3': ['FLZ0vJvNirM', 'BUSdM6Blxzc'] } },
+    '56017': { directYtId: 'nqzifO3Cask', episodes: { '1': ['nqzifO3Cask', 'b_3R8kj3MCo'], '2': ['nqzifO3Cask', 'b_3R8kj3MCo'], '3': ['AfA0kyQ1zlM', 'nqzifO3Cask'] } },
+    '51157': { directYtId: 'O88eo4pZj9E', episodes: { '1': ['O88eo4pZj9E', 'F_RaNmwNr80'], '2': ['O88eo4pZj9E', 'F_RaNmwNr80'] } },
+    '27604': { directYtId: '-6tWrj2f9ZA', episodes: { '1': ['-6tWrj2f9ZA', 'RaW0qcBSjqE'], '2': ['-6tWrj2f9ZA'], '3': ['-6tWrj2f9ZA'], '4': ['-6tWrj2f9ZA'] } },
+    '111150': { directYtId: 'keRQsy-rWxI', episodes: { '1': ['keRQsy-rWxI', '35Fwt2tHfm0'] } },
+    '64708': { directYtId: 'd-0i8nfQFEI', episodes: { '1': ['d-0i8nfQFEI', 'CnihyXFQUbA'], '2': ['d-0i8nfQFEI'] } },
+    '10580': { directYtId: 'RKrQhzn89wo' },
+    '10581': { directYtId: 'RKrQhzn89wo' },
+    '10582': { directYtId: 'RKrQhzn89wo' },
+    '10583': { directYtId: 'RKrQhzn89wo' }
+  };
+
   /**
    * Item Normalization (Supports `data/hebrew_catalog.json`, TMDB API, Cinemeta, YTS, PirateBay & Telegram)
    */
@@ -2874,7 +2892,7 @@
     var heTitle = String(ISRAELI_TITLES[tmdbId] || rawTitleHe).trim();
     var origTitle = String(raw.title_en || raw.title_english || raw.originalTitle || raw.original_title || raw.original_name || '').trim();
 
-    // Auto-heal any cached/legacy metadata for "קופה ראשית" (TMDB 97177) and "הבורר" (TMDB 27604)
+    // Auto-heal any cached/legacy metadata for "קופה ראשית" (TMDB 97177), "הבורר" (TMDB 27604), and Israeli Full YouTube map
     if (type === 'series' && (tmdbId === '97177' || heTitle === 'קופה ראשית')) {
       tmdbId = '97177';
       imdbId = 'tt8796226';
@@ -2901,9 +2919,18 @@
       if (!raw.backdrop || String(raw.backdrop).indexOf('tt1339634') !== -1) {
         raw.backdrop = 'https://image.tmdb.org/t/p/w1280/nM641NJZ7YgkCT6DVKVFtIW7lJS.jpg';
       }
-      if (raw.direct_yt_id === 'r6Z8y3M5X0k') raw.direct_yt_id = '';
-      if (!raw.trailer_yt_id || raw.trailer_yt_id === 'r6Z8y3M5X0k') raw.trailer_yt_id = '-6tWrj2f9ZA';
+      raw.direct_yt_id = '-6tWrj2f9ZA';
+      raw.trailer_yt_id = '-6tWrj2f9ZA';
+      raw.yt_episodes_by_season = ISRAELI_FULL_YT_MAP['27604'].episodes;
       if (!raw.total_seasons) raw.total_seasons = 4;
+    } else if (tmdbId && ISRAELI_FULL_YT_MAP[tmdbId]) {
+      var ilYtEntry = ISRAELI_FULL_YT_MAP[tmdbId];
+      if (ilYtEntry.directYtId && !raw.direct_yt_id && !raw.directYtId) {
+        raw.direct_yt_id = ilYtEntry.directYtId;
+      }
+      if (ilYtEntry.episodes && !raw.yt_episodes_by_season && !raw.ytEpisodesBySeason) {
+        raw.yt_episodes_by_season = ilYtEntry.episodes;
+      }
     }
 
     // Strict Readiness Check #1: Reject items with missing, placeholder, or raw Telegram/torrent spam titles,
@@ -2981,11 +3008,14 @@
     }
     if (!year) year = type === 'channel' ? 'LIVE' : '2025';
 
-    // Strict Readiness Check #1b: Reject ONLY unreleased 0-vote theatrical stubs (e.g. TMDB 1568027 "קופה ראשית: הסרט", Avengers Doomsday, Sunrise on the Reaping)
-    // Never reject released 2026 titles (such as "תעתוע" / Verity TMDB 1283515) or Israeli/Viva titles!
+    // Strict Readiness Check #1b: Reject ONLY unreleased 0-vote theatrical stubs & unstreamable 0-vote domestic game-show/sketch stubs
+    // Never reject released 2026 titles (such as "תעתוע" / Verity TMDB 1283515) or verified Israeli/Viva titles!
     var hasDirectCustomStream = Boolean(raw.stream_url || raw.streamUrl || raw.hls_url || raw.directUrl || raw.direct_yt_id || raw.directYtId || raw.videoId);
     if (type !== 'channel' && type !== 'youtube' && !hasDirectCustomStream && !isYtsItem && !isTelegramItem) {
-      if (tmdbId === '1568027' || tmdbId === '851725' || tmdbId === '1003596' || tmdbId === '1336368') {
+      if (
+        tmdbId === '1568027' || tmdbId === '851725' || tmdbId === '1003596' || tmdbId === '1336368' ||
+        tmdbId === '288673' || tmdbId === '279667' || tmdbId === '287709' || tmdbId === '272521'
+      ) {
         return null;
       }
       if (raw.vote_count !== undefined && Number(raw.vote_count) === 0 && Number(year) >= 2026) {
@@ -3491,7 +3521,8 @@
       localStorage.removeItem('streamit_enriched_catalog_cache_v987');
       localStorage.removeItem('streamit_enriched_catalog_cache_v991');
       localStorage.removeItem('streamit_enriched_catalog_cache_v998');
-      var cachedRaw = localStorage.getItem('streamit_enriched_catalog_cache_v9991');
+      localStorage.removeItem('streamit_enriched_catalog_cache_v9991');
+      var cachedRaw = localStorage.getItem('streamit_enriched_catalog_cache_v9993');
       if (cachedRaw) {
         var cachedObj = JSON.parse(cachedRaw);
         var heRe = /[\u0590-\u05FF]/;
@@ -3580,8 +3611,8 @@
       { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_networks=49|3186&page=1', type: 'series', genre: 'hbo' },
       { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_networks=2552&page=1', type: 'series', genre: 'apple' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_genres=28&page=1', type: 'movie', genre: 'action' },
-      { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_original_language=he&page=1', type: 'movie', genre: 'israeli' },
-      { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_original_language=he&page=1', type: 'series', genre: 'israeli' },
+      { url: '/discover/movie?language=he-IL&sort_by=vote_count.desc&vote_count.gte=20&with_original_language=he&page=1', type: 'movie', genre: 'israeli' },
+      { url: '/discover/tv?language=he-IL&sort_by=vote_count.desc&vote_count.gte=15&with_original_language=he&page=1', type: 'series', genre: 'israeli' },
       { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_original_language=tr&page=1', type: 'series', genre: 'viva' },
       { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_original_language=es&with_genres=18|10766&page=1', type: 'series', genre: 'viva' },
       { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_original_language=he&with_genres=10762|16|10751&page=1', type: 'series', genre: 'hebrew_dub' },
@@ -3628,8 +3659,8 @@
       { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_genres=9648&page=1', type: 'series', genre: 'horror' },
       { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_networks=2552&with_genres=9648|10765&page=1', type: 'series', genre: 'horror' },
       { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_networks=213&with_genres=9648|10765&page=1', type: 'series', genre: 'horror' },
-      { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_original_language=he&page=2', type: 'movie', genre: 'israeli' },
-      { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_original_language=he&page=2', type: 'series', genre: 'israeli' },
+      { url: '/discover/movie?language=he-IL&sort_by=vote_count.desc&vote_count.gte=10&with_original_language=he&page=2', type: 'movie', genre: 'israeli' },
+      { url: '/discover/tv?language=he-IL&sort_by=vote_count.desc&vote_count.gte=8&with_original_language=he&page=2', type: 'series', genre: 'israeli' },
       { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_original_language=tr&page=2', type: 'series', genre: 'viva' },
       { url: '/discover/movie?language=he-IL&sort_by=popularity.desc&with_original_language=tr&page=1', type: 'movie', genre: 'viva' },
       { url: '/discover/tv?language=he-IL&sort_by=popularity.desc&with_original_language=es&with_genres=18|10766&page=2', type: 'series', genre: 'viva' }
@@ -3642,7 +3673,8 @@
           localStorage.removeItem('streamit_enriched_catalog_cache_v986');
           localStorage.removeItem('streamit_enriched_catalog_cache_v991');
           localStorage.removeItem('streamit_enriched_catalog_cache_v998');
-          localStorage.setItem('streamit_enriched_catalog_cache_v9991', JSON.stringify({
+          localStorage.removeItem('streamit_enriched_catalog_cache_v9991');
+          localStorage.setItem('streamit_enriched_catalog_cache_v9993', JSON.stringify({
             ts: Date.now(),
             movies: (state.catalog.movies || []).slice(0, isTvCache ? 140 : 280),
             series: (state.catalog.series || []).slice(0, isTvCache ? 90 : 180)
@@ -8607,8 +8639,13 @@
     // 4. Load Real Verified Hebrew Subtitles in Parallel!
     loadHebrewSubtitlesForItem(item, imdbId, state.activeSeason, state.activeEpisode);
 
-    // 4b. Direct Official YouTube Episode/Movie Broadcast (for Israeli series with official Kan 11 / HOT YouTube streams)
-    if (item.directYtId && (state.activeSourceTab === 'direct' || state.activeSourceTab === 'embed1')) {
+    // 4b. Direct Official YouTube Episode/Movie Broadcast (for Israeli series/classics with official Kan 11 / HOT / Full Hebrew YouTube streams)
+    var ilYtFallbackEntry = item.tmdbId ? ISRAELI_FULL_YT_MAP[String(item.tmdbId)] : null;
+    if (ilYtFallbackEntry) {
+      if (ilYtFallbackEntry.directYtId && !item.directYtId) item.directYtId = ilYtFallbackEntry.directYtId;
+      if (ilYtFallbackEntry.episodes && !item.ytEpisodesBySeason) item.ytEpisodesBySeason = ilYtFallbackEntry.episodes;
+    }
+    if ((item.directYtId || item.ytEpisodesBySeason) && (state.activeSourceTab === 'direct' || state.activeSourceTab === 'embed1')) {
       await playYoutubeVideoOrTrailer(item, mySessionId);
       return;
     }
@@ -8630,14 +8667,22 @@
       return;
     }
 
-    // 7. Try Native 1080p Direct HLS Stream (Plyr.io + HLS.js) — always probe/resolve on Desktop & Streamer
-    var resolvedM3u8 = await resolveDirect1080pHlsUrl(item, imdbId, state.activeSeason, state.activeEpisode);
+    // 7. Try Native 1080p Direct DASH/HLS Stream (Plyr.io + dash.js + HLS.js) — always probe/resolve on Desktop & Streamer
+    var resolvedStream = await resolveDirect1080pHlsUrl(item, imdbId, state.activeSeason, state.activeEpisode);
     if (!isPlaybackSessionActive(mySessionId)) {
       stopCurrentMedia();
       return;
     }
-    if (resolvedM3u8) {
-      playDirectHlsOrMp4(resolvedM3u8, startOffsetSec, null, mySessionId);
+    if (resolvedStream) {
+      playDirectHlsOrMp4(resolvedStream, startOffsetSec, null, mySessionId);
+      return;
+    }
+
+    // 7b. Anti-Dub Protection for Israeli Originals: if no verified original Hebrew stream was found on p9fx/w7dn,
+    // route to full-length Hebrew YouTube search instead of falling back to foreign-dubbed international mirrors!
+    var isIsraeliOriginal = Boolean(item.isIsraeli || String(item.originalLanguage || '').toLowerCase() === 'he');
+    if (isIsraeliOriginal) {
+      await playYoutubeVideoOrTrailer(item, mySessionId);
       return;
     }
 
@@ -8713,9 +8758,12 @@
 
     if (!ytId && hasLocalBackend()) {
       try {
+        var isIlSearch = Boolean(item.isIsraeli || String(item.originalLanguage || '').toLowerCase() === 'he');
         var q = (item.type === 'series' && state.activeSourceTab !== 'trailer')
-          ? ((item.title || item.originalTitle || '') + ' עונה ' + (state.activeSeason || 1) + ' פרק ' + (state.activeEpisode || 1))
-          : ((item.originalTitle || item.title || '') + ' official trailer');
+          ? ((item.title || item.originalTitle || '') + ' עונה ' + (state.activeSeason || 1) + ' פרק ' + (state.activeEpisode || 1) + ' מלא')
+          : (isIlSearch && state.activeSourceTab !== 'trailer'
+              ? ((item.title || item.originalTitle || '') + ' סרט מלא')
+              : ((item.originalTitle || item.title || '') + ' official trailer'));
         var yr = await fetch(getApiBase() + '/api/youtube/search?q=' + encodeURIComponent(q));
         if (yr.ok) {
           var yd = await yr.json();
@@ -8745,6 +8793,7 @@
 
     embedContainer.innerHTML =
       '<iframe id="streamEmbedIframe" tabindex="-1" src="' + escapeHtml(ytEmbedUrl) + '" ' +
+      'sandbox="allow-scripts allow-same-origin allow-presentation" ' +
       'allow="autoplay; fullscreen; encrypted-media; picture-in-picture"' + (isTvYt ? '' : ' allowfullscreen') + ' ' +
       'style="width:100%;height:100%;border:none;background:#000;' + (isTvYt ? 'pointer-events:none;' : '') + '"></iframe>';
 
@@ -8762,6 +8811,113 @@
     }
   }
 
+  function isReturnedStreamTitlePlausible(expectedTitle, returnedTitle, origLang) {
+    if (!expectedTitle || !returnedTitle) return true;
+    if (String(origLang || 'en').toLowerCase() !== 'en') return true;
+    var exp = String(expectedTitle).toLowerCase().replace(/[^a-z0-9\u0590-\u05ff]+/g, '');
+    var ret = String(returnedTitle).toLowerCase().replace(/[^a-z0-9\u0590-\u05ff]+/g, '');
+    if (exp && ret && /^[a-z0-9]+$/.test(exp) && /^[a-z0-9]+$/.test(ret)) {
+      if (exp.indexOf(ret) === -1 && ret.indexOf(exp) === -1) {
+        var minLen = Math.min(exp.length, ret.length);
+        if (minLen >= 4 && ret.indexOf(exp.slice(0, 4)) === -1) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  async function unwrapAndPrepareCloudFrontDashMpd(rawUrl, origLang, preferHebAudio) {
+    try {
+      var mBlob = String(rawUrl || '').match(/[?&]blob=([^&#]+)/);
+      if (!mBlob || !mBlob[1]) return '';
+      var b64 = decodeURIComponent(mBlob[1]).replace(/-/g, '+').replace(/_/g, '/');
+      while (b64.length % 4) b64 += '=';
+      var info = JSON.parse(atob(b64));
+      var base = String((info && info.base) || '').trim();
+      var cookie = String((info && info.cookie) || '').trim();
+      if (!base || base.indexOf('http') !== 0 || !cookie) return '';
+      if (base.charAt(base.length - 1) !== '/') base += '/';
+      var qsCf = cookie
+        .replace(/CloudFront-Policy=/g, 'Policy=')
+        .replace(/CloudFront-Signature=/g, 'Signature=')
+        .replace(/CloudFront-Key-Pair-Id=/g, 'Key-Pair-Id=')
+        .replace(/;\s*/g, '&')
+        .replace(/^&+|&+$/g, '');
+
+      var ctrl = new AbortController();
+      var t = setTimeout(function () { ctrl.abort(); }, 5000);
+      var res = await fetch(base + 'index.mpd?' + qsCf, { signal: ctrl.signal });
+      clearTimeout(t);
+      if (!res.ok) return '';
+      var mpdText = await res.text();
+      if (!mpdText || mpdText.indexOf('<MPD') === -1) return '';
+
+      // Anti-Dub Check: If original language is NOT English (e.g. Israeli he, Turkish tr, Spanish es, Korean ko),
+      // reject streams where the MPD audio AdaptationSet is explicitly tagged as an English dub (`lang="eng"`).
+      if (!preferHebAudio && origLang && origLang !== 'en') {
+        var audMatches = mpdText.match(/<AdaptationSet[^>]*contentType="audio"[^>]*>/gi) || [];
+        if (audMatches.length > 0) {
+          var hasOrigOrUnd = false;
+          var hasEngDub = false;
+          for (var ai = 0; ai < audMatches.length; ai++) {
+            var mLang = audMatches[ai].match(/\blang="([^"]+)"/i);
+            var aLang = mLang ? mLang[1].toLowerCase() : 'und';
+            if (aLang === 'und' || aLang.indexOf(origLang) === 0 || (origLang === 'he' && (aLang === 'heb' || aLang === 'iw'))) {
+              hasOrigOrUnd = true;
+            } else if (aLang === 'eng' || aLang === 'en') {
+              hasEngDub = true;
+            }
+          }
+          if (hasEngDub && !hasOrigOrUnd) {
+            return '';
+          }
+        }
+      }
+
+      var qsCfXml = qsCf.replace(/&/g, '&amp;');
+      var rewrittenMpd = mpdText
+        .replace(/codecs="hev1"/g, 'codecs="hev1.1.6.L120.90"')
+        .replace(/initialization="([^"]+)"/g, function (full, relPath) {
+          if (relPath.indexOf('http') === 0) return full;
+          return 'initialization="' + base + relPath + '?' + qsCfXml + '"';
+        })
+        .replace(/media="([^"]+)"/g, function (full, relPath) {
+          if (relPath.indexOf('http') === 0) return full;
+          return 'media="' + base + relPath + '?' + qsCfXml + '"';
+        });
+      var mpdBlob = new Blob([rewrittenMpd], { type: 'application/dash+xml' });
+      return URL.createObjectURL(mpdBlob) + '#streamit_dash_mpd=1';
+    } catch (eDashUnwrap) {
+      return '';
+    }
+  }
+
+  function ensureDashJsLoaded() {
+    if (window.dashjs && typeof window.dashjs.MediaPlayer === 'function') {
+      return Promise.resolve(true);
+    }
+    return new Promise(function (resolve) {
+      try {
+        var existing = document.getElementById('streamit-dashjs-sdk');
+        if (existing) {
+          existing.addEventListener('load', function () { resolve(Boolean(window.dashjs)); }, { once: true });
+          existing.addEventListener('error', function () { resolve(false); }, { once: true });
+          return;
+        }
+        var sc = document.createElement('script');
+        sc.id = 'streamit-dashjs-sdk';
+        sc.src = 'https://cdn.jsdelivr.net/npm/dashjs@4.7.4/dist/dash.all.min.js';
+        sc.async = true;
+        sc.onload = function () { resolve(Boolean(window.dashjs)); };
+        sc.onerror = function () { resolve(false); };
+        document.head.appendChild(sc);
+      } catch (e) {
+        resolve(false);
+      }
+    });
+  }
+
   async function resolveDirect1080pHlsUrl(item, imdbId, season, episode) {
     if (!hasLocalBackend()) {
       await probeLocalPythonBackend();
@@ -8773,31 +8929,38 @@
     var mediaType = item.type === 'series' ? 'series' : 'movie';
     var tmdbId = String(item.tmdbId || '').replace(/\D/g, '');
     var origLang = String(item.originalLanguage || (item.isIsraeli ? 'he' : 'en')).toLowerCase();
+    var activeProf = getActiveSubUser();
+    var preferHebAudio = Boolean((activeProf && activeProf.isKids) || item.isHebrewDubbed);
     var expectedTitle = String(item.originalTitle || item.title || '').trim();
     var expectedYear = String(item.year || '').slice(0, 4);
-    var data = null;
 
     // Fast non-blocking `/api/direct-stream` on `127.0.0.1:8092` (works on BOTH Streamer APK EmbeddedServer and Desktop Python Server!)
-    // Step 1: Force 1080p Full HD (`w7dn` = 1920x1080 Original Audio) even on older v9.8.8 Streamer APKs where `vjej` (720p) was listed first!
+    // Combines `p9fx` (Vertex 1080p CloudFront DASH — responds in ~1.0s) and `w7dn` (Nebula 1080p Original Audio HLS)
+    // and strictly blocks `vjej` (720p foreign-dubbed server)!
     var sNum = season || 1;
     var eNum = episode || 1;
-    var w7dnPriorityUrl = (mediaType === 'series')
-      ? (apiBase + '/api/direct-stream?type=tv' +
-          '&imdb_id=' + encodeURIComponent(imdbId || '') +
-          '&tmdb_id=' + encodeURIComponent(tmdbId) +
-          '&season=' + encodeURIComponent(String(sNum)) +
-          '&episode=' + encodeURIComponent(String(eNum) + '?source=w7dn&_ignore=') +
-          '&orig_lang=' + encodeURIComponent(origLang) +
-          '&expected_title=' + encodeURIComponent(expectedTitle) +
-          '&expected_year=' + encodeURIComponent(expectedYear))
-      : (apiBase + '/api/direct-stream?type=tv' +
-          '&imdb_id=' + encodeURIComponent(imdbId || '') +
-          '&tmdb_id=' + encodeURIComponent(tmdbId) +
-          '&season=' + encodeURIComponent('../../movie') +
-          '&episode=' + encodeURIComponent(tmdbId + '?source=w7dn&_ignore=') +
-          '&orig_lang=' + encodeURIComponent(origLang) +
-          '&expected_title=' + encodeURIComponent(expectedTitle) +
-          '&expected_year=' + encodeURIComponent(expectedYear));
+    var buildSourcePriorityUrl = function (srcCode) {
+      return (mediaType === 'series')
+        ? (apiBase + '/api/direct-stream?type=tv' +
+            '&imdb_id=' + encodeURIComponent(imdbId || '') +
+            '&tmdb_id=' + encodeURIComponent(tmdbId) +
+            '&season=' + encodeURIComponent(String(sNum)) +
+            '&episode=' + encodeURIComponent(String(eNum) + '?source=' + srcCode + '&_ignore=') +
+            '&orig_lang=' + encodeURIComponent(origLang) +
+            '&expected_title=' + encodeURIComponent(expectedTitle) +
+            '&expected_year=' + encodeURIComponent(expectedYear))
+        : (apiBase + '/api/direct-stream?type=tv' +
+            '&imdb_id=' + encodeURIComponent(imdbId || '') +
+            '&tmdb_id=' + encodeURIComponent(tmdbId) +
+            '&season=' + encodeURIComponent('../../movie') +
+            '&episode=' + encodeURIComponent(tmdbId + '?source=' + srcCode + '&_ignore=') +
+            '&orig_lang=' + encodeURIComponent(origLang) +
+            '&expected_title=' + encodeURIComponent(expectedTitle) +
+            '&expected_year=' + encodeURIComponent(expectedYear));
+    };
+
+    var p9fxPriorityUrl = buildSourcePriorityUrl('p9fx');
+    var w7dnPriorityUrl = buildSourcePriorityUrl('w7dn');
 
     var directEndpointUrl = apiBase + '/api/direct-stream?type=' + encodeURIComponent(mediaType) +
       '&imdb_id=' + encodeURIComponent(imdbId || '') +
@@ -8808,45 +8971,84 @@
       '&expected_title=' + encodeURIComponent(expectedTitle) +
       '&expected_year=' + encodeURIComponent(expectedYear);
 
-    var candidateCalls = tmdbId ? [w7dnPriorityUrl, w7dnPriorityUrl, directEndpointUrl] : [directEndpointUrl];
+    var hevcDashSupported = true;
+    try {
+      if (typeof window.MediaSource !== 'undefined' && typeof window.MediaSource.isTypeSupported === 'function') {
+        hevcDashSupported = window.MediaSource.isTypeSupported('video/mp4; codecs="hev1.1.6.L120.90"');
+      }
+    } catch (eMse) {}
+
+    var candidateCalls;
+    if (!tmdbId) {
+      candidateCalls = [directEndpointUrl];
+    } else if (origLang === 'he' && mediaType === 'movie') {
+      // For Israeli movies, only accept p9fx (where MPD audio language is verified) so w7dn's foreign-dubbed exports are never played
+      candidateCalls = [p9fxPriorityUrl];
+    } else if (hevcDashSupported) {
+      candidateCalls = [p9fxPriorityUrl, w7dnPriorityUrl, w7dnPriorityUrl];
+    } else {
+      candidateCalls = [w7dnPriorityUrl, w7dnPriorityUrl, p9fxPriorityUrl];
+    }
+
     for (var attempt = 0; attempt < candidateCalls.length; attempt++) {
       try {
         var ctrl = new AbortController();
-        var timer = setTimeout(function () { ctrl.abort(); }, 7500);
+        var timer = setTimeout(function () { ctrl.abort(); }, 6500);
         var res = await fetch(candidateCalls[attempt] + '&_try=' + attempt, { signal: ctrl.signal });
         clearTimeout(timer);
-        if (res.ok) {
-          state.pythonApiConfirmed = true;
-          var candData = await res.json();
-          if (candData && candData.ok && candData.streamUrl) {
-            data = candData;
-            break;
+        if (!res.ok) continue;
+        state.pythonApiConfirmed = true;
+        var candData = await res.json();
+        if (!candData || !candData.ok) continue;
+
+        if (!isReturnedStreamTitlePlausible(expectedTitle, candData.title, origLang)) {
+          continue;
+        }
+        if (candData.source && origLang !== 'en' && String(candData.source).toLowerCase() === 'vjej') {
+          continue;
+        }
+
+        var rawStreamUrl = String(candData.streamUrl || '').trim();
+        if (rawStreamUrl) {
+          // Never allow broken hakunaymatata/resource or johnkulumbe links, or vjej CDN (hscow.com) on non-English titles
+          var rawLowerUrl = rawStreamUrl.toLowerCase();
+          if (
+            rawLowerUrl.indexOf('hakunaymatata.com/resource/') !== -1 ||
+            rawLowerUrl.indexOf('hakunaymatata.com%2fresource%2f') !== -1 ||
+            rawLowerUrl.indexOf('johnkulumbe.workers.dev') !== -1
+          ) {
+            continue;
           }
+          if (origLang !== 'en' && rawLowerUrl.indexOf('hscow.com') !== -1) {
+            continue;
+          }
+          if (rawStreamUrl.indexOf('dash-mpd') !== -1 && rawStreamUrl.indexOf('blob=') !== -1) {
+            var dashBlobUrl = await unwrapAndPrepareCloudFrontDashMpd(rawStreamUrl, origLang, preferHebAudio);
+            if (dashBlobUrl) {
+              return dashBlobUrl;
+            }
+            continue;
+          }
+          if (rawStreamUrl.indexOf('/') === 0 && apiBase) {
+            return apiBase + rawStreamUrl;
+          }
+          return rawStreamUrl;
+        }
+
+        if (candData.enc_stream_urls && candData.wasm_b64) {
+          try {
+            var rawUrls = await decryptDirectStreamUrls(candData.enc_stream_urls, candData.wasm_b64);
+            if (rawUrls && rawUrls.length) {
+              var playerOrigin = candData.player_origin || 'https://stellarconductornexus.com';
+              return apiBase + '/api/hls-proxy?url=' + encodeURIComponent(rawUrls[0]) +
+                '&api_token=' + encodeURIComponent(candData.api_token || '') +
+                '&origin=' + encodeURIComponent(playerOrigin);
+            }
+          } catch (eWasm) {}
         }
       } catch (e) {}
     }
 
-    if (!data || !data.ok) return '';
-    // Only reject if `data.source` is explicitly `'vjej'` on non-English originals (never reject Streamer APK responses that omit `data.source`!)
-    if (data.source && origLang !== 'en' && String(data.source).toLowerCase() === 'vjej') return '';
-    if (data.streamUrl) {
-      if (data.streamUrl.indexOf('/') === 0 && apiBase) {
-        return apiBase + data.streamUrl;
-      }
-      return data.streamUrl;
-    }
-
-    if (data.enc_stream_urls && data.wasm_b64) {
-      try {
-        var rawUrls = await decryptDirectStreamUrls(data.enc_stream_urls, data.wasm_b64);
-        if (rawUrls && rawUrls.length) {
-          var playerOrigin = data.player_origin || 'https://stellarconductornexus.com';
-          return apiBase + '/api/hls-proxy?url=' + encodeURIComponent(rawUrls[0]) +
-            '&api_token=' + encodeURIComponent(data.api_token || '') +
-            '&origin=' + encodeURIComponent(playerOrigin);
-        }
-      } catch (e) {}
-    }
     return '';
   }
 
@@ -9110,6 +9312,14 @@
       try { window.__streamItActiveHls.destroy(); } catch (eOldHls) {}
       window.__streamItActiveHls = null;
     }
+    if (state.dashInstance) {
+      try { state.dashInstance.reset(); } catch (eDash) {}
+      state.dashInstance = null;
+    }
+    if (window.__streamItActiveDash) {
+      try { window.__streamItActiveDash.reset(); } catch (eOldDash) {}
+      window.__streamItActiveDash = null;
+    }
 
     if (state.liveWatchdogTimer) {
       clearTimeout(state.liveWatchdogTimer);
@@ -9162,7 +9372,96 @@
       }, 9000);
     }
 
-    if ((streamUrl.indexOf('.m3u8') !== -1 || streamUrl.indexOf('/api/hls-proxy') !== -1) && window.Hls && window.Hls.isSupported()) {
+    var isDashMpdStream = Boolean(
+      streamUrl.indexOf('#streamit_dash_mpd=1') !== -1 ||
+      streamUrl.indexOf('.mpd') !== -1 ||
+      streamUrl.indexOf('/api/dash-mpd') !== -1
+    );
+
+    if (isDashMpdStream) {
+      ensureDashJsLoaded().then(function (dashReady) {
+        if (!isPlaybackSessionActive(activeSession)) {
+          stopCurrentMedia();
+          return;
+        }
+        if (!dashReady || !window.dashjs || typeof window.dashjs.MediaPlayer !== 'function') {
+          if (fallbackQueue.length > 0) {
+            playDirectHlsOrMp4(fallbackQueue[0], startOffsetSec, fallbackQueue.slice(1), activeSession);
+          } else if (state.playingItem && state.playingItem.type !== 'channel') {
+            playCleanEmbedStream(state.playingItem, state.activeSeason, state.activeEpisode, startOffsetSec, 'embed1', activeSession);
+          }
+          return;
+        }
+        try {
+          var cleanMpdUrl = streamUrl.split('#')[0];
+          var dashPlayer = window.dashjs.MediaPlayer().create();
+          state.dashInstance = dashPlayer;
+          window.__streamItActiveDash = dashPlayer;
+          try {
+            dashPlayer.updateSettings({
+              streaming: {
+                text: { defaultEnabled: false },
+                abr: { autoSwitchBitrate: { video: false } }
+              }
+            });
+          } catch (eDashCfg) {}
+          dashPlayer.initialize(video, cleanMpdUrl, true, startOffsetSec > 0 ? startOffsetSec : 0);
+          try { dashPlayer.setTextTrack(-1); } catch (eDashTxt) {}
+          disableAllNativeVideoTextTracks(video);
+          dashPlayer.on(window.dashjs.MediaPlayer.events.STREAM_INITIALIZED, function () {
+            if (!isPlaybackSessionActive(activeSession)) {
+              stopCurrentMedia();
+              return;
+            }
+            try { dashPlayer.setTextTrack(-1); } catch (eSubOff) {}
+            disableAllNativeVideoTextTracks(video);
+            try {
+              var bitrates = (typeof dashPlayer.getBitrateInfoListFor === 'function')
+                ? dashPlayer.getBitrateInfoListFor('video')
+                : [];
+              if (Array.isArray(bitrates) && bitrates.length > 1) {
+                var bestQ = 0;
+                var maxScore = -1;
+                for (var bi = 0; bi < bitrates.length; bi++) {
+                  var bh = Number(bitrates[bi].height) || 0;
+                  var bbr = Number(bitrates[bi].bitrate) || 0;
+                  var bScore = bh * 10000000 + bbr;
+                  if (bScore > maxScore) {
+                    maxScore = bScore;
+                    bestQ = typeof bitrates[bi].qualityIndex === 'number' ? bitrates[bi].qualityIndex : bi;
+                  }
+                }
+                if (typeof dashPlayer.setQualityFor === 'function') {
+                  dashPlayer.setQualityFor('video', bestQ, true);
+                }
+              }
+            } catch (eDashQual) {}
+            onReadyToPlay();
+          });
+          dashPlayer.on(window.dashjs.MediaPlayer.events.ERROR, function (ev) {
+            if (!isPlaybackSessionActive(activeSession)) {
+              stopCurrentMedia();
+              return;
+            }
+            if (ev && ev.error && (ev.error.code || ev.error === 'capability' || ev.error === 'mediasource')) {
+              try { dashPlayer.reset(); } catch (eRst) {}
+              state.dashInstance = null;
+              if (fallbackQueue.length > 0) {
+                playDirectHlsOrMp4(fallbackQueue[0], startOffsetSec, fallbackQueue.slice(1), activeSession);
+              } else if (state.playingItem && state.playingItem.type !== 'channel') {
+                playCleanEmbedStream(state.playingItem, state.activeSeason, state.activeEpisode, startOffsetSec, 'embed1', activeSession);
+              }
+            }
+          });
+        } catch (eDashInit) {
+          if (fallbackQueue.length > 0) {
+            playDirectHlsOrMp4(fallbackQueue[0], startOffsetSec, fallbackQueue.slice(1), activeSession);
+          } else if (state.playingItem && state.playingItem.type !== 'channel') {
+            playCleanEmbedStream(state.playingItem, state.activeSeason, state.activeEpisode, startOffsetSec, 'embed1', activeSession);
+          }
+        }
+      });
+    } else if ((streamUrl.indexOf('.m3u8') !== -1 || streamUrl.indexOf('/api/hls-proxy') !== -1) && window.Hls && window.Hls.isSupported()) {
       var customHlsLoader = createStreamItCleanHlsLoader();
       var hlsCfg = {
         maxBufferLength: 30,
@@ -9374,24 +9673,13 @@
       baseParams += '&start=' + Math.floor(state.embedStartOffsetSec) + '&t=' + Math.floor(state.embedStartOffsetSec);
     }
     var queryStr = '?' + baseParams;
-    if (state.embedActiveServerKey === 'embed2') {
-      if (item.type === 'series') {
-        embedUrl = 'https://vidlink.pro/tv/' + encodeURIComponent(tmdbId || mediaId) + '/' + (season || 1) + '/' + (episode || 1) + '?autoplay=true&sub=off&ds_lang=off';
-      } else {
-        embedUrl = 'https://vidlink.pro/movie/' + encodeURIComponent(tmdbId || mediaId) + '?autoplay=true&sub=off&ds_lang=off';
-      }
-    } else if (state.embedActiveServerKey === 'swarm') {
-      if (item.type === 'series') {
-        embedUrl = 'https://embed.su/embed/tv/' + encodeURIComponent(tmdbId || mediaId) + '/' + (season || 1) + '/' + (episode || 1) + queryStr;
-      } else {
-        embedUrl = 'https://embed.su/embed/movie/' + encodeURIComponent(tmdbId || mediaId) + queryStr;
-      }
-    } else if ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port === '8092') {
+    if ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port === '8092') {
       embedUrl = '/api/embed-clean?type=' + encodeURIComponent(item.type === 'series' ? 'series' : 'movie') +
         '&id=' + encodeURIComponent(mediaId) +
         '&season=' + (season || 1) +
         '&episode=' + (episode || 1) +
-        '&start=' + Math.floor(state.embedStartOffsetSec || 0);
+        '&start=' + Math.floor(state.embedStartOffsetSec || 0) +
+        '&server=' + encodeURIComponent(state.embedActiveServerKey || 'embed1');
     } else {
       if (item.type === 'series') {
         embedUrl = 'https://cdn.vidspark.to/tv/' + encodeURIComponent(mediaId) + '/' + (season || 1) + '/' + (episode || 1) + queryStr;
@@ -9403,10 +9691,11 @@
     state.embedResumeSeekDone = !(state.embedStartOffsetSec > 15);
     state.lastEmbedPostMsgTimeAt = 0;
 
-    // Never set a `sandbox` attribute on `#streamEmbedIframe` — modern streaming embeds (VidLink, VidSpark/VidPrime, Embed.su)
-    // actively check for `sandbox` and block playback with "Please disable sandbox" when present!
+    // Strict browser-level sandbox: `allow-scripts allow-same-origin` WITHOUT `allow-popups` or `allow-top-navigation`
+    // physically prevents any popup window, tab, or external redirect from ever opening.
     embedContainer.innerHTML =
       '<iframe id="streamEmbedIframe" tabindex="-1" src="' + escapeHtml(embedUrl) + '" ' +
+      'sandbox="allow-scripts allow-same-origin" ' +
       'referrerpolicy="origin" ' +
       'allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen ' +
       'style="width:100%;height:100%;border:none;background:#000;opacity:1;pointer-events:auto;transition:opacity 0.25s ease;"></iframe>';
@@ -11595,6 +11884,14 @@
     if (window.__streamItActiveHls) {
       try { window.__streamItActiveHls.destroy(); } catch (eActHls) {}
       window.__streamItActiveHls = null;
+    }
+    if (state.dashInstance) {
+      try { state.dashInstance.reset(); } catch (eDashStop) {}
+      state.dashInstance = null;
+    }
+    if (window.__streamItActiveDash) {
+      try { window.__streamItActiveDash.reset(); } catch (eActDash) {}
+      window.__streamItActiveDash = null;
     }
     if (state.plyrInstance) {
       try { state.plyrInstance.pause(); } catch (ePlyr) {}
@@ -16903,7 +17200,8 @@
   }
 
   function bootStreamItApp() {
-    if (window.__STREAMIT_V9992_BOOT_DONE) return;
+    if (window.__STREAMIT_V9993_BOOT_DONE) return;
+    window.__STREAMIT_V9993_BOOT_DONE = true;
     window.__STREAMIT_V9992_BOOT_DONE = true;
     window.__STREAMIT_V9991_BOOT_DONE = true;
     window.__STREAMIT_V999_BOOT_DONE = true;

@@ -45,19 +45,25 @@ def is_returned_title_plausible(expected_title: str, expected_year: str, ret_tit
     return True
 
 
-def resolve_vidspark_original_hls(media_type: str, tmdb_id: str, season: str, episode: str, orig_lang: str, expected_title: str, expected_year: str):
+def resolve_vidspark_original_hls(media_type: str, tmdb_id: str, season: str, episode: str, orig_lang: str, expected_title: str, expected_year: str, preferred_source: str = ""):
     if not tmdb_id or not tmdb_id.isdigit():
         return None
     lang = (orig_lang or "en").strip().lower()
-    cache_key = f"{media_type}:{tmdb_id}:{season}:{episode}:{lang}"
+    pref = (preferred_source or "").strip().lower()
+    cache_key = f"{media_type}:{tmdb_id}:{season}:{episode}:{lang}:{pref}"
     cached = DIRECT_STREAM_CACHE.get(cache_key)
     now = time.time()
     if cached and (now - cached[0]) < 900:
         return cached[1]
 
     hosts = ["https://cdn.vidspark.to"]
-    # Prioritize w7dn (Nebula — 1080p Original Audio HLS) with retry so cold cache never falls back to 720p vjej
-    sources = ["w7dn", "w7dn", "vjej"] if lang == "en" else ["w7dn", "w7dn"]
+    # Combine p9fx (Vertex — 1080p CloudFront DASH) and w7dn (Nebula — 1080p Original Audio HLS); NEVER allow dubbed vjej!
+    if pref == "p9fx":
+        sources = ["p9fx"]
+    elif pref == "w7dn":
+        sources = ["w7dn", "w7dn"]
+    else:
+        sources = ["p9fx", "w7dn", "w7dn"]
     for attempt_idx, src_code in enumerate(sources):
         for host in hosts:
             if media_type == "series":
@@ -75,7 +81,7 @@ def resolve_vidspark_original_hls(media_type: str, tmdb_id: str, season: str, ep
                         "x-player-key": PLAYER_KEY,
                     },
                 )
-                req_timeout = 5.5 if src_code == "w7dn" else 4.0
+                req_timeout = 5.5 if src_code == "w7dn" else 4.2
                 with urllib.request.urlopen(req, timeout=req_timeout) as resp:
                     if resp.status != 200:
                         continue
@@ -91,18 +97,37 @@ def resolve_vidspark_original_hls(media_type: str, tmdb_id: str, season: str, ep
                     continue
                 s0 = src_arr[0] or {}
                 actual_src = str(s0.get("source") or src_code).lower()
-                if lang != "en" and actual_src == "vjej":
+                if actual_src == "vjej":
                     continue
                 if src_code == "w7dn" and actual_src != "w7dn" and attempt_idx == 0:
                     continue
                 raw_stream_url = str(s0.get("url") or "").strip()
-                # If p9fx returns DASH .mpd in url, use its direct MP4 from qualities[] if available
-                if (not raw_stream_url.startswith("http")) or (".mpd" in raw_stream_url) or ("/dash-" in raw_stream_url):
+                raw_lower = raw_stream_url.lower()
+                is_broken_or_dubbed = (
+                    "hscow.com" in raw_lower
+                    or "johnkulumbe.workers.dev" in raw_lower
+                    or "hakunaymatata.com/resource/" in raw_lower
+                    or "hakunaymatata.com%2fresource%2f" in raw_lower
+                )
+                # Allow p9fx CloudFront DASH URLs containing dash-mpd?blob= directly so client/server can unwrap to sacdn.hakunaymatata.com!
+                is_cloudfront_dash_blob = ("dash-mpd" in raw_stream_url and "blob=" in raw_stream_url)
+                if is_broken_or_dubbed or (
+                    not is_cloudfront_dash_blob
+                    and ((not raw_stream_url.startswith("http")) or (".mpd" in raw_stream_url) or ("/dash-" in raw_stream_url))
+                ):
                     quals = s0.get("qualities") or data.get("qualities") or []
                     mp4_candidate = ""
                     for q_item in quals:
                         q_url = str((q_item or {}).get("url") or "").strip()
-                        if q_url.startswith("http") and ".mpd" not in q_url:
+                        q_low = q_url.lower()
+                        if (
+                            q_url.startswith("http")
+                            and ".mpd" not in q_low
+                            and "hscow.com" not in q_low
+                            and "johnkulumbe.workers.dev" not in q_low
+                            and "hakunaymatata.com/resource/" not in q_low
+                            and "hakunaymatata.com%2fresource%2f" not in q_low
+                        ):
                             mp4_candidate = q_url
                             break
                     if mp4_candidate:
@@ -182,7 +207,80 @@ class StreamItDevHandler(SimpleHTTPRequestHandler):
         qs = urllib.parse.parse_qs(parsed.query)
 
         if path == "/api/health":
-            return self._send_json({"ok": True, "engine": "streamit-local-dev-v9.9.8", "version": "9.9.8", "port": 8092})
+            return self._send_json({"ok": True, "engine": "streamit-local-dev-v9.9.93", "version": "9.9.93", "port": 8092})
+
+        if path == "/api/youtube/search":
+            q = (qs.get("q") or [""])[0].strip()
+            if not q:
+                return self._send_json({"ok": True, "results": []})
+            try:
+                yt_url = "https://www.youtube.com/results?search_query=" + urllib.parse.quote(q)
+                req = urllib.request.Request(yt_url, headers={"User-Agent": UA})
+                with urllib.request.urlopen(req, timeout=6) as resp:
+                    html = resp.read().decode("utf-8", errors="ignore")
+                results = []
+                seen = set()
+                for m in re.finditer(r'"videoRenderer":\{"videoId":"([a-zA-Z0-9_-]{11})"', html):
+                    vid = m.group(1)
+                    if vid not in seen:
+                        seen.add(vid)
+                        results.append({"videoId": vid})
+                    if len(results) >= 5:
+                        break
+                return self._send_json({"ok": True, "results": results})
+            except Exception as e:
+                return self._send_json({"ok": False, "results": [], "error": str(e)})
+
+        if path == "/api/dash-mpd":
+            blob = (qs.get("blob") or [""])[0].strip()
+            if not blob:
+                self.send_response(400)
+                self.end_headers()
+                return
+            try:
+                b64 = blob.replace("-", "+").replace("_", "/")
+                while len(b64) % 4 != 0:
+                    b64 += "="
+                info = json.loads(base64.b64decode(b64).decode("utf-8", errors="ignore"))
+                base_url = str(info.get("base") or "").strip()
+                cookie_str = str(info.get("cookie") or "").strip()
+                if not base_url.startswith("http") or not cookie_str:
+                    self.send_response(400)
+                    self.end_headers()
+                    return
+                if not base_url.endswith("/"):
+                    base_url += "/"
+                qs_cf = (
+                    cookie_str.replace("CloudFront-Policy=", "Policy=")
+                    .replace("CloudFront-Signature=", "Signature=")
+                    .replace("CloudFront-Key-Pair-Id=", "Key-Pair-Id=")
+                    .replace(";", "&")
+                    .strip("&")
+                )
+                req = urllib.request.Request(base_url + "index.mpd?" + qs_cf, headers={"User-Agent": UA})
+                with urllib.request.urlopen(req, timeout=6) as upstream:
+                    mpd_text = upstream.read().decode("utf-8", errors="ignore")
+                qs_cf_xml = qs_cf.replace("&", "&amp;")
+                mpd_text = mpd_text.replace('codecs="hev1"', 'codecs="hev1.1.6.L120.90"')
+                mpd_text = re.sub(
+                    r'initialization="([^"]+)"',
+                    lambda m: m.group(0) if m.group(1).startswith("http") else f'initialization="{base_url}{m.group(1)}?{qs_cf_xml}"',
+                    mpd_text,
+                )
+                mpd_text = re.sub(
+                    r'media="([^"]+)"',
+                    lambda m: m.group(0) if m.group(1).startswith("http") else f'media="{base_url}{m.group(1)}?{qs_cf_xml}"',
+                    mpd_text,
+                )
+                raw = mpd_text.encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "application/dash+xml; charset=utf-8")
+                self.send_header("Content-Length", str(len(raw)))
+                self.end_headers()
+                self.wfile.write(raw)
+                return
+            except Exception as e:
+                return self._send_json({"ok": False, "error": str(e)}, status=502)
 
         if path == "/api/catalog":
             cat_file = os.path.join(ROOT_DIR, "data", "hebrew_catalog.json")
@@ -201,6 +299,11 @@ class StreamItDevHandler(SimpleHTTPRequestHandler):
             raw_type = (qs.get("type") or ["movie"])[0]
             raw_season = (qs.get("season") or ["1"])[0]
             raw_episode = (qs.get("episode") or ["1"])[0]
+            pref_src = ""
+            if "source=p9fx" in raw_episode.lower():
+                pref_src = "p9fx"
+            elif "source=w7dn" in raw_episode.lower():
+                pref_src = "w7dn"
             if "movie" in raw_season.lower():
                 media_type = "movie"
             else:
@@ -213,7 +316,7 @@ class StreamItDevHandler(SimpleHTTPRequestHandler):
             expected_year = (qs.get("expected_year") or [""])[0]
 
             hit = resolve_vidspark_original_hls(
-                media_type, tmdb_id, season, episode, orig_lang, expected_title, expected_year
+                media_type, tmdb_id, season, episode, orig_lang, expected_title, expected_year, pref_src
             )
             if hit:
                 return self._send_json(hit)
@@ -287,6 +390,22 @@ class StreamItDevHandler(SimpleHTTPRequestHandler):
                     for s_item in (data.get("sources") or []):
                         if isinstance(s_item, dict):
                             s_item["tracks"] = []
+                            s_url = str(s_item.get("url") or "")
+                            if "dash-mpd" in s_url and "blob=" in s_url:
+                                m_b = re.search(r"[?&]blob=([^&#]+)", s_url)
+                                if m_b:
+                                    s_item["url"] = "/api/dash-mpd?blob=" + m_b.group(1)
+                            elif "url=" in s_url and "workers.dev" in s_url:
+                                parsed_w = urllib.parse.urlparse(s_url)
+                                qs_w = urllib.parse.parse_qs(parsed_w.query)
+                                inner_m3u8 = (qs_w.get("url") or [""])[0]
+                                if inner_m3u8.startswith("http"):
+                                    s_item["url"] = (
+                                        "/api/hls-proxy?url="
+                                        + urllib.parse.quote(inner_m3u8, safe="")
+                                        + "&origin="
+                                        + urllib.parse.quote("https://vidrock.to", safe="")
+                                    )
                 return self._send_json(data)
             except Exception as e:
                 return self._send_json({"result": False, "error": str(e)}, status=502)
@@ -310,9 +429,23 @@ class StreamItDevHandler(SimpleHTTPRequestHandler):
                 req = urllib.request.Request(vp_url, headers={"User-Agent": UA})
                 with urllib.request.urlopen(req, timeout=6) as upstream:
                     html = upstream.read().decode("utf-8", errors="ignore")
+                # Strip popup/ad scripts injected by upstream (<!-- p1 -->...<!-- p2 --> and non-/assets/ scripts)
+                html = re.sub(r"<!--\s*p1\s*-->.*?<!--\s*p2\s*-->", "", html, flags=re.S | re.I)
+                html = re.sub(
+                    r"<script\b(?![^>]*\bsrc=[\"']/assets/)[^>]*>.*?</script>",
+                    "",
+                    html,
+                    flags=re.S | re.I,
+                )
                 inject_head = (
                     "<script>"
                     "try{"
+                    "Object.defineProperty(window,'open',{value:function(){return null;},writable:false,configurable:false});"
+                    "Object.defineProperty(window,'frameElement',{get:function(){return null;},configurable:false});"
+                    "window.addEventListener('click',function(e){"
+                    "const a=e.target&&e.target.closest?e.target.closest('a'):null;"
+                    "if(a){e.preventDefault();e.stopImmediatePropagation();}"
+                    "},true);"
                     f"history.replaceState(null,'','{route_path}');"
                     "localStorage.setItem('vp_subtitle_lang','off');"
                     "localStorage.setItem('vp_server','w7dn');"
@@ -331,13 +464,14 @@ class StreamItDevHandler(SimpleHTTPRequestHandler):
                     "</script>"
                     '<base href="https://cdn.vidspark.to/">'
                     "<style>"
-                    ".vds-captions,[class*='captions'],[data-media-captions],track,::cue{display:none!important;opacity:0!important;visibility:hidden!important;font-size:0!important;}"
+                    ".vds-captions,[class*='captions'],[data-media-captions],track,::cue,a[target='_blank']{display:none!important;opacity:0!important;visibility:hidden!important;font-size:0!important;pointer-events:none!important;}"
                     "</style>"
                 )
                 html = html.replace("<head>", "<head>" + inject_head, 1)
                 raw = html.encode("utf-8")
                 self.send_response(200)
                 self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Content-Security-Policy", "sandbox allow-scripts allow-same-origin;")
                 self.send_header("Content-Length", str(len(raw)))
                 self.end_headers()
                 self.wfile.write(raw)
@@ -434,7 +568,7 @@ class StreamItDevHandler(SimpleHTTPRequestHandler):
 def main():
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 8092
     server = ThreadingHTTPServer(("0.0.0.0", port), StreamItDevHandler)
-    print(f"STREAM IT Local Dev Server v9.9.1 listening on http://localhost:{port}", flush=True)
+    print(f"STREAM IT Local Dev Server v9.9.93 listening on http://localhost:{port}", flush=True)
     server.serve_forever()
 
 

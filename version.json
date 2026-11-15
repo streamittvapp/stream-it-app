@@ -1,10 +1,10 @@
 {
-  "version": "9.9.92",
-  "native_apk_version": "9.9.91",
+  "version": "9.9.93",
+  "native_apk_version": "9.9.93",
   "apk_download_url": "https://streamittvapp.github.io/stream-it-app/StreamIt-AndroidTV.apk",
   "apk_short_url": "https://is.gd/streamitapk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-15T20:09:00Z",
-  "notes": "v9.9.92 — Remove iframe sandbox attribute completely to eliminate 'Please disable sandbox' error across all embed mirrors, and fix React Router route path in /api/embed-clean."
+  "updated_at": "2026-11-15T21:25:00Z",
+  "notes": "v9.9.93 — Global 1080p CloudFront DASH (p9fx) + HLS (w7dn) native player with dash.js, strict anti-dub enforcement on Israeli/foreign titles, and verified Israeli catalog & YouTube episodes."
 }

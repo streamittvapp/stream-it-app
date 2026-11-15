@@ -131,7 +131,7 @@ public class StreamItEmbeddedServer {
             Map<String, String> params = parseQuery(query);
 
             if ("/api/health".equals(path)) {
-                byte[] body = "{\"ok\":true,\"mode\":\"android_embedded_server\",\"version\":\"9.9.8\",\"ota_ver_url\":\"https://is.gd/streamittv_ver\",\"ota_apk_url\":\"https://is.gd/streamittv_apk\"}"
+                byte[] body = "{\"ok\":true,\"mode\":\"android_embedded_server\",\"version\":\"9.9.93\",\"ota_ver_url\":\"https://is.gd/streamittv_ver\",\"ota_apk_url\":\"https://is.gd/streamittv_apk\"}"
                         .getBytes(StandardCharsets.UTF_8);
                 sendResponse(out, 200, "application/json; charset=utf-8", body);
             } else if ("/api/ota".equals(path)) {
@@ -140,6 +140,8 @@ public class StreamItEmbeddedServer {
                 handleDirectStream(out, params);
             } else if ("/api/hls-proxy".equals(path)) {
                 handleHlsProxy(out, params);
+            } else if ("/api/youtube/search".equals(path)) {
+                handleYoutubeSearch(out, params);
             } else if ("/api/telegram-channel".equals(path)) {
                 handleTelegramChannelProxy(out, params);
             } else {
@@ -207,6 +209,12 @@ public class StreamItEmbeddedServer {
         String rawTypeStr = (rawType != null && !rawType.trim().isEmpty()) ? rawType.trim() : "movie";
         String rawSeasonStr = (rawSeason != null && !rawSeason.trim().isEmpty()) ? rawSeason.trim() : "1";
         String rawEpisodeStr = (rawEpisode != null && !rawEpisode.trim().isEmpty()) ? rawEpisode.trim() : "1";
+        String prefSrc = "";
+        if (rawEpisodeStr.toLowerCase().contains("source=p9fx")) {
+            prefSrc = "p9fx";
+        } else if (rawEpisodeStr.toLowerCase().contains("source=w7dn")) {
+            prefSrc = "w7dn";
+        }
         String itemType = rawSeasonStr.toLowerCase().contains("movie")
                 ? "movie"
                 : (("series".equalsIgnoreCase(rawTypeStr) || "tv".equalsIgnoreCase(rawTypeStr)) ? "series" : "movie");
@@ -220,20 +228,24 @@ public class StreamItEmbeddedServer {
         String expectedTitle = (rawExpectedTitle != null) ? rawExpectedTitle.trim() : "";
         String expectedYear = (rawExpectedYear != null) ? rawExpectedYear.replaceAll("\\D", "") : "";
 
-        String cacheKey = itemType + ":" + imdbId + ":" + tmdbId + ":" + season + ":" + episode + ":" + origLang;
+        String cacheKey = itemType + ":" + imdbId + ":" + tmdbId + ":" + season + ":" + episode + ":" + origLang + ":" + prefSrc;
         long now = System.currentTimeMillis();
         CachedItem cached = directStreamCache.get(cacheKey);
         if (cached != null && (now - cached.timestampMs) < 900_000L) {
             return cached.value;
         }
 
-        // Priority 1: Original-Language 1080p HLS source ("w7dn" = Nebula Original Audio) across verified hosts!
-        // Never allow "vjej" (Russian/foreign-dubbed mirror) on non-English titles (Israeli he, Turkish tr, Spanish es, Korean ko, etc.)!
+        // Priority 1: Combine p9fx (Vertex 1080p CloudFront DASH) + w7dn (Nebula 1080p Original Audio HLS); NEVER allow dubbed "vjej"!
         if (!tmdbId.isEmpty()) {
             String[] vidoraHosts = new String[]{"https://cdn.vidspark.to"};
-            String[] vidoraSources = "en".equals(origLang)
-                    ? new String[]{"w7dn", "w7dn", "vjej"}
-                    : new String[]{"w7dn", "w7dn"};
+            String[] vidoraSources;
+            if ("p9fx".equals(prefSrc)) {
+                vidoraSources = new String[]{"p9fx"};
+            } else if ("w7dn".equals(prefSrc)) {
+                vidoraSources = new String[]{"w7dn", "w7dn"};
+            } else {
+                vidoraSources = new String[]{"p9fx", "w7dn", "w7dn"};
+            }
             for (int attemptIdx = 0; attemptIdx < vidoraSources.length; attemptIdx++) {
                 String srcKey = vidoraSources[attemptIdx];
                 for (String host : vidoraHosts) {
@@ -246,7 +258,7 @@ public class StreamItEmbeddedServer {
                         hVp.put("Referer", host + "/");
                         hVp.put("Origin", host);
                         hVp.put("x-player-key", "f3b72e73c80c9a996574379798703796a1936efa3516a7105cb0e43048b46b5a");
-                        int reqTimeout = "w7dn".equals(srcKey) ? 5200 : 3800;
+                        int reqTimeout = "w7dn".equals(srcKey) ? 5200 : 4000;
                         String vpRaw = new String(httpGetBytes(host + vpPath, hVp, reqTimeout), StandardCharsets.UTF_8);
                         JSONObject vpObj = new JSONObject(vpRaw);
                         if (!vpObj.optBoolean("result", true)) continue;
@@ -259,15 +271,21 @@ public class StreamItEmbeddedServer {
                         if (sources != null && sources.length() > 0) {
                             JSONObject s0 = sources.getJSONObject(0);
                             String actualSrc = s0.optString("source", srcKey);
-                            // Block silent backend fallback to dubbed "vjej" when requesting original audio!
-                            if (!"en".equals(origLang) && "vjej".equalsIgnoreCase(actualSrc)) {
+                            // Block silent backend fallback to dubbed "vjej"
+                            if ("vjej".equalsIgnoreCase(actualSrc)) {
                                 continue;
                             }
                             if ("w7dn".equals(srcKey) && !"w7dn".equalsIgnoreCase(actualSrc) && attemptIdx == 0) {
                                 continue;
                             }
                             String rawStreamUrl = s0.optString("url", "");
-                            if (!rawStreamUrl.startsWith("http") || rawStreamUrl.contains(".mpd") || rawStreamUrl.contains("/dash-")) {
+                            String rawLower = rawStreamUrl.toLowerCase();
+                            boolean isBrokenOrDubbed = rawLower.contains("hscow.com")
+                                    || rawLower.contains("johnkulumbe.workers.dev")
+                                    || rawLower.contains("hakunaymatata.com/resource/")
+                                    || rawLower.contains("hakunaymatata.com%2fresource%2f");
+                            boolean isCloudFrontDashBlob = rawStreamUrl.contains("dash-mpd") && rawStreamUrl.contains("blob=");
+                            if (isBrokenOrDubbed || (!isCloudFrontDashBlob && (!rawStreamUrl.startsWith("http") || rawStreamUrl.contains(".mpd") || rawStreamUrl.contains("/dash-")))) {
                                 JSONArray quals = s0.optJSONArray("qualities");
                                 if (quals == null) quals = vpObj.optJSONArray("qualities");
                                 rawStreamUrl = "";
@@ -276,7 +294,13 @@ public class StreamItEmbeddedServer {
                                         JSONObject qObj = quals.optJSONObject(qi);
                                         if (qObj != null) {
                                             String qUrl = qObj.optString("url", "");
-                                            if (qUrl.startsWith("http") && !qUrl.contains(".mpd")) {
+                                            String qLow = qUrl.toLowerCase();
+                                            if (qUrl.startsWith("http")
+                                                    && !qLow.contains(".mpd")
+                                                    && !qLow.contains("hscow.com")
+                                                    && !qLow.contains("johnkulumbe.workers.dev")
+                                                    && !qLow.contains("hakunaymatata.com/resource/")
+                                                    && !qLow.contains("hakunaymatata.com%2fresource%2f")) {
                                                 rawStreamUrl = qUrl;
                                                 break;
                                             }
@@ -548,6 +572,40 @@ public class StreamItEmbeddedServer {
         } catch (Exception e) {
             byte[] err = ("{\"ok\":false,\"error\":\"" + e.getMessage() + "\"}").getBytes(StandardCharsets.UTF_8);
             sendResponse(out, 502, "application/json; charset=utf-8", err);
+        }
+    }
+
+    private void handleYoutubeSearch(OutputStream out, Map<String, String> params) throws Exception {
+        try {
+            String q = params.get("q");
+            if (q == null || q.trim().isEmpty()) {
+                byte[] empty = "{\"ok\":true,\"results\":[]}".getBytes(StandardCharsets.UTF_8);
+                sendResponse(out, 200, "application/json; charset=utf-8", empty);
+                return;
+            }
+            String ytUrl = "https://www.youtube.com/results?search_query=" + URLEncoder.encode(q.trim(), "UTF-8");
+            Map<String, String> headers = new HashMap<>();
+            headers.put("User-Agent", USER_AGENT);
+            String html = new String(httpGetBytes(ytUrl, headers, 7000), StandardCharsets.UTF_8);
+            Pattern p = Pattern.compile("\"videoRenderer\":\\{\"videoId\":\"([a-zA-Z0-9_-]{11})\"");
+            Matcher m = p.matcher(html);
+            JSONArray results = new JSONArray();
+            java.util.HashSet<String> seen = new java.util.HashSet<>();
+            while (m.find() && results.length() < 5) {
+                String vid = m.group(1);
+                if (vid != null && seen.add(vid)) {
+                    JSONObject item = new JSONObject();
+                    item.put("videoId", vid);
+                    results.put(item);
+                }
+            }
+            JSONObject resp = new JSONObject();
+            resp.put("ok", true);
+            resp.put("results", results);
+            sendResponse(out, 200, "application/json; charset=utf-8", resp.toString().getBytes(StandardCharsets.UTF_8));
+        } catch (Exception e) {
+            byte[] err = "{\"ok\":false,\"results\":[]}".getBytes(StandardCharsets.UTF_8);
+            sendResponse(out, 200, "application/json; charset=utf-8", err);
         }
     }
 
