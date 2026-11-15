@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794770987478,
+      "updatedTs": 1794770989183,
       "subUsersUpdatedAt": 1794694857976,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -318,86 +318,6 @@
           },
           "watchlistUpdatedAt": 1794685001388,
           "progress": {
-            "movie-1011985": {
-              "id": "movie-1011985",
-              "imdbId": "tt21692408",
-              "tmdbId": "1011985",
-              "title": "קונג פו פנדה 4 (מדובב לעברית)",
-              "currentTime": 1221,
-              "duration": 5617,
-              "percent": 22,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794722284673,
-              "snapshot": {
-                "id": "movie-1011985",
-                "imdbId": "tt21692408",
-                "tmdbId": "1011985",
-                "type": "movie",
-                "title": "קונג פו פנדה 4 (מדובב לעברית)",
-                "originalTitle": "Kung Fu Panda 4",
-                "year": "2024",
-                "rating": "7.1",
-                "runtimeHe": "",
-                "ageRating": "כל הגילאים",
-                "overview": "פו לוחם הדרקון יוצא להרפתקה חדשה ומצחיקה לחיפוש יורש רוחני לעמק השלום מול הזיקית המשנה צורה — בדיבוב עברי.",
-                "poster": "https://image.tmdb.org/t/p/w500/kDp1vUBnMpe8ak4rjgl3cLELqjU.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/1XDDXPXGiI8id7MrUxK36ke7gkX.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w1280/1XDDXPXGiI8id7MrUxK36ke7gkX.jpg",
-                "genres": [
-                  "animation",
-                  "hebrew_dub",
-                  "action",
-                  "comedy"
-                ],
-                "genresHe": [
-                  "מדובב לעברית 🇮🇱",
-                  "אנימציה ואקשן"
-                ],
-                "seasonsCount": 0
-              }
-            },
-            "tt0816692": {
-              "id": "tt0816692",
-              "imdbId": "tt0816692",
-              "tmdbId": "157336",
-              "title": "בין כוכבים",
-              "currentTime": 3989,
-              "duration": 7200,
-              "percent": 55,
-              "season": 1,
-              "episode": 1,
-              "updatedAt": 1794732760006,
-              "snapshot": {
-                "id": "tt0816692",
-                "imdbId": "tt0816692",
-                "tmdbId": "157336",
-                "type": "movie",
-                "title": "בין כוכבים",
-                "originalTitle": "Interstellar",
-                "year": "2014",
-                "rating": "8.7",
-                "runtimeHe": "2 שעות ו-49 דק'",
-                "ageRating": "12+",
-                "overview": "כשכדור הארץ הולך והופך לבלתי ראוי למגורי אדם, צוות של חוקרים ואסטרונאוטים יוצא למסע נועז דרך חור תולעת בחלל בחיפוש אחר בית חדש לאנושות.",
-                "poster": "https://images.metahub.space/poster/medium/tt0816692/img",
-                "backdrop": "https://images.metahub.space/background/medium/tt0816692/img",
-                "cardBackdrop": "https://images.metahub.space/background/medium/tt0816692/img",
-                "genres": [
-                  "scifi",
-                  "drama",
-                  "action",
-                  "tpb",
-                  "telegram"
-                ],
-                "genresHe": [
-                  "מדע בדיוני",
-                  "דרמה",
-                  "הרפתקאות"
-                ],
-                "seasonsCount": 0
-              }
-            },
             "tt32261958": {
               "id": "tt32261958",
               "imdbId": "tt32261958",
@@ -447,11 +367,13 @@
             "69557": 1794698934882,
             "95396": 1794698940923,
             "103913": 1794698937513,
+            "157336": 1794770988551,
             "293660": 1794698940065,
             "301528": 1794698933987,
             "533535": 1794686262083,
             "693134": 1794686261114,
             "872585": 1794770987478,
+            "1011985": 1794770989183,
             "1236045": 1794698939147,
             "1283515": 1794731391181,
             "1290417": 1794770985537,
@@ -518,7 +440,13 @@
             "series-1290417": 1794770985537,
             "tt15398776": 1794770987478,
             "movie-872585": 1794770987478,
-            "series-872585": 1794770987478
+            "series-872585": 1794770987478,
+            "tt0816692": 1794770988551,
+            "movie-157336": 1794770988551,
+            "series-157336": 1794770988551,
+            "movie-1011985": 1794770989183,
+            "tt21692408": 1794770989183,
+            "series-1011985": 1794770989183
           },
           "progressClearedAt": 1794432225027
         },
