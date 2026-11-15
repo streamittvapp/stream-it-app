@@ -132,14 +132,14 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794772219833,
-      "subUsersUpdatedAt": 1794772219833,
+      "updatedTs": 1794772225879,
+      "subUsersUpdatedAt": 1794772225879,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
         "prof-bedroom": 1794494898603,
         "prof-kids": 1794494905106
       },
-      "activeSubUserId": "prof-1794772219833",
+      "activeSubUserId": "prof-1794772225879",
       "subUsers": [
         {
           "id": "prof-main",
@@ -185,6 +185,26 @@
           "id": "prof-1794772219833",
           "name": "איה",
           "color": "#3f3f46",
+          "isKids": false,
+          "isPrimary": false,
+          "parentalControl": {
+            "enabled": false,
+            "actionMode": "skip",
+            "profanityMode": "mute_censor",
+            "sensitivity": "balanced",
+            "categories": {
+              "sex": true,
+              "violence": true,
+              "profanity": true,
+              "drugs": true,
+              "horror": false
+            }
+          }
+        },
+        {
+          "id": "prof-1794772225879",
+          "name": "איה",
+          "color": "#475569",
           "isKids": false,
           "isPrimary": false,
           "parentalControl": {
@@ -781,6 +801,14 @@
           "progressClearedAt": 0
         },
         "prof-1794772219833": {
+          "watchlist": [],
+          "watchlistSnapshots": {},
+          "watchlistUpdatedAt": 0,
+          "progress": {},
+          "deletedProgressIds": {},
+          "progressClearedAt": 0
+        },
+        "prof-1794772225879": {
           "watchlist": [],
           "watchlistSnapshots": {},
           "watchlistUpdatedAt": 0,
