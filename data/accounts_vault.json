@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794774383070,
+      "updatedTs": 1794774400348,
       "subUsersUpdatedAt": 1794773270494,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -870,12 +870,12 @@
               "imdbId": "tt38793125",
               "tmdbId": "1571955",
               "title": "מסלול התנגשות",
-              "currentTime": 885,
+              "currentTime": 900,
               "duration": 6381,
               "percent": 14,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794774383069,
+              "updatedAt": 1794774400348,
               "snapshot": {
                 "id": "movie-1571955",
                 "imdbId": "tt38793125",
