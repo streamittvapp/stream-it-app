@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794770874942,
+      "updatedTs": 1794770893051,
       "subUsersUpdatedAt": 1794694857976,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -442,12 +442,12 @@
               "imdbId": "tt32362890",
               "tmdbId": "1290417",
               "title": "הפלישה",
-              "currentTime": 3053,
+              "currentTime": 3055,
               "duration": 5168,
               "percent": 59,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794732699558,
+              "updatedAt": 1794770893051,
               "snapshot": {
                 "id": "movie-1290417",
                 "imdbId": "tt32362890",
@@ -479,12 +479,12 @@
               "imdbId": "tt32261958",
               "tmdbId": "1283515",
               "title": "תעתוע",
-              "currentTime": 200,
+              "currentTime": 209,
               "duration": 7256,
               "percent": 3,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794770874942,
+              "updatedAt": 1794770883258,
               "snapshot": {
                 "id": "tt32261958",
                 "imdbId": "tt32261958",
