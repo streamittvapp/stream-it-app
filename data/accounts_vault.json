@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794732760006,
+      "updatedTs": 1794732772731,
       "subUsersUpdatedAt": 1794694857976,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -324,11 +324,11 @@
               "tmdbId": "872585",
               "title": "אופנהיימר",
               "currentTime": 420,
-              "duration": 10786,
-              "percent": 4,
+              "duration": 7200,
+              "percent": 6,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794691488145,
+              "updatedAt": 1794732772731,
               "snapshot": {
                 "id": "tt15398776",
                 "imdbId": "tt15398776",
@@ -346,7 +346,9 @@
                 "cardBackdrop": "https://images.metahub.space/background/medium/tt15398776/img",
                 "genres": [
                   "drama",
-                  "docu"
+                  "docu",
+                  "war",
+                  "telegram"
                 ],
                 "genresHe": [
                   "דרמה",
