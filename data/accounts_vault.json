@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794771420771,
+      "updatedTs": 1794771429719,
       "subUsersUpdatedAt": 1794694857976,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -362,12 +362,12 @@
               "imdbId": "tt0137523",
               "tmdbId": "550",
               "title": "מועדון קרב",
-              "currentTime": 2430,
+              "currentTime": 2437,
               "duration": 8348,
               "percent": 29,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794771420771,
+              "updatedAt": 1794771429719,
               "snapshot": {
                 "id": "movie-550",
                 "imdbId": "tt0137523",
