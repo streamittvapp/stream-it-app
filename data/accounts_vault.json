@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794770989183,
+      "updatedTs": 1794771196086,
       "subUsersUpdatedAt": 1794694857976,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -148,7 +148,7 @@
           "isKids": false,
           "isPrimary": true,
           "parentalControl": {
-            "enabled": false,
+            "enabled": true,
             "actionMode": "skip",
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
