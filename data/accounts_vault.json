@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794776886162,
+      "updatedTs": 1794776887772,
       "subUsersUpdatedAt": 1794774698606,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -308,47 +308,6 @@
                 ],
                 "seasonsCount": 0
               }
-            },
-            "series-226637": {
-              "id": "series-226637",
-              "imdbId": "tt22091076",
-              "tmdbId": "226637",
-              "title": "פוטנציאל גבוה",
-              "currentTime": 39,
-              "duration": 2490,
-              "percent": 3,
-              "season": 1,
-              "episode": 8,
-              "updatedAt": 1794776886162,
-              "snapshot": {
-                "id": "series-226637",
-                "imdbId": "tt22091076",
-                "tmdbId": "226637",
-                "type": "series",
-                "title": "פוטנציאל גבוה",
-                "originalTitle": "High Potential",
-                "year": "2024",
-                "rating": "8.3",
-                "runtimeHe": "45 דק׳ לפרק",
-                "ageRating": "16+",
-                "overview": "הסדרה מתחקה אחר אם חד-הורית בעלת אופן מחשבה יוצא דופן וכישרון לא קונבנציולני לפתירת פשעים, שבזכותו היא רוקמת שותפות יוצאת דופן ובלתי ניתנת לעצירה עם בלש קפדן ומנוסה.",
-                "poster": "https://image.tmdb.org/t/p/w500/7t48C1dmFiAINVxiLYQh743SeZJ.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/yVP12H81dwaay5B7GVqgO893q2c.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/yVP12H81dwaay5B7GVqgO893q2c.jpg",
-                "genres": [
-                  "drama",
-                  "crime",
-                  "mystery",
-                  "thriller"
-                ],
-                "genresHe": [
-                  "דרמה",
-                  "מתח ופשע",
-                  "מסתורין ובלשי",
-                  "מותחנים"
-                ],
-                "seasonsCount": 2
-              }
             }
           },
           "watchlistSnapshots": {
@@ -507,6 +466,7 @@
             "95396": 1794698940923,
             "103913": 1794698937513,
             "157336": 1794770988551,
+            "226637": 1794776887772,
             "293660": 1794698940065,
             "301528": 1794698933987,
             "533535": 1794686262083,
@@ -598,7 +558,10 @@
             "movie-1399": 1794776544169,
             "movie-24611": 1794776669508,
             "tt0073052": 1794776669508,
-            "series-24611": 1794776669508
+            "series-24611": 1794776669508,
+            "series-226637": 1794776887772,
+            "tt22091076": 1794776887772,
+            "movie-226637": 1794776887772
           },
           "progressClearedAt": 1794432225027
         },
