@@ -132,8 +132,8 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794776500000,
-      "subUsersUpdatedAt": 1794776500000,
+      "updatedTs": 1794862859717,
+      "subUsersUpdatedAt": 1794779202437,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
         "prof-bedroom": 1794494898603,
@@ -154,20 +154,21 @@
           "isKids": false,
           "isPrimary": true,
           "parentalControl": {
-            "enabled": true,
+            "enabled": false,
             "actionMode": "blur_mute",
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
             "blurPx": 22,
-            "updatedAt": 1794776500000,
+            "updatedAt": 1794779202437,
             "categories": {
-              "sex": true,
+              "sex": false,
               "violence": false,
               "profanity": false,
               "drugs": false,
               "horror": false
             }
-          }
+          },
+          "avatarUrl": ""
         },
         {
           "id": "prof-1794773247760",
@@ -183,17 +184,16 @@
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
             "blurPx": 22,
-            "updatedAt": 1794776500000,
+            "updatedAt": 0,
             "categories": {
               "sex": true,
               "violence": false,
               "profanity": false,
               "drugs": false,
               "horror": false
-            },
-            "blurPx": 22,
-            "updatedAt": 0
-          }
+            }
+          },
+          "avatarUrl": ""
         },
         {
           "id": "prof-1794773258268",
@@ -209,17 +209,16 @@
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
             "blurPx": 22,
-            "updatedAt": 1794776500000,
+            "updatedAt": 0,
             "categories": {
               "sex": true,
               "violence": false,
               "profanity": false,
               "drugs": false,
               "horror": false
-            },
-            "blurPx": 22,
-            "updatedAt": 0
-          }
+            }
+          },
+          "avatarUrl": ""
         },
         {
           "id": "prof-1794773265526",
@@ -235,17 +234,16 @@
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
             "blurPx": 22,
-            "updatedAt": 1794776500000,
+            "updatedAt": 0,
             "categories": {
               "sex": true,
               "violence": false,
               "profanity": false,
               "drugs": false,
               "horror": false
-            },
-            "blurPx": 22,
-            "updatedAt": 0
-          }
+            }
+          },
+          "avatarUrl": ""
         },
         {
           "id": "prof-1794773270494",
@@ -261,17 +259,16 @@
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
             "blurPx": 22,
-            "updatedAt": 1794776500000,
+            "updatedAt": 0,
             "categories": {
               "sex": true,
               "violence": false,
               "profanity": false,
               "drugs": false,
               "horror": false
-            },
-            "blurPx": 22,
-            "updatedAt": 0
-          }
+            }
+          },
+          "avatarUrl": ""
         }
       ],
       "profileData": {
@@ -292,12 +289,12 @@
               "imdbId": "tt32261958",
               "tmdbId": "1283515",
               "title": "תעתוע",
-              "currentTime": 235,
-              "duration": 7200,
+              "currentTime": 248,
+              "duration": 7256,
               "percent": 3,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794771587533,
+              "updatedAt": 1794862859717,
               "snapshot": {
                 "id": "tt32261958",
                 "imdbId": "tt32261958",
@@ -316,8 +313,7 @@
                 "genres": [
                   "mystery",
                   "thriller",
-                  "drama",
-                  "telegram"
+                  "drama"
                 ],
                 "genresHe": [
                   "מסתורין",
@@ -325,47 +321,6 @@
                   "דרמה"
                 ],
                 "seasonsCount": 0
-              }
-            },
-            "series-5303": {
-              "id": "series-5303",
-              "imdbId": "tt0092383",
-              "tmdbId": "5303",
-              "title": "סיפורי עמים",
-              "currentTime": 15,
-              "duration": 7200,
-              "percent": 3,
-              "season": 1,
-              "episode": 2,
-              "updatedAt": 1794777223638,
-              "snapshot": {
-                "id": "series-5303",
-                "imdbId": "tt0092383",
-                "tmdbId": "5303",
-                "type": "series",
-                "title": "סיפורי עמים",
-                "originalTitle": "The Storyteller",
-                "year": "1988",
-                "rating": "8.2",
-                "runtimeHe": "45 דק׳ לפרק",
-                "ageRating": "לכל המשפחה (8+)",
-                "overview": "יצור קטן, צרוד וזקן עם עור פנים מחוספס, יושב על כיסא נוח מול האח הבוערת, בעוד כלבו הציני והמרוט שרוע לרגליו, הוא מספר אגדה מופלאה. ביחד השניים חושפים בפנינו את עולמן המופלא של אגדות העם. מספר הסיפורים הוא ג'ון הארט, הכלב הוא קולו של בריאן הנסון והאגדה היא אחת שכבר שמעתם.",
-                "poster": "https://image.tmdb.org/t/p/w500/xmxsuEWhAjHy2GVlOL28KjHXobe.jpg",
-                "backdrop": "https://image.tmdb.org/t/p/w1280/celzfQGiEaOLzZaGPYrO3fP2ogX.jpg",
-                "cardBackdrop": "https://image.tmdb.org/t/p/w500/celzfQGiEaOLzZaGPYrO3fP2ogX.jpg",
-                "genres": [
-                  "action",
-                  "animation",
-                  "scifi",
-                  "drama"
-                ],
-                "genresHe": [
-                  "אקשן והרפתקאות",
-                  "אנימציה ומשפחה",
-                  "מדע בדיוני ופנטזיה",
-                  "דרמה"
-                ],
-                "seasonsCount": 1
               }
             }
           },
@@ -517,18 +472,23 @@
             "278": 1794686259883,
             "550": 1794772327539,
             "1396": 1794686263135,
-            "1399": 1794776544169,
+            "1399": 1794779036711,
             "1413": 1794686264301,
+            "2251": 1794778847466,
             "2875": 1794777022228,
+            "5303": 1794778868860,
             "10580": 1794770938868,
+            "15976": 1794778866125,
             "24611": 1794776669508,
             "69557": 1794698934882,
             "95396": 1794698940923,
             "103913": 1794698937513,
             "157336": 1794770988551,
+            "216015": 1794778959698,
             "226637": 1794776887772,
             "293660": 1794698940065,
             "301528": 1794698933987,
+            "337167": 1794778850838,
             "533535": 1794686262083,
             "693134": 1794686261114,
             "872585": 1794770987478,
@@ -554,7 +514,6 @@
             "tt43612870": 1794432217226,
             "movie-1568027": 1794432217226,
             "series-1568027": 1794432217226,
-            "tt4565380": 1794698934882,
             "tt8190688": 1794432225027,
             "tt1745960": 1794432225027,
             "tt6263850": 1794686262083,
@@ -578,6 +537,7 @@
             "series-1413": 1794686264301,
             "tt1844624": 1794686264301,
             "movie-1413": 1794686264301,
+            "tt4565380": 1794698934882,
             "movie-301528": 1794698933987,
             "tt1979376": 1794698933987,
             "series-301528": 1794698933987,
@@ -592,9 +552,6 @@
             "tt11280740": 1794698940923,
             "movie-95396": 1794698940923,
             "series-95396": 1794698940923,
-            "movie-1283515": 1794731391181,
-            "tt32261958": 1794731391181,
-            "series-1283515": 1794731391181,
             "movie-1290417": 1794770985537,
             "tt32362890": 1794770985537,
             "series-1290417": 1794770985537,
@@ -613,9 +570,6 @@
             "tt17526714": 1794772609370,
             "movie-933260": 1794772609370,
             "series-933260": 1794772609370,
-            "series-1399": 1794776544169,
-            "tt0944947": 1794776544169,
-            "movie-1399": 1794776544169,
             "movie-24611": 1794776669508,
             "tt0073052": 1794776669508,
             "series-24611": 1794776669508,
@@ -624,7 +578,28 @@
             "movie-226637": 1794776887772,
             "series-2875": 1794777022228,
             "tt0088559": 1794777022228,
-            "movie-2875": 1794777022228
+            "movie-2875": 1794777022228,
+            "movie-2251": 1794778847466,
+            "tt0250797": 1794778847466,
+            "series-2251": 1794778847466,
+            "movie-337167": 1794778850838,
+            "tt4477536": 1794778850838,
+            "series-337167": 1794778850838,
+            "movie-15976": 1794778866125,
+            "tt0476643": 1794778866125,
+            "series-15976": 1794778866125,
+            "series-5303": 1794778868860,
+            "tt0092383": 1794778868860,
+            "movie-5303": 1794778868860,
+            "movie-216015": 1794778959698,
+            "tt2322441": 1794778959698,
+            "series-216015": 1794778959698,
+            "series-1399": 1794779036711,
+            "tt0944947": 1794779036711,
+            "movie-1399": 1794779036711,
+            "movie-1283515": 1794731391181,
+            "tt32261958": 1794731391181,
+            "series-1283515": 1794731391181
           },
           "progressClearedAt": 1794432225027
         },
@@ -1007,43 +982,29 @@
     }
   },
   "_system_config": {
-    "updatedTs": 1794265080000,
+    "updatedTs": 1794779206303,
     "features": {
       "top10Shelves": true,
       "strictPosterFilter": true,
       "strictSourcesAndSubs": true,
       "autoCollapseTvRail": true,
       "parentalSafeWatch": true,
-      "crossDeviceCloudSync": true,
       "bootLoaderAnim": true,
       "autoResumePlayback": true,
+      "crossDeviceCloudSync": true,
       "liveNewsTicker": true,
       "otaAutoUpdate": true
     },
-    "categories": {
-      "top10_most_watched": true,
-      "top10_newest": true,
-      "top10_series": true,
-      "top10_action": true,
-      "live_channels": true,
-      "continue_watching": true,
-      "watchlist": true,
-      "trending_global": true,
-      "new_2025_2026": true,
-      "netflix_originals": true,
-      "apple_hbo_prime": true,
-      "israeli_cinema": true,
-      "israeli_series": true,
-      "action_blockbusters": true,
-      "crime_thriller": true,
-      "scifi_fantasy": true,
-      "comedy_drama": true,
-      "horror_mystery": true,
-      "docu_biopic": true,
-      "kids_family": true,
-      "piratebay_4k": true
-    },
     "sources": {
+      "vidsrc_vip": true,
+      "vidlink_mirror": true,
+      "tpb_yts_4k": true,
+      "telegram_vod": true,
+      "israeli_live": true,
+      "cinema_live": true,
+      "sports_live": true,
+      "news_live": true,
+      "youtube_hub": true,
       "vidsrc_pro": true,
       "vidlink_pro": true,
       "superembed_multi": true,
@@ -1054,8 +1015,47 @@
       "opensubtitles_wizdom_he": true,
       "live_hls_israel": true
     },
-    "disabledLiveChannels": {},
-    "disabledTelegramChannels": {}
+    "disabledChannelIds": {},
+    "disabledTelegramHandles": {},
+    "categories": {
+      "top10_most_watched": true,
+      "top10_newest": true,
+      "top10_series": true,
+      "top10_action": true,
+      "movies": true,
+      "series": true,
+      "israeli": true,
+      "channels": true,
+      "telegram": true,
+      "netflix": true,
+      "apple_hbo_prime": true,
+      "tpb_4k": true,
+      "action": true,
+      "crime": true,
+      "scifi": true,
+      "comedy": true,
+      "drama": true,
+      "horror": true,
+      "animation": true,
+      "docu": true,
+      "youtube": true,
+      "live_channels": true,
+      "continue_watching": true,
+      "watchlist": true,
+      "trending_global": true,
+      "new_2025_2026": true,
+      "netflix_originals": true,
+      "israeli_cinema": true,
+      "israeli_series": true,
+      "action_blockbusters": true,
+      "crime_thriller": true,
+      "scifi_fantasy": true,
+      "comedy_drama": true,
+      "horror_mystery": true,
+      "docu_biopic": true,
+      "kids_family": true,
+      "piratebay_4k": true
+    }
   },
   "__qr_pairings": {}
 }
