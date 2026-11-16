@@ -132,8 +132,8 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794779201403,
-      "subUsersUpdatedAt": 1794779201403,
+      "updatedTs": 1794834351440,
+      "subUsersUpdatedAt": 1794779202437,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
         "prof-bedroom": 1794494898603,
@@ -154,12 +154,12 @@
           "isKids": false,
           "isPrimary": true,
           "parentalControl": {
-            "enabled": true,
+            "enabled": false,
             "actionMode": "blur_mute",
             "profanityMode": "mute_censor",
             "sensitivity": "balanced",
             "blurPx": 22,
-            "updatedAt": 1794779201403,
+            "updatedAt": 1794779202437,
             "categories": {
               "sex": false,
               "violence": false,
@@ -290,11 +290,11 @@
               "tmdbId": "1283515",
               "title": "תעתוע",
               "currentTime": 235,
-              "duration": 7200,
+              "duration": 7256,
               "percent": 3,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794771587533,
+              "updatedAt": 1794834351440,
               "snapshot": {
                 "id": "tt32261958",
                 "imdbId": "tt32261958",
@@ -553,9 +553,6 @@
             "tt11280740": 1794698940923,
             "movie-95396": 1794698940923,
             "series-95396": 1794698940923,
-            "movie-1283515": 1794731391181,
-            "tt32261958": 1794731391181,
-            "series-1283515": 1794731391181,
             "movie-1290417": 1794770985537,
             "tt32362890": 1794770985537,
             "series-1290417": 1794770985537,
@@ -600,7 +597,10 @@
             "series-216015": 1794778959698,
             "series-1399": 1794779036711,
             "tt0944947": 1794779036711,
-            "movie-1399": 1794779036711
+            "movie-1399": 1794779036711,
+            "movie-1283515": 1794731391181,
+            "tt32261958": 1794731391181,
+            "series-1283515": 1794731391181
           },
           "progressClearedAt": 1794432225027
         },
