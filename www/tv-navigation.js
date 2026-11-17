@@ -12,11 +12,104 @@
 (function () {
   'use strict';
 
-  var NAV_VERSION = '9.9.7';
+  var NAV_VERSION = '9.9.98';
+  var tvViewportListenerBound = false;
+
+  function isOtaVersionStrictlyNewer(verA, verB) {
+    var pa = String(verA || '').replace(/^v/i, '').split('.');
+    var pb = String(verB || '').replace(/^v/i, '').split('.');
+    var len = Math.max(pa.length, pb.length);
+    for (var i = 0; i < len; i++) {
+      var na = parseInt(pa[i] || '0', 10) || 0;
+      var nb = parseInt(pb[i] || '0', 10) || 0;
+      if (na > nb) return true;
+      if (na < nb) return false;
+    }
+    return false;
+  }
+
+  function isNativeTvDevice() {
+    var ua = (navigator.userAgent || '').toLowerCase();
+    try {
+      if (window.AndroidTvBridge && typeof window.AndroidTvBridge.isAndroidTv === 'function') {
+        if (window.AndroidTvBridge.isAndroidTv()) return true;
+      }
+    } catch (e) {}
+    return /android tv|smarttv|smart-tv|googletv|bravia|aft|shield|mibox|chromecast|leanback|tizen|web0s|webos|netcast|vidaa|hisense|viera|aquos|wv/i.test(ua);
+  }
+
+  function detectTvEnvironment() {
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('tv') === '1') return true;
+    if (params.get('tv') === '0') return false;
+    return isNativeTvDevice();
+  }
+
+  function getTvCanvasScale() {
+    if (!document.body || !document.body.classList.contains('tv-mode')) return 1;
+    var z = parseFloat(document.body.style.zoom || document.documentElement.style.getPropertyValue('--tv-zoom'));
+    return (z > 0.1 && isFinite(z)) ? z : 1;
+  }
+
+  function syncTvCanvasViewport() {
+    if (!document.body || !document.body.classList.contains('tv-mode')) return;
+    var existing = document.getElementById('tvSimulatorViewportBar');
+    if (existing && existing.parentNode) {
+      existing.parentNode.removeChild(existing);
+    }
+    try {
+      var vpMeta = document.querySelector('meta[name="viewport"]');
+      var desiredVp = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
+      if (vpMeta && vpMeta.getAttribute('content') !== desiredVp) {
+        vpMeta.setAttribute('content', desiredVp);
+      }
+    } catch (eVp) {}
+
+    var layoutW = window.innerWidth || (document.documentElement && document.documentElement.clientWidth) || 1280;
+    var visW = (window.visualViewport && window.visualViewport.width > 200) ? window.visualViewport.width : layoutW;
+    var cssVarZoom = Math.max(0.4, Math.min(4, layoutW / 1280));
+    var bodyZoom = Math.max(0.4, Math.min(4, visW / 1280));
+    document.documentElement.style.setProperty('--tv-zoom', cssVarZoom.toFixed(4));
+    document.body.style.zoom = Math.abs(bodyZoom - 1) > 0.005 ? bodyZoom.toFixed(4) : '';
+  }
+
+  function applyTvModeClass() {
+    if (!document.body) return;
+    if (detectTvEnvironment()) {
+      document.documentElement.classList.add('tv-mode-html');
+      if (!isNativeTvDevice()) {
+        document.documentElement.classList.add('tv-desktop-simulator');
+      }
+      document.body.classList.add('tv-mode');
+      syncTvCanvasViewport();
+      if (typeof window.requestAnimationFrame === 'function') {
+        window.requestAnimationFrame(syncTvCanvasViewport);
+      }
+      setTimeout(syncTvCanvasViewport, 80);
+      setTimeout(syncTvCanvasViewport, 280);
+      if (!tvViewportListenerBound) {
+        tvViewportListenerBound = true;
+        window.addEventListener('resize', syncTvCanvasViewport);
+        if (window.visualViewport && typeof window.visualViewport.addEventListener === 'function') {
+          window.visualViewport.addEventListener('resize', syncTvCanvasViewport);
+        }
+      }
+    } else {
+      document.documentElement.classList.remove('tv-mode-html', 'tv-desktop-simulator');
+      document.body.classList.remove('tv-mode');
+      document.documentElement.style.removeProperty('--tv-zoom');
+      document.body.style.zoom = '';
+    }
+  }
+
+  window.syncStreamItTvViewport = syncTvCanvasViewport;
+  window.applyStreamItTvMode = applyTvModeClass;
+  try { applyTvModeClass(); } catch (eEarlyTv) {}
+
   try {
     var pendingOtaVer = localStorage.getItem('streamit_ota_version_v9') || '';
     var pendingOtaNav = localStorage.getItem('streamit_ota_tv_nav_v9') || '';
-    if (pendingOtaVer && pendingOtaVer > NAV_VERSION && pendingOtaNav.length > 500 && !window.__STREAMIT_OTA_INJECTED_RUNNING) {
+    if (pendingOtaVer && isOtaVersionStrictlyNewer(pendingOtaVer, NAV_VERSION) && pendingOtaNav.length > 500 && !window.__STREAMIT_OTA_INJECTED_RUNNING) {
       return;
     }
   } catch (eSkipNavOta) {}
@@ -64,69 +157,6 @@
       ['z', 'x', 'c', 'v', 'b', 'n', 'm', '.', '-', '_']
     ]
   };
-
-  var tvViewportListenerBound = false;
-
-  function isNativeTvDevice() {
-    var ua = (navigator.userAgent || '').toLowerCase();
-    try {
-      if (window.AndroidTvBridge && typeof window.AndroidTvBridge.isAndroidTv === 'function') {
-        if (window.AndroidTvBridge.isAndroidTv()) return true;
-      }
-    } catch (e) {}
-    return /android tv|smarttv|smart-tv|googletv|bravia|aft|shield|mibox|chromecast|leanback|tizen|web0s|webos|netcast|vidaa|hisense|viera|aquos|wv/i.test(ua);
-  }
-
-  function detectTvEnvironment() {
-    var params = new URLSearchParams(window.location.search);
-    if (params.get('tv') === '1') return true;
-    if (params.get('tv') === '0') return false;
-    return isNativeTvDevice();
-  }
-
-  function getTvCanvasScale() {
-    if (!document.body || !document.body.classList.contains('tv-mode')) return 1;
-    var z = parseFloat(document.documentElement.style.getPropertyValue('--tv-zoom'));
-    return (z > 0.1 && isFinite(z)) ? z : 1;
-  }
-
-  function syncTvCanvasViewport() {
-    if (!document.body || !document.body.classList.contains('tv-mode')) return;
-    var existing = document.getElementById('tvSimulatorViewportBar');
-    if (existing && existing.parentNode) {
-      existing.parentNode.removeChild(existing);
-    }
-    var nativeTv = isNativeTvDevice();
-    var vw = window.innerWidth || 1920;
-    var zoomFactor = 1;
-    if (!nativeTv) {
-      // Automatically scale the ?tv=1 tab to 1280px logical Streamer width (150% on a 1920px desktop browser at 100% browser zoom)
-      zoomFactor = Math.max(1, vw / 1280);
-    }
-    document.documentElement.style.setProperty('--tv-zoom', zoomFactor.toFixed(4));
-    document.body.style.zoom = zoomFactor !== 1 ? zoomFactor.toFixed(4) : '';
-  }
-
-  function applyTvModeClass() {
-    if (!document.body) return;
-    if (detectTvEnvironment()) {
-      document.documentElement.classList.add('tv-mode-html');
-      if (!isNativeTvDevice()) {
-        document.documentElement.classList.add('tv-desktop-simulator');
-      }
-      document.body.classList.add('tv-mode');
-      syncTvCanvasViewport();
-      if (!tvViewportListenerBound) {
-        tvViewportListenerBound = true;
-        window.addEventListener('resize', syncTvCanvasViewport);
-      }
-    } else {
-      document.documentElement.classList.remove('tv-mode-html', 'tv-desktop-simulator');
-      document.body.classList.remove('tv-mode');
-      document.documentElement.style.removeProperty('--tv-zoom');
-      document.body.style.zoom = '';
-    }
-  }
 
   function isElementVisible(el) {
     if (!el || !el.isConnected || el.disabled) return false;

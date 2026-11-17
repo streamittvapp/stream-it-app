@@ -1,10 +1,10 @@
 {
-  "version": "9.9.97",
-  "native_apk_version": "9.9.97",
+  "version": "9.9.98",
+  "native_apk_version": "9.9.6",
   "apk_download_url": "https://streamittvapp.github.io/stream-it-app/StreamIt-AndroidTV.apk",
   "apk_short_url": "https://is.gd/streamitapk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-15T23:25:00Z",
-  "notes": "v9.9.97 — System-wide SafeWatch Parental Control engine (real-time VidSpark/VidLink postMessage clock sync + OpenSubtitles SDH cue detection), strict per-user settings isolation, custom Profile Color & Avatar/Image Customizer, and zero personal defaults."
+  "updated_at": "2026-11-17T09:10:00Z",
+  "notes": "v9.9.98 — Fix Streamer 200% viewport overflow (lock 1280x720 Streamer canvas to exact visible TV screen width, restore width=device-width viewport meta, and sync NAV_VERSION = 9.9.98)."
 }

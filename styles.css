@@ -7955,13 +7955,21 @@ body.tv-mode .poster-card:not(.tv-focused) {
   --tv-zoom: 1;
 }
 
+html.tv-mode-html,
+html.tv-desktop-simulator {
+  overflow: hidden !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
 html.tv-desktop-simulator {
   --tv-zoom: 1.5;
-  overflow: hidden !important;
 }
 
 body.tv-mode {
+  zoom: var(--tv-zoom, 1);
   width: calc(100vw / var(--tv-zoom, 1)) !important;
+  max-width: calc(100vw / var(--tv-zoom, 1)) !important;
   height: calc(100vh / var(--tv-zoom, 1)) !important;
   max-height: calc(100vh / var(--tv-zoom, 1)) !important;
   margin: 0 !important;

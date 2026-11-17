@@ -10,7 +10,53 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.9.97';
+  var APP_VERSION = '9.9.98';
+
+  function isSemverStrictlyNewer(verA, verB) {
+    var pa = String(verA || '').replace(/^v/i, '').split('.');
+    var pb = String(verB || '').replace(/^v/i, '').split('.');
+    var len = Math.max(pa.length, pb.length);
+    for (var i = 0; i < len; i++) {
+      var na = parseInt(pa[i] || '0', 10) || 0;
+      var nb = parseInt(pb[i] || '0', 10) || 0;
+      if (na > nb) return true;
+      if (na < nb) return false;
+    }
+    return false;
+  }
+
+  function ensureStreamerTvViewportFit() {
+    try {
+      var ua = (navigator.userAgent || '').toLowerCase();
+      var params = new URLSearchParams(window.location.search);
+      var isTvParam = params.get('tv') === '1';
+      var isNotTvParam = params.get('tv') === '0';
+      var isNativeTv = Boolean(window.AndroidTvBridge && typeof window.AndroidTvBridge.isAndroidTv === 'function') ||
+        /android tv|smarttv|smart-tv|googletv|bravia|aft|shield|mibox|chromecast|leanback|tizen|web0s|webos|netcast|vidaa|hisense|viera|aquos|wv/i.test(ua);
+      if (isNotTvParam || (!isTvParam && !isNativeTv)) return;
+
+      var vpMeta = document.querySelector('meta[name="viewport"]');
+      var desiredVp = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
+      if (vpMeta && vpMeta.getAttribute('content') !== desiredVp) {
+        vpMeta.setAttribute('content', desiredVp);
+      }
+      if (document.documentElement) {
+        document.documentElement.classList.add('tv-mode-html');
+        if (!isNativeTv && isTvParam) {
+          document.documentElement.classList.add('tv-desktop-simulator');
+        }
+      }
+      if (document.body) {
+        document.body.classList.add('tv-mode');
+        var layoutW = window.innerWidth || (document.documentElement && document.documentElement.clientWidth) || 1280;
+        var visW = (window.visualViewport && window.visualViewport.width > 200) ? window.visualViewport.width : layoutW;
+        var cssVarZoom = Math.max(0.4, Math.min(4, layoutW / 1280));
+        var bodyZoom = Math.max(0.4, Math.min(4, visW / 1280));
+        document.documentElement.style.setProperty('--tv-zoom', cssVarZoom.toFixed(4));
+        document.body.style.zoom = Math.abs(bodyZoom - 1) > 0.005 ? bodyZoom.toFixed(4) : '';
+      }
+    } catch (eTvFit) {}
+  }
 
   function ensureOtaStylesheetInjected() {
     try {
@@ -45,13 +91,14 @@
     } catch (eOtaCss) {}
   }
   ensureOtaStylesheetInjected();
+  ensureStreamerTvViewportFit();
 
   // If a strictly newer OTA script is stored in localStorage and index.html is about to inject it,
   // skip running this older bundled script completely so two versions of app.js NEVER run in parallel!
   try {
     var pendingOtaVer = localStorage.getItem('streamit_ota_version_v9') || '';
     var pendingOtaJs = localStorage.getItem('streamit_ota_app_js_v9') || '';
-    if (pendingOtaVer && pendingOtaVer > APP_VERSION && pendingOtaJs.length > 2000 && !window.__STREAMIT_OTA_INJECTED_RUNNING) {
+    if (pendingOtaVer && isSemverStrictlyNewer(pendingOtaVer, APP_VERSION) && pendingOtaJs.length > 2000 && !window.__STREAMIT_OTA_INJECTED_RUNNING) {
       return;
     }
   } catch (eSkipOta) {}
@@ -78,8 +125,10 @@
     window.__STREAMIT_V9994_BOOTED ||
     window.__STREAMIT_V9995_BOOTED ||
     window.__STREAMIT_V9996_BOOTED ||
-    window.__STREAMIT_V9997_BOOTED
+    window.__STREAMIT_V9997_BOOTED ||
+    window.__STREAMIT_V9998_BOOTED
   );
+  window.__STREAMIT_V9998_BOOTED = true;
   window.__STREAMIT_V9997_BOOTED = true;
   window.__STREAMIT_V9996_BOOTED = true;
   window.__STREAMIT_V9995_BOOTED = true;
@@ -129,7 +178,8 @@
   window.__STREAMIT_V968_BOOTED = true;
   window.__STREAMIT_V969_BOOTED = true;
   window.__STREAMIT_V970_BOOTED = true;
-  // Synchronously block any older bundled v9.7.0-v9.9.96 script from firing its DOMContentLoaded boot handler after OTA loads!
+  // Synchronously block any older bundled v9.7.0-v9.9.97 script from firing its DOMContentLoaded boot handler after OTA loads!
+  window.__STREAMIT_V9997_BOOT_DONE = true;
   window.__STREAMIT_V9996_BOOT_DONE = true;
   window.__STREAMIT_V9995_BOOT_DONE = true;
   window.__STREAMIT_V9994_BOOT_DONE = true;
@@ -4666,7 +4716,7 @@
   function updateVersionBadgesUi(forcedVer) {
     try {
       var otaStored = localStorage.getItem('streamit_ota_version_v9') || '';
-      var activeVer = forcedVer || (otaStored && otaStored > APP_VERSION ? otaStored : APP_VERSION);
+      var activeVer = forcedVer || (otaStored && isSemverStrictlyNewer(otaStored, APP_VERSION) ? otaStored : APP_VERSION);
       var verLabel = 'v' + String(activeVer).replace(/^v/i, '');
       var topBadge = document.getElementById('appVersionBadge');
       if (topBadge) topBadge.textContent = verLabel;
@@ -4686,15 +4736,22 @@
       var verObj = JSON.parse(verTxt);
       if (!verObj || !verObj.version) return;
 
-      updateVersionBadgesUi(verObj.version >= APP_VERSION ? verObj.version : APP_VERSION);
+      var isCloudNewerOrEqual = !isSemverStrictlyNewer(APP_VERSION, verObj.version);
+      var isCloudStrictlyNewer = isSemverStrictlyNewer(verObj.version, APP_VERSION);
+      updateVersionBadgesUi(isCloudNewerOrEqual ? verObj.version : APP_VERSION);
 
       var cachedVer = localStorage.getItem('streamit_ota_version_v9') || APP_VERSION;
       var cachedJsCheck = localStorage.getItem('streamit_ota_app_js_v9') || '';
       var cachedCssCheck = localStorage.getItem('streamit_ota_css_v9') || '';
       ensureOtaStylesheetInjected();
-      var needsOtaWrite = (verObj.version !== cachedVer && verObj.version >= APP_VERSION) ||
-        (verObj.version > APP_VERSION && cachedJsCheck.length < 2000) ||
-        (verObj.version >= APP_VERSION && cachedCssCheck.length < 200);
+      var isOtaHost = Boolean(
+        window.__STREAMIT_OTA_INJECTED_RUNNING ||
+        (window.AndroidTvBridge && typeof window.AndroidTvBridge.isAndroidTv === 'function') ||
+        window.Capacitor
+      );
+      var needsOtaWrite = isCloudStrictlyNewer ||
+        (isOtaHost && verObj.version !== cachedVer && isCloudNewerOrEqual) ||
+        (isOtaHost && isCloudNewerOrEqual && (cachedJsCheck.length < 2000 || cachedCssCheck.length < 200));
       if (needsOtaWrite) {
         var cssTxt = await fetchCloudKey('css');
         var navTxt = await fetchCloudKey('nav');
@@ -4707,7 +4764,8 @@
               if (kName && (
                 kName.indexOf('streamit_enriched_catalog_cache_') === 0 ||
                 kName.indexOf('streamit_catalog_cache_') === 0 ||
-                kName.indexOf('streamit_tmdb_he_cache_') === 0
+                kName.indexOf('streamit_tmdb_he_cache_') === 0 ||
+                kName === 'streamit_cloud_vault_v9'
               )) {
                 keysToPurge.push(kName);
               }
@@ -18003,7 +18061,8 @@
   }
 
   function bootStreamItApp() {
-    if (window.__STREAMIT_V9997_BOOT_DONE) return;
+    if (window.__STREAMIT_V9998_BOOT_DONE) return;
+    window.__STREAMIT_V9998_BOOT_DONE = true;
     window.__STREAMIT_V9997_BOOT_DONE = true;
     window.__STREAMIT_V9996_BOOT_DONE = true;
     window.__STREAMIT_V9995_BOOT_DONE = true;
@@ -18028,6 +18087,10 @@
     window.__STREAMIT_V985_BOOT_DONE = true;
     window.__STREAMIT_V970_BOOT_DONE = true;
     ensureOtaStylesheetInjected();
+    ensureStreamerTvViewportFit();
+    if (typeof window.applyStreamItTvMode === 'function') {
+      try { window.applyStreamItTvMode(); } catch (eTvM) {}
+    }
 
     // If an older bundled APK script ran 1ms earlier, strip its stale DOM listeners via cloneNode(true)
     if (wasLegacyBooted) {
