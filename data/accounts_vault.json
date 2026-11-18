@@ -972,12 +972,12 @@
       },
       "subPrefs": {
         "schemaVer": 2,
-        "updatedAt": 1794732688104,
+        "updatedAt": 1795041502941,
         "size": "large",
         "fontPx": 37,
         "color": "white",
         "bg": "none",
-        "bottomPct": 9
+        "bottomPct": 10.5
       }
     }
   },
