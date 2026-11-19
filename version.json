@@ -1,10 +1,10 @@
 {
-  "version": "9.9.98",
+  "version": "9.9.99",
   "native_apk_version": "9.9.6",
   "apk_download_url": "https://streamittvapp.github.io/stream-it-app/StreamIt-AndroidTV.apk",
   "apk_short_url": "https://is.gd/streamitapk",
   "web_url": "https://streamittvapp.github.io/stream-it-app/",
   "short_url": "https://is.gd/streamittv",
-  "updated_at": "2026-11-17T09:10:00Z",
-  "notes": "v9.9.98 — Fix Streamer 200% viewport overflow (lock 1280x720 Streamer canvas to exact visible TV screen width, restore width=device-width viewport meta, and sync NAV_VERSION = 9.9.98)."
+  "updated_at": "2026-11-19T10:55:00Z",
+  "notes": "v9.9.99 — 10-Foot Living-Room Typography & Menu Scale for Android TV Streamers (enlarged top menu, side rail, hero title/overview/buttons, row titles, card labels & modals on a 1152x648 16:9 TV canvas with zero overflow)."
 }

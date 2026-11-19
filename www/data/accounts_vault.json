@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1794862859717,
+      "updatedTs": 1795041540594,
       "subUsersUpdatedAt": 1794779202437,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -289,12 +289,12 @@
               "imdbId": "tt32261958",
               "tmdbId": "1283515",
               "title": "תעתוע",
-              "currentTime": 248,
+              "currentTime": 256,
               "duration": 7256,
-              "percent": 3,
+              "percent": 4,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1794862859717,
+              "updatedAt": 1794939900641,
               "snapshot": {
                 "id": "tt32261958",
                 "imdbId": "tt32261958",
@@ -321,6 +321,49 @@
                   "דרמה"
                 ],
                 "seasonsCount": 0
+              }
+            },
+            "series-96677": {
+              "id": "series-96677",
+              "imdbId": "tt2531336",
+              "tmdbId": "96677",
+              "title": "לופן",
+              "currentTime": 346,
+              "duration": 2834,
+              "percent": 12,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1795041540593,
+              "snapshot": {
+                "id": "series-96677",
+                "imdbId": "tt2531336",
+                "tmdbId": "96677",
+                "type": "series",
+                "title": "לופן",
+                "originalTitle": "Lupin",
+                "year": "2021",
+                "rating": "7.7",
+                "runtimeHe": "45 דק׳ לפרק",
+                "ageRating": "16+",
+                "overview": "הגנב הג'נטלמני אסאן דיופ שואב השראה מהרפתקאותיו של ארסן לופן, ויוצא להתנקם במשפחה העשירה שאחראית למות אביו.",
+                "poster": "https://image.tmdb.org/t/p/w500/yeDvmW387pW0Z0r4PZW6rkKHwXx.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/jgAZYiuRV37pCxmhx8NTdhE36RL.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/jgAZYiuRV37pCxmhx8NTdhE36RL.jpg",
+                "genres": [
+                  "crime",
+                  "drama",
+                  "mystery",
+                  "thriller",
+                  "netflix"
+                ],
+                "genresHe": [
+                  "מתח ופשע",
+                  "דרמה",
+                  "מסתורין ובלשי",
+                  "מותחנים",
+                  "נטפליקס (Netflix)"
+                ],
+                "seasonsCount": 3
               }
             }
           },
@@ -972,12 +1015,12 @@
       },
       "subPrefs": {
         "schemaVer": 2,
-        "updatedAt": 1794732688104,
+        "updatedAt": 1795041536595,
         "size": "large",
         "fontPx": 37,
         "color": "white",
         "bg": "none",
-        "bottomPct": 9
+        "bottomPct": 10.5
       }
     }
   },

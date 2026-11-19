@@ -12,7 +12,7 @@
 (function () {
   'use strict';
 
-  var NAV_VERSION = '9.9.98';
+  var NAV_VERSION = '9.9.99';
   var tvViewportListenerBound = false;
 
   function isOtaVersionStrictlyNewer(verA, verB) {
@@ -65,10 +65,10 @@
       }
     } catch (eVp) {}
 
-    var layoutW = window.innerWidth || (document.documentElement && document.documentElement.clientWidth) || 1280;
+    var layoutW = window.innerWidth || (document.documentElement && document.documentElement.clientWidth) || 1152;
     var visW = (window.visualViewport && window.visualViewport.width > 200) ? window.visualViewport.width : layoutW;
-    var cssVarZoom = Math.max(0.4, Math.min(4, layoutW / 1280));
-    var bodyZoom = Math.max(0.4, Math.min(4, visW / 1280));
+    var cssVarZoom = Math.max(0.4, Math.min(4, layoutW / 1152));
+    var bodyZoom = Math.max(0.4, Math.min(4, visW / 1152));
     document.documentElement.style.setProperty('--tv-zoom', cssVarZoom.toFixed(4));
     document.body.style.zoom = Math.abs(bodyZoom - 1) > 0.005 ? bodyZoom.toFixed(4) : '';
   }

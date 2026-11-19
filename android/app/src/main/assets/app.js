@@ -10,7 +10,7 @@
 (function () {
   'use strict';
 
-  var APP_VERSION = '9.9.98';
+  var APP_VERSION = '9.9.99';
 
   function isSemverStrictlyNewer(verA, verB) {
     var pa = String(verA || '').replace(/^v/i, '').split('.');
@@ -48,10 +48,10 @@
       }
       if (document.body) {
         document.body.classList.add('tv-mode');
-        var layoutW = window.innerWidth || (document.documentElement && document.documentElement.clientWidth) || 1280;
+        var layoutW = window.innerWidth || (document.documentElement && document.documentElement.clientWidth) || 1152;
         var visW = (window.visualViewport && window.visualViewport.width > 200) ? window.visualViewport.width : layoutW;
-        var cssVarZoom = Math.max(0.4, Math.min(4, layoutW / 1280));
-        var bodyZoom = Math.max(0.4, Math.min(4, visW / 1280));
+        var cssVarZoom = Math.max(0.4, Math.min(4, layoutW / 1152));
+        var bodyZoom = Math.max(0.4, Math.min(4, visW / 1152));
         document.documentElement.style.setProperty('--tv-zoom', cssVarZoom.toFixed(4));
         document.body.style.zoom = Math.abs(bodyZoom - 1) > 0.005 ? bodyZoom.toFixed(4) : '';
       }
@@ -126,8 +126,10 @@
     window.__STREAMIT_V9995_BOOTED ||
     window.__STREAMIT_V9996_BOOTED ||
     window.__STREAMIT_V9997_BOOTED ||
-    window.__STREAMIT_V9998_BOOTED
+    window.__STREAMIT_V9998_BOOTED ||
+    window.__STREAMIT_V9999_BOOTED
   );
+  window.__STREAMIT_V9999_BOOTED = true;
   window.__STREAMIT_V9998_BOOTED = true;
   window.__STREAMIT_V9997_BOOTED = true;
   window.__STREAMIT_V9996_BOOTED = true;
@@ -178,7 +180,8 @@
   window.__STREAMIT_V968_BOOTED = true;
   window.__STREAMIT_V969_BOOTED = true;
   window.__STREAMIT_V970_BOOTED = true;
-  // Synchronously block any older bundled v9.7.0-v9.9.97 script from firing its DOMContentLoaded boot handler after OTA loads!
+  // Synchronously block any older bundled v9.7.0-v9.9.98 script from firing its DOMContentLoaded boot handler after OTA loads!
+  window.__STREAMIT_V9998_BOOT_DONE = true;
   window.__STREAMIT_V9997_BOOT_DONE = true;
   window.__STREAMIT_V9996_BOOT_DONE = true;
   window.__STREAMIT_V9995_BOOT_DONE = true;
@@ -18061,7 +18064,8 @@
   }
 
   function bootStreamItApp() {
-    if (window.__STREAMIT_V9998_BOOT_DONE) return;
+    if (window.__STREAMIT_V9999_BOOT_DONE) return;
+    window.__STREAMIT_V9999_BOOT_DONE = true;
     window.__STREAMIT_V9998_BOOT_DONE = true;
     window.__STREAMIT_V9997_BOOT_DONE = true;
     window.__STREAMIT_V9996_BOOT_DONE = true;
