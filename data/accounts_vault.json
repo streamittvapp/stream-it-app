@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1795555441227,
+      "updatedTs": 1795555464689,
       "subUsersUpdatedAt": 1794779202437,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -283,7 +283,8 @@
             "tt10577736",
             "series-1413",
             "movie-1307118",
-            "movie-1400837"
+            "movie-1400837",
+            "movie-1263337"
           ],
           "progress": {},
           "watchlistSnapshots": {
@@ -526,6 +527,56 @@
                 "אימה"
               ],
               "seasonsCount": 0
+            },
+            "movie-1263337": {
+              "id": "movie-1263337",
+              "imdbId": "tt7526136",
+              "tmdbId": "1263337",
+              "type": "movie",
+              "title": "בלב הפרא",
+              "originalTitle": "Heart of the Beast",
+              "year": "2026",
+              "rating": "7.8",
+              "runtimeHe": "שעתיים",
+              "ageRating": "14+",
+              "overview": "לאחר התרסקות מטוס קשה, קצין הכוחות המיוחדים ג'יימס בלמונט (בראד פיט) וכלבו, אודין, מוצאים את עצמם תקועים עמוק בשממה של אלסקה. יחד, הם נאלצים לצאת למאבק הישרדות אכזרי כנגד איתני הטבע.",
+              "poster": "https://image.tmdb.org/t/p/w500/fiaZHaaeC8TThp6Xw4hQxp6LHXO.jpg",
+              "backdrop": "https://image.tmdb.org/t/p/w1280/yE766yhgg98tKwTKd8CyNvAtmn6.jpg",
+              "cardBackdrop": "https://image.tmdb.org/t/p/w500/yE766yhgg98tKwTKd8CyNvAtmn6.jpg",
+              "genres": [
+                "action",
+                "thriller"
+              ],
+              "genresHe": [
+                "אקשן והרפתקאות",
+                "מותחנים"
+              ],
+              "seasonsCount": 0
+            },
+            "tt7526136": {
+              "id": "movie-1263337",
+              "imdbId": "tt7526136",
+              "tmdbId": "1263337",
+              "type": "movie",
+              "title": "בלב הפרא",
+              "originalTitle": "Heart of the Beast",
+              "year": "2026",
+              "rating": "7.8",
+              "runtimeHe": "שעתיים",
+              "ageRating": "14+",
+              "overview": "לאחר התרסקות מטוס קשה, קצין הכוחות המיוחדים ג'יימס בלמונט (בראד פיט) וכלבו, אודין, מוצאים את עצמם תקועים עמוק בשממה של אלסקה. יחד, הם נאלצים לצאת למאבק הישרדות אכזרי כנגד איתני הטבע.",
+              "poster": "https://image.tmdb.org/t/p/w500/fiaZHaaeC8TThp6Xw4hQxp6LHXO.jpg",
+              "backdrop": "https://image.tmdb.org/t/p/w1280/yE766yhgg98tKwTKd8CyNvAtmn6.jpg",
+              "cardBackdrop": "https://image.tmdb.org/t/p/w500/yE766yhgg98tKwTKd8CyNvAtmn6.jpg",
+              "genres": [
+                "action",
+                "thriller"
+              ],
+              "genresHe": [
+                "אקשן והרפתקאות",
+                "מותחנים"
+              ],
+              "seasonsCount": 0
             }
           },
           "deletedProgressIds": {
@@ -667,7 +718,7 @@
             "movie-96677": 1795134759260
           },
           "progressClearedAt": 1794432225027,
-          "watchlistUpdatedAt": 1795555441227
+          "watchlistUpdatedAt": 1795555464688
         },
         "prof-1794166536010": {
           "watchlist": [],
