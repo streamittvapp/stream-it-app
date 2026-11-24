@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1795555418630,
+      "updatedTs": 1795555441227,
       "subUsersUpdatedAt": 1794779202437,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -282,7 +282,8 @@
             "1339713",
             "tt10577736",
             "series-1413",
-            "movie-1307118"
+            "movie-1307118",
+            "movie-1400837"
           ],
           "progress": {},
           "watchlistSnapshots": {
@@ -479,6 +480,52 @@
                 "מותחנים"
               ],
               "seasonsCount": 0
+            },
+            "movie-1400837": {
+              "id": "movie-1400837",
+              "imdbId": "tt36586020",
+              "tmdbId": "1400837",
+              "type": "movie",
+              "title": "אין כמו אמא",
+              "originalTitle": "Other Mommy",
+              "year": "2026",
+              "rating": "6.4",
+              "runtimeHe": "שעתיים",
+              "ageRating": "16+",
+              "overview": "מסע מבעית אל עולמה המפחיד של בלה, ילדה צעירה שמפתחת מערכת יחסים עם ישות זדונית בביתה שנראית באופן מחריד בדיוק כמו אימא שלה.",
+              "poster": "https://image.tmdb.org/t/p/w500/bwsVinUODVVYJnTR6MNQqWu07iA.jpg",
+              "backdrop": "https://image.tmdb.org/t/p/w1280/smZ8BT4Vzw4iCEppTLCnN8jNYtn.jpg",
+              "cardBackdrop": "https://image.tmdb.org/t/p/w500/smZ8BT4Vzw4iCEppTLCnN8jNYtn.jpg",
+              "genres": [
+                "horror"
+              ],
+              "genresHe": [
+                "אימה"
+              ],
+              "seasonsCount": 0
+            },
+            "tt36586020": {
+              "id": "movie-1400837",
+              "imdbId": "tt36586020",
+              "tmdbId": "1400837",
+              "type": "movie",
+              "title": "אין כמו אמא",
+              "originalTitle": "Other Mommy",
+              "year": "2026",
+              "rating": "6.4",
+              "runtimeHe": "שעתיים",
+              "ageRating": "16+",
+              "overview": "מסע מבעית אל עולמה המפחיד של בלה, ילדה צעירה שמפתחת מערכת יחסים עם ישות זדונית בביתה שנראית באופן מחריד בדיוק כמו אימא שלה.",
+              "poster": "https://image.tmdb.org/t/p/w500/bwsVinUODVVYJnTR6MNQqWu07iA.jpg",
+              "backdrop": "https://image.tmdb.org/t/p/w1280/smZ8BT4Vzw4iCEppTLCnN8jNYtn.jpg",
+              "cardBackdrop": "https://image.tmdb.org/t/p/w500/smZ8BT4Vzw4iCEppTLCnN8jNYtn.jpg",
+              "genres": [
+                "horror"
+              ],
+              "genresHe": [
+                "אימה"
+              ],
+              "seasonsCount": 0
             }
           },
           "deletedProgressIds": {
@@ -620,7 +667,7 @@
             "movie-96677": 1795134759260
           },
           "progressClearedAt": 1794432225027,
-          "watchlistUpdatedAt": 1795555418629
+          "watchlistUpdatedAt": 1795555441227
         },
         "prof-1794166536010": {
           "watchlist": [],
