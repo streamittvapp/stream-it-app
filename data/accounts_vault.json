@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1795134763233,
+      "updatedTs": 1795555418630,
       "subUsersUpdatedAt": 1794779202437,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -281,7 +281,8 @@
             "1236045",
             "1339713",
             "tt10577736",
-            "series-1413"
+            "series-1413",
+            "movie-1307118"
           ],
           "progress": {},
           "watchlistSnapshots": {
@@ -422,6 +423,60 @@
               "genresHe": [
                 "מלחמה והיסטוריה",
                 "דרמה"
+              ],
+              "seasonsCount": 0
+            },
+            "movie-1307118": {
+              "id": "movie-1307118",
+              "imdbId": "tt32654916",
+              "tmdbId": "1307118",
+              "type": "movie",
+              "title": "נפש תאומה",
+              "originalTitle": "Soulm8te",
+              "year": "2026",
+              "rating": "7.4",
+              "runtimeHe": "שעתיים",
+              "ageRating": "16+",
+              "overview": "דיוויד, מהנדס בודד שבוחן אב-טיפוס חדש של רובוטית, מנסה לתכנת את הרובוטית להיות יותר אנושית בתור בת זוגו, הוא מגלה שהיא מעניקה לו הרבה יותר מכפי שציפה, כאשר היא מפתחת אובססיה מסוכנת כלפיו ויוצאת למסע אלים נגד כל מי שנתפס כאיום על מערכת היחסים ביניהם.",
+              "poster": "https://image.tmdb.org/t/p/w500/aRfFP8stzodl0bo8ywoNZXdaVwo.jpg",
+              "backdrop": "https://image.tmdb.org/t/p/w1280/7t6f6VxA2ZXbbZSVctgt7bZG2DI.jpg",
+              "cardBackdrop": "https://image.tmdb.org/t/p/w500/7t6f6VxA2ZXbbZSVctgt7bZG2DI.jpg",
+              "genres": [
+                "horror",
+                "scifi",
+                "thriller"
+              ],
+              "genresHe": [
+                "אימה",
+                "מדע בדיוני ופנטזיה",
+                "מותחנים"
+              ],
+              "seasonsCount": 0
+            },
+            "tt32654916": {
+              "id": "movie-1307118",
+              "imdbId": "tt32654916",
+              "tmdbId": "1307118",
+              "type": "movie",
+              "title": "נפש תאומה",
+              "originalTitle": "Soulm8te",
+              "year": "2026",
+              "rating": "7.4",
+              "runtimeHe": "שעתיים",
+              "ageRating": "16+",
+              "overview": "דיוויד, מהנדס בודד שבוחן אב-טיפוס חדש של רובוטית, מנסה לתכנת את הרובוטית להיות יותר אנושית בתור בת זוגו, הוא מגלה שהיא מעניקה לו הרבה יותר מכפי שציפה, כאשר היא מפתחת אובססיה מסוכנת כלפיו ויוצאת למסע אלים נגד כל מי שנתפס כאיום על מערכת היחסים ביניהם.",
+              "poster": "https://image.tmdb.org/t/p/w500/aRfFP8stzodl0bo8ywoNZXdaVwo.jpg",
+              "backdrop": "https://image.tmdb.org/t/p/w1280/7t6f6VxA2ZXbbZSVctgt7bZG2DI.jpg",
+              "cardBackdrop": "https://image.tmdb.org/t/p/w500/7t6f6VxA2ZXbbZSVctgt7bZG2DI.jpg",
+              "genres": [
+                "horror",
+                "scifi",
+                "thriller"
+              ],
+              "genresHe": [
+                "אימה",
+                "מדע בדיוני ופנטזיה",
+                "מותחנים"
               ],
               "seasonsCount": 0
             }
@@ -565,7 +620,7 @@
             "movie-96677": 1795134759260
           },
           "progressClearedAt": 1794432225027,
-          "watchlistUpdatedAt": 1794685001388
+          "watchlistUpdatedAt": 1795555418629
         },
         "prof-1794166536010": {
           "watchlist": [],
