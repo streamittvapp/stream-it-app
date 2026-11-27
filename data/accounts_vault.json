@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1795740906390,
+      "updatedTs": 1795740927725,
       "subUsersUpdatedAt": 1794779202437,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -287,7 +287,47 @@
             "movie-1263337",
             "movie-1127384"
           ],
-          "progress": {},
+          "progress": {
+            "movie-1127384": {
+              "id": "movie-1127384",
+              "imdbId": "tt29516222",
+              "tmdbId": "1127384",
+              "title": "מים עמוקים",
+              "currentTime": 10,
+              "duration": 6386,
+              "percent": 3,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1795740927725,
+              "snapshot": {
+                "id": "movie-1127384",
+                "imdbId": "tt29516222",
+                "tmdbId": "1127384",
+                "type": "movie",
+                "title": "מים עמוקים",
+                "originalTitle": "Deep Water",
+                "year": "2026",
+                "rating": "7.3",
+                "runtimeHe": "שעתיים",
+                "ageRating": "16+",
+                "overview": "מותחן אימה עם ארון אקהרט ובן קינגסלי. טיסה בינלאומית מלוס אנג'לס לשנגחאי מבצעת נחיתת חירום בלב האוקיינוס השקט עקב תקלה קשה. הניצולים נותרים מנותקים בים ועליהם להילחם על חייהם מול סכנות קטלניות במים כדי לשרוד.",
+                "poster": "https://image.tmdb.org/t/p/w500/ZWHxL2ETItcZzeVsVfs6gv3SZ7.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/szKv713FcUXx6hcfdY369vtkmzr.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/szKv713FcUXx6hcfdY369vtkmzr.jpg",
+                "genres": [
+                  "horror",
+                  "thriller",
+                  "action"
+                ],
+                "genresHe": [
+                  "אימה",
+                  "מותחנים",
+                  "אקשן והרפתקאות"
+                ],
+                "seasonsCount": 0
+              }
+            }
+          },
           "watchlistSnapshots": {
             "tt10577736": {
               "id": "tt10577736",
