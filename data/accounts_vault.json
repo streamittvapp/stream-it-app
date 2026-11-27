@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1795741011912,
+      "updatedTs": 1795741032460,
       "subUsersUpdatedAt": 1794779202437,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -293,12 +293,12 @@
               "imdbId": "tt29516222",
               "tmdbId": "1127384",
               "title": "מים עמוקים",
-              "currentTime": 65,
+              "currentTime": 85,
               "duration": 6386,
               "percent": 3,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1795741011912,
+              "updatedAt": 1795741032459,
               "snapshot": {
                 "id": "movie-1127384",
                 "imdbId": "tt29516222",
