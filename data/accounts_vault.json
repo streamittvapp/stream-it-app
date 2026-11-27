@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1795741258848,
+      "updatedTs": 1795741276684,
       "subUsersUpdatedAt": 1794779202437,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -333,12 +333,12 @@
               "imdbId": "tt1742179",
               "tmdbId": "662707",
               "title": "סטארברייט",
-              "currentTime": 30,
+              "currentTime": 47,
               "duration": 8878,
               "percent": 3,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1795741258848,
+              "updatedAt": 1795741276684,
               "snapshot": {
                 "id": "movie-662707",
                 "imdbId": "tt1742179",
