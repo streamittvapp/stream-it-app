@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1795555464689,
+      "updatedTs": 1795740775326,
       "subUsersUpdatedAt": 1794779202437,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -284,7 +284,8 @@
             "series-1413",
             "movie-1307118",
             "movie-1400837",
-            "movie-1263337"
+            "movie-1263337",
+            "movie-1127384"
           ],
           "progress": {},
           "watchlistSnapshots": {
@@ -577,6 +578,60 @@
                 "מותחנים"
               ],
               "seasonsCount": 0
+            },
+            "movie-1127384": {
+              "id": "movie-1127384",
+              "imdbId": "tt29516222",
+              "tmdbId": "1127384",
+              "type": "movie",
+              "title": "מים עמוקים",
+              "originalTitle": "Deep Water",
+              "year": "2026",
+              "rating": "7.3",
+              "runtimeHe": "שעתיים",
+              "ageRating": "16+",
+              "overview": "מותחן אימה עם ארון אקהרט ובן קינגסלי. טיסה בינלאומית מלוס אנג'לס לשנגחאי מבצעת נחיתת חירום בלב האוקיינוס השקט עקב תקלה קשה. הניצולים נותרים מנותקים בים ועליהם להילחם על חייהם מול סכנות קטלניות במים כדי לשרוד.",
+              "poster": "https://image.tmdb.org/t/p/w500/ZWHxL2ETItcZzeVsVfs6gv3SZ7.jpg",
+              "backdrop": "https://image.tmdb.org/t/p/w1280/szKv713FcUXx6hcfdY369vtkmzr.jpg",
+              "cardBackdrop": "https://image.tmdb.org/t/p/w500/szKv713FcUXx6hcfdY369vtkmzr.jpg",
+              "genres": [
+                "horror",
+                "thriller",
+                "action"
+              ],
+              "genresHe": [
+                "אימה",
+                "מותחנים",
+                "אקשן והרפתקאות"
+              ],
+              "seasonsCount": 0
+            },
+            "tt29516222": {
+              "id": "movie-1127384",
+              "imdbId": "tt29516222",
+              "tmdbId": "1127384",
+              "type": "movie",
+              "title": "מים עמוקים",
+              "originalTitle": "Deep Water",
+              "year": "2026",
+              "rating": "7.3",
+              "runtimeHe": "שעתיים",
+              "ageRating": "16+",
+              "overview": "מותחן אימה עם ארון אקהרט ובן קינגסלי. טיסה בינלאומית מלוס אנג'לס לשנגחאי מבצעת נחיתת חירום בלב האוקיינוס השקט עקב תקלה קשה. הניצולים נותרים מנותקים בים ועליהם להילחם על חייהם מול סכנות קטלניות במים כדי לשרוד.",
+              "poster": "https://image.tmdb.org/t/p/w500/ZWHxL2ETItcZzeVsVfs6gv3SZ7.jpg",
+              "backdrop": "https://image.tmdb.org/t/p/w1280/szKv713FcUXx6hcfdY369vtkmzr.jpg",
+              "cardBackdrop": "https://image.tmdb.org/t/p/w500/szKv713FcUXx6hcfdY369vtkmzr.jpg",
+              "genres": [
+                "horror",
+                "thriller",
+                "action"
+              ],
+              "genresHe": [
+                "אימה",
+                "מותחנים",
+                "אקשן והרפתקאות"
+              ],
+              "seasonsCount": 0
             }
           },
           "deletedProgressIds": {
@@ -718,7 +773,7 @@
             "movie-96677": 1795134759260
           },
           "progressClearedAt": 1794432225027,
-          "watchlistUpdatedAt": 1795555464688
+          "watchlistUpdatedAt": 1795740775326
         },
         "prof-1794166536010": {
           "watchlist": [],
