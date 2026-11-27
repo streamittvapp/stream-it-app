@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1795741047189,
+      "updatedTs": 1795741200611,
       "subUsersUpdatedAt": 1794779202437,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -285,7 +285,8 @@
             "movie-1307118",
             "movie-1400837",
             "movie-1263337",
-            "movie-1127384"
+            "movie-1127384",
+            "movie-662707"
           ],
           "progress": {
             "movie-1127384": {
@@ -672,6 +673,52 @@
                 "אקשן והרפתקאות"
               ],
               "seasonsCount": 0
+            },
+            "movie-662707": {
+              "id": "movie-662707",
+              "imdbId": "tt1742179",
+              "tmdbId": "662707",
+              "type": "movie",
+              "title": "סטארברייט",
+              "originalTitle": "Starbright",
+              "year": "2026",
+              "rating": "5.7",
+              "runtimeHe": "שעתיים",
+              "ageRating": "14+",
+              "overview": "אשלינג, יתומה צעירה, גרה עם סבא וסבתא, מטפלת בחווה, אך אינה מסופקת מחייה אלו. בליל ליקוי חמה, כוכב נופל לאדמה ונוחת בשדה החווה. אשלינג יוצאת ומוצאת כוכב קטן וזוהר במכתש.‏ ‏המלאך רפאל מתגלה במקום. הכוכב מוכנס לתליון ונענד על צווארה של אשלינג. ‏שלושה פושעים ראו את נפילת הכוכב, את הניצוץ שהפך צינור עופרת לזהב ורודפים אחר אשלינג ורפאל שנאלצים לברוח.‏",
+              "poster": "https://image.tmdb.org/t/p/w500/m1Zl07DNYeSyNcz9hf8hDsS2oB5.jpg",
+              "backdrop": "https://image.tmdb.org/t/p/w1280/tZiRd4IpoNiaoLXr2o2YfhTMjE2.jpg",
+              "cardBackdrop": "https://image.tmdb.org/t/p/w500/tZiRd4IpoNiaoLXr2o2YfhTMjE2.jpg",
+              "genres": [
+                "action"
+              ],
+              "genresHe": [
+                "אקשן והרפתקאות"
+              ],
+              "seasonsCount": 0
+            },
+            "tt1742179": {
+              "id": "movie-662707",
+              "imdbId": "tt1742179",
+              "tmdbId": "662707",
+              "type": "movie",
+              "title": "סטארברייט",
+              "originalTitle": "Starbright",
+              "year": "2026",
+              "rating": "5.7",
+              "runtimeHe": "שעתיים",
+              "ageRating": "14+",
+              "overview": "אשלינג, יתומה צעירה, גרה עם סבא וסבתא, מטפלת בחווה, אך אינה מסופקת מחייה אלו. בליל ליקוי חמה, כוכב נופל לאדמה ונוחת בשדה החווה. אשלינג יוצאת ומוצאת כוכב קטן וזוהר במכתש.‏ ‏המלאך רפאל מתגלה במקום. הכוכב מוכנס לתליון ונענד על צווארה של אשלינג. ‏שלושה פושעים ראו את נפילת הכוכב, את הניצוץ שהפך צינור עופרת לזהב ורודפים אחר אשלינג ורפאל שנאלצים לברוח.‏",
+              "poster": "https://image.tmdb.org/t/p/w500/m1Zl07DNYeSyNcz9hf8hDsS2oB5.jpg",
+              "backdrop": "https://image.tmdb.org/t/p/w1280/tZiRd4IpoNiaoLXr2o2YfhTMjE2.jpg",
+              "cardBackdrop": "https://image.tmdb.org/t/p/w500/tZiRd4IpoNiaoLXr2o2YfhTMjE2.jpg",
+              "genres": [
+                "action"
+              ],
+              "genresHe": [
+                "אקשן והרפתקאות"
+              ],
+              "seasonsCount": 0
             }
           },
           "deletedProgressIds": {
@@ -817,7 +864,7 @@
             "series-1127384": 1795740906389
           },
           "progressClearedAt": 1794432225027,
-          "watchlistUpdatedAt": 1795740779647
+          "watchlistUpdatedAt": 1795741200611
         },
         "prof-1794166536010": {
           "watchlist": [],
