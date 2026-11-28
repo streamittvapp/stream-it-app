@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1795864913822,
+      "updatedTs": 1795864933748,
       "subUsersUpdatedAt": 1794779202437,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -333,12 +333,12 @@
               "imdbId": "tt31192372",
               "tmdbId": "1101412",
               "title": "תלויה באוויר 2",
-              "currentTime": 110,
+              "currentTime": 130,
               "duration": 5842,
               "percent": 3,
               "season": 1,
               "episode": 1,
-              "updatedAt": 1795864913822,
+              "updatedAt": 1795864933748,
               "snapshot": {
                 "id": "movie-1101412",
                 "imdbId": "tt31192372",
