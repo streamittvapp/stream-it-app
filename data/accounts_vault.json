@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1795865060341,
+      "updatedTs": 1795865078705,
       "subUsersUpdatedAt": 1794779202437,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -286,7 +286,8 @@
             "movie-1400837",
             "movie-1263337",
             "movie-1127384",
-            "movie-662707"
+            "movie-662707",
+            "movie-1101412"
           ],
           "progress": {
             "movie-1127384": {
@@ -754,9 +755,55 @@
                 "אקשן והרפתקאות"
               ],
               "seasonsCount": 0
+            },
+            "movie-1101412": {
+              "id": "movie-1101412",
+              "imdbId": "tt31192372",
+              "tmdbId": "1101412",
+              "type": "movie",
+              "title": "תלויה באוויר 2",
+              "originalTitle": "Fall 2: Deadpoint",
+              "year": "2026",
+              "rating": "7.2",
+              "runtimeHe": "שעתיים",
+              "ageRating": "14+",
+              "overview": "אחר מות אחותה שיילו, ג'אקס האנטר מתיידדת עם חברתה הנועזת של שיילו – לוס, והשתיים מחליטות לבצע את \"הליכת הקרש\" המסוכנת של הר קוואן בתאילנד. כשמפולת סלעים לוכדת אותן על קרש צר בגובה 900 מטר מעל הקרקע, ג'אקס מוכרחה להתמודד עם פחדיה כדי לשרוד.",
+              "poster": "https://image.tmdb.org/t/p/w500/gp0Be4F9lnaxX8NwTLwsELdIqoF.jpg",
+              "backdrop": "https://image.tmdb.org/t/p/w1280/nGau0KBOaRILSK5MqFcuTfv7GMl.jpg",
+              "cardBackdrop": "https://image.tmdb.org/t/p/w500/nGau0KBOaRILSK5MqFcuTfv7GMl.jpg",
+              "genres": [
+                "thriller"
+              ],
+              "genresHe": [
+                "מותחנים"
+              ],
+              "seasonsCount": 0
+            },
+            "tt31192372": {
+              "id": "movie-1101412",
+              "imdbId": "tt31192372",
+              "tmdbId": "1101412",
+              "type": "movie",
+              "title": "תלויה באוויר 2",
+              "originalTitle": "Fall 2: Deadpoint",
+              "year": "2026",
+              "rating": "7.2",
+              "runtimeHe": "שעתיים",
+              "ageRating": "14+",
+              "overview": "אחר מות אחותה שיילו, ג'אקס האנטר מתיידדת עם חברתה הנועזת של שיילו – לוס, והשתיים מחליטות לבצע את \"הליכת הקרש\" המסוכנת של הר קוואן בתאילנד. כשמפולת סלעים לוכדת אותן על קרש צר בגובה 900 מטר מעל הקרקע, ג'אקס מוכרחה להתמודד עם פחדיה כדי לשרוד.",
+              "poster": "https://image.tmdb.org/t/p/w500/gp0Be4F9lnaxX8NwTLwsELdIqoF.jpg",
+              "backdrop": "https://image.tmdb.org/t/p/w1280/nGau0KBOaRILSK5MqFcuTfv7GMl.jpg",
+              "cardBackdrop": "https://image.tmdb.org/t/p/w500/nGau0KBOaRILSK5MqFcuTfv7GMl.jpg",
+              "genres": [
+                "thriller"
+              ],
+              "genresHe": [
+                "מותחנים"
+              ],
+              "seasonsCount": 0
             }
           },
-          "watchlistUpdatedAt": 1795741200611,
+          "watchlistUpdatedAt": 1795865078705,
           "deletedProgressIds": {
             "27": 1794432189831,
             "278": 1794686259883,
