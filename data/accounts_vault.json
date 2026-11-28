@@ -132,7 +132,7 @@
     "updatedAt": "2026-11-10 12:02",
     "updatedTs": 1794304920000,
     "accountState": {
-      "updatedTs": 1795741291233,
+      "updatedTs": 1795864813685,
       "subUsersUpdatedAt": 1794779202437,
       "deletedSubUserIds": {
         "prof-living": 1794494892845,
@@ -324,6 +324,41 @@
                   "אימה",
                   "מותחנים",
                   "אקשן והרפתקאות"
+                ],
+                "seasonsCount": 0
+              }
+            },
+            "movie-1101412": {
+              "id": "movie-1101412",
+              "imdbId": "tt31192372",
+              "tmdbId": "1101412",
+              "title": "תלויה באוויר 2",
+              "currentTime": 10,
+              "duration": 5842,
+              "percent": 3,
+              "season": 1,
+              "episode": 1,
+              "updatedAt": 1795864813684,
+              "snapshot": {
+                "id": "movie-1101412",
+                "imdbId": "tt31192372",
+                "tmdbId": "1101412",
+                "type": "movie",
+                "title": "תלויה באוויר 2",
+                "originalTitle": "Fall 2: Deadpoint",
+                "year": "2026",
+                "rating": "7.2",
+                "runtimeHe": "שעתיים",
+                "ageRating": "14+",
+                "overview": "אחר מות אחותה שיילו, ג'אקס האנטר מתיידדת עם חברתה הנועזת של שיילו – לוס, והשתיים מחליטות לבצע את \"הליכת הקרש\" המסוכנת של הר קוואן בתאילנד. כשמפולת סלעים לוכדת אותן על קרש צר בגובה 900 מטר מעל הקרקע, ג'אקס מוכרחה להתמודד עם פחדיה כדי לשרוד.",
+                "poster": "https://image.tmdb.org/t/p/w500/gp0Be4F9lnaxX8NwTLwsELdIqoF.jpg",
+                "backdrop": "https://image.tmdb.org/t/p/w1280/nGau0KBOaRILSK5MqFcuTfv7GMl.jpg",
+                "cardBackdrop": "https://image.tmdb.org/t/p/w500/nGau0KBOaRILSK5MqFcuTfv7GMl.jpg",
+                "genres": [
+                  "thriller"
+                ],
+                "genresHe": [
+                  "מותחנים"
                 ],
                 "seasonsCount": 0
               }
@@ -721,6 +756,7 @@
               "seasonsCount": 0
             }
           },
+          "watchlistUpdatedAt": 1795741200611,
           "deletedProgressIds": {
             "27": 1794432189831,
             "278": 1794686259883,
@@ -771,13 +807,12 @@
             "tt43612870": 1794432217226,
             "movie-1568027": 1794432217226,
             "series-1568027": 1794432217226,
-            "tt4565380": 1794698934882,
             "tt8190688": 1794432225027,
             "tt1745960": 1794432225027,
+            "tt6263850": 1794686262083,
             "tt10577736": 1794698937513,
             "movie-103913": 1794698937513,
             "series-103913": 1794698937513,
-            "tt6263850": 1794686262083,
             "movie-1560520": 1794686257036,
             "tt32333324": 1794686257036,
             "series-1560520": 1794686257036,
@@ -795,6 +830,7 @@
             "series-1413": 1794686264301,
             "tt1844624": 1794686264301,
             "movie-1413": 1794686264301,
+            "tt4565380": 1794698934882,
             "movie-301528": 1794698933987,
             "tt1979376": 1794698933987,
             "series-301528": 1794698933987,
@@ -867,8 +903,7 @@
             "tt1742179": 1795741291231,
             "series-662707": 1795741291231
           },
-          "progressClearedAt": 1794432225027,
-          "watchlistUpdatedAt": 1795741200611
+          "progressClearedAt": 1794432225027
         },
         "prof-1794166536010": {
           "watchlist": [],
